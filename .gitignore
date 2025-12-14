@@ -35,6 +35,7 @@ env/
 # VS Code
 .vscode/
 *.code-workspace
+claude.md
 
 # macOS
 .DS_Store

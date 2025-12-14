@@ -10,6 +10,14 @@
     <header>
         <h1>Subcutanean Variorum</h1>
         <p class="subtitle">Explore the variations across 25 versions of Aaron Reed's novel</p>
+
+        <div class="base-selector">
+            <label for="base-version-select">Base witness:</label>
+            <select id="base-version-select" class="base-select">
+                <!-- Options will be populated by JavaScript -->
+            </select>
+        </div>
+
         <nav>
             <button id="btn-prologue" class="nav-btn active">Prologue</button>
             <button id="btn-chapter1" class="nav-btn">Chapter 1</button>
@@ -24,7 +32,8 @@
                 <span id="variation-count"></span> variation points
             </p>
             <p class="instructions">
-                <strong>Hover over highlighted text</strong> to see variations from other versions.
+                <strong>Hover over highlighted paragraphs</strong> to see variations from other versions.
+                Variants show different text; agreements (≡) show versions with identical text; omissions (⊘) indicate paragraphs missing in some versions.
             </p>
         </div>
 

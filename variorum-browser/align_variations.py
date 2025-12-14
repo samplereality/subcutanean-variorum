@@ -1,116 +1,78 @@
 #!/usr/bin/env python3
 """
-Align text across all versions and identify variation points.
+Align text across all versions and identify variation points at paragraph level.
 """
 
 import json
 import re
 from pathlib import Path
-from difflib import SequenceMatcher
 from collections import defaultdict
 
 
-def tokenize(text):
-    """Split text into words while preserving punctuation."""
-    # Split on whitespace but keep the whitespace
-    tokens = re.findall(r'\S+|\s+', text)
-    return tokens
+def normalize_paragraph(text):
+    """Normalize a paragraph for comparison - remove extra whitespace, etc."""
+    # Remove extra whitespace
+    text = ' '.join(text.split())
+    # Remove em tags for comparison purposes
+    text = re.sub(r'</?em>', '', text)
+    return text.strip()
 
 
-def find_variations_in_paragraph(base_para, all_paras):
+def find_paragraph_variations(base_paras, all_versions_paras, version_ids):
     """
-    Find variations within a set of corresponding paragraphs.
-    Returns a list of segments with variation information.
+    Find paragraph-level variations across all versions.
+    Returns paragraphs with their variants.
     """
-    if not all_paras:
-        return [{'text': base_para, 'variants': []}]
+    result = []
 
-    # Tokenize all paragraphs
-    base_tokens = tokenize(base_para)
-    other_tokens = [tokenize(p) for p in all_paras]
+    # Assume paragraphs are in the same order, but content may vary
+    max_paras = len(base_paras)
 
-    # Find common and varying sections
-    segments = []
-    i = 0
-
-    while i < len(base_tokens):
-        # Check if this token varies across versions
-        current_token = base_tokens[i]
-
-        # Collect this token from all versions
-        versions_tokens = [tokens[i] if i < len(tokens) else '' for tokens in other_tokens]
-
-        # Check if there's variation
-        all_tokens = [current_token] + versions_tokens
-        unique_tokens = set(t.strip() for t in all_tokens if t.strip())
-
-        if len(unique_tokens) > 1:
-            # There's variation at this position
-            # Try to find the extent of the variation
-            var_end = i + 1
-
-            # Look ahead to find where variation ends
-            # (simplified version - we'll just capture single token variations for now)
-            variants = list(unique_tokens - {current_token.strip()})
-
-            segments.append({
-                'text': current_token,
-                'has_variation': True,
-                'variants': variants
-            })
-        else:
-            # No variation - add to current non-varying segment
-            if segments and not segments[-1].get('has_variation'):
-                segments[-1]['text'] += current_token
-            else:
-                segments.append({
-                    'text': current_token,
-                    'has_variation': False,
-                    'variants': []
-                })
-
-        i += 1
-
-    # Merge consecutive non-varying segments
-    merged_segments = []
-    for seg in segments:
-        if merged_segments and not seg.get('has_variation') and not merged_segments[-1].get('has_variation'):
-            merged_segments[-1]['text'] += seg['text']
-        else:
-            merged_segments.append(seg)
-
-    return merged_segments
-
-
-def align_paragraphs(base_paras, all_versions_paras):
-    """
-    Align paragraphs across all versions.
-    Uses simple sequential alignment - assumes paragraphs are in the same order.
-    """
-    max_paras = max(len(base_paras), max(len(v) for v in all_versions_paras))
-
-    aligned_result = []
-
-    for i in range(len(base_paras)):
+    for i in range(max_paras):
         base_para = base_paras[i]
+        base_normalized = normalize_paragraph(base_para)
 
-        # Get corresponding paragraph from each version
-        corresponding_paras = []
-        for version_paras in all_versions_paras:
+        # Collect this paragraph from all versions
+        para_variants = {}
+
+        for j, version_paras in enumerate(all_versions_paras):
             if i < len(version_paras):
-                corresponding_paras.append(version_paras[i])
-            else:
-                corresponding_paras.append('')
+                version_para = version_paras[i]
+                version_normalized = normalize_paragraph(version_para)
 
-        # Find variations within this paragraph
-        segments = find_variations_in_paragraph(base_para, corresponding_paras)
+                # Group by normalized content
+                if version_normalized not in para_variants:
+                    para_variants[version_normalized] = {
+                        'text': version_para,
+                        'versions': []
+                    }
+                para_variants[version_normalized]['versions'].append(version_ids[j + 1])
 
-        aligned_result.append({
+        # Check if there are variations
+        has_variation = len(para_variants) > 0 and (
+            base_normalized not in para_variants or
+            len(para_variants) > 1
+        )
+
+        # Build variant list (excluding the base version)
+        variants = []
+        if has_variation:
+            for norm_text, data in para_variants.items():
+                if norm_text != base_normalized:
+                    variants.append({
+                        'text': data['text'],
+                        'versions': data['versions'],
+                        'count': len(data['versions'])
+                    })
+
+        result.append({
             'paragraph_index': i,
-            'segments': segments
+            'base_text': base_para,
+            'has_variation': has_variation,
+            'variants': variants
         })
 
-    return aligned_result
+    return result
 
 
 def create_variorum_data():
@@ -137,14 +99,14 @@ def create_variorum_data():
     base_prologue = base_data['prologue']
     other_prologues = [all_versions[vid]['prologue'] for vid in version_ids[1:]]
 
-    prologue_aligned = align_paragraphs(base_prologue, other_prologues)
+    prologue_aligned = find_paragraph_variations(base_prologue, other_prologues, version_ids)
 
     # Process chapter 1
     print("Processing chapter 1...")
     base_chapter1 = base_data['chapter1']
     other_chapter1s = [all_versions[vid]['chapter1'] for vid in version_ids[1:]]
 
-    chapter1_aligned = align_paragraphs(base_chapter1, other_chapter1s)
+    chapter1_aligned = find_paragraph_variations(base_chapter1, other_chapter1s, version_ids)
 
     # Create final variorum structure
     variorum = {
@@ -163,12 +125,23 @@ def create_variorum_data():
     print(f"\nVariorum data saved to {output_file}")
 
     # Print some statistics
-    prologue_variations = sum(1 for p in prologue_aligned for s in p['segments'] if s.get('has_variation'))
-    chapter1_variations = sum(1 for p in chapter1_aligned for s in p['segments'] if s.get('has_variation'))
+    prologue_variations = sum(1 for p in prologue_aligned if p['has_variation'])
+    chapter1_variations = sum(1 for p in chapter1_aligned if p['has_variation'])
+
+    prologue_total = len(prologue_aligned)
+    chapter1_total = len(chapter1_aligned)
 
     print(f"\nStatistics:")
-    print(f"  Prologue: {len(prologue_aligned)} paragraphs, {prologue_variations} variation points")
-    print(f"  Chapter 1: {len(chapter1_aligned)} paragraphs, {chapter1_variations} variation points")
+    print(f"  Prologue: {prologue_variations}/{prologue_total} paragraphs vary ({prologue_variations/prologue_total*100:.1f}%)")
+    print(f"  Chapter 1: {chapter1_variations}/{chapter1_total} paragraphs vary ({chapter1_variations/chapter1_total*100:.1f}%)")
+
+    # Show some example variations
+    print(f"\nExample variations in prologue:")
+    count = 0
+    for p in prologue_aligned:
+        if p['has_variation'] and count < 3:
+            print(f"  Paragraph {p['paragraph_index']}: {len(p['variants'])} variant(s)")
+            count += 1
 
     return variorum
 
