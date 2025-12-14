@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subcutanean Variorum Browser</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Subcutanean Variorum</h1>
+        <p class="subtitle">Explore the variations across 25 versions of Aaron Reed's novel</p>
+        <nav>
+            <button id="btn-prologue" class="nav-btn active">Prologue</button>
+            <button id="btn-chapter1" class="nav-btn">Chapter 1</button>
+        </nav>
+    </header>
+
+    <main>
+        <div id="info-panel">
+            <p>
+                Base version: <span id="base-version"></span> |
+                Comparing <span id="total-versions"></span> versions |
+                <span id="variation-count"></span> variation points
+            </p>
+            <p class="instructions">
+                <strong>Hover over highlighted text</strong> to see variations from other versions.
+            </p>
+        </div>
+
+        <article id="text-display">
+            <!-- Text will be loaded here by JavaScript -->
+        </article>
+
+        <div id="variant-tooltip" class="tooltip hidden">
+            <div class="tooltip-header">Variants:</div>
+            <ul id="variant-list"></ul>
+        </div>
+    </main>
+
+    <footer>
+        <p>
+            <em>Subcutanean</em> by Aaron Reed |
+            Variorum browser prototype |
+            <a href="https://github.com/samplereality/subcutanean-browser" target="_blank">GitHub</a>
+        </p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
