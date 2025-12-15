@@ -73,11 +73,32 @@ header h1 {
     border-color: var(--accent-color);
 }
 
-nav {
+.chapter-nav {
     display: flex;
-    justify-content: center;
-    gap: 1rem;
+    justify-content: flex-start;
+    gap: 0.5rem;
     margin-top: 1.5rem;
+    overflow-x: auto;
+    padding: 0.5rem;
+    max-width: 100%;
+    -webkit-overflow-scrolling: touch;
+}
+
+.chapter-nav::-webkit-scrollbar {
+    height: 6px;
+}
+
+.chapter-nav::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.1);
+}
+
+.chapter-nav::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.3);
+    border-radius: 3px;
+}
+
+.chapter-nav::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.5);
 }
 
 .nav-btn {

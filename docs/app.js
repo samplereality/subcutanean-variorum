@@ -1,20 +1,21 @@
 // Subcutanean Variorum Browser
 // JavaScript for interactive text display with variations
 
-let variorumData = null;
-let currentSection = 'prologue';
+let manifest = null;
+let loadedChapters = {}; // Cache for loaded chapter data
+let currentChapter = 'prologue';
 let currentBaseVersion = null;
 let hideTooltipTimeout = null;
 
-// Load the variorum data
-async function loadVariorumData() {
+// Load the manifest file
+async function loadManifest() {
     try {
-        const response = await fetch('variorum_data/variorum.json');
-        variorumData = await response.json();
+        const response = await fetch('variorum_data/manifest.json');
+        manifest = await response.json();
 
         // Set up base version selector
         const selector = document.getElementById('base-version-select');
-        variorumData.available_base_versions.forEach(vid => {
+        manifest.base_version_options.forEach(vid => {
             const option = document.createElement('option');
             option.value = vid;
             option.textContent = `Version ${vid}`;
@@ -22,45 +23,113 @@ async function loadVariorumData() {
         });
 
         // Set default base version
-        currentBaseVersion = variorumData.available_base_versions[0];
+        currentBaseVersion = manifest.base_version_options[0];
         selector.value = currentBaseVersion;
 
         // Add change handler
         selector.addEventListener('change', (e) => {
             currentBaseVersion = e.target.value;
-            displaySection(currentSection);
+            displayChapter(currentChapter);
         });
 
         // Update info panel
         document.getElementById('base-version').textContent = currentBaseVersion;
-        document.getElementById('total-versions').textContent = variorumData.total_versions;
+        document.getElementById('total-versions').textContent = manifest.total_versions;
 
-        // Display prologue by default
-        displaySection('prologue');
+        // Build chapter navigation
+        buildChapterNavigation();
+
+        // Load and display prologue by default
+        await loadAndDisplayChapter('prologue');
+
     } catch (error) {
-        console.error('Error loading variorum data:', error);
+        console.error('Error loading manifest:', error);
         document.getElementById('text-display').innerHTML =
-            '<p class="loading">Error loading variorum data. Please ensure variorum.json is in the variorum_data folder.</p>';
+            '<p class="loading">Error loading manifest. Please ensure manifest.json is in the variorum_data folder.</p>';
     }
 }
 
-// Display a section (prologue or chapter1)
-function displaySection(section) {
-    currentSection = section;
+// Build chapter navigation buttons
+function buildChapterNavigation() {
+    const nav = document.getElementById('chapter-nav');
+    nav.innerHTML = '';
+
+    manifest.chapters.forEach(chapter => {
+        const button = document.createElement('button');
+        button.className = 'nav-btn';
+        button.id = `btn-${chapter.id}`;
+
+        // Format button text
+        let buttonText = chapter.id === 'prologue'
+            ? 'Prologue'
+            : `Ch ${chapter.id.replace('chapter', '')}`;
+
+        button.textContent = buttonText;
+        button.addEventListener('click', () => loadAndDisplayChapter(chapter.id));
+        nav.appendChild(button);
+    });
+}
+
+// Load and display a chapter (with caching)
+async function loadAndDisplayChapter(chapterId) {
+    // Check if already loaded
+    if (!loadedChapters[chapterId]) {
+        try {
+            // Find chapter info in manifest
+            const chapterInfo = manifest.chapters.find(ch => ch.id === chapterId);
+            if (!chapterInfo) {
+                throw new Error(`Chapter ${chapterId} not found in manifest`);
+            }
+
+            // Show loading state
+            document.getElementById('text-display').innerHTML =
+                '<p class="loading">Loading chapter...</p>';
+
+            // Fetch chapter data
+            const response = await fetch(`variorum_data/${chapterInfo.file}`);
+            const chapterData = await response.json();
+
+            // Cache it
+            loadedChapters[chapterId] = chapterData;
+
+        } catch (error) {
+            console.error(`Error loading chapter ${chapterId}:`, error);
+            document.getElementById('text-display').innerHTML =
+                `<p class="loading">Error loading chapter. Please try again.</p>`;
+            return;
+        }
+    }
+
+    // Display the chapter
+    displayChapter(chapterId);
+}
+
+// Display a chapter (from cache)
+function displayChapter(chapterId) {
+    currentChapter = chapterId;
 
     // Update active button
     document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-    document.getElementById(`btn-${section}`).classList.add('active');
+    const activeBtn = document.getElementById(`btn-${chapterId}`);
+    if (activeBtn) {
+        activeBtn.classList.add('active');
+    }
 
-    // Get the section data for current base version
-    const sectionData = variorumData.variorums_by_base[currentBaseVersion][section];
+    // Get the chapter data for current base version
+    const chapterData = loadedChapters[chapterId];
+    if (!chapterData) {
+        console.error(`Chapter ${chapterId} not loaded`);
+        return;
+    }
+
+    const variorumData = chapterData.variorums_by_base[currentBaseVersion];
 
     // Update base version display
     document.getElementById('base-version').textContent = currentBaseVersion;
 
     // Count variations and omissions
-    const variationCount = sectionData.filter(p => p.has_variation).length;
-    const omissionCount = sectionData.filter(p =>
+    const variationCount = variorumData.filter(p => p.has_variation).length;
+    const omissionCount = variorumData.filter(p =>
         p.variants.some(v => v.type === 'omission')
     ).length;
 
@@ -75,7 +144,7 @@ function displaySection(section) {
     const textDisplay = document.getElementById('text-display');
     textDisplay.innerHTML = '';
 
-    sectionData.forEach((paragraph, paraIndex) => {
+    variorumData.forEach((paragraph, paraIndex) => {
         const p = document.createElement('p');
 
         if (paragraph.has_variation && paragraph.variants.length > 0) {
@@ -245,20 +314,8 @@ function setupTooltipBehavior() {
     });
 }
 
-// Set up navigation
-function setupNavigation() {
-    document.getElementById('btn-prologue').addEventListener('click', () => {
-        displaySection('prologue');
-    });
-
-    document.getElementById('btn-chapter1').addEventListener('click', () => {
-        displaySection('chapter1');
-    });
-}
-
 // Initialize the app
 document.addEventListener('DOMContentLoaded', () => {
-    setupNavigation();
     setupTooltipBehavior();
-    loadVariorumData();
+    loadManifest();
 });
