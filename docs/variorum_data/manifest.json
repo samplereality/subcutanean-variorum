@@ -36,6 +36,11 @@
   ],
   "chapters": [
     {
+      "id": "introduction",
+      "file": "introduction.json",
+      "paragraph_count": 29
+    },
+    {
       "id": "prologue",
       "file": "prologue.json",
       "paragraph_count": 113
@@ -86,78 +91,78 @@
       "paragraph_count": 328
     },
     {
+      "id": "part2",
+      "file": "part2.json",
+      "paragraph_count": 13
+    },
+    {
       "id": "chapter10",
       "file": "chapter10.json",
-      "paragraph_count": 13
+      "paragraph_count": 190
     },
     {
       "id": "chapter11",
       "file": "chapter11.json",
-      "paragraph_count": 190
+      "paragraph_count": 179
     },
     {
       "id": "chapter12",
       "file": "chapter12.json",
-      "paragraph_count": 179
+      "paragraph_count": 211
     },
     {
       "id": "chapter13",
       "file": "chapter13.json",
-      "paragraph_count": 211
+      "paragraph_count": 183
     },
     {
       "id": "chapter14",
       "file": "chapter14.json",
-      "paragraph_count": 183
+      "paragraph_count": 262
     },
     {
       "id": "chapter15",
       "file": "chapter15.json",
-      "paragraph_count": 262
+      "paragraph_count": 175
+    },
+    {
+      "id": "part3",
+      "file": "part3.json",
+      "paragraph_count": 8
     },
     {
       "id": "chapter16",
       "file": "chapter16.json",
-      "paragraph_count": 175
+      "paragraph_count": 244
     },
     {
       "id": "chapter17",
       "file": "chapter17.json",
-      "paragraph_count": 8
+      "paragraph_count": 181
     },
     {
       "id": "chapter18",
       "file": "chapter18.json",
-      "paragraph_count": 244
+      "paragraph_count": 112
     },
     {
       "id": "chapter19",
       "file": "chapter19.json",
-      "paragraph_count": 181
+      "paragraph_count": 214
     },
     {
       "id": "chapter20",
       "file": "chapter20.json",
-      "paragraph_count": 112
+      "paragraph_count": 60
     },
     {
       "id": "chapter21",
       "file": "chapter21.json",
-      "paragraph_count": 214
+      "paragraph_count": 2
     },
     {
       "id": "chapter22",
       "file": "chapter22.json",
-      "paragraph_count": 60
-    },
-    {
-      "id": "chapter23",
-      "file": "chapter23.json",
-      "paragraph_count": 2
-    },
-    {
-      "id": "chapter24",
-      "file": "chapter24.json",
       "paragraph_count": 5
     }
   ]

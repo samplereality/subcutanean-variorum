@@ -3,7 +3,7 @@
 
 let manifest = null;
 let loadedChapters = {}; // Cache for loaded chapter data
-let currentChapter = 'prologue';
+let currentChapter = 'introduction';
 let currentBaseVersion = null;
 let hideTooltipTimeout = null;
 
@@ -39,8 +39,8 @@ async function loadManifest() {
         // Build chapter navigation
         buildChapterNavigation();
 
-        // Load and display prologue by default
-        await loadAndDisplayChapter('prologue');
+        // Load and display introduction by default
+        await loadAndDisplayChapter('introduction');
 
     } catch (error) {
         console.error('Error loading manifest:', error);
@@ -59,10 +59,21 @@ function buildChapterNavigation() {
         button.className = 'nav-btn';
         button.id = `btn-${chapter.id}`;
 
-        // Format button text
-        let buttonText = chapter.id === 'prologue'
-            ? 'Prologue'
-            : `Ch ${chapter.id.replace('chapter', '')}`;
+        // Format button text based on section type
+        let buttonText;
+        if (chapter.id === 'introduction') {
+            buttonText = 'Intro';
+        } else if (chapter.id === 'prologue') {
+            buttonText = 'Prologue';
+        } else if (chapter.id === 'part2') {
+            buttonText = 'Part II';
+        } else if (chapter.id === 'part3') {
+            buttonText = 'Part III';
+        } else if (chapter.id.startsWith('chapter')) {
+            buttonText = `Ch ${chapter.id.replace('chapter', '')}`;
+        } else {
+            buttonText = chapter.id;
+        }
 
         button.textContent = buttonText;
         button.addEventListener('click', () => loadAndDisplayChapter(chapter.id));
