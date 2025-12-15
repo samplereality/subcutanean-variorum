@@ -38,122 +38,122 @@
     {
       "id": "introduction",
       "file": "introduction.json",
-      "paragraph_count": 29
+      "paragraph_count": 5
     },
     {
       "id": "prologue",
       "file": "prologue.json",
-      "paragraph_count": 113
+      "paragraph_count": 11
     },
     {
       "id": "chapter1",
       "file": "chapter1.json",
-      "paragraph_count": 281
+      "paragraph_count": 108
     },
     {
       "id": "chapter2",
       "file": "chapter2.json",
-      "paragraph_count": 246
+      "paragraph_count": 106
     },
     {
       "id": "chapter3",
       "file": "chapter3.json",
-      "paragraph_count": 169
+      "paragraph_count": 82
     },
     {
       "id": "chapter4",
       "file": "chapter4.json",
-      "paragraph_count": 222
+      "paragraph_count": 136
     },
     {
       "id": "chapter5",
       "file": "chapter5.json",
-      "paragraph_count": 268
+      "paragraph_count": 139
     },
     {
       "id": "chapter6",
       "file": "chapter6.json",
-      "paragraph_count": 156
+      "paragraph_count": 80
     },
     {
       "id": "chapter7",
       "file": "chapter7.json",
-      "paragraph_count": 171
+      "paragraph_count": 61
     },
     {
       "id": "chapter8",
       "file": "chapter8.json",
-      "paragraph_count": 376
+      "paragraph_count": 61
     },
     {
       "id": "chapter9",
       "file": "chapter9.json",
-      "paragraph_count": 328
+      "paragraph_count": 153
     },
     {
       "id": "part2",
       "file": "part2.json",
-      "paragraph_count": 13
+      "paragraph_count": 2
     },
     {
       "id": "chapter10",
       "file": "chapter10.json",
-      "paragraph_count": 190
+      "paragraph_count": 118
     },
     {
       "id": "chapter11",
       "file": "chapter11.json",
-      "paragraph_count": 179
+      "paragraph_count": 68
     },
     {
       "id": "chapter12",
       "file": "chapter12.json",
-      "paragraph_count": 211
+      "paragraph_count": 85
     },
     {
       "id": "chapter13",
       "file": "chapter13.json",
-      "paragraph_count": 183
+      "paragraph_count": 85
     },
     {
       "id": "chapter14",
       "file": "chapter14.json",
-      "paragraph_count": 262
+      "paragraph_count": 103
     },
     {
       "id": "chapter15",
       "file": "chapter15.json",
-      "paragraph_count": 175
+      "paragraph_count": 92
     },
     {
       "id": "part3",
       "file": "part3.json",
-      "paragraph_count": 8
+      "paragraph_count": 2
     },
     {
       "id": "chapter16",
       "file": "chapter16.json",
-      "paragraph_count": 244
+      "paragraph_count": 110
     },
     {
       "id": "chapter17",
       "file": "chapter17.json",
-      "paragraph_count": 181
+      "paragraph_count": 70
     },
     {
       "id": "chapter18",
       "file": "chapter18.json",
-      "paragraph_count": 112
+      "paragraph_count": 39
     },
     {
       "id": "chapter19",
       "file": "chapter19.json",
-      "paragraph_count": 214
+      "paragraph_count": 6
     },
     {
       "id": "chapter20",
       "file": "chapter20.json",
-      "paragraph_count": 60
+      "paragraph_count": 13
     },
     {
       "id": "chapter21",
