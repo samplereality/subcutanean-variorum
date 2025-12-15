@@ -1,0 +1,2120 @@
+{
+  "chapter_id": "chapter17",
+  "total_versions": 25,
+  "version_ids": [
+    "45443",
+    "45444",
+    "45445",
+    "45446",
+    "45447",
+    "45448",
+    "45449",
+    "45450",
+    "45451",
+    "45452",
+    "45453",
+    "45454",
+    "45455",
+    "45456",
+    "45457",
+    "45458",
+    "45459",
+    "45460",
+    "45461",
+    "45462",
+    "45463",
+    "45464",
+    "45465",
+    "45466",
+    "45467"
+  ],
+  "base_version_options": [
+    "45451",
+    "45452",
+    "45453",
+    "45457",
+    "45462"
+  ],
+  "variorums_by_base": {
+    "45451": [
+      {
+        "position": 0,
+        "base_text": "How should we like it were stars to burn\nWith a passion for us we could not return?",
+        "base_version": "composite",
+        "base_versions": [
+          "45451"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "How should we like it were stars to burn\nWith a passion for us we could not return?",
+            "versions": [
+              "45443",
+              "45455",
+              "45458",
+              "45461",
+              "45467"
+            ],
+            "count": 5,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45453",
+              "45454",
+              "45456",
+              "45457",
+              "45459",
+              "45460",
+              "45462",
+              "45463",
+              "45464",
+              "45465",
+              "45466"
+            ],
+            "count": 20,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 5
+      },
+      {
+        "position": 1,
+        "base_text": "…before I die I want to see\nThe world that lies behind the strangeness of your eyes,\nThere is nothing gay or green there for my gathering, it may be,\nYet on brown fields there lies\nA haunting purple bloom: is there not something in grey skies\nAnd in grey sea?",
+        "base_version": "composite",
+        "base_versions": [
+          "45451"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "…before I die I want to see\nThe world that lies behind the strangeness of your eyes,\nThere is nothing gay or green there for my gathering, it may be,\nYet on brown fields there lies\nA haunting purple bloom: is there not something in grey skies\nAnd in grey sea?",
+            "versions": [
+              "45444",
+              "45445",
+              "45448",
+              "45452",
+              "45459",
+              "45460",
+              "45462",
+              "45466"
+            ],
+            "count": 8,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45443",
+              "45446",
+              "45447",
+              "45449",
+              "45450",
+              "45451",
+              "45453",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45461",
+              "45463",
+              "45464",
+              "45465",
+              "45467"
+            ],
+            "count": 17,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 8
+      },
+      {
+        "position": 2,
+        "base_text": "As long as the sky whirls\nYou will be my redemption and my doom",
+        "base_version": "45451",
+        "base_versions": [
+          "45451"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "As long as the sky whirls\nYou will be my redemption and my doom",
+            "versions": [
+              "45446",
+              "45449",
+              "45450",
+              "45454",
+              "45456",
+              "45457",
+              "45463",
+              "45465"
+            ],
+            "count": 8,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45447",
+              "45448",
+              "45452",
+              "45453",
+              "45455",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45464",
+              "45466",
+              "45467"
+            ],
+            "count": 16,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 9
+      },
+      {
+        "position": 3,
+        "base_text": "Some things do through our judgment pass\nAs through a multiplying glass.\nAnd sometimes, if the object be too far,\nWe take a falling meteor for a star.",
+        "base_version": "composite",
+        "base_versions": [
+          "45451"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "Some things do through our judgment pass\nAs through a multiplying glass.\nAnd sometimes, if the object be too far,\nWe take a falling meteor for a star.",
+            "versions": [
+              "45447",
+              "45453",
+              "45464"
+            ],
+            "count": 3,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45463",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 22,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 3
+      },
+      {
+        "position": 4,
+        "base_text": "W. H. Auden",
+        "base_version": "composite",
+        "base_versions": [
+          "45451"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "W. H. Auden",
+            "versions": [
+              "45443",
+              "45455",
+              "45458",
+              "45461",
+              "45467"
+            ],
+            "count": 5,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45453",
+              "45454",
+              "45456",
+              "45457",
+              "45459",
+              "45460",
+              "45462",
+              "45463",
+              "45464",
+              "45465",
+              "45466"
+            ],
+            "count": 20,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 5
+      },
+      {
+        "position": 5,
+        "base_text": "“On The Road To The Sea,” Charlotte Mary Mew (1869-1928)",
+        "base_version": "composite",
+        "base_versions": [
+          "45451"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "“On The Road To The Sea,” Charlotte Mary Mew (1869-1928)",
+            "versions": [
+              "45444",
+              "45445",
+              "45448",
+              "45452",
+              "45459",
+              "45460",
+              "45462",
+              "45466"
+            ],
+            "count": 8,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45443",
+              "45446",
+              "45447",
+              "45449",
+              "45450",
+              "45451",
+              "45453",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45461",
+              "45463",
+              "45464",
+              "45465",
+              "45467"
+            ],
+            "count": 17,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 8
+      },
+      {
+        "position": 6,
+        "base_text": "Reinaldo Arenas",
+        "base_version": "45451",
+        "base_versions": [
+          "45451"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "Reinaldo Arenas",
+            "versions": [
+              "45446",
+              "45449",
+              "45450",
+              "45454",
+              "45456",
+              "45457",
+              "45463",
+              "45465"
+            ],
+            "count": 8,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45447",
+              "45448",
+              "45452",
+              "45453",
+              "45455",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45464",
+              "45466",
+              "45467"
+            ],
+            "count": 16,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 9
+      },
+      {
+        "position": 7,
+        "base_text": "“Ode: Of Wit,” Abraham Cowley (1618-1667)",
+        "base_version": "composite",
+        "base_versions": [
+          "45451"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "“Ode: Of Wit,” Abraham Cowley (1618-1667)",
+            "versions": [
+              "45447",
+              "45453",
+              "45464"
+            ],
+            "count": 3,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45463",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 22,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 3
+      }
+    ],
+    "45452": [
+      {
+        "position": 0,
+        "base_text": "How should we like it were stars to burn\nWith a passion for us we could not return?",
+        "base_version": "composite",
+        "base_versions": [
+          "45452"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "How should we like it were stars to burn\nWith a passion for us we could not return?",
+            "versions": [
+              "45443",
+              "45455",
+              "45458",
+              "45461",
+              "45467"
+            ],
+            "count": 5,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45453",
+              "45454",
+              "45456",
+              "45457",
+              "45459",
+              "45460",
+              "45462",
+              "45463",
+              "45464",
+              "45465",
+              "45466"
+            ],
+            "count": 20,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 5
+      },
+      {
+        "position": 1,
+        "base_text": "…before I die I want to see\nThe world that lies behind the strangeness of your eyes,\nThere is nothing gay or green there for my gathering, it may be,\nYet on brown fields there lies\nA haunting purple bloom: is there not something in grey skies\nAnd in grey sea?",
+        "base_version": "45452",
+        "base_versions": [
+          "45452"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "…before I die I want to see\nThe world that lies behind the strangeness of your eyes,\nThere is nothing gay or green there for my gathering, it may be,\nYet on brown fields there lies\nA haunting purple bloom: is there not something in grey skies\nAnd in grey sea?",
+            "versions": [
+              "45444",
+              "45445",
+              "45448",
+              "45459",
+              "45460",
+              "45462",
+              "45466"
+            ],
+            "count": 7,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45443",
+              "45446",
+              "45447",
+              "45449",
+              "45450",
+              "45451",
+              "45453",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45461",
+              "45463",
+              "45464",
+              "45465",
+              "45467"
+            ],
+            "count": 17,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 8
+      },
+      {
+        "position": 2,
+        "base_text": "As long as the sky whirls\nYou will be my redemption and my doom",
+        "base_version": "composite",
+        "base_versions": [
+          "45452"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "As long as the sky whirls\nYou will be my redemption and my doom",
+            "versions": [
+              "45446",
+              "45449",
+              "45450",
+              "45451",
+              "45454",
+              "45456",
+              "45457",
+              "45463",
+              "45465"
+            ],
+            "count": 9,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45447",
+              "45448",
+              "45452",
+              "45453",
+              "45455",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45464",
+              "45466",
+              "45467"
+            ],
+            "count": 16,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 9
+      },
+      {
+        "position": 3,
+        "base_text": "Some things do through our judgment pass\nAs through a multiplying glass.\nAnd sometimes, if the object be too far,\nWe take a falling meteor for a star.",
+        "base_version": "composite",
+        "base_versions": [
+          "45452"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "Some things do through our judgment pass\nAs through a multiplying glass.\nAnd sometimes, if the object be too far,\nWe take a falling meteor for a star.",
+            "versions": [
+              "45447",
+              "45453",
+              "45464"
+            ],
+            "count": 3,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45463",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 22,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 3
+      },
+      {
+        "position": 4,
+        "base_text": "W. H. Auden",
+        "base_version": "composite",
+        "base_versions": [
+          "45452"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "W. H. Auden",
+            "versions": [
+              "45443",
+              "45455",
+              "45458",
+              "45461",
+              "45467"
+            ],
+            "count": 5,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45453",
+              "45454",
+              "45456",
+              "45457",
+              "45459",
+              "45460",
+              "45462",
+              "45463",
+              "45464",
+              "45465",
+              "45466"
+            ],
+            "count": 20,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 5
+      },
+      {
+        "position": 5,
+        "base_text": "“On The Road To The Sea,” Charlotte Mary Mew (1869-1928)",
+        "base_version": "45452",
+        "base_versions": [
+          "45452"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "“On The Road To The Sea,” Charlotte Mary Mew (1869-1928)",
+            "versions": [
+              "45444",
+              "45445",
+              "45448",
+              "45459",
+              "45460",
+              "45462",
+              "45466"
+            ],
+            "count": 7,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45443",
+              "45446",
+              "45447",
+              "45449",
+              "45450",
+              "45451",
+              "45453",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45461",
+              "45463",
+              "45464",
+              "45465",
+              "45467"
+            ],
+            "count": 17,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 8
+      },
+      {
+        "position": 6,
+        "base_text": "Reinaldo Arenas",
+        "base_version": "composite",
+        "base_versions": [
+          "45452"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "Reinaldo Arenas",
+            "versions": [
+              "45446",
+              "45449",
+              "45450",
+              "45451",
+              "45454",
+              "45456",
+              "45457",
+              "45463",
+              "45465"
+            ],
+            "count": 9,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45447",
+              "45448",
+              "45452",
+              "45453",
+              "45455",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45464",
+              "45466",
+              "45467"
+            ],
+            "count": 16,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 9
+      },
+      {
+        "position": 7,
+        "base_text": "“Ode: Of Wit,” Abraham Cowley (1618-1667)",
+        "base_version": "composite",
+        "base_versions": [
+          "45452"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "“Ode: Of Wit,” Abraham Cowley (1618-1667)",
+            "versions": [
+              "45447",
+              "45453",
+              "45464"
+            ],
+            "count": 3,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45463",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 22,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 3
+      }
+    ],
+    "45453": [
+      {
+        "position": 0,
+        "base_text": "How should we like it were stars to burn\nWith a passion for us we could not return?",
+        "base_version": "composite",
+        "base_versions": [
+          "45453"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "How should we like it were stars to burn\nWith a passion for us we could not return?",
+            "versions": [
+              "45443",
+              "45455",
+              "45458",
+              "45461",
+              "45467"
+            ],
+            "count": 5,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45453",
+              "45454",
+              "45456",
+              "45457",
+              "45459",
+              "45460",
+              "45462",
+              "45463",
+              "45464",
+              "45465",
+              "45466"
+            ],
+            "count": 20,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 5
+      },
+      {
+        "position": 1,
+        "base_text": "…before I die I want to see\nThe world that lies behind the strangeness of your eyes,\nThere is nothing gay or green there for my gathering, it may be,\nYet on brown fields there lies\nA haunting purple bloom: is there not something in grey skies\nAnd in grey sea?",
+        "base_version": "composite",
+        "base_versions": [
+          "45453"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "…before I die I want to see\nThe world that lies behind the strangeness of your eyes,\nThere is nothing gay or green there for my gathering, it may be,\nYet on brown fields there lies\nA haunting purple bloom: is there not something in grey skies\nAnd in grey sea?",
+            "versions": [
+              "45444",
+              "45445",
+              "45448",
+              "45452",
+              "45459",
+              "45460",
+              "45462",
+              "45466"
+            ],
+            "count": 8,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45443",
+              "45446",
+              "45447",
+              "45449",
+              "45450",
+              "45451",
+              "45453",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45461",
+              "45463",
+              "45464",
+              "45465",
+              "45467"
+            ],
+            "count": 17,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 8
+      },
+      {
+        "position": 2,
+        "base_text": "As long as the sky whirls\nYou will be my redemption and my doom",
+        "base_version": "composite",
+        "base_versions": [
+          "45453"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "As long as the sky whirls\nYou will be my redemption and my doom",
+            "versions": [
+              "45446",
+              "45449",
+              "45450",
+              "45451",
+              "45454",
+              "45456",
+              "45457",
+              "45463",
+              "45465"
+            ],
+            "count": 9,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45447",
+              "45448",
+              "45452",
+              "45453",
+              "45455",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45464",
+              "45466",
+              "45467"
+            ],
+            "count": 16,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 9
+      },
+      {
+        "position": 3,
+        "base_text": "Some things do through our judgment pass\nAs through a multiplying glass.\nAnd sometimes, if the object be too far,\nWe take a falling meteor for a star.",
+        "base_version": "45453",
+        "base_versions": [
+          "45453"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "Some things do through our judgment pass\nAs through a multiplying glass.\nAnd sometimes, if the object be too far,\nWe take a falling meteor for a star.",
+            "versions": [
+              "45447",
+              "45464"
+            ],
+            "count": 2,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45463",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 22,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 3
+      },
+      {
+        "position": 4,
+        "base_text": "W. H. Auden",
+        "base_version": "composite",
+        "base_versions": [
+          "45453"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "W. H. Auden",
+            "versions": [
+              "45443",
+              "45455",
+              "45458",
+              "45461",
+              "45467"
+            ],
+            "count": 5,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45453",
+              "45454",
+              "45456",
+              "45457",
+              "45459",
+              "45460",
+              "45462",
+              "45463",
+              "45464",
+              "45465",
+              "45466"
+            ],
+            "count": 20,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 5
+      },
+      {
+        "position": 5,
+        "base_text": "“On The Road To The Sea,” Charlotte Mary Mew (1869-1928)",
+        "base_version": "composite",
+        "base_versions": [
+          "45453"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "“On The Road To The Sea,” Charlotte Mary Mew (1869-1928)",
+            "versions": [
+              "45444",
+              "45445",
+              "45448",
+              "45452",
+              "45459",
+              "45460",
+              "45462",
+              "45466"
+            ],
+            "count": 8,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45443",
+              "45446",
+              "45447",
+              "45449",
+              "45450",
+              "45451",
+              "45453",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45461",
+              "45463",
+              "45464",
+              "45465",
+              "45467"
+            ],
+            "count": 17,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 8
+      },
+      {
+        "position": 6,
+        "base_text": "Reinaldo Arenas",
+        "base_version": "composite",
+        "base_versions": [
+          "45453"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "Reinaldo Arenas",
+            "versions": [
+              "45446",
+              "45449",
+              "45450",
+              "45451",
+              "45454",
+              "45456",
+              "45457",
+              "45463",
+              "45465"
+            ],
+            "count": 9,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45447",
+              "45448",
+              "45452",
+              "45453",
+              "45455",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45464",
+              "45466",
+              "45467"
+            ],
+            "count": 16,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 9
+      },
+      {
+        "position": 7,
+        "base_text": "“Ode: Of Wit,” Abraham Cowley (1618-1667)",
+        "base_version": "45453",
+        "base_versions": [
+          "45453"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "“Ode: Of Wit,” Abraham Cowley (1618-1667)",
+            "versions": [
+              "45447",
+              "45464"
+            ],
+            "count": 2,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45463",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 22,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 3
+      }
+    ],
+    "45457": [
+      {
+        "position": 0,
+        "base_text": "How should we like it were stars to burn\nWith a passion for us we could not return?",
+        "base_version": "composite",
+        "base_versions": [
+          "45457"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "How should we like it were stars to burn\nWith a passion for us we could not return?",
+            "versions": [
+              "45443",
+              "45455",
+              "45458",
+              "45461",
+              "45467"
+            ],
+            "count": 5,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45453",
+              "45454",
+              "45456",
+              "45457",
+              "45459",
+              "45460",
+              "45462",
+              "45463",
+              "45464",
+              "45465",
+              "45466"
+            ],
+            "count": 20,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 5
+      },
+      {
+        "position": 1,
+        "base_text": "…before I die I want to see\nThe world that lies behind the strangeness of your eyes,\nThere is nothing gay or green there for my gathering, it may be,\nYet on brown fields there lies\nA haunting purple bloom: is there not something in grey skies\nAnd in grey sea?",
+        "base_version": "composite",
+        "base_versions": [
+          "45457"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "…before I die I want to see\nThe world that lies behind the strangeness of your eyes,\nThere is nothing gay or green there for my gathering, it may be,\nYet on brown fields there lies\nA haunting purple bloom: is there not something in grey skies\nAnd in grey sea?",
+            "versions": [
+              "45444",
+              "45445",
+              "45448",
+              "45452",
+              "45459",
+              "45460",
+              "45462",
+              "45466"
+            ],
+            "count": 8,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45443",
+              "45446",
+              "45447",
+              "45449",
+              "45450",
+              "45451",
+              "45453",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45461",
+              "45463",
+              "45464",
+              "45465",
+              "45467"
+            ],
+            "count": 17,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 8
+      },
+      {
+        "position": 2,
+        "base_text": "As long as the sky whirls\nYou will be my redemption and my doom",
+        "base_version": "45457",
+        "base_versions": [
+          "45457"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "As long as the sky whirls\nYou will be my redemption and my doom",
+            "versions": [
+              "45446",
+              "45449",
+              "45450",
+              "45451",
+              "45454",
+              "45456",
+              "45463",
+              "45465"
+            ],
+            "count": 8,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45447",
+              "45448",
+              "45452",
+              "45453",
+              "45455",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45464",
+              "45466",
+              "45467"
+            ],
+            "count": 16,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 9
+      },
+      {
+        "position": 3,
+        "base_text": "Some things do through our judgment pass\nAs through a multiplying glass.\nAnd sometimes, if the object be too far,\nWe take a falling meteor for a star.",
+        "base_version": "composite",
+        "base_versions": [
+          "45457"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "Some things do through our judgment pass\nAs through a multiplying glass.\nAnd sometimes, if the object be too far,\nWe take a falling meteor for a star.",
+            "versions": [
+              "45447",
+              "45453",
+              "45464"
+            ],
+            "count": 3,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45463",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 22,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 3
+      },
+      {
+        "position": 4,
+        "base_text": "W. H. Auden",
+        "base_version": "composite",
+        "base_versions": [
+          "45457"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "W. H. Auden",
+            "versions": [
+              "45443",
+              "45455",
+              "45458",
+              "45461",
+              "45467"
+            ],
+            "count": 5,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45453",
+              "45454",
+              "45456",
+              "45457",
+              "45459",
+              "45460",
+              "45462",
+              "45463",
+              "45464",
+              "45465",
+              "45466"
+            ],
+            "count": 20,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 5
+      },
+      {
+        "position": 5,
+        "base_text": "“On The Road To The Sea,” Charlotte Mary Mew (1869-1928)",
+        "base_version": "composite",
+        "base_versions": [
+          "45457"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "“On The Road To The Sea,” Charlotte Mary Mew (1869-1928)",
+            "versions": [
+              "45444",
+              "45445",
+              "45448",
+              "45452",
+              "45459",
+              "45460",
+              "45462",
+              "45466"
+            ],
+            "count": 8,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45443",
+              "45446",
+              "45447",
+              "45449",
+              "45450",
+              "45451",
+              "45453",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45461",
+              "45463",
+              "45464",
+              "45465",
+              "45467"
+            ],
+            "count": 17,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 8
+      },
+      {
+        "position": 6,
+        "base_text": "Reinaldo Arenas",
+        "base_version": "45457",
+        "base_versions": [
+          "45457"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "Reinaldo Arenas",
+            "versions": [
+              "45446",
+              "45449",
+              "45450",
+              "45451",
+              "45454",
+              "45456",
+              "45463",
+              "45465"
+            ],
+            "count": 8,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45447",
+              "45448",
+              "45452",
+              "45453",
+              "45455",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45464",
+              "45466",
+              "45467"
+            ],
+            "count": 16,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 9
+      },
+      {
+        "position": 7,
+        "base_text": "“Ode: Of Wit,” Abraham Cowley (1618-1667)",
+        "base_version": "composite",
+        "base_versions": [
+          "45457"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "“Ode: Of Wit,” Abraham Cowley (1618-1667)",
+            "versions": [
+              "45447",
+              "45453",
+              "45464"
+            ],
+            "count": 3,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45463",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 22,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 3
+      }
+    ],
+    "45462": [
+      {
+        "position": 0,
+        "base_text": "How should we like it were stars to burn\nWith a passion for us we could not return?",
+        "base_version": "composite",
+        "base_versions": [
+          "45462"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "How should we like it were stars to burn\nWith a passion for us we could not return?",
+            "versions": [
+              "45443",
+              "45455",
+              "45458",
+              "45461",
+              "45467"
+            ],
+            "count": 5,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45453",
+              "45454",
+              "45456",
+              "45457",
+              "45459",
+              "45460",
+              "45462",
+              "45463",
+              "45464",
+              "45465",
+              "45466"
+            ],
+            "count": 20,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 5
+      },
+      {
+        "position": 1,
+        "base_text": "…before I die I want to see\nThe world that lies behind the strangeness of your eyes,\nThere is nothing gay or green there for my gathering, it may be,\nYet on brown fields there lies\nA haunting purple bloom: is there not something in grey skies\nAnd in grey sea?",
+        "base_version": "45462",
+        "base_versions": [
+          "45462"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "…before I die I want to see\nThe world that lies behind the strangeness of your eyes,\nThere is nothing gay or green there for my gathering, it may be,\nYet on brown fields there lies\nA haunting purple bloom: is there not something in grey skies\nAnd in grey sea?",
+            "versions": [
+              "45444",
+              "45445",
+              "45448",
+              "45452",
+              "45459",
+              "45460",
+              "45466"
+            ],
+            "count": 7,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45443",
+              "45446",
+              "45447",
+              "45449",
+              "45450",
+              "45451",
+              "45453",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45461",
+              "45463",
+              "45464",
+              "45465",
+              "45467"
+            ],
+            "count": 17,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 8
+      },
+      {
+        "position": 2,
+        "base_text": "As long as the sky whirls\nYou will be my redemption and my doom",
+        "base_version": "composite",
+        "base_versions": [
+          "45462"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "As long as the sky whirls\nYou will be my redemption and my doom",
+            "versions": [
+              "45446",
+              "45449",
+              "45450",
+              "45451",
+              "45454",
+              "45456",
+              "45457",
+              "45463",
+              "45465"
+            ],
+            "count": 9,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45447",
+              "45448",
+              "45452",
+              "45453",
+              "45455",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45464",
+              "45466",
+              "45467"
+            ],
+            "count": 16,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 9
+      },
+      {
+        "position": 3,
+        "base_text": "Some things do through our judgment pass\nAs through a multiplying glass.\nAnd sometimes, if the object be too far,\nWe take a falling meteor for a star.",
+        "base_version": "composite",
+        "base_versions": [
+          "45462"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "Some things do through our judgment pass\nAs through a multiplying glass.\nAnd sometimes, if the object be too far,\nWe take a falling meteor for a star.",
+            "versions": [
+              "45447",
+              "45453",
+              "45464"
+            ],
+            "count": 3,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45463",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 22,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 3
+      },
+      {
+        "position": 4,
+        "base_text": "W. H. Auden",
+        "base_version": "composite",
+        "base_versions": [
+          "45462"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "W. H. Auden",
+            "versions": [
+              "45443",
+              "45455",
+              "45458",
+              "45461",
+              "45467"
+            ],
+            "count": 5,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45453",
+              "45454",
+              "45456",
+              "45457",
+              "45459",
+              "45460",
+              "45462",
+              "45463",
+              "45464",
+              "45465",
+              "45466"
+            ],
+            "count": 20,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 5
+      },
+      {
+        "position": 5,
+        "base_text": "“On The Road To The Sea,” Charlotte Mary Mew (1869-1928)",
+        "base_version": "45462",
+        "base_versions": [
+          "45462"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "“On The Road To The Sea,” Charlotte Mary Mew (1869-1928)",
+            "versions": [
+              "45444",
+              "45445",
+              "45448",
+              "45452",
+              "45459",
+              "45460",
+              "45466"
+            ],
+            "count": 7,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45443",
+              "45446",
+              "45447",
+              "45449",
+              "45450",
+              "45451",
+              "45453",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45461",
+              "45463",
+              "45464",
+              "45465",
+              "45467"
+            ],
+            "count": 17,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 8
+      },
+      {
+        "position": 6,
+        "base_text": "Reinaldo Arenas",
+        "base_version": "composite",
+        "base_versions": [
+          "45462"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "Reinaldo Arenas",
+            "versions": [
+              "45446",
+              "45449",
+              "45450",
+              "45451",
+              "45454",
+              "45456",
+              "45457",
+              "45463",
+              "45465"
+            ],
+            "count": 9,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45447",
+              "45448",
+              "45452",
+              "45453",
+              "45455",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45464",
+              "45466",
+              "45467"
+            ],
+            "count": 16,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 9
+      },
+      {
+        "position": 7,
+        "base_text": "“Ode: Of Wit,” Abraham Cowley (1618-1667)",
+        "base_version": "composite",
+        "base_versions": [
+          "45462"
+        ],
+        "has_variation": true,
+        "variants": [
+          {
+            "text": "“Ode: Of Wit,” Abraham Cowley (1618-1667)",
+            "versions": [
+              "45447",
+              "45453",
+              "45464"
+            ],
+            "count": 3,
+            "type": "agreement",
+            "note": "Same text as base"
+          },
+          {
+            "text": "[Paragraph not present in these versions]",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45463",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 22,
+            "type": "omission"
+          }
+        ],
+        "total_versions_present": 3
+      }
+    ]
+  }
+}

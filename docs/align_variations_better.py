@@ -209,14 +209,8 @@ def create_variorum_data():
     # Generate variorums for multiple base versions
     print("\n=== Generating variorums for different base versions ===")
 
-    # Select a few representative base versions
-    # Using first, middle, and a couple others from the range
-    base_version_options = [
-        version_ids[0],   # First
-        version_ids[len(version_ids)//2],  # Middle
-        version_ids[-1],  # Last
-        version_ids[len(version_ids)//4],  # Quarter way
-    ]
+    # Specific base versions selected for the variorum
+    base_version_options = ['45451', '45452', '45453', '45457', '45462']
 
     print(f"Creating variorums for base versions: {base_version_options}")
 

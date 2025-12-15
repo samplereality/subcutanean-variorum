@@ -1,0 +1,1150 @@
+{
+  "chapter_id": "chapter24",
+  "total_versions": 25,
+  "version_ids": [
+    "45443",
+    "45444",
+    "45445",
+    "45446",
+    "45447",
+    "45448",
+    "45449",
+    "45450",
+    "45451",
+    "45452",
+    "45453",
+    "45454",
+    "45455",
+    "45456",
+    "45457",
+    "45458",
+    "45459",
+    "45460",
+    "45461",
+    "45462",
+    "45463",
+    "45464",
+    "45465",
+    "45466",
+    "45467"
+  ],
+  "base_version_options": [
+    "45451",
+    "45452",
+    "45453",
+    "45457",
+    "45462"
+  ],
+  "variorums_by_base": {
+    "45451": [
+      {
+        "position": 0,
+        "base_text": "Aaron A. Reed is a writer and game designer focused on exploring new ways for authors and readers to tell stories together. His award-winning games have been featured at IndieCade, South by Southwest, Slamdance, GaymerX, and the Independent Games Festival, and he has spoken about digital storytelling at Google, PAX and PAX East, WorldCon, NarraScope, and the Game Developer Conference. He holds a PhD in Computer Science and a MFA in Digital Arts and New Media, and aims to continue abusing them both in interesting ways.",
+        "base_version": "45451",
+        "base_versions": [
+          "45451"
+        ],
+        "has_variation": false,
+        "variants": [
+          {
+            "text": "Aaron A. Reed is a writer and game designer focused on exploring new ways for authors and readers to tell stories together. His award-winning games have been featured at IndieCade, South by Southwest, Slamdance, GaymerX, and the Independent Games Festival, and he has spoken about digital storytelling at Google, PAX and PAX East, WorldCon, NarraScope, and the Game Developer Conference. He holds a PhD in Computer Science and a MFA in Digital Arts and New Media, and aims to continue abusing them both in interesting ways.",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45452",
+              "45453",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45463",
+              "45464",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 24,
+            "type": "agreement",
+            "note": "Same text as base"
+          }
+        ],
+        "total_versions_present": 25
+      },
+      {
+        "position": 1,
+        "base_text": "This is, by some definitions, his first novel. Or maybe that was <em>Blue Lacuna</em>. Or <em>Hollywood Visionary</em>. Or <em>The Ice-Bound Concordance</em>. It’s hard to say.",
+        "base_version": "45451",
+        "base_versions": [
+          "45451"
+        ],
+        "has_variation": false,
+        "variants": [
+          {
+            "text": "This is, by some definitions, his first novel. Or maybe that was <em>Blue Lacuna</em>. Or <em>Hollywood Visionary</em>. Or <em>The Ice-Bound Concordance</em>. It’s hard to say.",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45452",
+              "45453",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45463",
+              "45464",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 24,
+            "type": "agreement",
+            "note": "Same text as base"
+          }
+        ],
+        "total_versions_present": 25
+      },
+      {
+        "position": 2,
+        "base_text": "Aaron lives with his totally real boyfriend in Alameda, California, in a house without a basement.",
+        "base_version": "45451",
+        "base_versions": [
+          "45451"
+        ],
+        "has_variation": false,
+        "variants": [
+          {
+            "text": "Aaron lives with his totally real boyfriend in Alameda, California, in a house without a basement.",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45452",
+              "45453",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45463",
+              "45464",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 24,
+            "type": "agreement",
+            "note": "Same text as base"
+          }
+        ],
+        "total_versions_present": 25
+      },
+      {
+        "position": 3,
+        "base_text": "Reviews wanted! Please share your reaction to <em>Subcutanean</em> on Goodreads or anywhere else readers congregate. Your voice is a huge part of helping an indie book like this succeed. Thank you!",
+        "base_version": "45451",
+        "base_versions": [
+          "45451"
+        ],
+        "has_variation": false,
+        "variants": [
+          {
+            "text": "Reviews wanted! Please share your reaction to <em>Subcutanean</em> on Goodreads or anywhere else readers congregate. Your voice is a huge part of helping an indie book like this succeed. Thank you!",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45452",
+              "45453",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45463",
+              "45464",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 24,
+            "type": "agreement",
+            "note": "Same text as base"
+          }
+        ],
+        "total_versions_present": 25
+      },
+      {
+        "position": 4,
+        "base_text": "aaronareed.net",
+        "base_version": "45451",
+        "base_versions": [
+          "45451"
+        ],
+        "has_variation": false,
+        "variants": [
+          {
+            "text": "aaronareed.net",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45452",
+              "45453",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45463",
+              "45464",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 24,
+            "type": "agreement",
+            "note": "Same text as base"
+          }
+        ],
+        "total_versions_present": 25
+      }
+    ],
+    "45452": [
+      {
+        "position": 0,
+        "base_text": "Aaron A. Reed is a writer and game designer focused on exploring new ways for authors and readers to tell stories together. His award-winning games have been featured at IndieCade, South by Southwest, Slamdance, GaymerX, and the Independent Games Festival, and he has spoken about digital storytelling at Google, PAX and PAX East, WorldCon, NarraScope, and the Game Developer Conference. He holds a PhD in Computer Science and a MFA in Digital Arts and New Media, and aims to continue abusing them both in interesting ways.",
+        "base_version": "45452",
+        "base_versions": [
+          "45452"
+        ],
+        "has_variation": false,
+        "variants": [
+          {
+            "text": "Aaron A. Reed is a writer and game designer focused on exploring new ways for authors and readers to tell stories together. His award-winning games have been featured at IndieCade, South by Southwest, Slamdance, GaymerX, and the Independent Games Festival, and he has spoken about digital storytelling at Google, PAX and PAX East, WorldCon, NarraScope, and the Game Developer Conference. He holds a PhD in Computer Science and a MFA in Digital Arts and New Media, and aims to continue abusing them both in interesting ways.",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45453",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45463",
+              "45464",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 24,
+            "type": "agreement",
+            "note": "Same text as base"
+          }
+        ],
+        "total_versions_present": 25
+      },
+      {
+        "position": 1,
+        "base_text": "This is, by some definitions, his first novel. Or maybe that was <em>Blue Lacuna</em>. Or <em>Hollywood Visionary</em>. Or <em>The Ice-Bound Concordance</em>. It’s hard to say.",
+        "base_version": "45452",
+        "base_versions": [
+          "45452"
+        ],
+        "has_variation": false,
+        "variants": [
+          {
+            "text": "This is, by some definitions, his first novel. Or maybe that was <em>Blue Lacuna</em>. Or <em>Hollywood Visionary</em>. Or <em>The Ice-Bound Concordance</em>. It’s hard to say.",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45453",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45463",
+              "45464",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 24,
+            "type": "agreement",
+            "note": "Same text as base"
+          }
+        ],
+        "total_versions_present": 25
+      },
+      {
+        "position": 2,
+        "base_text": "Aaron lives with his totally real boyfriend in Alameda, California, in a house without a basement.",
+        "base_version": "45452",
+        "base_versions": [
+          "45452"
+        ],
+        "has_variation": false,
+        "variants": [
+          {
+            "text": "Aaron lives with his totally real boyfriend in Alameda, California, in a house without a basement.",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45453",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45463",
+              "45464",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 24,
+            "type": "agreement",
+            "note": "Same text as base"
+          }
+        ],
+        "total_versions_present": 25
+      },
+      {
+        "position": 3,
+        "base_text": "Reviews wanted! Please share your reaction to <em>Subcutanean</em> on Goodreads or anywhere else readers congregate. Your voice is a huge part of helping an indie book like this succeed. Thank you!",
+        "base_version": "45452",
+        "base_versions": [
+          "45452"
+        ],
+        "has_variation": false,
+        "variants": [
+          {
+            "text": "Reviews wanted! Please share your reaction to <em>Subcutanean</em> on Goodreads or anywhere else readers congregate. Your voice is a huge part of helping an indie book like this succeed. Thank you!",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45453",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45463",
+              "45464",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 24,
+            "type": "agreement",
+            "note": "Same text as base"
+          }
+        ],
+        "total_versions_present": 25
+      },
+      {
+        "position": 4,
+        "base_text": "aaronareed.net",
+        "base_version": "45452",
+        "base_versions": [
+          "45452"
+        ],
+        "has_variation": false,
+        "variants": [
+          {
+            "text": "aaronareed.net",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45453",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45463",
+              "45464",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 24,
+            "type": "agreement",
+            "note": "Same text as base"
+          }
+        ],
+        "total_versions_present": 25
+      }
+    ],
+    "45453": [
+      {
+        "position": 0,
+        "base_text": "Aaron A. Reed is a writer and game designer focused on exploring new ways for authors and readers to tell stories together. His award-winning games have been featured at IndieCade, South by Southwest, Slamdance, GaymerX, and the Independent Games Festival, and he has spoken about digital storytelling at Google, PAX and PAX East, WorldCon, NarraScope, and the Game Developer Conference. He holds a PhD in Computer Science and a MFA in Digital Arts and New Media, and aims to continue abusing them both in interesting ways.",
+        "base_version": "45453",
+        "base_versions": [
+          "45453"
+        ],
+        "has_variation": false,
+        "variants": [
+          {
+            "text": "Aaron A. Reed is a writer and game designer focused on exploring new ways for authors and readers to tell stories together. His award-winning games have been featured at IndieCade, South by Southwest, Slamdance, GaymerX, and the Independent Games Festival, and he has spoken about digital storytelling at Google, PAX and PAX East, WorldCon, NarraScope, and the Game Developer Conference. He holds a PhD in Computer Science and a MFA in Digital Arts and New Media, and aims to continue abusing them both in interesting ways.",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45463",
+              "45464",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 24,
+            "type": "agreement",
+            "note": "Same text as base"
+          }
+        ],
+        "total_versions_present": 25
+      },
+      {
+        "position": 1,
+        "base_text": "This is, by some definitions, his first novel. Or maybe that was <em>Blue Lacuna</em>. Or <em>Hollywood Visionary</em>. Or <em>The Ice-Bound Concordance</em>. It’s hard to say.",
+        "base_version": "45453",
+        "base_versions": [
+          "45453"
+        ],
+        "has_variation": false,
+        "variants": [
+          {
+            "text": "This is, by some definitions, his first novel. Or maybe that was <em>Blue Lacuna</em>. Or <em>Hollywood Visionary</em>. Or <em>The Ice-Bound Concordance</em>. It’s hard to say.",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45463",
+              "45464",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 24,
+            "type": "agreement",
+            "note": "Same text as base"
+          }
+        ],
+        "total_versions_present": 25
+      },
+      {
+        "position": 2,
+        "base_text": "Aaron lives with his totally real boyfriend in Alameda, California, in a house without a basement.",
+        "base_version": "45453",
+        "base_versions": [
+          "45453"
+        ],
+        "has_variation": false,
+        "variants": [
+          {
+            "text": "Aaron lives with his totally real boyfriend in Alameda, California, in a house without a basement.",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45463",
+              "45464",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 24,
+            "type": "agreement",
+            "note": "Same text as base"
+          }
+        ],
+        "total_versions_present": 25
+      },
+      {
+        "position": 3,
+        "base_text": "Reviews wanted! Please share your reaction to <em>Subcutanean</em> on Goodreads or anywhere else readers congregate. Your voice is a huge part of helping an indie book like this succeed. Thank you!",
+        "base_version": "45453",
+        "base_versions": [
+          "45453"
+        ],
+        "has_variation": false,
+        "variants": [
+          {
+            "text": "Reviews wanted! Please share your reaction to <em>Subcutanean</em> on Goodreads or anywhere else readers congregate. Your voice is a huge part of helping an indie book like this succeed. Thank you!",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45463",
+              "45464",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 24,
+            "type": "agreement",
+            "note": "Same text as base"
+          }
+        ],
+        "total_versions_present": 25
+      },
+      {
+        "position": 4,
+        "base_text": "aaronareed.net",
+        "base_version": "45453",
+        "base_versions": [
+          "45453"
+        ],
+        "has_variation": false,
+        "variants": [
+          {
+            "text": "aaronareed.net",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45463",
+              "45464",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 24,
+            "type": "agreement",
+            "note": "Same text as base"
+          }
+        ],
+        "total_versions_present": 25
+      }
+    ],
+    "45457": [
+      {
+        "position": 0,
+        "base_text": "Aaron A. Reed is a writer and game designer focused on exploring new ways for authors and readers to tell stories together. His award-winning games have been featured at IndieCade, South by Southwest, Slamdance, GaymerX, and the Independent Games Festival, and he has spoken about digital storytelling at Google, PAX and PAX East, WorldCon, NarraScope, and the Game Developer Conference. He holds a PhD in Computer Science and a MFA in Digital Arts and New Media, and aims to continue abusing them both in interesting ways.",
+        "base_version": "45457",
+        "base_versions": [
+          "45457"
+        ],
+        "has_variation": false,
+        "variants": [
+          {
+            "text": "Aaron A. Reed is a writer and game designer focused on exploring new ways for authors and readers to tell stories together. His award-winning games have been featured at IndieCade, South by Southwest, Slamdance, GaymerX, and the Independent Games Festival, and he has spoken about digital storytelling at Google, PAX and PAX East, WorldCon, NarraScope, and the Game Developer Conference. He holds a PhD in Computer Science and a MFA in Digital Arts and New Media, and aims to continue abusing them both in interesting ways.",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45453",
+              "45454",
+              "45455",
+              "45456",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45463",
+              "45464",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 24,
+            "type": "agreement",
+            "note": "Same text as base"
+          }
+        ],
+        "total_versions_present": 25
+      },
+      {
+        "position": 1,
+        "base_text": "This is, by some definitions, his first novel. Or maybe that was <em>Blue Lacuna</em>. Or <em>Hollywood Visionary</em>. Or <em>The Ice-Bound Concordance</em>. It’s hard to say.",
+        "base_version": "45457",
+        "base_versions": [
+          "45457"
+        ],
+        "has_variation": false,
+        "variants": [
+          {
+            "text": "This is, by some definitions, his first novel. Or maybe that was <em>Blue Lacuna</em>. Or <em>Hollywood Visionary</em>. Or <em>The Ice-Bound Concordance</em>. It’s hard to say.",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45453",
+              "45454",
+              "45455",
+              "45456",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45463",
+              "45464",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 24,
+            "type": "agreement",
+            "note": "Same text as base"
+          }
+        ],
+        "total_versions_present": 25
+      },
+      {
+        "position": 2,
+        "base_text": "Aaron lives with his totally real boyfriend in Alameda, California, in a house without a basement.",
+        "base_version": "45457",
+        "base_versions": [
+          "45457"
+        ],
+        "has_variation": false,
+        "variants": [
+          {
+            "text": "Aaron lives with his totally real boyfriend in Alameda, California, in a house without a basement.",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45453",
+              "45454",
+              "45455",
+              "45456",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45463",
+              "45464",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 24,
+            "type": "agreement",
+            "note": "Same text as base"
+          }
+        ],
+        "total_versions_present": 25
+      },
+      {
+        "position": 3,
+        "base_text": "Reviews wanted! Please share your reaction to <em>Subcutanean</em> on Goodreads or anywhere else readers congregate. Your voice is a huge part of helping an indie book like this succeed. Thank you!",
+        "base_version": "45457",
+        "base_versions": [
+          "45457"
+        ],
+        "has_variation": false,
+        "variants": [
+          {
+            "text": "Reviews wanted! Please share your reaction to <em>Subcutanean</em> on Goodreads or anywhere else readers congregate. Your voice is a huge part of helping an indie book like this succeed. Thank you!",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45453",
+              "45454",
+              "45455",
+              "45456",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45463",
+              "45464",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 24,
+            "type": "agreement",
+            "note": "Same text as base"
+          }
+        ],
+        "total_versions_present": 25
+      },
+      {
+        "position": 4,
+        "base_text": "aaronareed.net",
+        "base_version": "45457",
+        "base_versions": [
+          "45457"
+        ],
+        "has_variation": false,
+        "variants": [
+          {
+            "text": "aaronareed.net",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45453",
+              "45454",
+              "45455",
+              "45456",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45462",
+              "45463",
+              "45464",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 24,
+            "type": "agreement",
+            "note": "Same text as base"
+          }
+        ],
+        "total_versions_present": 25
+      }
+    ],
+    "45462": [
+      {
+        "position": 0,
+        "base_text": "Aaron A. Reed is a writer and game designer focused on exploring new ways for authors and readers to tell stories together. His award-winning games have been featured at IndieCade, South by Southwest, Slamdance, GaymerX, and the Independent Games Festival, and he has spoken about digital storytelling at Google, PAX and PAX East, WorldCon, NarraScope, and the Game Developer Conference. He holds a PhD in Computer Science and a MFA in Digital Arts and New Media, and aims to continue abusing them both in interesting ways.",
+        "base_version": "45462",
+        "base_versions": [
+          "45462"
+        ],
+        "has_variation": false,
+        "variants": [
+          {
+            "text": "Aaron A. Reed is a writer and game designer focused on exploring new ways for authors and readers to tell stories together. His award-winning games have been featured at IndieCade, South by Southwest, Slamdance, GaymerX, and the Independent Games Festival, and he has spoken about digital storytelling at Google, PAX and PAX East, WorldCon, NarraScope, and the Game Developer Conference. He holds a PhD in Computer Science and a MFA in Digital Arts and New Media, and aims to continue abusing them both in interesting ways.",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45453",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45463",
+              "45464",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 24,
+            "type": "agreement",
+            "note": "Same text as base"
+          }
+        ],
+        "total_versions_present": 25
+      },
+      {
+        "position": 1,
+        "base_text": "This is, by some definitions, his first novel. Or maybe that was <em>Blue Lacuna</em>. Or <em>Hollywood Visionary</em>. Or <em>The Ice-Bound Concordance</em>. It’s hard to say.",
+        "base_version": "45462",
+        "base_versions": [
+          "45462"
+        ],
+        "has_variation": false,
+        "variants": [
+          {
+            "text": "This is, by some definitions, his first novel. Or maybe that was <em>Blue Lacuna</em>. Or <em>Hollywood Visionary</em>. Or <em>The Ice-Bound Concordance</em>. It’s hard to say.",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45453",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45463",
+              "45464",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 24,
+            "type": "agreement",
+            "note": "Same text as base"
+          }
+        ],
+        "total_versions_present": 25
+      },
+      {
+        "position": 2,
+        "base_text": "Aaron lives with his totally real boyfriend in Alameda, California, in a house without a basement.",
+        "base_version": "45462",
+        "base_versions": [
+          "45462"
+        ],
+        "has_variation": false,
+        "variants": [
+          {
+            "text": "Aaron lives with his totally real boyfriend in Alameda, California, in a house without a basement.",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45453",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45463",
+              "45464",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 24,
+            "type": "agreement",
+            "note": "Same text as base"
+          }
+        ],
+        "total_versions_present": 25
+      },
+      {
+        "position": 3,
+        "base_text": "Reviews wanted! Please share your reaction to <em>Subcutanean</em> on Goodreads or anywhere else readers congregate. Your voice is a huge part of helping an indie book like this succeed. Thank you!",
+        "base_version": "45462",
+        "base_versions": [
+          "45462"
+        ],
+        "has_variation": false,
+        "variants": [
+          {
+            "text": "Reviews wanted! Please share your reaction to <em>Subcutanean</em> on Goodreads or anywhere else readers congregate. Your voice is a huge part of helping an indie book like this succeed. Thank you!",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45453",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45463",
+              "45464",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 24,
+            "type": "agreement",
+            "note": "Same text as base"
+          }
+        ],
+        "total_versions_present": 25
+      },
+      {
+        "position": 4,
+        "base_text": "aaronareed.net",
+        "base_version": "45462",
+        "base_versions": [
+          "45462"
+        ],
+        "has_variation": false,
+        "variants": [
+          {
+            "text": "aaronareed.net",
+            "versions": [
+              "45443",
+              "45444",
+              "45445",
+              "45446",
+              "45447",
+              "45448",
+              "45449",
+              "45450",
+              "45451",
+              "45452",
+              "45453",
+              "45454",
+              "45455",
+              "45456",
+              "45457",
+              "45458",
+              "45459",
+              "45460",
+              "45461",
+              "45463",
+              "45464",
+              "45465",
+              "45466",
+              "45467"
+            ],
+            "count": 24,
+            "type": "agreement",
+            "note": "Same text as base"
+          }
+        ],
+        "total_versions_present": 25
+      }
+    ]
+  }
+}
