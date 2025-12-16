@@ -3,19 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Subcutanean Variorum Browser</title>
+    <title>Subcutanean Version Comparison</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="compare.css">
 </head>
 <body>
     <header>
-        <h1>Subcutanean Variorum</h1>
-        <p class="subtitle">Explore the variations across 25 versions of Aaron Reed's novel</p>
+        <h1>Subcutanean</h1>
+        <p class="subtitle">Version Comparison Tool</p>
 
-        <div class="base-selector">
-            <label for="base-version-select">Base witness:</label>
-            <select id="base-version-select" class="base-select">
-                <!-- Options will be populated by JavaScript -->
-            </select>
+        <div class="comparison-controls">
+            <div class="version-selectors">
+                <div class="selector-group">
+                    <label for="version-a-select">Compare</label>
+                    <select id="version-a-select" class="version-select">
+                        <!-- Options populated by JavaScript -->
+                    </select>
+                </div>
+
+                <div class="selector-group">
+                    <label for="version-b-select">With</label>
+                    <select id="version-b-select" class="version-select">
+                        <!-- Options populated by JavaScript -->
+                    </select>
+                </div>
+            </div>
+
+            <div class="view-mode-selector">
+                <label>View mode:</label>
+                <div class="button-group">
+                    <button id="mode-unified" class="mode-btn">Unified</button>
+                    <button id="mode-sidebyside" class="mode-btn active">Side-by-side</button>
+                    <button id="mode-diff" class="mode-btn">Diff</button>
+                </div>
+            </div>
         </div>
 
         <nav id="chapter-nav" class="chapter-nav">
@@ -24,36 +45,19 @@
     </header>
 
     <main>
-        <div id="info-panel">
-            <p>
-                Base version: <span id="base-version"></span> |
-                Comparing <span id="total-versions"></span> versions |
-                <span id="variation-count"></span> variation points
-            </p>
-            <p class="instructions">
-                <strong>Hover over highlighted paragraphs</strong> to see variations from other versions.
-                Variants show different text; agreements (≡) show versions with identical text; omissions (⊘) indicate paragraphs missing in some versions.
-            </p>
-        </div>
-
-        <article id="text-display">
-            <!-- Text will be loaded here by JavaScript -->
-        </article>
-
-        <div id="variant-tooltip" class="tooltip hidden">
-            <div class="tooltip-header">Variants:</div>
-            <ul id="variant-list"></ul>
+        <div id="comparison-display">
+            <!-- Comparison will be rendered here -->
         </div>
     </main>
 
     <footer>
         <p>
             <em>Subcutanean</em> by Aaron Reed |
-            Variorum browser prototype |
             <a href="https://github.com/samplereality/subcutanean-browser" target="_blank">GitHub</a>
         </p>
     </footer>
 
-    <script src="app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/diff@5.1.0/dist/diff.min.js"></script>
+    <script src="compare.js"></script>
 </body>
 </html>

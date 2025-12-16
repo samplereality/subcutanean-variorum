@@ -126,10 +126,10 @@ def extract_all_versions():
         'ch020.xhtml': 'chapter16',
         'ch021.xhtml': 'chapter17',
         'ch022.xhtml': 'chapter18',
-        'ch023.xhtml': 'chapter19',
-        'ch024.xhtml': 'chapter20',
-        'ch025.xhtml': 'chapter21',
-        'ch026.xhtml': 'chapter22',
+        # ch023 = Bonus content (excluded - not part of original novel)
+        'ch024.xhtml': 'notes',
+        # ch025 = Kickstarter backers (excluded - never changes)
+        # ch026 = About the author (excluded - never changes)
     }
 
     all_versions = {}

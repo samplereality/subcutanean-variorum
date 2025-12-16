@@ -1752,24 +1752,7 @@
     "Nah. Scratch that.",
     "I trust we will."
   ],
-  "chapter19": [
-    "<em>Here’s a scene from Subcutanean in a different rendering from the one in the main text of this version of the book.</em>",
-    "<em>(From Chapter 8…)</em> Some of the rooms got larger, too big for rooms in a house. More like a school gymnasium. Still the same carpet, though. And it felt like we were seeing more of the anomalies, the farther in and deeper down we got. An explosion of pipes and plumbing, sticking out of a wall for no particular reason; weird cube-shaped extrusions or cavities in the edges of rooms. It was like the deeper we went, the more flexible the rules became—of architecture, of stability, of god knows what else.",
-    "At one point we came to a low-ceilinged room maybe twenty feet across, unlit, too big for our flashlights to see the far end. But at the edge of their reach, in the dimness, the floor began to curve up.",
-    "We started forward. The ceiling stayed at the same low height, maybe seven feet up, but its angle began to steepen, in lockstep with the angle of the floor. After a few minutes, the slope was too severe for our shoes to get purchase on the carpet. For as far as our flashlight beams could show the slope kept on steepening, although we couldn’t see too far around the curve ahead. It was like walking up the inside of a giant carpeted hamster wheel.",
-    "“This proves it,” Niko said.",
-    "“Proves what?”",
-    "He threw his hands up. “Downstairs can’t possibly exist.”",
-    "“No shit, Sherlock.”",
-    "“I mean not in real, physical space.” He swayed, shifting his balance on the awkward carpeted slope. “This is too big. We haven’t gone down nearly far enough for this whole curve to fit underground.”",
-    "“I don’t know about that. It doesn’t feel like we’ve climbed enough to hit ground level yet. And maybe this isn’t a full wheel. Maybe it stops just up ahead.”",
-    "He scowled. “Man, why are you always <em>defending</em> this place? Making excuses for it? Okay, Einstein. Why wouldn’t it go all the way around?”",
-    "“Well, why <em>would</em> it?”",
-    "We stared at each other, but there was nothing else to say.",
-    "“Maybe it’s more like a message,” he muttered as we started back down the slope. “Rats in a cage, you know. Spinning our wheels. Getting nowhere.” He shot a vicious glance at the curving ceiling. “Funny.”",
-    "There were no doors out of the hamster wheel other than the one we’d come in from, where the slope had flattened out again. We left it behind, another baffling mystery."
-  ],
-  "chapter20": [
+  "notes": [
     "<em>There are several hundred places in the master copy of</em> Subcutanean <em>where text can vary. Here is a sampling of some of the decisions made by the rendering code when this copy was generated.</em>",
     "‣ Your narrator preferred more succinct ways of saying things.",
     "‣ Your narrator was a bit more optimistic than the norm.",
@@ -1782,16 +1765,5 @@
     "‣ At the bottom of your Downstairs was an endless empty space, the Basement.",
     "‣ In this version, the final fight took place on a tube of bedroom-stuff suspended over an endless dropoff.",
     "‣ Your Ryan never found the version of Niko he thought he was looking for. That’s probably for the best."
-  ],
-  "chapter21": [
-    "Countless permutations of thanks to my crowdfunding backers who helped make this project happen!",
-    "Adam Marshall Smith\nAdam Summerville\nAidan Linder\nAlan Hinchcliffe\nAlex Hutchinson\nAlex Mitchell\nAlexander Davis\nAlexis Ong\nAlice Southey\nAllison Parrish\nAnastasia M Salter\nAndrew Ferguson\nAndrew Plotkin\nAndrew Vestal\nAndy Whitmire\nAnonymous backers\nAnne Sullivan\nBay Chang\nBenjamin J Robertson\nBogi Takács and R.B. Lemberg\nBrett Witty\nBrian Jenkins\nByron Alexander Campbell\nCandice Majewski\nChad Barb\nChris Rees\nClara Fernández-Vara\nClifton Royston\nCraig D Hewitt\nDamien Neil\nDamien Neil\nDan Cox\nDana Duffield\nDaniel Dresser\nDaniel Ravipinto\nDave LeCompte\nDavid G Tubby\nDavid J. Allison\nDavid Masad\nDavid Szydloski\nDawn Sueoka\nDerek Donahue\nDiane Heaton\nDietrich Squinkifer\nDionysus Blazakis\nDoni Faber\nDuncan Bowsman\nDylan Lederle-Ensign\nEd Washburn\nEli Zupke\nElizabeth Goss\nEllie Yee\nEmily Hopson-Hill\nEmily Shearer\nEmily Short\nEvan Balster\nEvan Marzahn\nFelicity Drake\nFinn Ellis\nFlorian Mehm\nFrank Lantz\nfreddy elbaiady\nFreya Campbell\nGabriel Smedresman\nGillian Smith\nGreg Dember\nHamish McIntyre\nHartmut Koenitz\nHeather Albano\nHerb Swift\nian michael waddell\nIsaac Karth\nIsaac Schankler\nJacob Garbe\nJacob Topp-Mugglestone\nJames Ryan\nJane Clark\nJason Grinblat\nJay Edelson\nJenni Polodna\nJeremy Rishe\nJessica Rivera\nJinjin Wu\nJohn Leen\nJohn Maullin\nJohn Murray\nJohn Urquhart Ferguson\nJohnnemann Nordhagen\nJonathan Reyes\nJordan Han\nJosh & Amber Fitzgerald\nJosh Lawrence\nJoshua McCoy\nJulian Togelius\nJurie Horneman\nK.DeFlane\nKaren Vaughan\nKatherine Morayati\nKatrina Kinsley\nkay walker\nKerry Garvin\nKevin Langevin\nKimberly Shannon\nKrauseman\nKyle Haas\nKylie Taylor\nLara Martin\nLaura E Hall\nLyle Skains\nMalin Rozon\nMarcelo D. Viana Neto\nMari Page\nMarina Rossi\nMark C. Marino\nMark McGurl\nMark Rickerby\nMartin Ralya\nMatt Sinclair\nMatthew Campbell\nMatthew Ivan Bennett\nMatthew Kirschenbaum\nMatthew R.F. Balousek\nMax Kreminski\nMaya Sonenberg\nMegha Baikadi\nMelanie Dickinson\nMichael Bikovitsky\nMichael Janes\nMichael Mateas\nMichael Rubin\nMichiel Trimpe\nMike Treanor\nMolly O’Brien-Manley\nNick Junius\nNick Scheiblauer\nNoah Wardrip-Fruin\nNoel Warford\nNPCDev\nPatrick R\nPaul Benzon\nPeep van der Molen\nPeter Mawhorter\nPhoenix Toews\nRae Tay\nRaphael D’Amico\nRax Green\nRichard Eriksson\nRichard Roberts\nRick Dean\nRobb Sherwin\nRobert Fletcher\nRobert Giusti\nSam Kabo Ashwell\nSam Roberts\nScott Hardwick\nScott M. Bruner\nSebastian ‘achlys’ Stein\nShannon Prickett, Patron of the Arts\nSimon Sarginson\nStephen G. Ware\nStephen Granade\nSterling Keeley\nStorme Winfield\nstricken.messenger\nSydney Ellis\ntablesaw\nTara Liu\nTarn Adams\nTerry Beyak\nTheresa Jean Tanenbaum\nThomas Dinneny\nThomas Gizbert\nTim Chaplin\ntobbsvensson\nTracy O’Brien\nTravis Capener\nTy Eckley\ntyler burns\nValentina\nVallia Yu\nWill Jennings\nWilliam Hampton\nYuu Gamon\nZack Urlocker"
-  ],
-  "chapter22": [
-    "Aaron A. Reed is a writer and game designer focused on exploring new ways for authors and readers to tell stories together. His award-winning games have been featured at IndieCade, South by Southwest, Slamdance, GaymerX, and the Independent Games Festival, and he has spoken about digital storytelling at Google, PAX and PAX East, WorldCon, NarraScope, and the Game Developer Conference. He holds a PhD in Computer Science and a MFA in Digital Arts and New Media, and aims to continue abusing them both in interesting ways.",
-    "This is, by some definitions, his first novel. Or maybe that was <em>Blue Lacuna</em>. Or <em>Hollywood Visionary</em>. Or <em>The Ice-Bound Concordance</em>. It’s hard to say.",
-    "Aaron lives with his totally real boyfriend in Alameda, California, in a house without a basement.",
-    "Reviews wanted! Please share your reaction to <em>Subcutanean</em> on Goodreads or anywhere else readers congregate. Your voice is a huge part of helping an indie book like this succeed. Thank you!",
-    "aaronareed.net"
   ]
 }

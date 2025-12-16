@@ -365,13 +365,27 @@ footer a:hover {
 }
 
 /* Responsive */
+
+/* Tablet and below */
 @media (max-width: 768px) {
     body {
         font-size: 16px;
     }
 
+    header {
+        padding: 1.5rem 1rem 0.75rem;
+    }
+
     header h1 {
         font-size: 2rem;
+    }
+
+    .subtitle {
+        font-size: 0.9rem;
+    }
+
+    main {
+        padding: 1.5rem 1rem;
     }
 
     #text-display {
@@ -380,5 +394,63 @@ footer a:hover {
 
     .tooltip {
         max-width: 280px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+    body {
+        font-size: 15px;
+    }
+
+    header {
+        padding: 1rem 0.75rem 0.5rem;
+    }
+
+    header h1 {
+        font-size: 1.75rem;
+    }
+
+    .subtitle {
+        font-size: 0.85rem;
+    }
+
+    .nav-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .chapter-nav {
+        gap: 0.4rem;
+        padding: 0.5rem 0;
+    }
+
+    main {
+        padding: 1rem 0.75rem;
+    }
+
+    #info-panel {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    #text-display {
+        padding: 1.5rem 1rem;
+    }
+
+    #text-display p {
+        text-align: left;
+        text-indent: 0;
+    }
+
+    .tooltip {
+        max-width: calc(100vw - 2rem);
+        left: 1rem !important;
+        right: 1rem;
+    }
+
+    footer {
+        padding: 1.5rem 1rem;
+        font-size: 0.85rem;
     }
 }
