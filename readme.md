@@ -13,6 +13,23 @@ A web-based comparison tool for exploring textual variations across 25 unique ed
   - **Side-by-side**: Compare two versions in parallel columns
   - **Diff**: Inline highlighting shows exact additions (green) and deletions (red/strikethrough) between versions
 
+- **Search Functionality**: Find any word or phrase across all chapters
+  - Searches all chapters in the selected version(s)
+  - Navigate forward and backward through all occurrences
+  - Current result highlighted in orange, other matches in yellow
+  - Shows total count and current position (e.g., "3 of 15")
+  - Automatically switches chapters when navigating to matches in other sections
+  - Keyboard shortcuts: F3 (next), Shift+F3 (previous), Escape (clear search)
+  - Floating navigation buttons stay visible while scrolling for easy access
+
+- **Word Differential Analysis**: Compare the unique vocabulary between any two seeds
+  - Shows words that appear in one version but not the other
+  - Excludes the Notes chapter for focused textual analysis
+  - Sort options: alphabetical or by frequency
+  - Frequency view displays word counts in parentheses (only shown when count > 1)
+  - Click any word to see which chapters it appears in
+  - Click a chapter name to jump directly to that chapter with the word highlighted
+
 - **Complete Coverage**: Browse all 23 sections including:
   - Introduction and Prologue
   - Chapters 1-18
@@ -21,6 +38,13 @@ A web-based comparison tool for exploring textual variations across 25 unique ed
 
 - **25 Unique Editions**: Each "seed" represents a distinct version of the complete novel, numbered 45443-45467
 
+- **Upload Custom Versions**: Upload additional EPUB files to compare with built-in versions
+  - Drag and drop or click to select EPUB files
+  - Automatically extracts and parses text from all 23 sections
+  - Stored in browser's localStorage for persistence
+  - Custom versions appear in dropdowns with a 📎 icon
+  - Supports both standard naming (subcutanean-XXXXX.epub) and custom filenames
+
 - **Mobile-Friendly**: Fully responsive design optimized for phones, tablets, and desktop browsers
 
 ## How to Use
@@ -28,7 +52,10 @@ A web-based comparison tool for exploring textual variations across 25 unique ed
 1. **Select two versions** using the dropdown menus (labeled "Compare" and "With")
 2. **Choose a view mode**: Unified, Side-by-side, or Diff
 3. **Navigate chapters** using the horizontal scrolling chapter menu
-4. **Switch between versions** at any time to explore different comparisons
+4. **Search for text**: Enter a word or phrase and click "Find" to highlight all matches (click "Clear" to remove highlights)
+5. **Analyze word differences**: Click "Word Differential" to see which words are unique to each selected version
+6. **Upload custom versions**: Click "Upload EPUB" to add your own version of the novel for comparison
+7. **Switch between versions** at any time to explore different comparisons
 
 ## Technical Details
 
@@ -55,6 +82,9 @@ docs/
 
 - **Vanilla JavaScript** - No frameworks, just clean ES6+
 - **diff.js** - Word-level difference algorithm (via CDN)
+- **JSZip** - Client-side EPUB parsing (via CDN)
+- **localStorage API** - Browser-based persistence for uploaded versions
+- **DOMParser API** - HTML parsing for text extraction
 - **CSS Grid & Flexbox** - Responsive layouts
 - **GitHub Pages** - Free hosting for static site
 

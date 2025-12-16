@@ -6,6 +6,34 @@ let currentChapter = 'prologue';
 let currentMode = 'sidebyside';
 let versionA = null;
 let versionB = null;
+let customVersions = {}; // Store uploaded versions
+
+// Chapter mapping from EPUB files to section IDs
+const CHAPTER_MAPPING = {
+    'ch001.xhtml': 'introduction',
+    'ch002.xhtml': 'prologue',
+    'ch003.xhtml': 'chapter1',
+    'ch004.xhtml': 'chapter2',
+    'ch005.xhtml': 'chapter3',
+    'ch006.xhtml': 'chapter4',
+    'ch007.xhtml': 'chapter5',
+    'ch008.xhtml': 'chapter6',
+    'ch009.xhtml': 'chapter7',
+    'ch010.xhtml': 'chapter8',
+    'ch011.xhtml': 'chapter9',
+    'ch012.xhtml': 'part2',
+    'ch013.xhtml': 'chapter10',
+    'ch014.xhtml': 'chapter11',
+    'ch015.xhtml': 'chapter12',
+    'ch016.xhtml': 'chapter13',
+    'ch017.xhtml': 'chapter14',
+    'ch018.xhtml': 'chapter15',
+    'ch019.xhtml': 'part3',
+    'ch020.xhtml': 'chapter16',
+    'ch021.xhtml': 'chapter17',
+    'ch022.xhtml': 'chapter18',
+    'ch024.xhtml': 'notes'
+};
 
 // Load all versions data
 async function loadAllVersions() {
@@ -13,6 +41,9 @@ async function loadAllVersions() {
         const response = await fetch('extracted_text/all_versions.json');
         allVersions = await response.json();
         versionIds = Object.keys(allVersions).sort();
+
+        // Load custom versions from localStorage
+        loadCustomVersions();
 
         // Populate version selectors
         populateVersionSelectors();
@@ -40,6 +71,11 @@ function populateVersionSelectors() {
     const selectorA = document.getElementById('version-a-select');
     const selectorB = document.getElementById('version-b-select');
 
+    // Clear existing options
+    selectorA.innerHTML = '';
+    selectorB.innerHTML = '';
+
+    // Add built-in versions
     versionIds.forEach(vid => {
         const optionA = document.createElement('option');
         optionA.value = vid;
@@ -52,16 +88,49 @@ function populateVersionSelectors() {
         selectorB.appendChild(optionB);
     });
 
-    // Add change handlers
-    selectorA.addEventListener('change', (e) => {
-        versionA = e.target.value;
-        displayComparison();
-    });
+    // Add separator if there are custom versions
+    const customIds = Object.keys(customVersions);
+    if (customIds.length > 0) {
+        const separatorA = document.createElement('option');
+        separatorA.disabled = true;
+        separatorA.textContent = '──────────';
+        selectorA.appendChild(separatorA);
 
-    selectorB.addEventListener('change', (e) => {
-        versionB = e.target.value;
-        displayComparison();
-    });
+        const separatorB = document.createElement('option');
+        separatorB.disabled = true;
+        separatorB.textContent = '──────────';
+        selectorB.appendChild(separatorB);
+
+        // Add custom versions
+        customIds.sort().forEach(vid => {
+            const optionA = document.createElement('option');
+            optionA.value = vid;
+            optionA.textContent = `📎 ${customVersions[vid].name || vid}`;
+            selectorA.appendChild(optionA);
+
+            const optionB = document.createElement('option');
+            optionB.value = vid;
+            optionB.textContent = `📎 ${customVersions[vid].name || vid}`;
+            selectorB.appendChild(optionB);
+        });
+    }
+
+    // Add change handlers (only once)
+    if (!selectorA.dataset.hasListener) {
+        selectorA.addEventListener('change', (e) => {
+            versionA = e.target.value;
+            displayComparison();
+        });
+        selectorA.dataset.hasListener = 'true';
+    }
+
+    if (!selectorB.dataset.hasListener) {
+        selectorB.addEventListener('change', (e) => {
+            versionB = e.target.value;
+            displayComparison();
+        });
+        selectorB.dataset.hasListener = 'true';
+    }
 }
 
 function buildChapterNavigation() {
@@ -133,6 +202,11 @@ function setViewMode(mode) {
 function displayComparison() {
     const display = document.getElementById('comparison-display');
 
+    // Clear any search highlights when changing view (but preserve search state)
+    const hadActiveSearch = currentSearchTerm !== '';
+    const searchTerm = currentSearchTerm;
+    clearSearchHighlights(false);
+
     // Get chapter text from both versions
     const textA = allVersions[versionA][currentChapter] || [];
     const textB = allVersions[versionB][currentChapter] || [];
@@ -143,6 +217,13 @@ function displayComparison() {
         displaySideBySide(display, textA, textB);
     } else if (currentMode === 'diff') {
         displayDiff(display, textA, textB);
+    }
+
+    // Re-apply search highlights if there was an active search
+    if (hadActiveSearch && searchTerm) {
+        setTimeout(() => {
+            highlightSearchMatches(searchTerm);
+        }, 0);
     }
 }
 
@@ -263,8 +344,815 @@ function displayDiff(container, paragraphsA, paragraphsB) {
     container.appendChild(div);
 }
 
+// Search functionality
+let currentSearchTerm = '';
+let allSearchOccurrences = [];
+let currentOccurrenceIndex = -1;
+
+function highlightSearchMatches(searchTerm) {
+    if (!searchTerm) return;
+
+    currentSearchTerm = searchTerm.toLowerCase();
+    const container = document.getElementById('comparison-display');
+
+    // Get all text nodes
+    const walker = document.createTreeWalker(
+        container,
+        NodeFilter.SHOW_TEXT,
+        null,
+        false
+    );
+
+    const nodesToHighlight = [];
+    let node;
+
+    while (node = walker.nextNode()) {
+        // Skip if parent is already a highlight or script
+        if (node.parentElement.classList.contains('search-highlight') ||
+            node.parentElement.tagName === 'SCRIPT') {
+            continue;
+        }
+
+        const text = node.textContent.toLowerCase();
+        if (text.includes(currentSearchTerm)) {
+            nodesToHighlight.push(node);
+        }
+    }
+
+    // Highlight each matching node
+    nodesToHighlight.forEach(node => {
+        const text = node.textContent;
+        const regex = new RegExp(`(${escapeRegex(searchTerm)})`, 'gi');
+        const parts = text.split(regex);
+
+        if (parts.length > 1) {
+            const fragment = document.createDocumentFragment();
+            parts.forEach(part => {
+                if (part.toLowerCase() === searchTerm.toLowerCase()) {
+                    const highlight = document.createElement('span');
+                    highlight.className = 'search-highlight';
+                    highlight.textContent = part;
+                    fragment.appendChild(highlight);
+                } else if (part) {
+                    fragment.appendChild(document.createTextNode(part));
+                }
+            });
+            node.parentNode.replaceChild(fragment, node);
+        }
+    });
+}
+
+function clearSearchHighlights(resetState = true) {
+    const highlights = document.querySelectorAll('.search-highlight');
+    highlights.forEach(highlight => {
+        const text = highlight.textContent;
+        const textNode = document.createTextNode(text);
+        highlight.parentNode.replaceChild(textNode, highlight);
+    });
+
+    if (resetState) {
+        currentSearchTerm = '';
+        allSearchOccurrences = [];
+        currentOccurrenceIndex = -1;
+
+        // Hide navigation (both inline and floating)
+        const navigation = document.getElementById('search-navigation');
+        if (navigation) {
+            navigation.classList.add('hidden');
+        }
+        const floatingNav = document.getElementById('floating-search-nav');
+        if (floatingNav) {
+            floatingNav.classList.add('hidden');
+        }
+    }
+}
+
+function escapeRegex(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function findAllOccurrences(searchTerm) {
+    const occurrences = [];
+    const searchRegex = new RegExp(`\\b${escapeRegex(searchTerm)}\\b`, 'gi');
+
+    // Get all chapters from the first version
+    const firstVersion = allVersions[versionIds[0]];
+    const chapters = Object.keys(firstVersion).filter(key => key !== 'version_id');
+
+    chapters.forEach(chapterId => {
+        // Get text based on current mode
+        let textToSearch = '';
+
+        if (currentMode === 'unified') {
+            const paragraphs = allVersions[versionA][chapterId] || [];
+            textToSearch = paragraphs.join(' ');
+        } else if (currentMode === 'sidebyside') {
+            const paragraphsA = allVersions[versionA][chapterId] || [];
+            const paragraphsB = allVersions[versionB][chapterId] || [];
+            textToSearch = paragraphsA.join(' ') + ' ' + paragraphsB.join(' ');
+        } else if (currentMode === 'diff') {
+            const paragraphsA = allVersions[versionA][chapterId] || [];
+            const paragraphsB = allVersions[versionB][chapterId] || [];
+            textToSearch = paragraphsA.join(' ') + ' ' + paragraphsB.join(' ');
+        }
+
+        // Remove HTML tags for searching
+        const cleanText = textToSearch.replace(/<[^>]*>/g, ' ');
+
+        // Find all matches in this chapter
+        let match;
+        searchRegex.lastIndex = 0;
+        while ((match = searchRegex.exec(cleanText)) !== null) {
+            occurrences.push({
+                chapterId: chapterId,
+                chapterName: formatChapterName(chapterId),
+                index: match.index
+            });
+        }
+    });
+
+    return occurrences;
+}
+
+function performSearch() {
+    const searchInput = document.getElementById('search-input');
+    const searchTerm = searchInput.value.trim();
+
+    if (!searchTerm) return;
+
+    currentSearchTerm = searchTerm;
+
+    // Find all occurrences across all chapters
+    allSearchOccurrences = findAllOccurrences(searchTerm);
+
+    if (allSearchOccurrences.length === 0) {
+        updateSearchUI();
+        return;
+    }
+
+    // Find the first occurrence in or after the current chapter
+    let startIndex = allSearchOccurrences.findIndex(occ => occ.chapterId === currentChapter);
+    if (startIndex === -1) {
+        startIndex = 0;
+    }
+
+    currentOccurrenceIndex = startIndex;
+    goToOccurrence(currentOccurrenceIndex);
+}
+
+function goToOccurrence(index) {
+    if (index < 0 || index >= allSearchOccurrences.length) return;
+
+    const occurrence = allSearchOccurrences[index];
+    currentOccurrenceIndex = index;
+
+    // Switch chapter if needed
+    if (occurrence.chapterId !== currentChapter) {
+        currentChapter = occurrence.chapterId;
+
+        // Update active chapter button
+        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+        const chapterButtons = document.querySelectorAll('.nav-btn');
+        chapterButtons.forEach(btn => {
+            const btnChapter = btn.textContent.toLowerCase();
+            const occChapter = occurrence.chapterName.toLowerCase();
+            if (btnChapter.includes(occChapter) || occChapter.includes(btnChapter)) {
+                btn.classList.add('active');
+            }
+        });
+
+        // Display the new chapter
+        displayComparison();
+    }
+
+    // Wait for rendering, then highlight
+    setTimeout(() => {
+        clearSearchHighlights(false); // Don't reset state, just remove highlights
+        highlightSearchMatches(currentSearchTerm);
+
+        // Mark current occurrence
+        const highlights = document.querySelectorAll('.search-highlight');
+        if (highlights.length > 0) {
+            // Find which highlight in this chapter corresponds to our occurrence
+            let chapterOccurrences = allSearchOccurrences.filter(occ => occ.chapterId === currentChapter);
+            let indexInChapter = chapterOccurrences.findIndex(occ => occ === occurrence);
+
+            if (indexInChapter >= 0 && indexInChapter < highlights.length) {
+                highlights[indexInChapter].classList.add('current');
+                highlights[indexInChapter].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else if (highlights[0]) {
+                highlights[0].classList.add('current');
+                highlights[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        updateSearchUI();
+    }, occurrence.chapterId !== currentChapter ? 100 : 0);
+}
+
+function goToPreviousOccurrence() {
+    if (currentOccurrenceIndex > 0) {
+        goToOccurrence(currentOccurrenceIndex - 1);
+    }
+}
+
+function goToNextOccurrence() {
+    if (currentOccurrenceIndex < allSearchOccurrences.length - 1) {
+        goToOccurrence(currentOccurrenceIndex + 1);
+    }
+}
+
+function updateSearchUI() {
+    const navigation = document.getElementById('search-navigation');
+    const count = document.getElementById('search-results-count');
+    const chapterLabel = document.getElementById('search-chapter-label');
+    const prevBtn = document.getElementById('search-prev-btn');
+    const nextBtn = document.getElementById('search-next-btn');
+
+    // Also update floating navigation
+    const floatingNav = document.getElementById('floating-search-nav');
+    const floatingCount = document.getElementById('floating-count');
+    const floatingChapterLabel = document.getElementById('floating-chapter-label');
+    const floatingPrevBtn = document.getElementById('floating-prev-btn');
+    const floatingNextBtn = document.getElementById('floating-next-btn');
+
+    if (allSearchOccurrences.length === 0) {
+        navigation.classList.add('hidden');
+        floatingNav.classList.add('hidden');
+        return;
+    }
+
+    navigation.classList.remove('hidden');
+    floatingNav.classList.remove('hidden');
+
+    const countText = `${currentOccurrenceIndex + 1} of ${allSearchOccurrences.length}`;
+    const shortCountText = `${currentOccurrenceIndex + 1}/${allSearchOccurrences.length}`;
+
+    count.textContent = countText;
+    floatingCount.textContent = shortCountText;
+
+    // Update chapter labels
+    const currentOccurrence = allSearchOccurrences[currentOccurrenceIndex];
+    if (currentOccurrence) {
+        const chapterName = formatChapterName(currentOccurrence.chapterId);
+        chapterLabel.textContent = `in ${chapterName}`;
+
+        // Shorter version for floating nav
+        let shortChapterName = chapterName;
+        if (chapterName.startsWith('Chapter ')) {
+            shortChapterName = 'Ch ' + chapterName.replace('Chapter ', '');
+        }
+        floatingChapterLabel.textContent = shortChapterName;
+    }
+
+    const isPrevDisabled = currentOccurrenceIndex <= 0;
+    const isNextDisabled = currentOccurrenceIndex >= allSearchOccurrences.length - 1;
+
+    prevBtn.disabled = isPrevDisabled;
+    nextBtn.disabled = isNextDisabled;
+    floatingPrevBtn.disabled = isPrevDisabled;
+    floatingNextBtn.disabled = isNextDisabled;
+}
+
+// Word differential functionality
+let currentSortMode = 'alpha'; // 'alpha' or 'freq'
+let currentWordData = { uniqueToA: [], uniqueToB: [], freqA: new Map(), freqB: new Map() };
+
+function extractWords(text) {
+    // Remove HTML tags, lowercase, extract words (alphanumeric + apostrophes)
+    const cleanText = text.replace(/<[^>]*>/g, ' ').toLowerCase();
+    const words = cleanText.match(/[a-z]+(?:'[a-z]+)?/g) || [];
+
+    // Count word frequencies
+    const frequencies = new Map();
+    words.forEach(word => {
+        frequencies.set(word, (frequencies.get(word) || 0) + 1);
+    });
+
+    return frequencies;
+}
+
+function getAllTextForSeed(seedId) {
+    const seedData = allVersions[seedId];
+    if (!seedData) return '';
+
+    let allText = '';
+    // Exclude 'notes' chapter and version_id field
+    for (const [chapterId, paragraphs] of Object.entries(seedData)) {
+        if (chapterId === 'version_id' || chapterId === 'notes') continue;
+        if (Array.isArray(paragraphs)) {
+            allText += ' ' + paragraphs.join(' ');
+        }
+    }
+    return allText;
+}
+
+function calculateWordDifferential() {
+    const modal = document.getElementById('word-diff-modal');
+    const seedALabel = document.getElementById('seed-a-label');
+    const seedBLabel = document.getElementById('seed-b-label');
+
+    // Get text for both seeds
+    const textA = getAllTextForSeed(versionA);
+    const textB = getAllTextForSeed(versionB);
+
+    // Extract word frequencies
+    const freqA = extractWords(textA);
+    const freqB = extractWords(textB);
+
+    // Calculate unique words
+    const uniqueToA = [...freqA.keys()].filter(word => !freqB.has(word));
+    const uniqueToB = [...freqB.keys()].filter(word => !freqA.has(word));
+
+    // Store data globally for sorting
+    currentWordData = {
+        uniqueToA: uniqueToA,
+        uniqueToB: uniqueToB,
+        freqA: freqA,
+        freqB: freqB
+    };
+
+    // Update modal labels
+    seedALabel.textContent = versionA;
+    seedBLabel.textContent = versionB;
+
+    // Display words with current sort mode
+    displayWordLists();
+
+    // Show modal
+    modal.classList.remove('hidden');
+}
+
+function displayWordLists() {
+    const uniqueACount = document.getElementById('unique-a-count');
+    const uniqueBCount = document.getElementById('unique-b-count');
+    const uniqueWordsA = document.getElementById('unique-words-a');
+    const uniqueWordsB = document.getElementById('unique-words-b');
+
+    let sortedA, sortedB;
+
+    if (currentSortMode === 'alpha') {
+        // Sort alphabetically
+        sortedA = [...currentWordData.uniqueToA].sort();
+        sortedB = [...currentWordData.uniqueToB].sort();
+    } else {
+        // Sort by frequency (descending)
+        sortedA = [...currentWordData.uniqueToA].sort((a, b) =>
+            currentWordData.freqA.get(b) - currentWordData.freqA.get(a)
+        );
+        sortedB = [...currentWordData.uniqueToB].sort((a, b) =>
+            currentWordData.freqB.get(b) - currentWordData.freqB.get(a)
+        );
+    }
+
+    // Update counts
+    uniqueACount.textContent = sortedA.length;
+    uniqueBCount.textContent = sortedB.length;
+
+    // Display unique words with frequencies if in frequency mode
+    uniqueWordsA.innerHTML = '';
+    sortedA.forEach(word => {
+        const freq = currentWordData.freqA.get(word);
+        const freqText = (currentSortMode === 'freq' && freq > 1) ? ` (${freq})` : '';
+        const span = document.createElement('span');
+        span.className = 'word-item';
+        span.textContent = word + freqText;
+        span.dataset.word = word;
+        span.dataset.seed = versionA;
+        span.addEventListener('click', (e) => showWordPopup(e, word, versionA));
+        uniqueWordsA.appendChild(span);
+    });
+
+    uniqueWordsB.innerHTML = '';
+    sortedB.forEach(word => {
+        const freq = currentWordData.freqB.get(word);
+        const freqText = (currentSortMode === 'freq' && freq > 1) ? ` (${freq})` : '';
+        const span = document.createElement('span');
+        span.className = 'word-item';
+        span.textContent = word + freqText;
+        span.dataset.word = word;
+        span.dataset.seed = versionB;
+        span.addEventListener('click', (e) => showWordPopup(e, word, versionB));
+        uniqueWordsB.appendChild(span);
+    });
+}
+
+function setSortMode(mode) {
+    currentSortMode = mode;
+
+    // Update button states
+    document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(`sort-${mode}-btn`).classList.add('active');
+
+    // Re-display with new sort
+    displayWordLists();
+}
+
+function findChaptersWithWord(word, seedId) {
+    const seedData = allVersions[seedId];
+    if (!seedData) return [];
+
+    const chaptersWithWord = [];
+    const searchRegex = new RegExp(`\\b${escapeRegex(word)}\\b`, 'i');
+
+    for (const [chapterId, paragraphs] of Object.entries(seedData)) {
+        if (chapterId === 'version_id' || chapterId === 'notes') continue;
+        if (Array.isArray(paragraphs)) {
+            const allText = paragraphs.join(' ').replace(/<[^>]*>/g, ' ');
+            if (searchRegex.test(allText)) {
+                chaptersWithWord.push(chapterId);
+            }
+        }
+    }
+
+    return chaptersWithWord;
+}
+
+function formatChapterName(chapterId) {
+    if (chapterId === 'introduction') return 'Introduction';
+    if (chapterId === 'prologue') return 'Prologue';
+    if (chapterId === 'part2') return 'Part II';
+    if (chapterId === 'part3') return 'Part III';
+    if (chapterId === 'notes') return 'Notes';
+    if (chapterId.startsWith('chapter')) {
+        return `Chapter ${chapterId.replace('chapter', '')}`;
+    }
+    return chapterId;
+}
+
+function showWordPopup(event, word, seedId) {
+    const popup = document.getElementById('word-popup');
+    const popupWord = document.getElementById('popup-word');
+    const chaptersList = document.getElementById('word-popup-chapters');
+
+    // Find chapters containing this word
+    const chapters = findChaptersWithWord(word, seedId);
+
+    if (chapters.length === 0) {
+        return; // No chapters found
+    }
+
+    // Update popup content
+    popupWord.textContent = word;
+    chaptersList.innerHTML = '';
+
+    chapters.forEach(chapterId => {
+        const li = document.createElement('li');
+        li.textContent = formatChapterName(chapterId);
+        li.addEventListener('click', () => jumpToChapterWithWord(chapterId, word));
+        chaptersList.appendChild(li);
+    });
+
+    // Position popup near the clicked word
+    const rect = event.target.getBoundingClientRect();
+    popup.style.left = `${Math.min(rect.left, window.innerWidth - 320)}px`;
+    popup.style.top = `${rect.bottom + 5}px`;
+
+    // Show popup
+    popup.classList.add('visible');
+}
+
+function jumpToChapterWithWord(chapterId, word) {
+    // Close both popup and modal
+    closeWordPopup();
+    closeModal();
+
+    // Update current chapter
+    currentChapter = chapterId;
+
+    // Update active chapter button
+    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+    const chapterButtons = document.querySelectorAll('.nav-btn');
+    chapterButtons.forEach(btn => {
+        if (btn.textContent.toLowerCase().includes(chapterId.replace('chapter', '').replace('part', ''))) {
+            btn.classList.add('active');
+        }
+    });
+
+    // Display the chapter
+    displayComparison();
+
+    // Wait a moment for rendering, then highlight the word
+    setTimeout(() => {
+        // Start a new search for this word
+        currentSearchTerm = word;
+        allSearchOccurrences = findAllOccurrences(word);
+        currentOccurrenceIndex = 0;
+
+        clearSearchHighlights(false);
+        highlightSearchMatches(word);
+
+        // Mark first occurrence and scroll to it
+        const firstHighlight = document.querySelector('.search-highlight');
+        if (firstHighlight) {
+            firstHighlight.classList.add('current');
+            firstHighlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        updateSearchUI();
+    }, 100);
+}
+
+function closeWordPopup() {
+    const popup = document.getElementById('word-popup');
+    popup.classList.remove('visible');
+}
+
+function closeModal() {
+    const modal = document.getElementById('word-diff-modal');
+    modal.classList.add('hidden');
+}
+
+// EPUB Upload and Processing
+
+function loadCustomVersions() {
+    try {
+        const stored = localStorage.getItem('subcutanean_custom_versions');
+        if (stored) {
+            const parsed = JSON.parse(stored);
+            customVersions = parsed;
+
+            // Merge custom versions into allVersions
+            Object.keys(customVersions).forEach(vid => {
+                allVersions[vid] = customVersions[vid].data;
+            });
+        }
+    } catch (error) {
+        console.error('Error loading custom versions:', error);
+    }
+}
+
+function saveCustomVersions() {
+    try {
+        localStorage.setItem('subcutanean_custom_versions', JSON.stringify(customVersions));
+    } catch (error) {
+        console.error('Error saving custom versions:', error);
+        if (error.name === 'QuotaExceededError') {
+            showUploadStatus('Storage limit exceeded. Try removing other uploaded versions.', 'error');
+        }
+    }
+}
+
+class HTMLTextExtractor {
+    constructor() {
+        this.paragraphs = [];
+        this.currentParagraph = [];
+        this.title = null;
+    }
+
+    parse(html) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        // Extract title from h1
+        const h1 = doc.querySelector('h1');
+        if (h1) {
+            this.title = h1.textContent.trim();
+        }
+
+        // Extract paragraphs
+        const paragraphElements = doc.querySelectorAll('p');
+        paragraphElements.forEach(p => {
+            const paraText = this.extractParagraphWithEm(p);
+            if (paraText) {
+                this.paragraphs.push(paraText);
+            }
+        });
+
+        return {
+            paragraphs: this.paragraphs,
+            title: this.title
+        };
+    }
+
+    extractParagraphWithEm(element) {
+        let result = '';
+
+        element.childNodes.forEach(node => {
+            if (node.nodeType === Node.TEXT_NODE) {
+                result += node.textContent;
+            } else if (node.nodeName === 'EM') {
+                result += `<em>${node.textContent}</em>`;
+            } else if (node.childNodes.length > 0) {
+                // Recursively handle nested elements
+                result += this.extractParagraphWithEm(node);
+            }
+        });
+
+        return result.trim();
+    }
+}
+
+async function extractChapterFromEPUB(zip, chapterFile) {
+    try {
+        const chapterPath = `EPUB/text/${chapterFile}`;
+        const file = zip.file(chapterPath);
+
+        if (!file) {
+            console.warn(`Chapter file not found: ${chapterPath}`);
+            return null;
+        }
+
+        const htmlContent = await file.async('text');
+        const extractor = new HTMLTextExtractor();
+        return extractor.parse(htmlContent);
+    } catch (error) {
+        console.error(`Error extracting ${chapterFile}:`, error);
+        return null;
+    }
+}
+
+async function processEPUBFile(file) {
+    showUploadStatus('Processing EPUB...', 'processing');
+
+    try {
+        // Load the EPUB file as a zip
+        const arrayBuffer = await file.arrayBuffer();
+        const zip = await JSZip.loadAsync(arrayBuffer);
+
+        // Extract version ID from filename (e.g., "subcutanean-45468.epub" -> "45468")
+        const match = file.name.match(/subcutanean-(\d+)/i);
+        let versionId;
+
+        if (match) {
+            versionId = match[1];
+        } else {
+            // Generate a custom ID if pattern doesn't match
+            versionId = `custom-${Date.now()}`;
+        }
+
+        // Check if already exists
+        if (allVersions[versionId] || customVersions[versionId]) {
+            showUploadStatus(`Version ${versionId} already loaded`, 'error');
+            return;
+        }
+
+        const versionData = { version_id: versionId };
+
+        // Extract all chapters according to mapping
+        for (const [epubFile, sectionId] of Object.entries(CHAPTER_MAPPING)) {
+            const result = await extractChapterFromEPUB(zip, epubFile);
+            if (result) {
+                versionData[sectionId] = result.paragraphs;
+            }
+        }
+
+        // Store in custom versions
+        customVersions[versionId] = {
+            name: versionId,
+            data: versionData,
+            uploadDate: new Date().toISOString()
+        };
+
+        // Merge into allVersions
+        allVersions[versionId] = versionData;
+
+        // Save to localStorage
+        saveCustomVersions();
+
+        // Refresh version selectors
+        populateVersionSelectors();
+
+        showUploadStatus(`Successfully loaded version ${versionId}!`, 'success');
+
+        // Auto-select the new version
+        document.getElementById('version-b-select').value = versionId;
+        versionB = versionId;
+        displayComparison();
+
+    } catch (error) {
+        console.error('Error processing EPUB:', error);
+        showUploadStatus('Error processing EPUB file', 'error');
+    }
+}
+
+function showUploadStatus(message, type) {
+    const statusElement = document.getElementById('upload-status');
+    statusElement.textContent = message;
+    statusElement.className = `upload-status ${type}`;
+
+    // Clear success/error messages after 5 seconds
+    if (type === 'success' || type === 'error') {
+        setTimeout(() => {
+            statusElement.textContent = '';
+            statusElement.className = 'upload-status';
+        }, 5000);
+    }
+}
+
+function handleEPUBUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!file.name.toLowerCase().endsWith('.epub')) {
+        showUploadStatus('Please select an EPUB file', 'error');
+        return;
+    }
+
+    processEPUBFile(file);
+
+    // Reset file input
+    event.target.value = '';
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     setupViewModeButtons();
     loadAllVersions();
+
+    // Search event listeners
+    const searchBtn = document.getElementById('search-btn');
+    const clearSearchBtn = document.getElementById('clear-search-btn');
+    const searchInput = document.getElementById('search-input');
+
+    searchBtn.addEventListener('click', performSearch);
+    clearSearchBtn.addEventListener('click', () => {
+        clearSearchHighlights();
+        searchInput.value = '';
+    });
+
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            performSearch();
+        }
+    });
+
+    // Search navigation event listeners
+    const searchPrevBtn = document.getElementById('search-prev-btn');
+    const searchNextBtn = document.getElementById('search-next-btn');
+
+    searchPrevBtn.addEventListener('click', goToPreviousOccurrence);
+    searchNextBtn.addEventListener('click', goToNextOccurrence);
+
+    // Word differential event listeners
+    const wordDiffBtn = document.getElementById('word-diff-btn');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const modal = document.getElementById('word-diff-modal');
+
+    wordDiffBtn.addEventListener('click', calculateWordDifferential);
+    closeModalBtn.addEventListener('click', closeModal);
+
+    // Close modal when clicking outside
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+
+    // Sort button event listeners
+    const sortAlphaBtn = document.getElementById('sort-alpha-btn');
+    const sortFreqBtn = document.getElementById('sort-freq-btn');
+
+    sortAlphaBtn.addEventListener('click', () => setSortMode('alpha'));
+    sortFreqBtn.addEventListener('click', () => setSortMode('freq'));
+
+    // Word popup event listeners
+    const wordPopup = document.getElementById('word-popup');
+    const wordPopupCloseBtn = document.getElementById('word-popup-close');
+
+    wordPopupCloseBtn.addEventListener('click', closeWordPopup);
+
+    // Close popup when clicking outside
+    document.addEventListener('click', (e) => {
+        if (wordPopup.classList.contains('visible') &&
+            !wordPopup.contains(e.target) &&
+            !e.target.classList.contains('word-item')) {
+            closeWordPopup();
+        }
+    });
+
+    // Floating search navigation event listeners
+    const floatingPrevBtn = document.getElementById('floating-prev-btn');
+    const floatingNextBtn = document.getElementById('floating-next-btn');
+
+    floatingPrevBtn.addEventListener('click', goToPreviousOccurrence);
+    floatingNextBtn.addEventListener('click', goToNextOccurrence);
+
+    // Keyboard shortcuts for search navigation
+    document.addEventListener('keydown', (e) => {
+        // Only respond to keyboard shortcuts if there are active search results
+        if (allSearchOccurrences.length === 0) return;
+
+        // F3 - Next occurrence (standard browser find convention)
+        if (e.key === 'F3' && !e.shiftKey) {
+            e.preventDefault();
+            goToNextOccurrence();
+        }
+
+        // Shift+F3 - Previous occurrence
+        if (e.key === 'F3' && e.shiftKey) {
+            e.preventDefault();
+            goToPreviousOccurrence();
+        }
+
+        // Escape - Clear search
+        if (e.key === 'Escape' && currentSearchTerm) {
+            clearSearchHighlights();
+            searchInput.value = '';
+        }
+    });
+
+    // EPUB upload event listener
+    const epubUpload = document.getElementById('epub-upload');
+    epubUpload.addEventListener('change', handleEPUBUpload);
 });

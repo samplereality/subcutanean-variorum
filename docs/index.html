@@ -37,6 +37,31 @@
                     <button id="mode-diff" class="mode-btn">Diff</button>
                 </div>
             </div>
+
+            <div class="upload-section">
+                <label for="epub-upload" class="upload-btn tool-btn">
+                    <span id="upload-text">Upload EPUB</span>
+                    <input type="file" id="epub-upload" accept=".epub" style="display: none;">
+                </label>
+                <span id="upload-status" class="upload-status"></span>
+            </div>
+
+            <div class="tools-row">
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="Search text..." />
+                    <button id="search-btn" class="tool-btn">Find</button>
+                    <div class="search-navigation hidden" id="search-navigation">
+                        <button id="search-prev-btn" class="search-nav-btn" title="Previous occurrence">←</button>
+                        <div class="search-info">
+                            <span id="search-results-count" class="search-count">0 of 0</span>
+                            <span id="search-chapter-label" class="search-chapter"></span>
+                        </div>
+                        <button id="search-next-btn" class="search-nav-btn" title="Next occurrence">→</button>
+                    </div>
+                    <button id="clear-search-btn" class="tool-btn">Clear</button>
+                </div>
+                <button id="word-diff-btn" class="tool-btn">Word Differential</button>
+            </div>
         </div>
 
         <nav id="chapter-nav" class="chapter-nav">
@@ -57,7 +82,60 @@
         </p>
     </footer>
 
+    <!-- Word Differential Modal -->
+    <div id="word-diff-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Word Differential Analysis</h2>
+                <button id="close-modal-btn" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-controls">
+                <label>Sort by:</label>
+                <div class="sort-buttons">
+                    <button id="sort-alpha-btn" class="sort-btn active">Alphabetical</button>
+                    <button id="sort-freq-btn" class="sort-btn">Frequency</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="diff-results">
+                    <div class="unique-words-panel">
+                        <h3>Unique to Seed <span id="seed-a-label"></span></h3>
+                        <p class="word-count">(<span id="unique-a-count"></span> unique words)</p>
+                        <div id="unique-words-a" class="word-list"></div>
+                    </div>
+                    <div class="unique-words-panel">
+                        <h3>Unique to Seed <span id="seed-b-label"></span></h3>
+                        <p class="word-count">(<span id="unique-b-count"></span> unique words)</p>
+                        <div id="unique-words-b" class="word-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Word Chapter Popup -->
+    <div id="word-popup" class="word-popup">
+        <button id="word-popup-close" class="word-popup-close">&times;</button>
+        <div class="word-popup-header">
+            Chapters containing "<span id="popup-word"></span>":
+        </div>
+        <ul id="word-popup-chapters" class="word-popup-chapters">
+            <!-- Chapters will be populated by JavaScript -->
+        </ul>
+    </div>
+
+    <!-- Floating Search Navigation -->
+    <div id="floating-search-nav" class="floating-search-nav hidden">
+        <button id="floating-prev-btn" class="floating-nav-btn" title="Previous (Shift+F3)">↑</button>
+        <div class="floating-info">
+            <span id="floating-count" class="floating-count">0/0</span>
+            <span id="floating-chapter-label" class="floating-chapter"></span>
+        </div>
+        <button id="floating-next-btn" class="floating-nav-btn" title="Next (F3)">↓</button>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/diff@5.1.0/dist/diff.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="compare.js"></script>
 </body>
 </html>
