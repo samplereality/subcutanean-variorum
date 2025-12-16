@@ -163,7 +163,8 @@ main {
     text-indent: 0;
 }
 
-.variant {
+/* Paragraph-level variants (block display) */
+p.variant {
     background-color: var(--highlight-color);
     border-left: 4px solid var(--variant-color);
     cursor: help;
@@ -174,9 +175,25 @@ main {
     border-radius: 4px;
 }
 
-.variant:hover {
+p.variant:hover {
     background-color: #ead4bb;
     box-shadow: 0 2px 8px rgba(139, 90, 60, 0.15);
+}
+
+/* Sentence-level variants (inline display) */
+span.variant {
+    background-color: var(--highlight-color);
+    border-bottom: 2px solid var(--variant-color);
+    cursor: help;
+    padding: 0.1rem 0.2rem;
+    transition: all 0.2s ease;
+    position: relative;
+    border-radius: 2px;
+}
+
+span.variant:hover {
+    background-color: #ead4bb;
+    box-shadow: 0 1px 4px rgba(139, 90, 60, 0.2);
 }
 
 .tooltip {

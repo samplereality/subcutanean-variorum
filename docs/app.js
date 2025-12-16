@@ -96,9 +96,31 @@ async function loadAndDisplayChapter(chapterId) {
             document.getElementById('text-display').innerHTML =
                 '<p class="loading">Loading chapter...</p>';
 
-            // Fetch chapter data
-            const response = await fetch(`variorum_data/${chapterInfo.file}`);
-            const chapterData = await response.json();
+            // Try to fetch sentence-level data first, fall back to paragraph-level
+            let response;
+            let chapterData;
+
+            // For prologue and chapter1, try sentence-level first
+            if (chapterId === 'prologue' || chapterId === 'chapter1') {
+                try {
+                    response = await fetch(`variorum_data/${chapterId}_sentences.json`);
+                    if (response.ok) {
+                        chapterData = await response.json();
+                        console.log(`Loaded sentence-level data for ${chapterId}`);
+                    } else {
+                        throw new Error('Sentence-level not found, using paragraph-level');
+                    }
+                } catch (e) {
+                    // Fall back to paragraph-level
+                    response = await fetch(`variorum_data/${chapterInfo.file}`);
+                    chapterData = await response.json();
+                    console.log(`Loaded paragraph-level data for ${chapterId}`);
+                }
+            } else {
+                // Other chapters use paragraph-level
+                response = await fetch(`variorum_data/${chapterInfo.file}`);
+                chapterData = await response.json();
+            }
 
             // Cache it
             loadedChapters[chapterId] = chapterData;
@@ -155,26 +177,55 @@ function displayChapter(chapterId) {
     const textDisplay = document.getElementById('text-display');
     textDisplay.innerHTML = '';
 
-    variorumData.forEach((paragraph, paraIndex) => {
+    // Check if this is sentence-level data
+    const isSentenceLevel = chapterData.alignment_type === 'sentence-level';
+
+    if (isSentenceLevel) {
+        // For sentence-level: group sentences into paragraphs for readability
+        // Display each sentence as a span within a paragraph
         const p = document.createElement('p');
 
-        if (paragraph.has_variation && paragraph.variants.length > 0) {
-            // This paragraph has variations - make it interactive
-            p.className = 'variant';
-            p.innerHTML = paragraph.base_text;
-            p.dataset.variants = JSON.stringify(paragraph.variants);
-            p.dataset.paraIndex = paraIndex;
+        variorumData.forEach((item, index) => {
+            const span = document.createElement('span');
+            span.innerHTML = item.base_text + ' ';
 
-            // Add hover events
-            p.addEventListener('mouseenter', showVariantTooltip);
-            p.addEventListener('mouseleave', hideVariantTooltip);
-        } else {
-            // Regular paragraph
-            p.innerHTML = paragraph.base_text;
-        }
+            if (item.has_variation && item.variants.length > 0) {
+                span.className = 'variant';
+                span.dataset.variants = JSON.stringify(item.variants);
+                span.dataset.index = index;
+
+                // Add hover events
+                span.addEventListener('mouseenter', showVariantTooltip);
+                span.addEventListener('mouseleave', hideVariantTooltip);
+            }
+
+            p.appendChild(span);
+        });
 
         textDisplay.appendChild(p);
-    });
+    } else {
+        // For paragraph-level: each item is a separate paragraph
+        variorumData.forEach((paragraph, paraIndex) => {
+            const p = document.createElement('p');
+
+            if (paragraph.has_variation && paragraph.variants.length > 0) {
+                // This paragraph has variations - make it interactive
+                p.className = 'variant';
+                p.innerHTML = paragraph.base_text;
+                p.dataset.variants = JSON.stringify(paragraph.variants);
+                p.dataset.paraIndex = paraIndex;
+
+                // Add hover events
+                p.addEventListener('mouseenter', showVariantTooltip);
+                p.addEventListener('mouseleave', hideVariantTooltip);
+            } else {
+                // Regular paragraph
+                p.innerHTML = paragraph.base_text;
+            }
+
+            textDisplay.appendChild(p);
+        });
+    }
 }
 
 // Show variant tooltip
@@ -193,22 +244,16 @@ function showVariantTooltip(event) {
         li.dataset.index = index;
         li.dataset.expanded = 'false';
 
-        const needsTruncation = variant.text.length > 150;
-
-        // Create variant text preview (truncate if too long)
-        const variantTextShort = needsTruncation
-            ? variant.text.substring(0, 150) + '...'
-            : variant.text;
+        // Show full text immediately (no truncation)
+        const textSpan = document.createElement('span');
+        textSpan.className = 'variant-text';
+        textSpan.innerHTML = variant.text;
 
         // Show text and which versions have it
         let versionInfo = `(${variant.count} version${variant.count > 1 ? 's' : ''})`;
         if (variant.type === 'agreement') {
             versionInfo = `Same as base ${versionInfo}`;
         }
-
-        const textSpan = document.createElement('span');
-        textSpan.className = 'variant-text';
-        textSpan.innerHTML = variantTextShort;
 
         const infoSpan = document.createElement('span');
         infoSpan.className = 'version-count';
@@ -224,28 +269,25 @@ function showVariantTooltip(event) {
             li.classList.add('agreement');
         }
 
-        // Add expand hint if text is truncated OR if we want to show version details
-        const isExpandable = needsTruncation || variant.type === 'omission' || variant.count > 3;
+        // Add click to show version details
+        const showVersionDetails = variant.count > 1;
 
-        if (isExpandable) {
+        if (showVersionDetails) {
             li.classList.add('expandable');
             const expandHint = document.createElement('span');
             expandHint.className = 'expand-hint';
-            expandHint.textContent = 'click to expand';
+            expandHint.textContent = 'click to see versions';
             li.appendChild(expandHint);
 
-            // Add click handler to expand/collapse
+            // Add click handler to show/hide version IDs
             li.addEventListener('click', () => {
                 const isExpanded = li.dataset.expanded === 'true';
 
                 if (isExpanded) {
-                    // Collapse
-                    if (needsTruncation) {
-                        textSpan.innerHTML = variantTextShort;
-                    }
+                    // Collapse - hide version details
                     li.dataset.expanded = 'false';
                     li.classList.remove('expanded');
-                    expandHint.textContent = 'click to expand';
+                    expandHint.textContent = 'click to see versions';
 
                     // Remove version details
                     const oldDetails = li.querySelector('.version-details');
@@ -253,14 +295,9 @@ function showVariantTooltip(event) {
                         oldDetails.remove();
                     }
                 } else {
-                    // Expand - show full text and version IDs
+                    // Expand - show version IDs
                     const versionIds = variant.versions.join(', ');
 
-                    if (needsTruncation) {
-                        textSpan.innerHTML = variant.text;
-                    }
-
-                    // Show which specific versions have this variant
                     const versionDetails = document.createElement('div');
                     versionDetails.className = 'version-details';
                     versionDetails.textContent = `Versions: ${versionIds}`;
@@ -274,7 +311,7 @@ function showVariantTooltip(event) {
                     li.appendChild(versionDetails);
                     li.dataset.expanded = 'true';
                     li.classList.add('expanded');
-                    expandHint.textContent = 'click to collapse';
+                    expandHint.textContent = 'click to hide versions';
                 }
             });
         }
