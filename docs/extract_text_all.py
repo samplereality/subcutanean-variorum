@@ -51,6 +51,10 @@ class TextExtractor(HTMLParser):
         elif tag == 'h1':
             if self.current_paragraph:
                 self.title = ''.join(self.current_paragraph).strip()
+                # For PART sections, add the h1 content as the first paragraph
+                # This captures the subtitle (e.g., "PART ONE: DOWNSTAIRS")
+                if self.title.startswith('PART '):
+                    self.text_parts.insert(0, self.title)
             self.in_h1 = False
             self.current_paragraph = []
 

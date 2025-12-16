@@ -38,12 +38,15 @@ A web-based comparison tool for exploring textual variations across 25 unique ed
 
 - **25 Unique Editions**: Each "seed" represents a distinct version of the complete novel, numbered 45443-45467
 
-- **Upload Custom Versions**: Upload additional EPUB files to compare with built-in versions
-  - Drag and drop or click to select EPUB files
-  - Automatically extracts and parses text from all 23 sections
+- **Upload Custom Versions**: Upload additional EPUB or TXT files to compare with built-in versions
+  - Drag and drop or click to select EPUB or TXT files
+  - Automatically extracts and parses text from all sections
+  - EPUB files: Extracts all 23 sections with full HTML formatting
+  - TXT files: Parses chapters using "Chapter X" markers and PART dividers, with smart punctuation normalization
   - Stored in browser's localStorage for persistence
-  - Custom versions appear in dropdowns with a 📎 icon
-  - Supports both standard naming (subcutanean-XXXXX.epub) and custom filenames
+  - Custom versions appear in dropdowns with a 📎 icon and seed number
+  - Supports both standard naming (subcutanean-XXXXX.epub, 50000.txt) and custom filenames
+  - Manage Uploads: View all uploaded versions and delete them from localStorage
 
 - **Mobile-Friendly**: Fully responsive design optimized for phones, tablets, and desktop browsers
 
@@ -54,8 +57,9 @@ A web-based comparison tool for exploring textual variations across 25 unique ed
 3. **Navigate chapters** using the horizontal scrolling chapter menu
 4. **Search for text**: Enter a word or phrase and click "Find" to highlight all matches (click "Clear" to remove highlights)
 5. **Analyze word differences**: Click "Word Differential" to see which words are unique to each selected version
-6. **Upload custom versions**: Click "Upload EPUB" to add your own version of the novel for comparison
-7. **Switch between versions** at any time to explore different comparisons
+6. **Upload custom versions**: Click "Upload EPUB/TXT" to add your own version of the novel for comparison (supports both EPUB and plain text formats)
+7. **Manage uploaded versions**: Click "Manage Uploads" to view all uploaded versions and delete any you no longer need
+8. **Switch between versions** at any time to explore different comparisons
 
 ## Technical Details
 

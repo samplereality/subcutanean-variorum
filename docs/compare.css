@@ -720,6 +720,15 @@
         width: 100%;
     }
 
+    .upload-section {
+        flex-wrap: wrap;
+    }
+
+    #manage-uploads-btn {
+        flex: 1;
+        min-width: 120px;
+    }
+
     .unified-view,
     .diff-view,
     .version-panel {
@@ -821,6 +830,68 @@
     .floating-chapter {
         font-size: 0.65rem;
     }
+}
+
+/* Manage Uploads Modal */
+
+.uploads-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.upload-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: #f9f9f9;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+}
+
+.upload-info {
+    flex: 1;
+}
+
+.upload-seed {
+    font-weight: bold;
+    color: var(--accent-color);
+    font-size: 1rem;
+}
+
+.upload-date {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 0.25rem;
+}
+
+.delete-upload-btn {
+    background-color: #d32f2f;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background-color 0.2s ease;
+}
+
+.delete-upload-btn:hover {
+    background-color: #b71c1c;
+}
+
+.no-uploads-message {
+    text-align: center;
+    padding: 2rem;
+    color: #999;
+    font-style: italic;
+}
+
+.no-uploads-message.hidden {
+    display: none;
 }
 
 /* Floating Search Navigation */

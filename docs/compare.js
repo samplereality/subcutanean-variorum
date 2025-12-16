@@ -863,6 +863,109 @@ function closeModal() {
     modal.classList.add('hidden');
 }
 
+// Manage Uploads functionality
+
+function openManageUploadsModal() {
+    const modal = document.getElementById('manage-uploads-modal');
+    const uploadsList = document.getElementById('uploads-list');
+    const noUploadsMessage = document.getElementById('no-uploads-message');
+
+    // Clear existing content
+    uploadsList.innerHTML = '';
+
+    const customIds = Object.keys(customVersions);
+
+    if (customIds.length === 0) {
+        noUploadsMessage.classList.remove('hidden');
+        uploadsList.classList.add('hidden');
+    } else {
+        noUploadsMessage.classList.add('hidden');
+        uploadsList.classList.remove('hidden');
+
+        // Sort by upload date (newest first)
+        customIds.sort((a, b) => {
+            const dateA = new Date(customVersions[a].uploadDate);
+            const dateB = new Date(customVersions[b].uploadDate);
+            return dateB - dateA;
+        });
+
+        customIds.forEach(versionId => {
+            const version = customVersions[versionId];
+            const uploadDate = new Date(version.uploadDate);
+            const formattedDate = uploadDate.toLocaleDateString() + ' ' + uploadDate.toLocaleTimeString();
+
+            const item = document.createElement('div');
+            item.className = 'upload-item';
+
+            const info = document.createElement('div');
+            info.className = 'upload-info';
+
+            const seedLabel = document.createElement('div');
+            seedLabel.className = 'upload-seed';
+            seedLabel.textContent = version.name || `Seed ${versionId}`;
+
+            const dateLabel = document.createElement('div');
+            dateLabel.className = 'upload-date';
+            dateLabel.textContent = `Uploaded: ${formattedDate}`;
+
+            info.appendChild(seedLabel);
+            info.appendChild(dateLabel);
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-upload-btn';
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.addEventListener('click', () => deleteCustomVersion(versionId));
+
+            item.appendChild(info);
+            item.appendChild(deleteBtn);
+            uploadsList.appendChild(item);
+        });
+    }
+
+    modal.classList.remove('hidden');
+}
+
+function closeManageUploadsModal() {
+    const modal = document.getElementById('manage-uploads-modal');
+    modal.classList.add('hidden');
+}
+
+function deleteCustomVersion(versionId) {
+    if (!confirm(`Are you sure you want to delete Seed ${versionId}?`)) {
+        return;
+    }
+
+    // Remove from customVersions
+    delete customVersions[versionId];
+
+    // Remove from allVersions
+    delete allVersions[versionId];
+
+    // Save to localStorage
+    saveCustomVersions();
+
+    // If either selected version was deleted, reset to default versions
+    if (versionA === versionId) {
+        versionA = versionIds[0];
+        document.getElementById('version-a-select').value = versionA;
+    }
+    if (versionB === versionId) {
+        versionB = versionIds[versionIds.length - 1];
+        document.getElementById('version-b-select').value = versionB;
+    }
+
+    // Refresh version selectors
+    populateVersionSelectors();
+
+    // Refresh the manage uploads modal
+    openManageUploadsModal();
+
+    // Refresh display if we changed the selected version
+    displayComparison();
+
+    showUploadStatus(`Deleted Seed ${versionId}`, 'success');
+}
+
 // EPUB Upload and Processing
 
 function loadCustomVersions() {
@@ -908,9 +1011,15 @@ class HTMLTextExtractor {
         const h1 = doc.querySelector('h1');
         if (h1) {
             this.title = h1.textContent.trim();
+
+            // For PART sections, add the h1 content as the first paragraph
+            // This captures the subtitle (e.g., "PART ONE: DOWNSTAIRS")
+            if (this.title.startsWith('PART ')) {
+                this.paragraphs.push(this.title);
+            }
         }
 
-        // Extract paragraphs
+        // Extract paragraphs (including those in blockquotes)
         const paragraphElements = doc.querySelectorAll('p');
         paragraphElements.forEach(p => {
             const paraText = this.extractParagraphWithEm(p);
@@ -999,7 +1108,7 @@ async function processEPUBFile(file) {
 
         // Store in custom versions
         customVersions[versionId] = {
-            name: versionId,
+            name: `Seed ${versionId}`,
             data: versionData,
             uploadDate: new Date().toISOString()
         };
@@ -1040,16 +1149,266 @@ function showUploadStatus(message, type) {
     }
 }
 
+function normalizeTextToSmartPunctuation(text) {
+    // Convert plain ASCII punctuation to Unicode smart punctuation to match EPUB format
+
+    // Convert triple hyphens to em dash
+    text = text.replace(/---/g, '\u2014');
+
+    // Convert double hyphens to em dash
+    text = text.replace(/--/g, '\u2014');
+
+    // Convert straight apostrophes to curly apostrophes
+    // This handles contractions like "he'd", "don't", "it's"
+    text = text.replace(/(\w)'(\w)/g, '$1\u2019$2');
+
+    // Convert straight double quotes to smart quotes
+    // Opening quote: after whitespace or at start of line
+    text = text.replace(/(^|[\s\(\[])"(\S)/gm, '$1\u201c$2');
+
+    // Closing quote: before whitespace, punctuation, or at end of line
+    text = text.replace(/(\S)"([\s\.,;:!\?\)\]]|$)/gm, '$1\u201d$2');
+
+    // Convert straight single quotes to smart quotes (for dialogue within dialogue)
+    // Opening single quote: after whitespace or at start
+    text = text.replace(/(^|[\s\("])'(\S)/gm, '$1\u2018$2');
+
+    // Closing single quote: before whitespace or punctuation
+    text = text.replace(/(\S)'([\s\.,;:!\?\)"]|$)/gm, '$1\u2019$2');
+
+    return text;
+}
+
+async function processTextFile(file) {
+    showUploadStatus('Processing text file...', 'processing');
+
+    try {
+        const text = await file.text();
+        const lines = text.split('\n');
+
+        // Extract seed number from header (line 7: "seed #50000")
+        const seedLine = lines.find(line => line.includes('seed #'));
+        let versionId;
+
+        if (seedLine) {
+            const match = seedLine.match(/seed #(\d+)/);
+            versionId = match ? match[1] : `custom-${Date.now()}`;
+        } else {
+            // Try to extract from filename
+            const filenameMatch = file.name.match(/(\d+)\.txt$/);
+            versionId = filenameMatch ? filenameMatch[1] : `custom-${Date.now()}`;
+        }
+
+        // Check if already exists
+        if (allVersions[versionId] || customVersions[versionId]) {
+            showUploadStatus(`Version ${versionId} already loaded`, 'error');
+            return;
+        }
+
+        const versionData = { version_id: versionId };
+
+        // Parse the text file structure
+        let currentSection = 'header';
+        let currentChapter = null;
+        let currentParagraphs = [];
+        const skipLines = new Set(); // Track line indices to skip (used as PART subtitles)
+
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim();
+
+            // Skip lines that were used as PART subtitles
+            if (skipLines.has(i)) continue;
+
+            // Skip empty lines in most cases
+            if (!line && currentSection === 'header') continue;
+
+            // Detect PART markers
+            if (line === 'PART ONE') {
+                // Look ahead for the subtitle on the next non-empty line
+                let subtitle = '';
+                let subtitleIndex = -1;
+                for (let j = i + 1; j < lines.length; j++) {
+                    const nextLine = lines[j].trim();
+                    if (nextLine) {
+                        subtitle = nextLine;
+                        subtitleIndex = j;
+                        break;
+                    }
+                }
+
+                // Save any previous prologue content (shouldn't happen, but just in case)
+                if (currentParagraphs.length > 0) {
+                    versionData.prologue = [...currentParagraphs];
+                }
+
+                currentSection = 'prologue';
+                currentChapter = 'prologue';
+                currentParagraphs = [];
+
+                // Add combined PART + subtitle as first paragraph
+                if (subtitle) {
+                    currentParagraphs.push(`PART ONE: ${subtitle}`);
+                    skipLines.add(subtitleIndex); // Mark subtitle line to skip
+                }
+
+                continue;
+            } else if (line === 'PART TWO') {
+                // Look ahead for the subtitle on the next non-empty line
+                let subtitle = '';
+                let subtitleIndex = -1;
+                for (let j = i + 1; j < lines.length; j++) {
+                    const nextLine = lines[j].trim();
+                    if (nextLine) {
+                        subtitle = nextLine;
+                        subtitleIndex = j;
+                        break;
+                    }
+                }
+
+                // Save previous chapter if any
+                if (currentChapter && currentParagraphs.length > 0) {
+                    versionData[currentChapter] = [...currentParagraphs];
+                }
+
+                // Treat PART TWO as a chapter to collect its epigram
+                currentChapter = 'part2';
+                currentParagraphs = [];
+                currentSection = 'part2';
+
+                // Add combined PART + subtitle as first paragraph
+                if (subtitle) {
+                    currentParagraphs.push(`PART TWO: ${subtitle}`);
+                    skipLines.add(subtitleIndex); // Mark subtitle line to skip
+                }
+
+                continue;
+            } else if (line === 'PART THREE') {
+                // Look ahead for the subtitle on the next non-empty line
+                let subtitle = '';
+                let subtitleIndex = -1;
+                for (let j = i + 1; j < lines.length; j++) {
+                    const nextLine = lines[j].trim();
+                    if (nextLine) {
+                        subtitle = nextLine;
+                        subtitleIndex = j;
+                        break;
+                    }
+                }
+
+                // Save previous chapter if any
+                if (currentChapter && currentParagraphs.length > 0) {
+                    versionData[currentChapter] = [...currentParagraphs];
+                }
+
+                // Treat PART THREE as a chapter to collect its epigram
+                currentChapter = 'part3';
+                currentParagraphs = [];
+                currentSection = 'part3';
+
+                // Add combined PART + subtitle as first paragraph
+                if (subtitle) {
+                    currentParagraphs.push(`PART THREE: ${subtitle}`);
+                    skipLines.add(subtitleIndex); // Mark subtitle line to skip
+                }
+
+                continue;
+            }
+
+            // Detect chapter markers
+            const chapterMatch = line.match(/^Chapter (\d+)$/);
+            if (chapterMatch) {
+                // Save previous chapter if any
+                if (currentChapter && currentParagraphs.length > 0) {
+                    versionData[currentChapter] = [...currentParagraphs];
+                } else if (currentSection === 'prologue' && currentParagraphs.length > 0) {
+                    versionData.prologue = [...currentParagraphs];
+                }
+
+                currentChapter = `chapter${chapterMatch[1]}`;
+                currentParagraphs = [];
+                currentSection = 'chapter';
+                continue;
+            }
+
+            // Stop at ALTERNATE SCENE or Kickstarter backers
+            if (line === 'ALTERNATE SCENE' || (i > 3900 && /^[A-Z][a-z]+ [A-Z]/.test(line))) {
+                break;
+            }
+
+            // Skip single # markers (scene breaks)
+            if (line === '#') {
+                continue;
+            }
+
+            // Collect paragraph content
+            if (line && currentSection !== 'header') {
+                currentParagraphs.push(normalizeTextToSmartPunctuation(line));
+            }
+
+            // Extract introduction from header
+            if (currentSection === 'header' && i < 17 && line && !line.includes('***') && !line.includes('===') && !line.startsWith('by ')) {
+                if (!versionData.introduction) {
+                    versionData.introduction = [];
+                }
+                if (line.includes('seed #')) {
+                    versionData.introduction.push(normalizeTextToSmartPunctuation(line));
+                }
+            }
+        }
+
+        // Save final chapter
+        if (currentChapter && currentParagraphs.length > 0) {
+            versionData[currentChapter] = [...currentParagraphs];
+        }
+
+        // Ensure introduction exists
+        if (!versionData.introduction || versionData.introduction.length === 0) {
+            versionData.introduction = ['Introduction'];
+        }
+
+        // Store in custom versions
+        customVersions[versionId] = {
+            name: `Seed ${versionId}`,
+            data: versionData,
+            uploadDate: new Date().toISOString()
+        };
+
+        // Merge into allVersions
+        allVersions[versionId] = versionData;
+
+        // Save to localStorage
+        saveCustomVersions();
+
+        // Refresh version selectors
+        populateVersionSelectors();
+
+        showUploadStatus(`Successfully loaded Seed ${versionId}!`, 'success');
+
+        // Auto-select the new version
+        document.getElementById('version-b-select').value = versionId;
+        versionB = versionId;
+        displayComparison();
+
+    } catch (error) {
+        console.error('Error processing text file:', error);
+        showUploadStatus('Error processing text file', 'error');
+    }
+}
+
 function handleEPUBUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
 
-    if (!file.name.toLowerCase().endsWith('.epub')) {
-        showUploadStatus('Please select an EPUB file', 'error');
+    const fileName = file.name.toLowerCase();
+
+    if (fileName.endsWith('.epub')) {
+        processEPUBFile(file);
+    } else if (fileName.endsWith('.txt')) {
+        processTextFile(file);
+    } else {
+        showUploadStatus('Please select an EPUB or TXT file', 'error');
         return;
     }
-
-    processEPUBFile(file);
 
     // Reset file input
     event.target.value = '';
@@ -1155,4 +1514,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // EPUB upload event listener
     const epubUpload = document.getElementById('epub-upload');
     epubUpload.addEventListener('change', handleEPUBUpload);
+
+    // Manage uploads event listeners
+    const manageUploadsBtn = document.getElementById('manage-uploads-btn');
+    const closeManageModalBtn = document.getElementById('close-manage-modal-btn');
+    const manageModal = document.getElementById('manage-uploads-modal');
+
+    manageUploadsBtn.addEventListener('click', openManageUploadsModal);
+    closeManageModalBtn.addEventListener('click', closeManageUploadsModal);
+
+    // Close modal when clicking outside
+    manageModal.addEventListener('click', (e) => {
+        if (e.target === manageModal) {
+            closeManageUploadsModal();
+        }
+    });
 });
