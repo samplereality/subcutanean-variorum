@@ -13,7 +13,7 @@ In 2025 Reed released the “source code, source text and all prior, current, an
 **Four View Modes:**
 - **Unified**: Read a single version as clean, uninterrupted text
 - **Side-by-side**: Compare two versions in parallel columns
-- **Diff**: Inline highlighting shows exact additions (green) and deletions (red/strikethrough) between two selected versions
+- **Track Changes**: Inline highlighting shows exact additions (green) and deletions (red/strikethrough) between two selected versions
 - **Collation**: View textual variations across multiple witnesses in a variorum-style format
 
 **Search Functionality**: Find any word or phrase across all chapters
@@ -56,7 +56,7 @@ In 2025 Reed released the “source code, source text and all prior, current, an
 ## How to Use
 
 1. **Select two versions** using the dropdown menus (labeled "Compare" and "With")
-2. **Choose a view mode**: Unified, Side-by-side, Diff, or Collation
+2. **Choose a view mode**: Unified, Side-by-side, Track Changes, or Collation
 3. **Navigate chapters** using the horizontal scrolling chapter menu
 4. **Search for text**: Enter a word or phrase and click "Find" to highlight all matches (click "Clear" to remove highlights)
 5. **Analyze word differences**: Click "Word Differential" to see which words are unique to each selected version
