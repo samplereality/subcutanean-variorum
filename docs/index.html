@@ -9,6 +9,11 @@
 </head>
 <body>
     <header>
+        <button id="about-btn" class="hamburger-btn" title="About this project">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+        </button>
         <h1>Subcutanean</h1>
         <p class="subtitle">Version Comparison Tool</p>
 
@@ -88,6 +93,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Word Differential Analysis</h2>
+                <p id="word-diff-description" class="modal-description"></p>
                 <button id="close-modal-btn" class="close-btn">&times;</button>
             </div>
             <div class="modal-controls">
@@ -149,6 +155,47 @@
                 <div id="no-uploads-message" class="no-uploads-message hidden">
                     No custom versions uploaded yet.
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Modal -->
+    <div id="about-modal" class="modal hidden">
+        <div class="modal-content about-modal-content">
+            <div class="modal-header">
+                <h2>About This Project</h2>
+                <button id="close-about-modal-btn" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body about-modal-body">
+                <h3>Subcutanean Variorum Browser</h3>
+                <p><em>Subcutanean</em> is a novel by Aaron Reed where every copy is different. Using a combinatorial narrative system, Reed generated thousands of unique versions by varying word choices, sentence structures, and entire passages throughout the text.</p>
+
+                <p>This browser allows readers to compare any two editions side-by-side to discover how the story shifts between versions.</p>
+
+                <h4>Features</h4>
+                <ul>
+                    <li><strong>Three view modes:</strong> Unified, Side-by-side, and Diff</li>
+                    <li><strong>Cross-chapter search</strong> with keyboard shortcuts (F3, Shift+F3)</li>
+                    <li><strong>Word differential analysis</strong> showing unique vocabulary between versions</li>
+                    <li><strong>Upload custom versions</strong> (EPUB or TXT files)</li>
+                    <li><strong>25 pre-loaded unique editions</strong> (seeds 45443-45467)</li>
+                </ul>
+
+                <h4>How to Use</h4>
+                <ol>
+                    <li>Select two versions using the dropdown menus</li>
+                    <li>Choose a view mode (Unified, Side-by-side, or Diff)</li>
+                    <li>Navigate chapters using the chapter menu</li>
+                    <li>Search for text or analyze word differences</li>
+                    <li>Upload your own EPUB or TXT version to compare</li>
+                </ol>
+
+                <h4>Credits</h4>
+                <p><strong>Novel:</strong> <a href="https://aaronareed.net/subcutanean/" target="_blank">Aaron Reed</a><br>
+                <strong>Browser:</strong> Mark Sample<br>
+                <strong>Code:</strong> <a href="https://github.com/samplereality/subcutanean-browser" target="_blank">GitHub Repository</a></p>
+
+                <p class="about-note">This browser tool is provided for scholarly and educational purposes. The text of <em>Subcutanean</em> is © Aaron Reed.</p>
             </div>
         </div>
     </div>

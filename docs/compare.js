@@ -676,6 +676,10 @@ function calculateWordDifferential() {
     seedALabel.textContent = versionA;
     seedBLabel.textContent = versionB;
 
+    // Update description with seed numbers
+    const description = document.getElementById('word-diff-description');
+    description.textContent = `Words that appear in Seed ${versionA} but which do not appear in Seed ${versionB}, and vice-versa`;
+
     // Display words with current sort mode
     displayWordLists();
 
@@ -966,6 +970,18 @@ function deleteCustomVersion(versionId) {
     showUploadStatus(`Deleted Seed ${versionId}`, 'success');
 }
 
+// About Modal functionality
+
+function openAboutModal() {
+    const modal = document.getElementById('about-modal');
+    modal.classList.remove('hidden');
+}
+
+function closeAboutModal() {
+    const modal = document.getElementById('about-modal');
+    modal.classList.add('hidden');
+}
+
 // EPUB Upload and Processing
 
 function loadCustomVersions() {
@@ -1106,6 +1122,13 @@ async function processEPUBFile(file) {
             }
         }
 
+        // Validate that this is actually a Subcutanean version
+        const validation = validateSubcutaneanVersion(versionData);
+        if (!validation.valid) {
+            showUploadStatus(`Upload failed: ${validation.error}`, 'error');
+            return;
+        }
+
         // Store in custom versions
         customVersions[versionId] = {
             name: `Seed ${versionId}`,
@@ -1177,6 +1200,47 @@ function normalizeTextToSmartPunctuation(text) {
     text = text.replace(/(\S)'([\s\.,;:!\?\)"]|$)/gm, '$1\u2019$2');
 
     return text;
+}
+
+function validateSubcutaneanVersion(versionData) {
+    // Light validation to ensure this is actually a Subcutanean version
+    // Check 1: Must have version_id
+    if (!versionData.version_id) {
+        return { valid: false, error: 'Missing version ID' };
+    }
+
+    // Check 2: Count how many expected sections we found
+    const expectedSections = ['introduction', 'prologue', 'chapter1', 'chapter2', 'chapter3',
+                              'chapter4', 'chapter5', 'chapter6', 'chapter7', 'chapter8',
+                              'chapter9', 'part2', 'chapter10', 'chapter11', 'chapter12',
+                              'chapter13', 'chapter14', 'chapter15', 'part3', 'chapter16',
+                              'chapter17', 'chapter18', 'notes'];
+
+    let foundSections = 0;
+    for (const section of expectedSections) {
+        if (versionData[section] && Array.isArray(versionData[section]) && versionData[section].length > 0) {
+            foundSections++;
+        }
+    }
+
+    // Check 3: Must have at least 10 sections to be considered valid (about half the expected sections)
+    if (foundSections < 10) {
+        return {
+            valid: false,
+            error: `Only found ${foundSections} valid sections. This may not be a Subcutanean version.`
+        };
+    }
+
+    // Check 4: Must have at least one of the key early sections
+    const hasKeySection = versionData.prologue || versionData.chapter1 || versionData.introduction;
+    if (!hasKeySection) {
+        return {
+            valid: false,
+            error: 'Missing key sections (prologue/chapter1). This may not be a Subcutanean version.'
+        };
+    }
+
+    return { valid: true, foundSections };
 }
 
 async function processTextFile(file) {
@@ -1366,6 +1430,13 @@ async function processTextFile(file) {
             versionData.introduction = ['Introduction'];
         }
 
+        // Validate that this is actually a Subcutanean version
+        const validation = validateSubcutaneanVersion(versionData);
+        if (!validation.valid) {
+            showUploadStatus(`Upload failed: ${validation.error}`, 'error');
+            return;
+        }
+
         // Store in custom versions
         customVersions[versionId] = {
             name: `Seed ${versionId}`,
@@ -1527,6 +1598,21 @@ document.addEventListener('DOMContentLoaded', () => {
     manageModal.addEventListener('click', (e) => {
         if (e.target === manageModal) {
             closeManageUploadsModal();
+        }
+    });
+
+    // About modal event listeners
+    const aboutBtn = document.getElementById('about-btn');
+    const closeAboutModalBtn = document.getElementById('close-about-modal-btn');
+    const aboutModal = document.getElementById('about-modal');
+
+    aboutBtn.addEventListener('click', openAboutModal);
+    closeAboutModalBtn.addEventListener('click', closeAboutModal);
+
+    // Close modal when clicking outside
+    aboutModal.addEventListener('click', (e) => {
+        if (e.target === aboutModal) {
+            closeAboutModal();
         }
     });
 });
