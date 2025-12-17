@@ -190,6 +190,10 @@ function setupViewModeButtons() {
     document.getElementById('mode-diff').addEventListener('click', () => {
         setViewMode('diff');
     });
+
+    document.getElementById('mode-comparison').addEventListener('click', () => {
+        setViewMode('comparison');
+    });
 }
 
 function setViewMode(mode) {
@@ -217,6 +221,8 @@ function displayComparison() {
         displaySideBySide(display, textA, textB);
     } else if (currentMode === 'diff') {
         displayDiff(display, textA, textB);
+    } else if (currentMode === 'comparison') {
+        displayParagraphComparison(display, textA, textB);
     }
 
     // Re-apply search highlights if there was an active search
@@ -294,30 +300,28 @@ function displayDiff(container, paragraphsA, paragraphsB) {
     heading.textContent = `Comparing Seeds ${versionA} → ${versionB}`;
     div.appendChild(heading);
 
-    // Compare paragraph by paragraph
-    const maxLength = Math.max(paragraphsA.length, paragraphsB.length);
+    // Use alignment algorithm to match paragraphs intelligently
+    const alignments = alignParagraphs(paragraphsA, paragraphsB);
 
-    for (let i = 0; i < maxLength; i++) {
-        const paraA = paragraphsA[i] || '';
-        const paraB = paragraphsB[i] || '';
-
-        // Remove HTML tags for comparison
-        const cleanA = paraA.replace(/<\/?em>/g, '');
-        const cleanB = paraB.replace(/<\/?em>/g, '');
+    for (const alignment of alignments) {
+        const { textA, textB, type } = alignment;
 
         const p = document.createElement('p');
 
-        if (cleanA === cleanB) {
+        if (type === 'identical') {
             // No change - show normal paragraph
-            p.innerHTML = paraA || paraB;
-        } else if (!cleanA) {
+            p.innerHTML = textA || textB;
+        } else if (type === 'unique-b') {
             // Paragraph only in B (added)
-            p.innerHTML = `<span class="diff-added">${paraB}</span>`;
-        } else if (!cleanB) {
+            p.innerHTML = `<span class="diff-added">${textB}</span>`;
+        } else if (type === 'unique-a') {
             // Paragraph only in A (removed)
-            p.innerHTML = `<span class="diff-removed">${paraA}</span>`;
-        } else {
-            // Use word-level diff and show inline
+            p.innerHTML = `<span class="diff-removed">${textA}</span>`;
+        } else if (type === 'modified') {
+            // Use word-level diff for similar paragraphs
+            const cleanA = textA.replace(/<\/?em>/g, '');
+            const cleanB = textB.replace(/<\/?em>/g, '');
+
             const diff = Diff.diffWords(cleanA, cleanB);
 
             diff.forEach(part => {
@@ -341,6 +345,281 @@ function displayDiff(container, paragraphsA, paragraphsB) {
         div.appendChild(p);
     }
 
+    container.appendChild(div);
+}
+
+// Collation View (intelligent paragraph alignment)
+function calculateSimilarity(textA, textB) {
+    // Remove HTML tags for comparison
+    const cleanA = textA.replace(/<\/?em>/g, '').toLowerCase().trim();
+    const cleanB = textB.replace(/<\/?em>/g, '').toLowerCase().trim();
+
+    // Exact match
+    if (cleanA === cleanB) return 1.0;
+
+    // If either is empty, they're completely different
+    if (!cleanA || !cleanB) return 0.0;
+
+    // Calculate Jaccard similarity (intersection over union of words)
+    const wordsA = new Set(cleanA.split(/\s+/));
+    const wordsB = new Set(cleanB.split(/\s+/));
+
+    const intersection = new Set([...wordsA].filter(word => wordsB.has(word)));
+    const union = new Set([...wordsA, ...wordsB]);
+
+    return intersection.size / union.size;
+}
+
+function normalizeText(text) {
+    return text.replace(/<\/?em>/g, '').toLowerCase().trim();
+}
+
+// Align two sets of paragraphs using anchor-based approach
+function alignParagraphs(paragraphsA, paragraphsB) {
+    const alignments = [];
+    const usedA = new Set();
+    const usedB = new Set();
+
+    // PHASE 1: Find exact matches as anchors
+    const anchors = [];
+    for (let i = 0; i < paragraphsA.length; i++) {
+        if (usedA.has(i)) continue;
+        const cleanA = normalizeText(paragraphsA[i]);
+        if (!cleanA) continue;
+
+        for (let j = 0; j < paragraphsB.length; j++) {
+            if (usedB.has(j)) continue;
+            const cleanB = normalizeText(paragraphsB[j]);
+
+            if (cleanA === cleanB) {
+                anchors.push({ indexA: i, indexB: j, similarity: 1.0 });
+                usedA.add(i);
+                usedB.add(j);
+                break; // Move to next paragraph in A
+            }
+        }
+    }
+
+    // PHASE 2: Between anchors, find best similarity matches with sliding window
+    const SIMILARITY_THRESHOLD = 0.3;
+    const WINDOW_SIZE = 20; // Look ahead/behind up to 20 paragraphs
+
+    for (let i = 0; i < paragraphsA.length; i++) {
+        if (usedA.has(i)) continue;
+        const cleanA = normalizeText(paragraphsA[i]);
+        if (!cleanA) continue;
+
+        let bestMatch = null;
+        let bestSimilarity = SIMILARITY_THRESHOLD;
+
+        // Determine search window based on nearby anchors
+        const prevAnchor = anchors.filter(a => a.indexA < i).pop();
+        const nextAnchor = anchors.find(a => a.indexA > i);
+
+        const minJ = prevAnchor ? prevAnchor.indexB + 1 : 0;
+        const maxJ = nextAnchor ? nextAnchor.indexB - 1 : paragraphsB.length - 1;
+
+        // Search within window
+        const searchStart = Math.max(minJ, i - WINDOW_SIZE);
+        const searchEnd = Math.min(maxJ, i + WINDOW_SIZE);
+
+        for (let j = searchStart; j <= searchEnd && j < paragraphsB.length; j++) {
+            if (usedB.has(j)) continue;
+            const cleanB = normalizeText(paragraphsB[j]);
+            if (!cleanB) continue;
+
+            const similarity = calculateSimilarity(cleanA, cleanB);
+            if (similarity > bestSimilarity) {
+                bestSimilarity = similarity;
+                bestMatch = j;
+            }
+        }
+
+        if (bestMatch !== null) {
+            anchors.push({ indexA: i, indexB: bestMatch, similarity: bestSimilarity });
+            usedA.add(i);
+            usedB.add(bestMatch);
+        }
+    }
+
+    // PHASE 3: Create final alignment array
+    // Sort anchors by position in A
+    anchors.sort((a, b) => a.indexA - b.indexA);
+
+    let lastIndexA = -1;
+    let lastIndexB = -1;
+
+    for (const anchor of anchors) {
+        // Add any unmatched paragraphs from A before this anchor
+        for (let i = lastIndexA + 1; i < anchor.indexA; i++) {
+            if (!usedA.has(i)) {
+                alignments.push({
+                    indexA: i,
+                    indexB: null,
+                    textA: paragraphsA[i],
+                    textB: null,
+                    similarity: 0,
+                    type: 'unique-a'
+                });
+            }
+        }
+
+        // Add any unmatched paragraphs from B before this anchor
+        for (let j = lastIndexB + 1; j < anchor.indexB; j++) {
+            if (!usedB.has(j)) {
+                alignments.push({
+                    indexA: null,
+                    indexB: j,
+                    textA: null,
+                    textB: paragraphsB[j],
+                    similarity: 0,
+                    type: 'unique-b'
+                });
+            }
+        }
+
+        // Add the matched pair
+        const type = anchor.similarity === 1.0 ? 'identical' : 'modified';
+        alignments.push({
+            indexA: anchor.indexA,
+            indexB: anchor.indexB,
+            textA: paragraphsA[anchor.indexA],
+            textB: paragraphsB[anchor.indexB],
+            similarity: anchor.similarity,
+            type: type
+        });
+
+        lastIndexA = anchor.indexA;
+        lastIndexB = anchor.indexB;
+    }
+
+    // Add remaining unmatched paragraphs from A
+    for (let i = lastIndexA + 1; i < paragraphsA.length; i++) {
+        if (!usedA.has(i)) {
+            alignments.push({
+                indexA: i,
+                indexB: null,
+                textA: paragraphsA[i],
+                textB: null,
+                similarity: 0,
+                type: 'unique-a'
+            });
+        }
+    }
+
+    // Add remaining unmatched paragraphs from B
+    for (let j = lastIndexB + 1; j < paragraphsB.length; j++) {
+        if (!usedB.has(j)) {
+            alignments.push({
+                indexA: null,
+                indexB: j,
+                textA: null,
+                textB: paragraphsB[j],
+                similarity: 0,
+                type: 'unique-b'
+            });
+        }
+    }
+
+    return alignments;
+}
+
+function displayParagraphComparison(container, paragraphsA, paragraphsB) {
+    container.innerHTML = '';
+    container.className = '';
+
+    const div = document.createElement('div');
+    div.className = 'comparison-view';
+
+    const heading = document.createElement('h2');
+    heading.textContent = `Collation: Seed ${versionA} vs Seed ${versionB}`;
+    div.appendChild(heading);
+
+    // Add legend
+    const legend = document.createElement('div');
+    legend.className = 'comparison-legend';
+    legend.innerHTML = `
+        <div class="legend-item">
+            <div class="legend-color identical"></div>
+            <span>Identical</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color modified"></div>
+            <span>Modified (similar)</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color unique-a"></div>
+            <span>Unique to Seed ${versionA}</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color unique-b"></div>
+            <span>Unique to Seed ${versionB}</span>
+        </div>
+    `;
+    div.appendChild(legend);
+
+    // Use alignment algorithm to match paragraphs intelligently
+    const alignments = alignParagraphs(paragraphsA, paragraphsB);
+
+    // Create grid for paragraphs
+    const grid = document.createElement('div');
+    grid.className = 'comparison-grid';
+
+    for (const alignment of alignments) {
+        const { indexA, indexB, textA, textB, similarity, type } = alignment;
+
+        // Create paragraph A (or placeholder)
+        const divA = document.createElement('div');
+        if (textA) {
+            divA.className = `comparison-paragraph ${type === 'unique-b' ? 'placeholder' : type}`;
+
+            if (type !== 'unique-b') {
+                const numberA = document.createElement('div');
+                numberA.className = 'comparison-paragraph-number';
+                numberA.textContent = `${versionA} [${indexA + 1}]`;
+                if (type === 'modified' && similarity > 0) {
+                    numberA.innerHTML += `<span class="similarity-score">${(similarity * 100).toFixed(0)}% similar</span>`;
+                }
+                divA.appendChild(numberA);
+
+                const contentA = document.createElement('div');
+                contentA.innerHTML = textA;
+                divA.appendChild(contentA);
+            } else {
+                divA.textContent = '—';
+            }
+        } else {
+            divA.className = 'comparison-paragraph placeholder';
+            divA.textContent = '—';
+        }
+
+        // Create paragraph B (or placeholder)
+        const divB = document.createElement('div');
+        if (textB) {
+            divB.className = `comparison-paragraph ${type === 'unique-a' ? 'placeholder' : type}`;
+
+            if (type !== 'unique-a') {
+                const numberB = document.createElement('div');
+                numberB.className = 'comparison-paragraph-number';
+                numberB.textContent = `${versionB} [${indexB + 1}]`;
+                divB.appendChild(numberB);
+
+                const contentB = document.createElement('div');
+                contentB.innerHTML = textB;
+                divB.appendChild(contentB);
+            } else {
+                divB.textContent = '—';
+            }
+        } else {
+            divB.className = 'comparison-paragraph placeholder';
+            divB.textContent = '—';
+        }
+
+        grid.appendChild(divA);
+        grid.appendChild(divB);
+    }
+
+    div.appendChild(grid);
     container.appendChild(div);
 }
 
