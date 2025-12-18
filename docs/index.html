@@ -88,6 +88,7 @@
                     <button id="clear-search-btn" class="tool-btn" title="Clear search results">Clear</button>
                 </div>
                 <button id="word-diff-btn" class="tool-btn" title="Compare unique vocabulary between two versions">Word Differential</button>
+                <button id="levenshtein-btn" class="tool-btn" title="Compare textual similarity between versions">Levenshtein Distance</button>
             </div>
         </div>
 
@@ -180,6 +181,28 @@
         </div>
     </div>
 
+    <!-- Privacy Notice Modal -->
+    <div id="privacy-notice-modal" class="modal hidden">
+        <div class="modal-content privacy-notice-content">
+            <div class="modal-header">
+                <h2>📁 About File Uploads</h2>
+                <button id="close-privacy-modal-btn" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Your files stay on your device.</strong></p>
+                <p>When you upload a file, it's stored only in your browser's local storage—not on any server. This means:</p>
+                <ul>
+                    <li>✓ Your files are completely private</li>
+                    <li>✓ No data is transmitted over the internet</li>
+                    <li>✓ Only you have access to your uploaded versions</li>
+                    <li>✓ Files persist across browser sessions on this device</li>
+                </ul>
+                <p class="privacy-note">You can delete uploaded versions anytime using the "Manage Uploads" button.</p>
+                <button id="privacy-understand-btn" class="tool-btn">Got it, proceed with upload</button>
+            </div>
+        </div>
+    </div>
+
     <!-- About Modal -->
     <div id="about-modal" class="modal hidden">
         <div class="modal-content about-modal-content">
@@ -221,8 +244,87 @@
         </div>
     </div>
 
+    <!-- Levenshtein Distance Modal -->
+    <div id="levenshtein-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Levenshtein Distance Analysis</h2>
+                <p class="modal-description">Levenshtein distance measures the similarity between two texts by counting the minimum number of single-character edits (insertions, deletions, or substitutions) needed to transform one into the other. Lower distances indicate more similar texts.</p>
+                <button id="close-levenshtein-modal-btn" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="levenshtein-summary">
+                    <div class="distance-card">
+                        <h3>Most Similar Versions</h3>
+                        <p class="distance-pair">
+                            <strong>Seeds <span id="most-similar-seeds"></span></strong>
+                        </p>
+                        <p class="distance-value">Distance: <span id="most-similar-distance"></span></p>
+                        <button id="load-most-similar-btn" class="tool-btn">Load These Versions</button>
+                    </div>
+                    <div class="distance-card">
+                        <h3>Most Different Versions</h3>
+                        <p class="distance-pair">
+                            <strong>Seeds <span id="most-different-seeds"></span></strong>
+                        </p>
+                        <p class="distance-value">Distance: <span id="most-different-distance"></span></p>
+                        <button id="load-most-different-btn" class="tool-btn">Load These Versions</button>
+                    </div>
+                </div>
+                <div class="matrix-section">
+                    <button id="show-matrix-btn" class="tool-btn">Show Complete Distance Matrix</button>
+                    <div id="distance-matrix" class="distance-matrix hidden"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/diff@5.1.0/dist/diff.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script>
+        // Optimized Levenshtein distance implementation
+        function levenshtein(a, b) {
+            if (a === b) return 0;
+            if (a.length === 0) return b.length;
+            if (b.length === 0) return a.length;
+
+            // Swap to save memory O(min(a,b)) instead of O(a)
+            if (a.length > b.length) {
+                const tmp = a;
+                a = b;
+                b = tmp;
+            }
+
+            const row = new Array(a.length + 1);
+
+            // Initialize first row
+            for (let i = 0; i <= a.length; i++) {
+                row[i] = i;
+            }
+
+            // Fill in the rest
+            for (let i = 1; i <= b.length; i++) {
+                let prev = i;
+                for (let j = 1; j <= a.length; j++) {
+                    let val;
+                    if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                        val = row[j - 1]; // Match
+                    } else {
+                        val = Math.min(
+                            row[j - 1] + 1, // Substitution
+                            prev + 1,       // Insertion
+                            row[j] + 1      // Deletion
+                        );
+                    }
+                    row[j - 1] = prev;
+                    prev = val;
+                }
+                row[a.length] = prev;
+            }
+
+            return row[a.length];
+        }
+    </script>
     <script src="compare.js"></script>
 </body>
 </html>

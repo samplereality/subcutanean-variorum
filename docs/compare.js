@@ -8,6 +8,33 @@ let versionA = null;
 let versionB = null;
 let customVersions = {}; // Store uploaded versions
 
+// Levenshtein Distance helper functions (global scope)
+const NARRATIVE_CHAPTERS = [
+    'prologue',
+    'chapter1', 'chapter2', 'chapter3', 'chapter4', 'chapter5', 'chapter6',
+    'chapter7', 'chapter8', 'chapter9', 'chapter10', 'chapter11', 'chapter12',
+    'chapter13', 'chapter14', 'chapter15', 'chapter16', 'chapter17', 'chapter18'
+];
+
+function getTextForDistance(versionData) {
+    // Concatenate narrative chapters (same as Python script)
+    const textParts = [];
+    NARRATIVE_CHAPTERS.forEach(chapter => {
+        if (versionData[chapter]) {
+            textParts.push(versionData[chapter].join(' '));
+        }
+    });
+    return textParts.join(' ');
+}
+
+function calculateDistanceBetweenVersions(versionData1, versionData2) {
+    const text1 = getTextForDistance(versionData1);
+    const text2 = getTextForDistance(versionData2);
+
+    // Use levenshtein function (defined inline in HTML)
+    return typeof levenshtein === 'function' ? levenshtein(text1, text2) : 0;
+}
+
 // Chapter mapping from EPUB files to section IDs
 const CHAPTER_MAPPING = {
     'ch001.xhtml': 'introduction',
@@ -119,6 +146,7 @@ function populateVersionSelectors() {
     if (!selectorA.dataset.hasListener) {
         selectorA.addEventListener('change', (e) => {
             versionA = e.target.value;
+            buildChapterNavigation();
             displayComparison();
         });
         selectorA.dataset.hasListener = 'true';
@@ -127,6 +155,7 @@ function populateVersionSelectors() {
     if (!selectorB.dataset.hasListener) {
         selectorB.addEventListener('change', (e) => {
             versionB = e.target.value;
+            buildChapterNavigation();
             displayComparison();
         });
         selectorB.dataset.hasListener = 'true';
@@ -137,9 +166,35 @@ function buildChapterNavigation() {
     const nav = document.getElementById('chapter-nav');
     nav.innerHTML = '';
 
-    // Get chapter list from first version
-    const firstVersion = allVersions[versionIds[0]];
-    const chapters = Object.keys(firstVersion).filter(key => key !== 'version_id');
+    // Get chapters from both selected versions (to show all available chapters)
+    const chaptersSet = new Set();
+
+    // Add chapters from version A
+    if (allVersions[versionA]) {
+        Object.keys(allVersions[versionA]).forEach(key => {
+            if (key !== 'version_id') chaptersSet.add(key);
+        });
+    }
+
+    // Add chapters from version B
+    if (allVersions[versionB]) {
+        Object.keys(allVersions[versionB]).forEach(key => {
+            if (key !== 'version_id') chaptersSet.add(key);
+        });
+    }
+
+    // Convert to array and sort in a logical order
+    // Exclude: epilogue, alternatescene, backers, aboutauthor, aboutcopy (per user request)
+    // chapter18 is the Epilogue
+    const chapterOrder = ['introduction', 'prologue',
+                         'chapter1', 'chapter2', 'chapter3', 'chapter4', 'chapter5',
+                         'chapter6', 'chapter7', 'chapter8', 'chapter9',
+                         'part2', 'chapter10', 'chapter11', 'chapter12', 'chapter13',
+                         'chapter14', 'chapter15',
+                         'part3', 'chapter16', 'chapter17', 'chapter18',
+                         'notes'];
+
+    const chapters = chapterOrder.filter(ch => chaptersSet.has(ch));
 
     chapters.forEach(chapterId => {
         const button = document.createElement('button');
@@ -158,6 +213,8 @@ function buildChapterNavigation() {
             buttonText = 'Part II';
         } else if (chapterId === 'part3') {
             buttonText = 'Part III';
+        } else if (chapterId === 'chapter18') {
+            buttonText = 'Epilogue';
         } else if (chapterId === 'notes') {
             buttonText = 'Notes';
         } else if (chapterId.startsWith('chapter')) {
@@ -318,9 +375,13 @@ function displayDiff(container, paragraphsA, paragraphsB) {
             // Paragraph only in A (removed)
             p.innerHTML = `<span class="diff-removed">${textA}</span>`;
         } else if (type === 'modified') {
-            // Use word-level diff for similar paragraphs
-            const cleanA = textA.replace(/<\/?em>/g, '');
-            const cleanB = textB.replace(/<\/?em>/g, '');
+            // Text is already formatted with HTML tags
+            const formattedA = textA;
+            const formattedB = textB;
+
+            // Remove HTML tags for diff comparison
+            const cleanA = formattedA.replace(/<\/?(?:em|strong)>/g, '');
+            const cleanB = formattedB.replace(/<\/?(?:em|strong)>/g, '');
 
             const diff = Diff.diffWords(cleanA, cleanB);
 
@@ -329,13 +390,13 @@ function displayDiff(container, paragraphsA, paragraphsB) {
 
                 if (part.added) {
                     span.className = 'diff-added';
-                    span.textContent = part.value;
+                    span.innerHTML = part.value;
                 } else if (part.removed) {
                     span.className = 'diff-removed';
-                    span.textContent = part.value;
+                    span.innerHTML = part.value;
                 } else {
                     // Unchanged text
-                    span.textContent = part.value;
+                    span.innerHTML = part.value;
                 }
 
                 p.appendChild(span);
@@ -1056,6 +1117,7 @@ function formatChapterName(chapterId) {
     if (chapterId === 'prologue') return 'Prologue';
     if (chapterId === 'part2') return 'Part II';
     if (chapterId === 'part3') return 'Part III';
+    if (chapterId === 'chapter18') return 'Epilogue';
     if (chapterId === 'notes') return 'Notes';
     if (chapterId.startsWith('chapter')) {
         return `Chapter ${chapterId.replace('chapter', '')}`;
@@ -1146,6 +1208,278 @@ function closeModal() {
     modal.classList.add('hidden');
 }
 
+// EPUB Generation functionality
+
+async function generateEPUBForVersion(versionId, versionData) {
+    const zip = new JSZip();
+
+    // 1. Add mimetype (must be first, uncompressed)
+    zip.file('mimetype', 'application/epub+zip', { compression: 'STORE' });
+
+    // 2. Add META-INF/container.xml
+    const containerXml = `<?xml version="1.0" encoding="UTF-8"?>
+<container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">
+  <rootfiles>
+    <rootfile full-path="EPUB/content.opf" media-type="application/oebps-package+xml" />
+  </rootfiles>
+</container>`;
+    zip.file('META-INF/container.xml', containerXml);
+
+    // 3. Add stylesheet
+    const css = `/* This defines styles and classes used in the book */
+body { margin: 5%; }
+code { font-family: monospace; }
+h1 { text-align: left; }
+h2 { text-align: left; }
+h3 { text-align: left; }
+h4 { text-align: left; }
+h5 { text-align: left; }
+h6 { text-align: left; }
+em, em em em, em em em em em { font-style: italic;}
+em em, em em em em { font-style: normal; }
+code{ white-space: pre-wrap; }
+span.smallcaps{ font-variant: small-caps; }
+span.underline{ text-decoration: underline; }
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}`;
+    zip.file('EPUB/styles/stylesheet1.css', css);
+
+    // 4. Add cover image
+    const coverImageResponse = await fetch('subcutanean-ebook-cover.jpg');
+    const coverImageBlob = await coverImageResponse.blob();
+    zip.file('EPUB/media/subcutanean-ebook-cover.jpg', coverImageBlob);
+
+    // 5. Generate chapter files
+    const chapters = generateChapterFiles(versionData);
+    chapters.forEach((chapter, index) => {
+        zip.file(chapter.filename, chapter.content);
+    });
+
+    // 6. Add cover and title page
+    zip.file('EPUB/text/cover.xhtml', generateCoverPage(versionId));
+    zip.file('EPUB/text/title_page.xhtml', generateTitlePage(versionId));
+
+    // 7. Generate content.opf
+    zip.file('EPUB/content.opf', generateContentOPF(versionId, chapters));
+
+    // 8. Generate nav.xhtml
+    zip.file('EPUB/nav.xhtml', generateNavigation(versionId, chapters));
+
+    // Generate the EPUB file
+    const blob = await zip.generateAsync({ type: 'blob', mimeType: 'application/epub+zip' });
+    return blob;
+}
+
+function generateCoverPage(versionId) {
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+<head>
+  <meta charset="utf-8" />
+  <title>Subcutanean ${versionId}</title>
+  <link rel="stylesheet" type="text/css" href="../styles/stylesheet1.css" />
+</head>
+<body id="cover">
+<div id="cover-image">
+<img src="../media/subcutanean-ebook-cover.jpg" alt="cover image" />
+</div>
+</body>
+</html>`;
+}
+
+function generateTitlePage(versionId) {
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+<head>
+  <meta charset="utf-8" />
+  <title>Subcutanean ${versionId}</title>
+  <link rel="stylesheet" type="text/css" href="../styles/stylesheet1.css" />
+</head>
+<body>
+<section epub:type="titlepage">
+  <h1 class="title">Subcutanean ${versionId}</h1>
+  <p class="author">Aaron A. Reed</p>
+  <p class="date">2020-02-02</p>
+  <div class="rights">CC-BY-4.0</div>
+</section>
+</body>
+</html>`;
+}
+
+function generateChapterFiles(versionData) {
+    const chapters = [];
+    const chapterMapping = {
+        'introduction': { num: '001', title: 'Introduction', addCredit: true },
+        'prologue': { num: '002', title: 'PART ONE: DOWNSTAIRS' },
+        'chapter1': { num: '003', title: 'Chapter 1' },
+        'chapter2': { num: '004', title: 'Chapter 2' },
+        'chapter3': { num: '005', title: 'Chapter 3' },
+        'chapter4': { num: '006', title: 'Chapter 4' },
+        'chapter5': { num: '007', title: 'Chapter 5' },
+        'chapter6': { num: '008', title: 'Chapter 6' },
+        'chapter7': { num: '009', title: 'Chapter 7' },
+        'chapter8': { num: '010', title: 'Chapter 8' },
+        'chapter9': { num: '011', title: 'Chapter 9' },
+        'part2': { num: '012', title: 'PART TWO: MULTIPLICIOUS' },
+        'chapter10': { num: '013', title: 'Chapter 10' },
+        'chapter11': { num: '014', title: 'Chapter 11' },
+        'chapter12': { num: '015', title: 'Chapter 12' },
+        'chapter13': { num: '016', title: 'Chapter 13' },
+        'chapter14': { num: '017', title: 'Chapter 14' },
+        'chapter15': { num: '018', title: 'Chapter 15' },
+        'part3': { num: '019', title: 'PART THREE: MANIFOLDWISE' },
+        'chapter16': { num: '020', title: 'Chapter 16' },
+        'chapter17': { num: '021', title: 'Chapter 17' },
+        'chapter18': { num: '022', title: 'EPILOGUE' },
+        'alternatescene': { num: '023', title: 'ALTERNATE SCENE' },
+        'backers': { num: '024', title: 'BACKER ACKNOWLEDGMENTS' },
+        'aboutauthor': { num: '025', title: 'ABOUT THE AUTHOR' },
+        'notes': { num: '026', title: 'Notes' }
+    };
+
+    Object.keys(chapterMapping).forEach(key => {
+        if (versionData[key]) {
+            const mapping = chapterMapping[key];
+            const filename = `EPUB/text/ch${mapping.num}.xhtml`;
+            const content = generateChapterXHTML(mapping.title, versionData[key], mapping.addCredit);
+            chapters.push({ id: key, num: mapping.num, title: mapping.title, filename, content });
+        }
+    });
+
+    return chapters;
+}
+
+function convertTextFormatting(text) {
+    // Convert _text_ to <em>text</em> (italics)
+    // Convert *text* to <strong>text</strong> (bold)
+    // Use global replace to handle multiple occurrences
+    let formatted = text.replace(/_([^_]+)_/g, '<em>$1</em>');
+    formatted = formatted.replace(/\*([^*]+)\*/g, '<strong>$1</strong>');
+    return formatted;
+}
+
+function generateChapterXHTML(title, paragraphs, addCredit = false) {
+    const paragraphsHTML = paragraphs.map(p => {
+        // Text is already formatted with HTML tags
+        return `<p>${p}</p>`;
+    }).join('\n');
+
+    // Add credit line for Introduction
+    const creditLine = addCredit ?
+        `<p class="credit-line"><em>This EPUB was generated by the <a href="https://subcutanean.fugitivetexts.net">Subcutanean Variorum</a> designed by Mark Sample.</em></p>\n` : '';
+
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+<head>
+  <meta charset="utf-8" />
+  <title>${title}</title>
+  <link rel="stylesheet" type="text/css" href="../styles/stylesheet1.css" />
+</head>
+<body>
+<section id="${title.toLowerCase().replace(/\s+/g, '-')}" class="level1">
+<h1>${title}</h1>
+${paragraphsHTML}
+${creditLine}
+</section>
+</body>
+</html>`;
+}
+
+function generateContentOPF(versionId, chapters) {
+    const manifestItems = chapters.map(ch =>
+        `    <item id="ch${ch.num}_xhtml" href="text/ch${ch.num}.xhtml" media-type="application/xhtml+xml" />`
+    ).join('\n');
+
+    const spineItems = chapters.map(ch =>
+        `    <itemref idref="ch${ch.num}_xhtml" />`
+    ).join('\n');
+
+    const uuid = `urn:uuid:${crypto.randomUUID()}`;
+
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<package version="3.0" xmlns="http://www.idpf.org/2007/opf" unique-identifier="epub-id-1">
+  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <dc:identifier id="epub-id-1">${uuid}</dc:identifier>
+    <dc:title id="epub-title-1">Subcutanean ${versionId}</dc:title>
+    <dc:date id="epub-date">2020-02-02</dc:date>
+    <dc:language>en-US</dc:language>
+    <dc:creator id="epub-creator-1">Aaron A. Reed</dc:creator>
+    <meta refines="#epub-creator-1" property="role" scheme="marc:relators">aut</meta>
+    <dc:rights>CC-BY-4.0</dc:rights>
+    <meta name="cover" content="subcutanean-ebook-cover_jpg" />
+    <meta property="dcterms:modified">${new Date().toISOString().split('.')[0]}Z</meta>
+  </metadata>
+  <manifest>
+    <item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav" />
+    <item id="style" href="styles/stylesheet1.css" media-type="text/css" />
+    <item id="cover_xhtml" href="text/cover.xhtml" media-type="application/xhtml+xml" />
+    <item id="title_page_xhtml" href="text/title_page.xhtml" media-type="application/xhtml+xml" />
+${manifestItems}
+    <item properties="cover-image" id="subcutanean-ebook-cover_jpg" href="media/subcutanean-ebook-cover.jpg" media-type="image/jpeg" />
+  </manifest>
+  <spine>
+    <itemref idref="cover_xhtml" />
+    <itemref idref="title_page_xhtml" linear="yes" />
+    <itemref idref="nav" />
+${spineItems}
+  </spine>
+  <guide>
+    <reference type="toc" title="Subcutanean ${versionId}" href="nav.xhtml" />
+    <reference type="cover" title="Cover" href="text/cover.xhtml" />
+  </guide>
+</package>`;
+}
+
+function generateNavigation(versionId, chapters) {
+    const navItems = chapters.map(ch =>
+        `          <li><a href="text/ch${ch.num}.xhtml">${ch.title}</a></li>`
+    ).join('\n');
+
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+<head>
+  <meta charset="utf-8" />
+  <title>Subcutanean ${versionId}</title>
+  <link rel="stylesheet" type="text/css" href="styles/stylesheet1.css" />
+</head>
+<body>
+  <nav id="toc" epub:type="toc">
+    <h1>Table of Contents</h1>
+    <ol>
+      <li><a href="text/cover.xhtml">Cover</a></li>
+      <li><a href="text/title_page.xhtml">Title Page</a></li>
+${navItems}
+    </ol>
+  </nav>
+</body>
+</html>`;
+}
+
+async function downloadEPUB(versionId) {
+    const versionData = allVersions[versionId];
+    if (!versionData) {
+        alert('Version data not found');
+        return;
+    }
+
+    try {
+        const blob = await generateEPUBForVersion(versionId, versionData);
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `subcutanean-${versionId}.epub`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error('Error generating EPUB:', error);
+        alert('Error generating EPUB. See console for details.');
+    }
+}
+
 // Manage Uploads functionality
 
 function openManageUploadsModal() {
@@ -1194,13 +1528,25 @@ function openManageUploadsModal() {
             info.appendChild(seedLabel);
             info.appendChild(dateLabel);
 
+            const buttonGroup = document.createElement('div');
+            buttonGroup.className = 'upload-item-buttons';
+
+            const downloadBtn = document.createElement('button');
+            downloadBtn.className = 'download-epub-btn';
+            downloadBtn.textContent = 'Download EPUB';
+            downloadBtn.title = 'Download as EPUB (works on modern Kindles, e-readers, and most devices)';
+            downloadBtn.addEventListener('click', () => downloadEPUB(versionId));
+
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'delete-upload-btn';
             deleteBtn.textContent = 'Delete';
             deleteBtn.addEventListener('click', () => deleteCustomVersion(versionId));
 
+            buttonGroup.appendChild(downloadBtn);
+            buttonGroup.appendChild(deleteBtn);
+
             item.appendChild(info);
-            item.appendChild(deleteBtn);
+            item.appendChild(buttonGroup);
             uploadsList.appendChild(item);
         });
     }
@@ -1259,6 +1605,46 @@ function openAboutModal() {
 function closeAboutModal() {
     const modal = document.getElementById('about-modal');
     modal.classList.add('hidden');
+}
+
+// Privacy Notice Modal functionality
+
+let pendingUploadFile = null;
+
+function hasSeenPrivacyNotice() {
+    return localStorage.getItem('subcutanean_privacy_notice_seen') === 'true';
+}
+
+function markPrivacyNoticeSeen() {
+    localStorage.setItem('subcutanean_privacy_notice_seen', 'true');
+}
+
+function openPrivacyNoticeModal() {
+    const modal = document.getElementById('privacy-notice-modal');
+    modal.classList.remove('hidden');
+}
+
+function closePrivacyNoticeModal() {
+    const modal = document.getElementById('privacy-notice-modal');
+    modal.classList.add('hidden');
+}
+
+function acceptPrivacyNoticeAndProceed() {
+    markPrivacyNoticeSeen();
+    closePrivacyNoticeModal();
+
+    // Process the pending file
+    if (pendingUploadFile) {
+        const fileName = pendingUploadFile.name.toLowerCase();
+
+        if (fileName.endsWith('.epub')) {
+            processEPUBFile(pendingUploadFile);
+        } else if (fileName.endsWith('.txt')) {
+            processTextFile(pendingUploadFile);
+        }
+
+        pendingUploadFile = null;
+    }
 }
 
 // EPUB Upload and Processing
@@ -1374,15 +1760,39 @@ async function processEPUBFile(file) {
         const arrayBuffer = await file.arrayBuffer();
         const zip = await JSZip.loadAsync(arrayBuffer);
 
-        // Extract version ID from filename (e.g., "subcutanean-45468.epub" -> "45468")
-        const match = file.name.match(/subcutanean-(\d+)/i);
+        // Extract version ID from filename
+        // Supports multiple patterns:
+        // - subcutanean-45468.epub -> 45468
+        // - 45468.epub -> 45468
+        // - subcutanean_45468.epub -> 45468
+        // - 45468-subcutanean.epub -> 45468
         let versionId;
 
+        // Try pattern: subcutanean-XXXXX or subcutanean_XXXXX
+        let match = file.name.match(/subcutanean[-_](\d+)/i);
         if (match) {
             versionId = match[1];
         } else {
-            // Generate a custom ID if pattern doesn't match
-            versionId = `custom-${Date.now()}`;
+            // Try pattern: XXXXX-subcutanean
+            match = file.name.match(/(\d+)[-_]subcutanean/i);
+            if (match) {
+                versionId = match[1];
+            } else {
+                // Try pattern: just a number (e.g., 45468.epub or 45468.txt)
+                match = file.name.match(/^(\d+)\./);
+                if (match) {
+                    versionId = match[1];
+                } else {
+                    // Try any 4+ digit number in the filename
+                    match = file.name.match(/(\d{4,})/);
+                    if (match) {
+                        versionId = match[1];
+                    } else {
+                        // Generate a custom ID if no pattern matches
+                        versionId = `custom-${Date.now()}`;
+                    }
+                }
+            }
         }
 
         // Check if already exists
@@ -1424,12 +1834,16 @@ async function processEPUBFile(file) {
         // Refresh version selectors
         populateVersionSelectors();
 
-        showUploadStatus(`Successfully loaded version ${versionId}!`, 'success');
-
         // Auto-select the new version
         document.getElementById('version-b-select').value = versionId;
         versionB = versionId;
+
+        // Rebuild chapter navigation to show all chapters
+        buildChapterNavigation();
         displayComparison();
+
+        // Show success message
+        showUploadStatus(`Successfully loaded Seed ${versionId}!`, 'success');
 
     } catch (error) {
         console.error('Error processing EPUB:', error);
@@ -1535,11 +1949,37 @@ async function processTextFile(file) {
 
         if (seedLine) {
             const match = seedLine.match(/seed #(\d+)/);
-            versionId = match ? match[1] : `custom-${Date.now()}`;
-        } else {
-            // Try to extract from filename
-            const filenameMatch = file.name.match(/(\d+)\.txt$/);
-            versionId = filenameMatch ? filenameMatch[1] : `custom-${Date.now()}`;
+            versionId = match ? match[1] : null;
+        }
+
+        // If not in header, try to extract from filename
+        if (!versionId) {
+            // Try pattern: subcutanean-XXXXX or subcutanean_XXXXX
+            let match = file.name.match(/subcutanean[-_](\d+)/i);
+            if (match) {
+                versionId = match[1];
+            } else {
+                // Try pattern: XXXXX-subcutanean
+                match = file.name.match(/(\d+)[-_]subcutanean/i);
+                if (match) {
+                    versionId = match[1];
+                } else {
+                    // Try pattern: just a number (e.g., 45468.txt or 56019.txt)
+                    match = file.name.match(/^(\d+)\./);
+                    if (match) {
+                        versionId = match[1];
+                    } else {
+                        // Try any 4+ digit number in the filename
+                        match = file.name.match(/(\d{4,})/);
+                        if (match) {
+                            versionId = match[1];
+                        } else {
+                            // Generate a custom ID if no pattern matches
+                            versionId = `custom-${Date.now()}`;
+                        }
+                    }
+                }
+            }
         }
 
         // Check if already exists
@@ -1567,13 +2007,11 @@ async function processTextFile(file) {
 
             // Detect PART markers
             if (line === 'PART ONE') {
-                // Look ahead for the subtitle on the next non-empty line
-                let subtitle = '';
+                // Look ahead for the subtitle on the next non-empty line to skip it
                 let subtitleIndex = -1;
                 for (let j = i + 1; j < lines.length; j++) {
                     const nextLine = lines[j].trim();
                     if (nextLine) {
-                        subtitle = nextLine;
                         subtitleIndex = j;
                         break;
                     }
@@ -1588,21 +2026,18 @@ async function processTextFile(file) {
                 currentChapter = 'prologue';
                 currentParagraphs = [];
 
-                // Add combined PART + subtitle as first paragraph
-                if (subtitle) {
-                    currentParagraphs.push(`PART ONE: ${subtitle}`);
-                    skipLines.add(subtitleIndex); // Mark subtitle line to skip
+                // Mark subtitle line to skip (it will be used in the title)
+                if (subtitleIndex !== -1) {
+                    skipLines.add(subtitleIndex);
                 }
 
                 continue;
             } else if (line === 'PART TWO') {
-                // Look ahead for the subtitle on the next non-empty line
-                let subtitle = '';
+                // Look ahead for the subtitle on the next non-empty line to skip it
                 let subtitleIndex = -1;
                 for (let j = i + 1; j < lines.length; j++) {
                     const nextLine = lines[j].trim();
                     if (nextLine) {
-                        subtitle = nextLine;
                         subtitleIndex = j;
                         break;
                     }
@@ -1618,21 +2053,18 @@ async function processTextFile(file) {
                 currentParagraphs = [];
                 currentSection = 'part2';
 
-                // Add combined PART + subtitle as first paragraph
-                if (subtitle) {
-                    currentParagraphs.push(`PART TWO: ${subtitle}`);
-                    skipLines.add(subtitleIndex); // Mark subtitle line to skip
+                // Mark subtitle line to skip (it will be used in the title)
+                if (subtitleIndex !== -1) {
+                    skipLines.add(subtitleIndex);
                 }
 
                 continue;
             } else if (line === 'PART THREE') {
-                // Look ahead for the subtitle on the next non-empty line
-                let subtitle = '';
+                // Look ahead for the subtitle on the next non-empty line to skip it
                 let subtitleIndex = -1;
                 for (let j = i + 1; j < lines.length; j++) {
                     const nextLine = lines[j].trim();
                     if (nextLine) {
-                        subtitle = nextLine;
                         subtitleIndex = j;
                         break;
                     }
@@ -1648,10 +2080,9 @@ async function processTextFile(file) {
                 currentParagraphs = [];
                 currentSection = 'part3';
 
-                // Add combined PART + subtitle as first paragraph
-                if (subtitle) {
-                    currentParagraphs.push(`PART THREE: ${subtitle}`);
-                    skipLines.add(subtitleIndex); // Mark subtitle line to skip
+                // Mark subtitle line to skip (it will be used in the title)
+                if (subtitleIndex !== -1) {
+                    skipLines.add(subtitleIndex);
                 }
 
                 continue;
@@ -1673,9 +2104,68 @@ async function processTextFile(file) {
                 continue;
             }
 
-            // Stop at ALTERNATE SCENE or Kickstarter backers
-            if (line === 'ALTERNATE SCENE' || (i > 3900 && /^[A-Z][a-z]+ [A-Z]/.test(line))) {
-                break;
+            // Detect Epilogue (handle both "Epilogue" and "EPILOGUE")
+            // Store as chapter18 to match built-in versions
+            if (line === 'Epilogue' || line === 'EPILOGUE') {
+                // Save previous chapter if any
+                if (currentChapter && currentParagraphs.length > 0) {
+                    versionData[currentChapter] = [...currentParagraphs];
+                }
+
+                currentChapter = 'chapter18';
+                currentParagraphs = [];
+                currentSection = 'chapter18';
+                continue;
+            }
+
+            // Detect end sections
+            if (line === 'ALTERNATE SCENE') {
+                // Save previous chapter/section if any
+                if (currentChapter && currentParagraphs.length > 0) {
+                    versionData[currentChapter] = [...currentParagraphs];
+                }
+
+                currentChapter = 'alternatescene';
+                currentParagraphs = [];
+                currentSection = 'alternatescene';
+                continue;
+            }
+
+            if (line === 'ABOUT THIS COPY') {
+                // Save previous section if any
+                if (currentChapter && currentParagraphs.length > 0) {
+                    versionData[currentChapter] = [...currentParagraphs];
+                }
+
+                // Append to existing 'notes' section if it exists
+                currentChapter = 'notes';
+                currentParagraphs = versionData['notes'] ? [...versionData['notes']] : [];
+                currentSection = 'notes';
+                continue;
+            }
+
+            if (line.startsWith('BACKER ACKNOWLEDGMENTS') || line === 'Kickstarter Backers') {
+                // Save previous section if any
+                if (currentChapter && currentParagraphs.length > 0) {
+                    versionData[currentChapter] = [...currentParagraphs];
+                }
+
+                currentChapter = 'backers';
+                currentParagraphs = [];
+                currentSection = 'backers';
+                continue;
+            }
+
+            if (line === 'ABOUT THE AUTHOR' || line === 'About the Author') {
+                // Save previous section if any
+                if (currentChapter && currentParagraphs.length > 0) {
+                    versionData[currentChapter] = [...currentParagraphs];
+                }
+
+                currentChapter = 'aboutauthor';
+                currentParagraphs = [];
+                currentSection = 'aboutauthor';
+                continue;
             }
 
             // Skip single # markers (scene breaks)
@@ -1685,7 +2175,9 @@ async function processTextFile(file) {
 
             // Collect paragraph content
             if (line && currentSection !== 'header') {
-                currentParagraphs.push(normalizeTextToSmartPunctuation(line));
+                // Convert formatting markers (_italics_, *bold*) to HTML tags
+                const formattedLine = convertTextFormatting(normalizeTextToSmartPunctuation(line));
+                currentParagraphs.push(formattedLine);
             }
 
             // Extract introduction from header
@@ -1694,7 +2186,8 @@ async function processTextFile(file) {
                     versionData.introduction = [];
                 }
                 if (line.includes('seed #')) {
-                    versionData.introduction.push(normalizeTextToSmartPunctuation(line));
+                    const formattedLine = convertTextFormatting(normalizeTextToSmartPunctuation(line));
+                    versionData.introduction.push(formattedLine);
                 }
             }
         }
@@ -1732,12 +2225,16 @@ async function processTextFile(file) {
         // Refresh version selectors
         populateVersionSelectors();
 
-        showUploadStatus(`Successfully loaded Seed ${versionId}!`, 'success');
-
         // Auto-select the new version
         document.getElementById('version-b-select').value = versionId;
         versionB = versionId;
+
+        // Rebuild chapter navigation to show all chapters
+        buildChapterNavigation();
         displayComparison();
+
+        // Show success message
+        showUploadStatus(`Successfully loaded Seed ${versionId}!`, 'success');
 
     } catch (error) {
         console.error('Error processing text file:', error);
@@ -1751,13 +2248,26 @@ function handleEPUBUpload(event) {
 
     const fileName = file.name.toLowerCase();
 
+    // Check file type
+    if (!fileName.endsWith('.epub') && !fileName.endsWith('.txt')) {
+        showUploadStatus('Please select an EPUB or TXT file', 'error');
+        event.target.value = '';
+        return;
+    }
+
+    // Check if user has seen privacy notice
+    if (!hasSeenPrivacyNotice()) {
+        pendingUploadFile = file;
+        openPrivacyNoticeModal();
+        event.target.value = '';
+        return;
+    }
+
+    // Process file immediately if privacy notice already seen
     if (fileName.endsWith('.epub')) {
         processEPUBFile(file);
     } else if (fileName.endsWith('.txt')) {
         processTextFile(file);
-    } else {
-        showUploadStatus('Please select an EPUB or TXT file', 'error');
-        return;
     }
 
     // Reset file input
@@ -1892,6 +2402,197 @@ document.addEventListener('DOMContentLoaded', () => {
     aboutModal.addEventListener('click', (e) => {
         if (e.target === aboutModal) {
             closeAboutModal();
+        }
+    });
+
+    // Privacy notice modal event listeners
+    const closePrivacyModalBtn = document.getElementById('close-privacy-modal-btn');
+    const privacyUnderstandBtn = document.getElementById('privacy-understand-btn');
+    const privacyModal = document.getElementById('privacy-notice-modal');
+
+    closePrivacyModalBtn.addEventListener('click', () => {
+        closePrivacyNoticeModal();
+        pendingUploadFile = null; // Clear pending file if user closes without accepting
+    });
+
+    privacyUnderstandBtn.addEventListener('click', acceptPrivacyNoticeAndProceed);
+
+    // Close modal when clicking outside
+    privacyModal.addEventListener('click', (e) => {
+        if (e.target === privacyModal) {
+            closePrivacyNoticeModal();
+            pendingUploadFile = null; // Clear pending file if user closes without accepting
+        }
+    });
+
+    // Levenshtein Distance functionality
+    let levenshteinData = null;
+
+    // Load Levenshtein distance data (only for 25 built-in versions)
+    async function loadLevenshteinData() {
+        if (levenshteinData) {
+            return levenshteinData;
+        }
+
+        try {
+            const response = await fetch('extracted_text/levenshtein_distances.json');
+            levenshteinData = await response.json();
+            return levenshteinData;
+        } catch (error) {
+            console.error('Error loading Levenshtein distance data:', error);
+            return null;
+        }
+    }
+
+    function openLevenshteinModal() {
+        const modal = document.getElementById('levenshtein-modal');
+        modal.classList.remove('hidden');
+
+        loadLevenshteinData().then(data => {
+            if (data) {
+                displayLevenshteinSummary(data);
+            }
+        });
+    }
+
+    function closeLevenshteinModal() {
+        const modal = document.getElementById('levenshtein-modal');
+        modal.classList.add('hidden');
+
+        // Hide matrix if it's showing
+        const matrix = document.getElementById('distance-matrix');
+        matrix.classList.add('hidden');
+
+        const showMatrixBtn = document.getElementById('show-matrix-btn');
+        showMatrixBtn.textContent = 'Show Complete Distance Matrix';
+    }
+
+    function displayLevenshteinSummary(data) {
+        // Display most similar
+        const [seed1, seed2] = data.most_similar.pair.split('-');
+        document.getElementById('most-similar-seeds').textContent = `${seed1} & ${seed2}`;
+        document.getElementById('most-similar-distance').textContent = data.most_similar.distance.toLocaleString();
+
+        // Display most different
+        const [seed3, seed4] = data.most_different.pair.split('-');
+        document.getElementById('most-different-seeds').textContent = `${seed3} & ${seed4}`;
+        document.getElementById('most-different-distance').textContent = data.most_different.distance.toLocaleString();
+
+        // Setup load buttons
+        const loadSimilarBtn = document.getElementById('load-most-similar-btn');
+        const loadDifferentBtn = document.getElementById('load-most-different-btn');
+
+        loadSimilarBtn.onclick = () => {
+            closeLevenshteinModal();
+            loadVersionPair(seed1, seed2);
+        };
+
+        loadDifferentBtn.onclick = () => {
+            closeLevenshteinModal();
+            loadVersionPair(seed3, seed4);
+        };
+    }
+
+    function loadVersionPair(version1, version2) {
+        const selectA = document.getElementById('version-a-select');
+        const selectB = document.getElementById('version-b-select');
+
+        selectA.value = version1;
+        selectB.value = version2;
+
+        // Update the version variables
+        versionA = version1;
+        versionB = version2;
+
+        // Rebuild navigation and trigger comparison update
+        buildChapterNavigation();
+        displayComparison();
+    }
+
+    function toggleDistanceMatrix() {
+        const matrix = document.getElementById('distance-matrix');
+        const showMatrixBtn = document.getElementById('show-matrix-btn');
+
+        if (matrix.classList.contains('hidden')) {
+            loadLevenshteinData().then(data => {
+                if (data) {
+                    generateDistanceMatrix(data);
+                    matrix.classList.remove('hidden');
+                    showMatrixBtn.textContent = 'Hide Distance Matrix';
+                }
+            });
+        } else {
+            matrix.classList.add('hidden');
+            showMatrixBtn.textContent = 'Show Complete Distance Matrix';
+        }
+    }
+
+    function generateDistanceMatrix(data) {
+        const matrixContainer = document.getElementById('distance-matrix');
+        const versionIds = data.version_ids;
+
+        // Create table
+        let html = '<table><thead><tr><th>Seeds</th>';
+
+        // Header row
+        versionIds.forEach(id => {
+            html += `<th>${id}</th>`;
+        });
+        html += '</tr></thead><tbody>';
+
+        // Data rows
+        versionIds.forEach(rowId => {
+            html += `<tr><td>${rowId}</td>`;
+
+            versionIds.forEach(colId => {
+                if (rowId === colId) {
+                    html += '<td>—</td>';
+                } else {
+                    const key = rowId < colId ? `${rowId}-${colId}` : `${colId}-${rowId}`;
+                    const distance = data.all_distances[key];
+
+                    // Handle cases where distance hasn't been calculated yet
+                    if (distance === undefined || distance === null) {
+                        html += `<td class="uncalculated" title="Distance not yet calculated">N/A</td>`;
+                    } else {
+                        let className = '';
+                        if (key === data.most_similar.pair) {
+                            className = 'highlight-min';
+                        } else if (key === data.most_different.pair) {
+                            className = 'highlight-max';
+                        }
+
+                        html += `<td class="${className}" data-v1="${rowId}" data-v2="${colId}" onclick="loadVersionsFromMatrix('${rowId}', '${colId}')">${distance.toLocaleString()}</td>`;
+                    }
+                }
+            });
+
+            html += '</tr>';
+        });
+
+        html += '</tbody></table>';
+        matrixContainer.innerHTML = html;
+    }
+
+    // Make this function global so it can be called from onclick
+    window.loadVersionsFromMatrix = function(version1, version2) {
+        closeLevenshteinModal();
+        loadVersionPair(version1, version2);
+    };
+
+    // Event listeners
+    const levenshteinBtn = document.getElementById('levenshtein-btn');
+    const closeLevenshteinBtn = document.getElementById('close-levenshtein-modal-btn');
+    const levenshteinModal = document.getElementById('levenshtein-modal');
+    const showMatrixBtn = document.getElementById('show-matrix-btn');
+
+    levenshteinBtn.addEventListener('click', openLevenshteinModal);
+    closeLevenshteinBtn.addEventListener('click', closeLevenshteinModal);
+    showMatrixBtn.addEventListener('click', toggleDistanceMatrix);
+
+    levenshteinModal.addEventListener('click', (e) => {
+        if (e.target === levenshteinModal) {
+            closeLevenshteinModal();
         }
     });
 });

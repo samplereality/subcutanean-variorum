@@ -109,7 +109,7 @@
 }
 
 .upload-status.success {
-    color: #4caf50;
+    color: #ff8800;
 }
 
 .upload-status.error {
@@ -525,6 +525,122 @@
     color: var(--accent-color);
 }
 
+/* Levenshtein Distance Modal */
+
+.levenshtein-summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.distance-card {
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+}
+
+.distance-card h3 {
+    color: var(--accent-color);
+    margin: 0 0 1rem 0;
+    font-size: 1.1rem;
+}
+
+.distance-pair {
+    font-size: 1.2rem;
+    margin: 0.75rem 0;
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.distance-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--accent-color);
+    margin: 0.75rem 0 1.5rem 0;
+}
+
+.matrix-section {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.distance-matrix {
+    margin-top: 1.5rem;
+    overflow-x: auto;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.distance-matrix table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.distance-matrix th,
+.distance-matrix td {
+    padding: 0.5rem;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.distance-matrix th {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--accent-color);
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.distance-matrix th:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 11;
+}
+
+.distance-matrix td:first-child {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--accent-color);
+    font-weight: bold;
+    position: sticky;
+    left: 0;
+    z-index: 9;
+}
+
+.distance-matrix td {
+    background-color: rgba(255, 255, 255, 0.02);
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.distance-matrix td:hover {
+    background-color: rgba(255, 193, 7, 0.2);
+    color: rgba(255, 255, 255, 1);
+}
+
+.distance-matrix td.highlight-min {
+    background-color: rgba(76, 175, 80, 0.3);
+    color: #c8e6c9;
+    font-weight: bold;
+}
+
+.distance-matrix td.highlight-max {
+    background-color: rgba(244, 67, 54, 0.3);
+    color: #ffcdd2;
+    font-weight: bold;
+}
+
+.distance-matrix td.uncalculated {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.4);
+    font-style: italic;
+    cursor: default;
+}
+
 /* Comparison display */
 
 #comparison-display {
@@ -609,6 +725,11 @@
     color: var(--accent-color);
     border-bottom: 2px solid var(--accent-color);
     padding-bottom: 0.5rem;
+}
+
+.diff-view p {
+    margin-bottom: 1.5rem;
+    line-height: 1.7;
 }
 
 .diff-paragraph {
@@ -1038,6 +1159,32 @@
         height: 0.18rem;
     }
 
+    .levenshtein-summary {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .distance-card {
+        padding: 1rem;
+    }
+
+    .distance-pair {
+        font-size: 1rem;
+    }
+
+    .distance-value {
+        font-size: 1.2rem;
+    }
+
+    .distance-matrix {
+        font-size: 0.7rem;
+    }
+
+    .distance-matrix th,
+    .distance-matrix td {
+        padding: 0.3rem;
+    }
+
     .about-modal-content {
         max-width: 90%;
         margin: 1rem;
@@ -1086,6 +1233,27 @@
     font-size: 0.85rem;
     color: #a0a0a0;
     margin-top: 0.25rem;
+}
+
+.upload-item-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.download-epub-btn {
+    background-color: #2e7d32;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background-color 0.2s ease;
+    white-space: nowrap;
+}
+
+.download-epub-btn:hover {
+    background-color: #1b5e20;
 }
 
 .delete-upload-btn {
@@ -1243,4 +1411,52 @@
     font-size: 0.9rem;
     color: #666;
     font-style: italic;
+}
+
+/* Privacy Notice Modal */
+
+.privacy-notice-content {
+    max-width: 600px;
+}
+
+.privacy-notice-content .modal-body {
+    line-height: 1.7;
+}
+
+.privacy-notice-content p {
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+.privacy-notice-content ul {
+    margin-bottom: 1.5rem;
+    padding-left: 1.5rem;
+    list-style: none;
+}
+
+.privacy-notice-content li {
+    margin-bottom: 0.75rem;
+    color: var(--text-color);
+    font-size: 0.95rem;
+}
+
+.privacy-notice-content .privacy-note {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #ddd;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+#privacy-understand-btn {
+    width: 100%;
+    margin-top: 0.5rem;
+    padding: 0.75rem;
+    font-size: 1rem;
+    background-color: var(--accent-color);
+    color: white;
+}
+
+#privacy-understand-btn:hover {
+    background-color: #8B4513;
 }

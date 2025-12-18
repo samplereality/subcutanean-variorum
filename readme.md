@@ -33,6 +33,13 @@ In 2025 Reed released the “source code, source text and all prior, current, an
 - Click any word to see which chapters it appears in
 - Click a chapter name to jump directly to that chapter with the word highlighted
 
+**Levenshtein Distance Analysis**: Measure textual similarity between the 25 built-in versions
+- Shows most similar and most different version pairs
+- Interactive distance matrix showing all pairwise comparisons
+- Pre-calculated distances for instant display
+- Click any matrix cell or "Load These Versions" button to immediately compare those versions
+- Note: Only available for the 25 built-in versions (seeds 45443-45467), not uploaded files
+
 **Complete Coverage**: Browse all 23 sections including:
 - Introduction and Prologue
 - Chapters 1-18
@@ -51,6 +58,13 @@ In 2025 Reed released the “source code, source text and all prior, current, an
 - Supports both standard naming (subcutanean-XXXXX.epub, 50000.txt) and custom filenames
 - Manage Uploads: View all uploaded versions and delete them from localStorage
 
+**Download as EPUB**: Convert uploaded text files to properly formatted EPUB files
+- Generate EPUB files from any uploaded TXT version
+- Includes cover image, table of contents, and proper metadata
+- Works on modern Kindles (August 2022 and later), Apple Books, Google Play Books, and most e-readers
+- For older Kindles: Use free [Calibre](https://calibre-ebook.com/) software to convert EPUB to MOBI format
+- Each EPUB follows the same structure as the original *Subcutanean* editions
+
 **Mobile-Friendly**: Fully responsive design optimized for phones, tablets, and desktop browsers
 
 ## How to Use
@@ -60,9 +74,10 @@ In 2025 Reed released the “source code, source text and all prior, current, an
 3. **Navigate chapters** using the horizontal scrolling chapter menu
 4. **Search for text**: Enter a word or phrase and click "Find" to highlight all matches (click "Clear" to remove highlights)
 5. **Analyze word differences**: Click "Word Differential" to see which words are unique to each selected version
-6. **Upload custom versions**: Click "Upload EPUB/TXT" to add your own version of the novel for comparison (supports both EPUB and plain text formats)
-7. **Manage uploaded versions**: Click "Manage Uploads" to view all uploaded versions and delete any you no longer need
-8. **Switch between versions** at any time to explore different comparisons
+6. **Compare textual similarity**: Click "Levenshtein Distance" to see how similar or different the 25 built-in versions are
+7. **Upload custom versions**: Click "Upload EPUB/TXT" to add your own version of the novel for comparison (supports both EPUB and plain text formats)
+8. **Manage uploaded versions**: Click "Manage Uploads" to view all uploaded versions and delete any you no longer need
+9. **Switch between versions** at any time to explore different comparisons
 
 ## Technical Details
 
