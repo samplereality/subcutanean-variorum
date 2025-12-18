@@ -957,7 +957,7 @@ function calculateWordDifferential() {
 
     // Update description with seed numbers
     const description = document.getElementById('word-diff-description');
-    description.textContent = `Words that appear in Seed ${versionA} but which do not appear in Seed ${versionB}, and vice-versa`;
+    description.textContent = `Words that appear in Seed ${versionA} but which do not appear in Seed ${versionB}, and vice-versa. Click any word to see which chapters it appears in.`;
 
     // Display words with current sort mode
     displayWordLists();
