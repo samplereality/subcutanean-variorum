@@ -37,15 +37,15 @@
             <div class="view-mode-selector">
                 <label>View mode:</label>
                 <div class="button-group">
-                    <button id="mode-unified" class="mode-btn">Unified</button>
-                    <button id="mode-sidebyside" class="mode-btn active">Side-by-side</button>
-                    <button id="mode-diff" class="mode-btn">Track Changes</button>
-                    <button id="mode-comparison" class="mode-btn">Collation</button>
+                    <button id="mode-unified" class="mode-btn" title="Read a single version without comparison">Unified</button>
+                    <button id="mode-sidebyside" class="mode-btn active" title="View two versions in parallel columns">Side-by-side</button>
+                    <button id="mode-diff" class="mode-btn" title="Highlight additions and deletions between versions">Track Changes</button>
+                    <button id="mode-comparison" class="mode-btn" title="Compare variations across multiple witnesses">Collation</button>
                 </div>
             </div>
 
             <div class="upload-section">
-                <label for="epub-upload" class="upload-btn tool-btn">
+                <label for="epub-upload" class="upload-btn tool-btn" title="Upload your own copy of Subcutanean">
                     <span id="upload-text">Upload EPUB/TXT</span>
                     <input type="file" id="epub-upload" accept=".epub,.txt" style="display: none;">
                 </label>
@@ -56,7 +56,7 @@
             <div class="tools-row">
                 <div class="search-box">
                     <input type="text" id="search-input" placeholder="Search text..." />
-                    <button id="search-btn" class="tool-btn">Find</button>
+                    <button id="search-btn" class="tool-btn" title="Search across all chapters">Find</button>
                     <div class="search-navigation hidden" id="search-navigation">
                         <button id="search-prev-btn" class="search-nav-btn" title="Previous occurrence">←</button>
                         <div class="search-info">
@@ -65,9 +65,9 @@
                         </div>
                         <button id="search-next-btn" class="search-nav-btn" title="Next occurrence">→</button>
                     </div>
-                    <button id="clear-search-btn" class="tool-btn">Clear</button>
+                    <button id="clear-search-btn" class="tool-btn" title="Clear search results">Clear</button>
                 </div>
-                <button id="word-diff-btn" class="tool-btn">Word Differential</button>
+                <button id="word-diff-btn" class="tool-btn" title="Compare unique vocabulary between two versions">Word Differential</button>
             </div>
         </div>
 
@@ -85,7 +85,7 @@
     <footer>
         <p>
             <em><a href="https://subcutanean.textories.com/">Subcutanean</em></a> by Aaron Reed |
-            <a href="https://github.com/samplereality/subcutanean-browser" target="_blank">Subcutanean Variorum</a> by Mark Sample
+            <a href="https://github.com/samplereality/subcutanean-variorum" target="_blank">Subcutanean Variorum</a> by Mark Sample
         </p>
     </footer>
 
@@ -164,22 +164,22 @@
     <div id="about-modal" class="modal hidden">
         <div class="modal-content about-modal-content">
             <div class="modal-header">
-                <h2>About This Project</h2>
+                <h2>Subcutanean Variorum</h2>
                 <button id="close-about-modal-btn" class="close-btn">&times;</button>
             </div>
             <div class="modal-body about-modal-body">
-                <h3>Subcutanean Variorum Browser</h3>
-                <p><em>Subcutanean</em> is a novel by Aaron Reed where every copy is different. Using a combinatorial narrative system, Reed generated thousands of unique versions by varying word choices, sentence structures, and entire passages throughout the text.</p>
-
-                <p>This browser allows readers to compare any two editions side-by-side to discover how the story shifts between versions.</p>
+                <h3>Overview</h3>
+                <p>Aaron Reed’s <em>Subcutanean</em> (2020) is a novel where every copy is different. Using a combinatorial narrative system, Reed generated thousands of unique versions by varying word choices, sentence structures, and entire passages throughout the text. In 2025 Reed released the source text and code of <em>Subcutanean</em> under a CC-BY 4.0 license, meaning anyone can copy, share, modify, or remix the novel as long as credit for the original is given to Reed.</p> 
+                    
+                <p>This variorum allows readers to compare any two editions side-by-side to discover how the story shifts between versions.</p>
 
                 <h4>Features</h4>
                 <ul>
-                    <li><strong>Four view modes:</strong> Unified, Side-by-side, Track Changes, and Collation</li>
-                    <li><strong>Cross-chapter search</strong> with keyboard shortcuts (F3, Shift+F3)</li>
-                    <li><strong>Word differential analysis</strong> showing unique vocabulary between versions</li>
-                    <li><strong>Upload custom versions</strong> (EPUB or TXT files)</li>
-                    <li><strong>25 pre-loaded unique editions</strong> (seeds 45443-45467)</li>
+                    <li>25 pre-loaded unique versions (seeds 45443-45467)</li> 
+                    <li>Upload additional versions (EPUB or TXT files)</li>
+                    <li>Four view modes: Unified, Side-by-side, Track Changes, and Collation</li>
+                    <li>Cross-chapter search with keyboard shortcuts (F3, Shift+F3)</li>
+                    <li>Word differential analysis showing unique vocabulary between versions</li>
                 </ul>
 
                 <h4>How to Use</h4>
@@ -188,15 +188,15 @@
                     <li>Choose a view mode (Unified, Side-by-side, Track Changes, or Collation)</li>
                     <li>Navigate chapters using the chapter menu</li>
                     <li>Search for text or analyze word differences</li>
-                    <li>Upload your own EPUB or TXT version to compare</li>
+                    <li>Upload additional EPUB or TXT copies of <em>Subcutanean</em> to compare; Aaron Reed has made <a href="https://subcutanean.textories.com/seeds/">1,000 variants readily available</a> for download</li>
                 </ol>
 
                 <h4>Credits</h4>
-                <p><strong>Novel:</strong> <a href="https://aaronareed.net/subcutanean/" target="_blank">Aaron Reed</a><br>
-                <strong>Browser:</strong> Mark Sample<br>
-                <strong>Code:</strong> <a href="https://github.com/samplereality/subcutanean-browser" target="_blank">GitHub Repository</a></p>
+                <p><em>Subcutanean:</em> <a href="https://aaronareed.net/subcutanean/" target="_blank">Aaron Reed</a><br>
+                Variorum: <a href="https:wwww.samplereality.com" target="_blank"> Mark Sample</a><br>
+                Project Code: <a href="https://github.com/samplereality/subcutanean-variorum" target="_blank">GitHub Repository</a></p>
 
-                <p class="about-note">This browser tool is provided for scholarly and educational purposes. The text of <em>Subcutanean</em> is © Aaron Reed.</p>
+                <p class="about-note">This tool is provided by Mark Sample for scholarly and educational purposes. The text of <em>Subcutanean</em> (every single version) is by Aaron Reed.</p>
             </div>
         </div>
     </div>
