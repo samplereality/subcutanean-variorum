@@ -1,0 +1,239 @@
+# QUANT
+
+
+[@fridgetrapped>{chapter/6}]
+
+
+We didn't [talk much|say anything to each other] on the way back, and when we climbed up through my bed and shut it, we split up. Niko went out the front door[, I assumed to take a walk,] without a word. I lay on my bed listening to records until I got too creeped out imagining what might be underneath me, and went out to curl up on the porch swing, instead.
+
+The summer air was hot, with only the hint of a breeze, but felt infinitely better than the cold dead air down there.
+
+I tried to think of anything else, but something kept dragging my brain Downstairs, as if it was too heavy to stay on the surface with me. No matter how often I clawed my way onto other topics, Downstairs and all the things we didn't know about it dominated my thoughts.
+
+I had no idea what we should do next.
+
+When Niko came back it was with a brown bag from the liquor store, and he went straight up to his room, not even looking at me. [I should have stopped him but] I didn't feel like talking to him either. 
+
+We didn't know what was going on; we didn't know how to stop it. We didn't know anything.
+
+We might have stayed in our funk for another couple days, except something happened the next morning.
+
+The local history lady had left me a voicemail at around 7:15, a solid fantasy movie and credits before I normally woke up. She'd been useless when I'd stopped by before, and her tone of voice in the message---“something a bit exciting's come to light about your house”---made me assume she'd dredged up some trivia as a pretense to get me to come back and keep her company. Maybe get me to join the local history society myself. A warm-blooded young person like myself could even aspire to become treasurer.
+
+So it was a couple hours before I got around to calling her back and asking when would be a good time to come over.
+
+“Oh, come right away,” she said, voice syrupy. “This really can't wait. Just wait till you see what I've found.”
+
+Not at all encouraged, I agreed to head over, and biked the mile or so to her [run-down|fastidiously tidy] house. The visit got off to an ugly start when she asked why I hadn't brought my colored friend this time. “Actually, he's Greek,” I said through clenched teeth, and then wished I had the guts to say something else. She served me tea again, weak to the point of tastelessness, and spent so much time making small talk I'd convinced myself she hadn't found anything and this whole exercise was a waste of time. Worse, she kept glancing at my pride bracelet and pursing her lips, and then pretending not to have done either. I wanted to get out of there but was too mentally exhausted to remember how social interactions were supposed to work, what niceties would bring a conversation to an end. [She was rolling me out with polite nothings and platitudes, like dough, and I couldn't escape it.]
+
+The third or fourd time I pressed her about what she'd found, she got up with a [smug|triumphant] smile and bustled out, returning a minute later with a file folder holding a few photocopies.
+
+“I did some digging on your address,” she said, “and found something rather interesting.” [She turned the last two words into an annoying sing-song. {i/Raaaaather intressting.} Trying to tune her out,|She pressed up against me as she handed over the file, a bony shoulder and cloying perfume crowding into my personal space. Trying not to sneeze,] I opened the file and pulled out the first page.
+
+# There are a bunch of different hinted explanations for Downstairs that can show up. All of them are bullshit. But they create different metaphors and clues Orion uses to try to make sense of what's happening to him.
+[DEFINE @vortex|@gardens|@snakeoil|@caves]
+
+[MACRO ad bit][~ad, maybe from around the turn of the century. It advertised, in a hand-drawn, swirling font,]
+[MACRO ad detail bit][@snakeoil>drawing of Dr. Henneson's storefront|address]
+Clutching the page, I scanned the smudged text. [*Ch6ResearchResults*@vortex>It was a blurry copy of an old newspaper {ad bit} some attraction called “{sc/THE VORTEX}.” {pp} I noticed the {ad detail bit} and almost choked on my tea. {pp} The ad looked for all the world like one of those terrible roadside attractions desperate for tourist dollars. {sc/MADAME ZOLA WILL READ YOUR FORTUNE}, {sc/MEET BOBO THE CHUCKLING CLOWN}, that kind of thing. {sc/IF YOU ONLY KNEW WHAT AWAITS YOU}.
+
+Towards the bottom, though, an image caught my eye. It was a drawing of two identical women with wavy, crimped hair and a distant expression, sad and remote. Actually, it looked like the same drawing printed twice, side by side. Both women stared vaguely down and to the left. {sc/THE SISTERS}, said a caption above them, and then, below and smaller, the word {scwide/DESCEND}.
+
+Running through the ad was something like a ribbon that, on peering closer, seemed meant to be a stylized stream of water. This was confirmed by a rhyme running alongside one part of it, in tiny, florid print:
+
+{verse/A looking-glass held above this stream \\ Will show your troubles like a dream}
+
+There was no further explanation. Admission to the Vortex was ten cents and it was closed Sundays.
+
+{scwide/DESCEND.}
+
+{nextpage} The second page was a short newspaper clipping about the Vortex being shut down---not over a grisly murder or string of disappearances but, of all things, a zoning controversy. A new mayor had instigated a crackdown on businesses operating improperly out of residential districts. There was no date but “1934” had been scrawled in pencil on the photocopy. 
+
+The final page was at first a mystery, an article---maybe even older than the Vortex ad---about an old Army post being torn down to make way for new housing. I pieced together from a few contextual clues (“the new university”, “on top of the hill”) that this was my neighborhood, and felt a sinking hunch our house was on the site of the old post.
+
+The article recounted in brief the fort's unstoried history, built on the site of a spring which “bubbled up from a natural cavern” bricked up when the place was constructed.|@gardens>It was a blurry copy of an old newspaper {ad bit} some attraction called “{sc/THE ENDLESS GARDENS}.” {pp} I noticed the {ad detail bit} and almost choked on my tea. {pp} Our house had once stood on the site of a large private garden, it seemed, collected by a woman the ad assumed needed no introduction: {sc/THE RENOWNED HORTICULTURALIST MADAME LUCIA DE LA FONTAINE}. The gardens were apparently extensive---{sc/ACRES AND ACRES}, the copy read, which to be fair was a more defensible claim about their extent than calling them endless.
+
+The next clipping, a review entitled “A Stroll In Fontaine's Fantastical Forest,” described the wide range of plants brought to the gardens from all around the world which “seem to have grown prodigiously in their new soil despite wildly varying climes of origin, fed by an effervescent spring bubbling up from deep beneath the earth.” The reviewer's chief complaint was that the vegetation was so dense and the paths so prolific that “it is all too easy to become lost,” allowing with a note of unease that the gardens were “perhaps too large.”
+
+Madame de La Fontaine herself, briefly profiled, came off like an out-of-touch heiress who had poured a fortune into the gardens, ignoring the advice of experts that the plants she'd uprooted were unlikely to survive here. She seemed to have taken a great deal of delight in proving them wrong. “It is indeed my fondest hope,” the article quoted her as saying, “that this small corner of Eden will continue to grow and thrive here, so I may share with visitors both present and future a small part of the arboreal wonders I have seen in my travels around the globe.”
+
+The date on the photocopied review was from the spring of 1879.
+
+{nextpage} There was a short clipping announcing that de La Fontaine's gardens had been closed to the public, with a reference to an unexplained “disappearance.” Of the lady herself? It wasn't clear. {i/1892} was scrawled in pencil on the back.
+
+Next was another advertisement, this one for a bank. This would have seemed incongruous except for the illustration that clearly showed our house, or how it must have looked brand new. The overall impression was of overwhelming success: the {ad was festooned}: {sc/YOUR FUTURES ARE SAFE WITH US}, and {sc/EXPANDING ONCE AGAIN}, and {sc/WE WELCOME NEW CLIENTS}, and finally {sc/THE LORENZO TRIPLETS}.
+
+This last ribbon was draped over a small oval portrait in the lower right of three mustachioed men. Actually it looked like the same portrait printed three times, side by side. Tiny florid text beneath read {sc/WE ARE ALWAYS AVAILABLE, EVERY DAY AT ANY HOUR} and {sc/WE WILL NEVER STOP INVESTING IN YOUR FUTURE} and, even bolder underneath that:
+
+{scwide/WE NEVER TIRE.}
+
+The final clipping was from a few years later, an official notice that the bank had been shut down. Apparently vast reserves of counterfeit money had been discovered in the basement. 
+
+My heart thumped, somewhere in my chest. None of this made sense in the large but bits and pieces seemed disturbingly familiar. Expansion. Duplication. Impossible dreams. I started at the portrait of the three men. Three. Why {i/three}?
+|@snakeoil>It was a blurry copy of an old newspaper {ad bit} some product called “{sc/DR. HENNESON'S MAGICAL TINCTURES}.” {pp} I noticed the {ad detail bit} and almost choked on my tea. {pp} The house in the picture was ours, no question about it: much newer and without the later extensions, but still. The {ad was festooned}: {sc/RESTORATIVE ELIXIRS} and {sc/WONDROUS CURE-ALLS} and {sc/SUCH WONDERS AWAIT YOU}. Tiny print along the bottom praised Dr. Henneson's unmatched skill at distilling his own secret medicinal ingredients from “the cleansing waters of an underground stream of utmost effervescent purity.” The copy got less and less believable as it rambled on: “praised by the crowned heads of Europe” and “a cure to all diseases known by man and science” and “the true American fountain of youth” and so on. 
+
+{nextpage} The second page was a similar ad, but now the drawing of the house had been replaced with a sketch of a series of steaming tubs carved out of rock. {sc/ENJOY OUR HEALING GROTTOS}, the ribbons said now, and {sc/BATHE IN THE WARMTH OF THE PURE WATERS OF LIFE}, and finally, even bolder underneath that: {sc/EXPANDING ONCE AGAIN}.
+
+Expanding.
+
+The final clipping was a short article giving notice that the house at our address, now billed more prosaically as “site of the discredited ‘Doctor' Henneson's smorgasbord of quackery,” had been condemned for “unsafe building practices” and was scheduled for immediate demolition. Apparently “in the wake of the building's abandonment” an appraiser had become concerned by “unauthorized constructions and extensions” and alerted city safety inspectors, who had deemed the building “unsound in the extreme.” The final paragraph also alluded to a “disappearance” but failed to specify whose. Henneson's?
+
+That was the last clipping in the stack. There was no more about the disappearance and no explanation for why the unsound house had never been demolished after all and had survived, seventy years later, to be rented out to college students.
+|@caves>It was a blurry copy of an old newspaper article, maybe from around the turn of the century. I didn't see the relevance until a few contextual clues started popping out at me (“by the new university”; “on top of the hill”) and I realized where the entrance to this cave was. I almost choked on my tea.
+
+It was about a search for two kids who had gotten lost in an underground cave, dating from a summer in 1931. Two neighborhood boys, 15 and 17, had gone exploring in the caves and never come back out. Rescuers sent down had heard faint voices, and it was suspected the pair had been boxed in by rising water. Brave men had tried swimming through flooded passages, but none had been successful at reaching the boys. Some rescuers had proposed digging a shaft down to them from the surface, but none could agree where to dig: different rescuers had heard the voices coming from very different places, saying very different things. 
+
+The next article, dated a day later, was a short history of the cave, most likely a filler piece given a lack of new rescue details to report. The cave had been a source of trouble before, it seemed: a forbidden but popular spot for local youths, it had never been mapped but was not believed to be extensive. But it was treacherous in part because of a spring which bubbled up from its depths with unpredictable rhythms, sometimes flooding lower passages or resmoothing upper ones. The spring's varying flow erased markers and made it hard to tell the twisting tunnels apart, making the cave seem “far larger than its true extent.” It had no official name but the locals had given it various nicknames, among the most popular of which was Looking-Glass Cave, after the clear pool the spring waters sometimes left at its entrance. The article explained that this was a reference to a Robert Louis Stevenson poem taught in local schools which all the kids knew, and which the article reprinted in its entirety. Some of the verses seemed uncomfortably on-the-nose.
+
+{verse/Sailing blossoms, silver fishes, \\
+Pave pools as clear as air--- \\
+How a child wishes \\
+To live down there! \\
+ \\
+We can see our coloured faces \\
+Floating on the shaken pool \\
+Down in cool places, \\
+Dim and very cool}
+
+{nextpage} The remaining articles painted a grim picture of the subsequent week of rescue attempts, the breathless updates unable to disguise the fact that all had failed. Squabbling about the proper dig site, fears of digging too aggressively and causing a cave-in, a surge of flooding from the spring which was flowing “with unusual vigor” that season, and ever-growing crowds of spectators all delayed and complicated the rescue efforts.
+
+The final article was short, the tone terse, only the headline betraying a hint of pathos: {sc/CAVE SEARCH CALLED OFF: SURELY NO HOPE LEFT FOR YOUNG SPELUNKERS}. It announced that after fifteen days the rescue efforts had been abandoned. No voices had been heard from anywhere in days, and the boys were presumed drowned, starved, or buried---dead, one way or another. The cave entrance was to be sealed for good, the spring bricked up to prevent its no-longer-pure water from reaching the surface. No future generations of children would stare wistfully into its pools clear as air.
+
+With the article, for the first time, were pictures of the two boys.
+
+They stared out from oval windows, sketched in ink, probably sourced from the descriptions of grieving mothers rather than life. They looked younger than their reported ages. I stared back at them, unable to stop from wondering what their story had been, what it must have been like to die down there. Alone except for each other. Had they been lifelong friends? Or casual schoolmates exploring the cave on a whim? Did their final days bring them closer together, or tear them apart?]
+[@vortex>Nothing much of note had ever happened there. Built to keep white settlers safe from the natives they were busy exterminating, the post had never been attacked or even threatened.
+
+“Once the fort was built and the spring bricked up, the Indians never again came near the place,” the old article said by way of explanation.
+
+She must have caught me staring at this sentence, because she leaned over and tapped it with a pencil. “Haunted.” Her grin was smug.
+
+“Excuse me?”
+
+“Been seeing spirits, have you?” she asked. “Must be an old burial ground. Read a book about it once. When they're disturbed, young man, the ghosts of redskins get {i/very} angry.”
+
+I looked up at her with a flash of anger. “I think we say Native Americans now. And there's no ghosts. That's not it.” I didn't know how, but I'd never been more sure of anything.|@gardens>
+
+She noticed me looking and tapped the portrait with a pencil. “Italians,” she said with a smug little smile, “can't trust them.”
+
+It took me a full five seconds to recover from this cognitive shift. “Excuse me?”
+
+“‘A Dago organ-grinder plays at my door each day,'” she quoted in a singsong. “‘And then a Dago damsel asks me to pay, pay, pay!'” She chuckled. “From something mother used to sing me. I know it's not fashionable to say those things any more, but there's truth in old rhymes. Wouldn't put {i/my} money in an Italian bank, that's all I'm saying. Did you find some old counterfeit banknotes in your cellar, young man?” She leaned closer; her breath smelled awful. “Were they”---she winked---“still greasy?”
+
+I recoiled from her, hot anger kindling somewhere inside me. “No,” I said, “I didn't. And I don't think their nationality had anything to do with it. At all.” I'd never been more sure of anything in my life.|@snakeoil>
+
+I turned back to the first article and stared at it. The history lady noticed me staring and tapped it with a discolored fingernail. “Voodoo,” she said.
+
+“Excuse me?”
+
+“Doesn't say here, but Henneson's a Negro name.” She sniffed, disdainful. “This kind of thing was quite common back in those days. Lots of his type coming through after the Depression, selling snake oil, or worse. Black magic. Letting the Devil loose on good and decent folk. Preying on their sickness.”
+
+“I'm pretty sure there were a lot of white con artists, too,” I said, trying to control my anger.
+
+“Been seeing ghosts in that house, have you?” she asked, ignoring me. “No wonder. Lord knows what terrible things he did to people, down in those grottos.”
+
+“There's no ghosts. That's not it. And I'm pretty sure it's not voodoo either.” I didn't know how, but I'd never been more sure of anything in my life. I got to my feet, face flushed. “So I think I'm going to head out now because I don't think you have a goddamned clue what you're talking about.”
+|@caves>
+
+The old woman caught me looking and smiled knowingly. “Been hearing their voices, have you?”
+
+“I'm sorry?”
+
+“Lost souls,” she said, “haunted. Not right to brick up a stream where a thing like that's happened. Keep that trauma bottled up.”
+
+“I don't think that's it,” I said, annoyed. I didn't believe in ghosts and hadn't heard any teenage voices sobbing in the night. “By that logic, any river anywhere should be haunted. I mean, twenty thousand people died building the Panama Canal, and you don't hear about---”
+
+“The ringleader was probably the Mexican one,” she interrupted, tapping one of the pencils with a portrait.
+
+It took me a full five seconds to recover from this cognitive shift. “Uh, what?”
+
+“Maybe looking for a good place to hide,” she said, matter-of-fact, still tapping the portrait. I looked down stupidly: one of the boys, I supposed, did have darker skin than the other. “Lots of deportations back then, during the Depression. The Spanish boy must have talked the other one into doing something foolish. Pity. Probably didn't have much education, didn't realize how dangerous those caves were.” She grinned and her mouth was full of rotting teeth. “Of course, they are very good at swimming rivers.”
+
+Hot anger kindled somewhere inside me, overcoming my usual shyness. “That's a shitty thing to say about two dead boys.”
+]
+[MACRO ad was festooned][~ad was festooned with decorative ribbons with all-caps slogans swirling artfully around the house]
+[MACRO nextpage][~I flipped to the other few pages in the folder as the woman twittered on about her sleuthing skills in the county archives.]
+
+She puckered her mouth, glanced again at my pride bracelet. “Well. Should have realized you'd be the {i/sensitive} type.”
+
+I couldn't take this any more. Her racist bullshit aside, the notion that what was happening to me was a cute [@snakeoil>ghost story|@caves>ghost story|mystery] for her to solve was so disconnected from the growing existential dread of the past few days I wanted to slap her. [I tried to remember she'd done me a favor, but in that moment I couldn't stand her.] She was everyone who thought my problems had simple explanations, [everything wrong with a world that was broken and couldn't be bothered to care about fixing itself|everyone who thought casting victims as villains made for good stories]. For a moment, brief and burning, I hated her.
+
+And that's when her face came unstuck.
+
+This was back when movies were still celluloid, and at the [second-run|dollar|drive-in] theater by our house the film would sometimes jump the gate, get misaligned. When that happened the image would smear, frames no longer projected neat one after the other but running liquid through the machine, all movement turned into vertical bands of distorted color; and the audio would go juddery, vague, and distant, recognizable but distorted. Clipped and monstrous.
+
+This was like that but in three dimensions.
+
+The woman exploded. Her face twisted and smeared, exposing blood and bone. The back of her tongue flapped against her pulsing epiglottis, her eyes round spheres peeling back, turning inside out, her lips deformed and pulled like taffy into a twisting shape that reached from the ceiling to her knees. Her fingers had gone long as tree branches and skinny like pencils, twisting and jerking backward at frantic angles; the pattern of her dress had multiplied and filled the empty spaces in the air and was so thick now I choked on it. Everything moved, everything in her sounded, and the sound was a scream, like her lungs were jet engines, her voice box a bleating thing the size of a cow being flayed alive.
+
+I dropped the teacup and the files: I vaguely remember them tumbling toward the floor in slow motion, spilling and twisting around each other. I was screaming too. All I wanted was to get away. I stumbled back and my head cracked against a cabinet of china plates; I held up my hands to shield myself, as if such a pathetic act could matter against a thing so huge and horrible. It came toward me, moving fast. I couldn't stop it. My sanity frayed.
+
+And then she snapped back into herself, and her voice returned to normal. Almost. It still juddered, like the floor beneath her vibrated a hundred times a second. And her skin was boiling and rippling, like something inside it was desperate to get out. Thousands of tiny somethings pushing and pounding with disproportionate strength against her wrinkled flesh.
+
+She reached toward me---and maybe this was all in my head, maybe she was trying to help, reacting in shock to my reaction, what must have seemed like some kind of seizure---but as she opened her mouth to speak, the rippling distortions made it into a grin. A huge, horrible, ravenous grin, malevolent. Gleeful.
+
+Her reaching fingers writhed, and her eyes were wide and round as saucers.
+
+I jerked to my feet and ran.
+
+For a while I didn't even know what direction I was running. I bolted straight through intersections and past oblivious pedestrians, not seeing them. I wasn't thinking about anything at all. I didn't stop until a knife in my side brought me up short, bent me double, and I realized I'd been running a long time.
+
+I collapsed on a patch of hot grass and threw up, retching and gasping. Gnats scribbled the air around me. Somewhere a dog barked.
+
+I stayed there five or ten minutes, breathing jagged, looking down, studying my hands on the grass and my puke, dealing with those three things, the hands and the grass and the puke, not wanting or able to look up or deal with anything else. Nothing happened. After a while that started to help.
+
+Eventually I climbed to my feet, got my bearings. I realized I knew where I was. I walked slowly back to our house. 
+
+I never went back for my bike.
+
+{section_break}
+
+When I got home, Niko was gone. I let myself into his bedroom and curled up on his bed, because I needed to be surrounded by something familiar. The smell of him was an anchor to reality. Maybe the only one.
+
+[I came in here sometimes when he was gone, usually only when he left the door unlocked. I didn’t touch anything. I just wanted to see the pieces of his life in isolation from his too-bright self, read the story they told about him with no silhouette from that burning corona. Once I’d seen a brochure from the campus LGBT center in his trash can, and wondered about that for a long time: why he’d taken it, why he’d thrown it away.]
+
+[DEFINE @bubbles|@shadows]
+
+I must have drifted off, because moments later the afternoon light was dying and his hand was on my shoulder, shaking it. I jerked awake, guilty excuses on my lips[@bubbles> before I realized he didn't seem concerned about me breaking in. His hair was matted and he had a distant expression, staring past me.
+
+“I took a piss,” he said quietly, as if to someone standing behind my left shoulder, “and the bubbles were like eyes. There were thousands of them, floating. Staring. Iridescent, like oil. Something grinning underneath them, though, behind them. Something babbling and grinning and hungry and even when I closed the lid and flushed them away I could still hear them, down there, all of them...”
+
+I sat up,|@shadows>. He was screaming at me.
+
+“What the {i/fuck} are you doing in here?” His face twisted with a rage I'd never seen there, sharp and ragged.
+
+“I didn't... I just...” I staggered to my feet, not knowing what to say. 
+
+“Get the fuck out,” he shouted, and then I saw something behind the rage: a fear, a wild, desperate fear. There were tears in his eyes. “Get out, out of my fucking room, I just want to be {i/alone},” he yelled, and as I backed up stammering he shoved me, so hard I slammed into the wall, cracking my head, and then he dropped down on his haunches and buried his face in his hands and started to sob.
+
+I would have left except I'd only heard him sob like that once before, and I couldn't stand the thought of letting him do it alone.
+
+“What happened?” I finally asked, back still pressed to the wall, afraid to move in any direction, towards him or away.
+
+He ran his hands through his hair, staying crouched, staring at the floor. “Something's... following me,” he said at last, quiet, miserable. “Shadows. Something's wrong with the shadows.” He looked up and past me, haunted, like speaking to someone behind my shoulder. “There's too many of them. I can see them squirming out of the corner of my eye. Like they can't all fit in the shade they've been given. They're following me, wherever I move, like regular shadows except these ones are alive and thinking about me and looking at me and {i/hungry} for me, and every time I turn around there's more of them pressing into the same space, packed tight, squeezing in, wriggling, more of them each time, more and more and more and more and more...”
+
+I knelt down,]
+grabbed his shoulders and shook him, then did it again, hard. His head flopped back and he grabbed my wrist, a faint annoyance reaching his face. I was glad to see anything there at all.
+
+I let him focus on me before saying, “There's no [@bubbles>eyes|@shadows>shadows].”
+
+He stared at me.
+
+I shook my head, more sure of it now. “[That's not it. ]It's not [@caves>ghosts, or|@vortex>ghosts, or|@snakeoil>voodoo, or ghosts, or] a thing out there, stalking us. It {i/is} us. We're what's wrong here. We're the ones who don't belong.” I swallowed, bile still souring the back of my throat. “We're slipping. Losing our grip on... something. This whole world, maybe. Or it's losing its grip on us.”
+
+I had his full attention now. 
+
+“And I don't know what happens when we let go, or it does,” I finished. “But I don't think it's good.”
+
+He stared at me, hopeless. “There's no way back.”
+
+“[There is. There has to be.” I took a breath. “We just have to find it|No. Not yet.” I took a breath. “Not until we find one].”
+
+
+
+
+
+
+
+
+

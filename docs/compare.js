@@ -8,6 +8,9 @@ let versionA = null;
 let versionB = null;
 let customVersions = {}; // Store uploaded versions
 let mostRecentUploadId = null; // Track most recently uploaded version for Jaccard analysis
+let bookmarks = [];
+let bookmarkPanelOpen = false;
+let pendingBookmarkScroll = null;
 
 function getAllVersionIds() {
     const combined = new Set([...versionIds, ...Object.keys(customVersions)]);
@@ -92,6 +95,7 @@ async function loadAllVersions() {
 
         // Display initial comparison
         displayComparison();
+        refreshBookmarkUI();
 
     } catch (error) {
         console.error('Error loading versions:', error);
@@ -202,6 +206,10 @@ function buildChapterNavigation() {
 
     const chapters = chapterOrder.filter(ch => chaptersSet.has(ch));
 
+    if (chapters.length > 0 && !chapters.includes(currentChapter)) {
+        currentChapter = chapters[0];
+    }
+
     chapters.forEach(chapterId => {
         const button = document.createElement('button');
         button.className = 'nav-btn';
@@ -293,6 +301,17 @@ function displayComparison() {
         setTimeout(() => {
             highlightSearchMatches(searchTerm);
         }, 0);
+    }
+
+    if (pendingBookmarkScroll !== null) {
+        const targetScroll = pendingBookmarkScroll;
+        pendingBookmarkScroll = null;
+        requestAnimationFrame(() => {
+            window.scrollTo({
+                top: typeof targetScroll === 'number' ? targetScroll : 0,
+                behavior: 'auto'
+            });
+        });
     }
 }
 
@@ -439,6 +458,30 @@ function calculateSimilarity(textA, textB) {
 
 function normalizeText(text) {
     return text.replace(/<\/?em>/g, '').toLowerCase().trim();
+}
+
+
+function formatChapterLabel(chapterId) {
+    if (!chapterId) return 'Chapter';
+    if (chapterId === 'prologue') return 'Part I';
+    if (chapterId === 'part2') return 'Part II';
+    if (chapterId === 'part3') return 'Part III';
+    if (chapterId === 'chapter18') return 'Epilogue';
+    if (chapterId === 'notes') return 'Notes';
+    if (chapterId.startsWith('chapter')) {
+        return `Ch ${chapterId.replace('chapter', '')}`;
+    }
+    return chapterId.charAt(0).toUpperCase() + chapterId.slice(1);
+}
+
+function formatModeLabel(mode) {
+    const labels = {
+        unified: 'Unified',
+        sidebyside: 'Side-by-side',
+        diff: 'Track Changes',
+        comparison: 'Collation'
+    };
+    return labels[mode] || 'View';
 }
 
 // Align two sets of paragraphs using anchor-based approach
@@ -1688,6 +1731,150 @@ function closeAboutModal() {
     modal.classList.add('hidden');
 }
 
+// Bookmark functionality
+
+function loadBookmarksFromStorage() {
+    try {
+        const stored = localStorage.getItem('subcutanean_bookmarks');
+        bookmarks = stored ? JSON.parse(stored) : [];
+    } catch (error) {
+        console.error('Error loading bookmarks:', error);
+        bookmarks = [];
+    }
+}
+
+function saveBookmarksToStorage() {
+    try {
+        localStorage.setItem('subcutanean_bookmarks', JSON.stringify(bookmarks));
+    } catch (error) {
+        console.error('Error saving bookmarks:', error);
+    }
+}
+
+function refreshBookmarkUI(selectedId) {
+    const select = document.getElementById('bookmark-select');
+    const emptyState = document.getElementById('bookmark-empty');
+    const loadBtn = document.getElementById('load-bookmark-btn');
+    const deleteBtn = document.getElementById('delete-bookmark-btn');
+
+    if (!select) return;
+
+    select.innerHTML = '';
+
+    if (bookmarks.length === 0) {
+        if (emptyState) emptyState.classList.remove('hidden');
+        select.disabled = true;
+        if (loadBtn) loadBtn.disabled = true;
+        if (deleteBtn) deleteBtn.disabled = true;
+        return;
+    }
+
+    if (emptyState) emptyState.classList.add('hidden');
+    select.disabled = false;
+    if (loadBtn) loadBtn.disabled = false;
+    if (deleteBtn) deleteBtn.disabled = false;
+
+    bookmarks.forEach(bookmark => {
+        const option = document.createElement('option');
+        option.value = bookmark.id;
+        option.textContent = bookmark.name;
+        select.appendChild(option);
+    });
+
+    if (selectedId) {
+        select.value = selectedId;
+    }
+}
+
+function saveCurrentBookmark() {
+    if (!versionA || !versionB) return;
+
+    const defaultName = `Seed ${versionA} vs ${versionB} – ${formatChapterLabel(currentChapter)} (${formatModeLabel(currentMode)})`;
+    const label = prompt('Name this bookmark:', defaultName);
+    if (label === null) return;
+    const trimmed = label.trim();
+    if (!trimmed) return;
+
+    const bookmark = {
+        id: `bookmark-${Date.now()}`,
+        name: trimmed,
+        versionA: versionA,
+        versionB: versionB,
+        chapter: currentChapter,
+        mode: currentMode,
+        scrollPosition: window.scrollY
+    };
+
+    bookmarks.push(bookmark);
+    saveBookmarksToStorage();
+    refreshBookmarkUI(bookmark.id);
+}
+
+function applyBookmark(bookmark) {
+    if (!bookmark) return;
+    if (!allVersions[bookmark.versionA] || !allVersions[bookmark.versionB]) {
+        alert('One of the versions in this bookmark is no longer available.');
+        if (bookmark.id) {
+            bookmarks = bookmarks.filter(b => b.id !== bookmark.id);
+            saveBookmarksToStorage();
+            refreshBookmarkUI();
+        }
+        return;
+    }
+
+    const selectA = document.getElementById('version-a-select');
+    const selectB = document.getElementById('version-b-select');
+
+    versionA = bookmark.versionA;
+    versionB = bookmark.versionB;
+
+    if (selectA) selectA.value = versionA;
+    if (selectB) selectB.value = versionB;
+
+    currentChapter = bookmark.chapter;
+    pendingBookmarkScroll = typeof bookmark.scrollPosition === 'number' ? bookmark.scrollPosition : 0;
+    buildChapterNavigation();
+    setViewMode(bookmark.mode || currentMode);
+}
+
+function deleteSelectedBookmark() {
+    const select = document.getElementById('bookmark-select');
+    if (!select || !select.value) return;
+
+    const confirmed = confirm('Delete this bookmark?');
+    if (!confirmed) return;
+
+    bookmarks = bookmarks.filter(b => b.id !== select.value);
+    saveBookmarksToStorage();
+    refreshBookmarkUI();
+}
+
+function getBookmarkById(id) {
+    return bookmarks.find(b => b.id === id);
+}
+
+function openBookmarkPanel() {
+    const panel = document.getElementById('bookmark-panel');
+    if (!panel) return;
+    panel.classList.remove('hidden');
+    bookmarkPanelOpen = true;
+}
+
+function closeBookmarkPanel() {
+    const panel = document.getElementById('bookmark-panel');
+    if (!panel) return;
+    panel.classList.add('hidden');
+    bookmarkPanelOpen = false;
+}
+
+function toggleBookmarkPanel() {
+    if (bookmarkPanelOpen) {
+        closeBookmarkPanel();
+    } else {
+        openBookmarkPanel();
+    }
+}
+
 // Privacy Notice Modal functionality
 
 let pendingUploadFile = null;
@@ -2433,6 +2620,8 @@ function handleEPUBUpload(event) {
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     setupViewModeButtons();
+    loadBookmarksFromStorage();
+    refreshBookmarkUI();
     loadAllVersions();
 
     // Search event listeners
@@ -2530,6 +2719,57 @@ document.addEventListener('DOMContentLoaded', () => {
     // EPUB upload event listener
     const epubUpload = document.getElementById('epub-upload');
     epubUpload.addEventListener('change', handleEPUBUpload);
+
+    // Bookmark controls
+    const saveBookmarkBtn = document.getElementById('save-bookmark-btn');
+    const loadBookmarkBtn = document.getElementById('load-bookmark-btn');
+    const deleteBookmarkBtn = document.getElementById('delete-bookmark-btn');
+    const bookmarkSelect = document.getElementById('bookmark-select');
+
+    if (saveBookmarkBtn) {
+        saveBookmarkBtn.addEventListener('click', saveCurrentBookmark);
+    }
+    if (loadBookmarkBtn) {
+        loadBookmarkBtn.addEventListener('click', () => {
+            if (!bookmarkSelect || !bookmarkSelect.value) return;
+            if (!allVersions) {
+                alert('Please wait for the versions to finish loading.');
+                return;
+            }
+            const bookmark = getBookmarkById(bookmarkSelect.value);
+            if (bookmark) {
+                applyBookmark(bookmark);
+            }
+        });
+    }
+    if (deleteBookmarkBtn) {
+        deleteBookmarkBtn.addEventListener('click', deleteSelectedBookmark);
+    }
+
+    const bookmarkToggleBtn = document.getElementById('bookmark-toggle-btn');
+    const bookmarkCloseBtn = document.getElementById('bookmark-close-btn');
+    if (bookmarkToggleBtn) {
+        bookmarkToggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleBookmarkPanel();
+        });
+    }
+    if (bookmarkCloseBtn) {
+        bookmarkCloseBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeBookmarkPanel();
+        });
+    }
+    document.addEventListener('click', (e) => {
+        if (!bookmarkPanelOpen) return;
+        const panel = document.getElementById('bookmark-panel');
+        const toggleBtn = document.getElementById('bookmark-toggle-btn');
+        if (!panel) return;
+        if (!panel.contains(e.target) && !toggleBtn.contains(e.target)) {
+            closeBookmarkPanel();
+        }
+    });
+
 
     // Manage uploads event listeners
     const manageUploadsBtn = document.getElementById('manage-uploads-btn');

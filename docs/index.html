@@ -90,6 +90,7 @@
                 <button id="word-diff-btn" class="tool-btn" title="Compare unique vocabulary between two versions">Word Differential</button>
                 <button id="levenshtein-btn" class="tool-btn" title="Analyze vocabulary similarity using Jaccard distance">Jaccard Distance</button>
             </div>
+
         </div>
 
         <nav id="chapter-nav" class="chapter-nav">
@@ -303,6 +304,28 @@
                     <button id="show-matrix-btn" class="tool-btn">Show All Uploaded Files</button>
                     <div id="distance-matrix" class="distance-matrix hidden"></div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="bookmark-floating" class="bookmark-floating">
+        <button id="bookmark-toggle-btn" class="bookmark-fab-btn" title="Bookmarks" aria-label="Bookmarks">
+            <span class="bookmark-icon">🔖</span>
+        </button>
+        <div id="bookmark-panel" class="bookmark-panel hidden">
+            <div class="bookmark-panel-header">
+                <span>Bookmarks</span>
+                <button id="bookmark-close-btn" class="bookmark-close-btn" aria-label="Close bookmarks">&times;</button>
+            </div>
+            <div class="bookmark-panel-body">
+                <button id="save-bookmark-btn" class="tool-btn full-width" title="Save the current versions, chapter, and view">Save Current View</button>
+                <label class="bookmark-label" for="bookmark-select">Saved views:</label>
+                <select id="bookmark-select" class="bookmark-select" title="Saved comparisons"></select>
+                <div class="bookmark-actions">
+                    <button id="load-bookmark-btn" class="tool-btn" title="Load selected bookmark">Load</button>
+                    <button id="delete-bookmark-btn" class="tool-btn" title="Delete selected bookmark">Delete</button>
+                </div>
+                <div id="bookmark-empty" class="bookmark-empty hidden">No bookmarks yet.</div>
             </div>
         </div>
     </div>

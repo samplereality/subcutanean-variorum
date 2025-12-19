@@ -1,0 +1,38 @@
+# QUANT
+
+
+
+
+
+
+{part/PART TWO/MULTIPLICIOUS}
+
+[@caves>{maybe_river_poem}]
+[MACRO maybe_river_poem][66>{river poem}{JUMP postch10epi}]
+[MACRO river poem][~{epigraph/See the rings pursue each other; \\
+All below grows black as night, \\
+Just as if mother \\
+Had blown out the light! \\
+
+Patience, children, just a minute--- \\
+See the spreading circles die; \\
+The stream and all in it \\
+Will clear by-and-by./“Looking-Glass River,” Robert Louis Stevenson}]
+
+[@epi_group1a>{epigraph/But the dark pines of your mind dip deeper \\
+And you are sinking, sinking, sleeper \\
+In an elementary world; \\
+There is something down there and you want it told./“Dark Pines Under Water,” Gwendolyn MacEwen (1941-1987)}
+
+|@epi_group1b>{epigraph/We two boys together clinging, \\ One the other never leaving/Walt Whitman}
+
+|@epi_group1c>{epigraph/You and I \\ Again and again \\ Always almost \\ Never enough./Ayushee Ghoshal}
+
+|@epi_group1d>{epigraph/They have no idea what happiness is. They don't know that for us, without our love, there is neither happiness nor unhappiness: there is no life at all./Tolstoy, “Anna Karenina”}
+
+|@epi_group1e>{epigraph/Than the gentleman above-named, there is nobody, in the whole circle of my acquaintance, whom I have more attentively studied, yet of whom I have less real knowledge, beneath the surface which it pleases him to present. ...He will pass to the dark realm of Nothingness, but will not find me there./Nathaniel Hawthorne, “Monsieur du Miroir”}
+]
+
+[LABEL postch10epi]
+
+{end_part_page}

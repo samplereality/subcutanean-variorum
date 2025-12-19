@@ -1,0 +1,147 @@
+# QUANT
+
+
+{chapter/EPILOGUE}
+
+[@epi_group2a>{epigraph/But love that moulds one man up out of two, \\
+Makes me forget and injure you.	\\
+I took you for myself sure when I thought \\
+That you in anything were to be taught./“Ode: Of Wit,” Abraham Cowley (1618-1667)}
+
+|@epi_group2b>{epigraph/When you are old and grey and full of sleep, \\
+And nodding by the fire, take down this book, \\
+And slowly read, and dream of the soft look \\
+Your eyes had once, and of their shadows deep/W. B. Yeats}
+
+|@epi_group2c>{epigraph/The art of losing isn’t hard to master; \\ so many things seem filled with the intent \\ to be lost that their loss is no disaster./“One Art,” Elizabeth Bishop (1911-1979)}
+
+|@epi_group2d>{epigraph/To have known him, to have loved him, \\ After loneness long; \\ And then to be estranged in life, \\ And neither in the wrong; \\ And now for death to set his seal--- \\ Ease me, a little ease, my song!/Herman Melville}
+]
+
+
+I hope this finds you well, if it finds you at all.
+
+I walked by our old house this morning. The whole yard was flooded, caution tape everywhere. Empty driveway. Whoever lives there now must have abandoned ship while they waited for the plumbers to sort it all out. But it gave me an idea.
+
+[@originalniko>|I always wondered what you must have felt, waiting on the other side for your Ryan to come through{maybe imperfect}: waiting while the whole place started to shiver and crumble and expand around you. Maybe you thought we both died down there. Maybe you did too but I don't think so. I bet you were smart enough to run.
+
+I hope you found another way back up to the surface, like I did. Took some doing. There were no more power bars by the time I made it out and hadn't been for a while. But I did make it out, in the end.
+
+{keep thinking I'm dead}
+
+]
+[MACRO maybe imperfect][@gayniko>, imperfect though you knew he’d be]
+
+Water gushing up from the basement windows. A mess. But I found a little whirlpool in the swamp of the front yard, a big exposed pipe sucking liquid back in. Back down. That's where I'll drop this, I suppose. [@originalniko>That pipe might just lead to the city sewer system, but|Maybe that pipe just leads to the city sewer system, but maybe,] if I'm lucky, it goes a lot deeper.
+
+[@originalniko>{keep thinking I'm dead}]
+[MACRO keep thinking I'm dead][~Maybe it would be better to let you keep thinking I'm dead. Maybe I shouldn’t be writing this. But I think you'd rather know. There’s a difference between dead and gone, despite the expression. I think you’d prefer knowing one Ryan, at least, survived. I never really did understand how you think, but I'm reasonably sure about that.]
+
+# Niko & Orion start off in the "fourd" universe, then end up trapped in "our" universe for most of the book. In most endings, final Niko is revealed to be the other from "our" universe; he stays there and Ryan goes back to "fourd" world. His USB message goes through to "our" world (which by implication is how the reader sees it).
+# In originalniko, the original Niko ends up back in his home "fourd" universe, while the narrator ends up in an alternate one. So to explain how it ends up in "our" world, we need to introduce the notion of the USB keys duplicating. 
+
+[@originalniko>Assuming, that is, you survived too.
+
+I think you did. That could be me projecting, one last time. But I don't know. It feels right that one of each of us made it out. Balanced.
+
+Not synchronous, but resolved.
+
+I don't have headaches here, which is weird, because it's not the place we started from. Elder Niko said there weren't just two sides, and I thought I got what he meant, but I've stopped trying to pretend we ever understood Downstairs. Anyway, it's different here. Chewing gum isn't a thing, and this asshole named Ted Cruz is president now, which feels like the worst possible timeline, but still. No headaches. This universe is not rejecting me. Maybe I should be insulted, but I suppose I'll have to take what I can get.
+
+You're not here. I'm pretty sure of that. Hopefully you ended up back where we started. Hopefully that part of the plan worked out.
+
+We never understood Downstairs, but that hasn't stopped me making up new theories. And I think we were wrong, about a lot of things. 
+
+Well. Duh.
+
+But for example: we always assumed our doubles were on the other side of the fridge from us. But I don't think that's right. I think it was worse than that.
+
+|I'll triple-bag the shit out of this first, though, because, and I hate to say this, the letter you gave me didn't survive my swim through.
+
+The seal on that baggie must not have been tight. When I finally pulled it out, back on the surface, the letter was soaked through and mostly illegible. Something seemed to have expanded it, too. All that was left was a nightmare of bloated wood pulp and smeared squiggles. Too much of both. But after a lot of tweezer work, I pieced together a little. Not the whole story, but enough to maybe get the gist.
+
+We were wrong, weren't we? About you guys being trapped on the wrong side, like us.] [@fridgetrapped>We could never figure out why {epYouThey} didn’t use {epYourTheir} keys to come through, since {epYouThey} should have had them both, one bent on the counter and the other stuck in the door. We didn’t think how easy they’d be to miss. How the two of {epYouThem}, coming back to {epYourTheir} own side from an expedition, might have gone straight through without seeing them at all.
+
+How the four of us all ended up trapped together. Only {epYouThey} had no need for the keys or to get back through, because {epYouThey} were home|Sure, {epYouThey} were trapped just like we were when the fridge connection was broken. But we were wrong when we thought {epYouThey}'d been looking for a way to get back through. Because {epYouThey} were back already,] where {epYouThey} belonged, on {epYourTheir} own side. The problem was that two doppelgangers had followed {epYouThem} through.
+
+[MACRO epYouThey][@originalniko>they|you]
+[MACRO epYouTheyCap][@originalniko>They|You]
+[MACRO epYourTheir][@originalniko>their|your]
+[MACRO epYouThem][@originalniko>them|you]
+
+Us.
+
+{epYouTheyCap} figured it out a lot quicker than we did, I think. How that loss of synchronicity had pulled our twin houses partially apart, like a gardener starting to separate two potted flowers. [@fridgetrapped>Even if we’d had the key, the connection through the fridge was gone. Too shallow, too close to the surface. What would we have found in there, if we’d forced it open? Maybe an endless tunnel of fridge insides: vinyl walls, crisper-drawer floors, stretching to infinity, going nowhere. How’s that for a road to hell?|How the easy way back had been sheared off.]
+
+So {epYouThey} had to figure out a different way to get rid of us. We were sleeping in {epYourTheir} beds. Eating {epYourTheir} food. Stealing {epYourTheir} lives while {epYouThey} lurked below, afraid to come near us and push things even [further|farther|more] out of sync. Sneaking up to steal food in the middle of the night, thieves in {epYourTheir} own house. And the only way to send us back was to find another connection point, a deeper one, down where roots still twined together. And prod us into finding it, too. {epYouTheyCap} had a lot more time to explore than we did. Downstairs became {epYourTheir} home.
+
+{epYouTheyCap} couldn't explain things to us, not directly. Because if we’d also realized how much things had diverged, it would have tugged our universes even further apart. So {epYouThey} tried to find the subtlest ways to send a message. Saying things without changing hardly anything. Tweaking the note, the video. Pulling us back from the dead-end of the [@empty>crawlways|furniture maze]. Nudging us away from the red herrings closer to the surface, to deeper explorations. Toward the new way through {epYouThey}'d discovered. A flooded tunnel, buried deep. A way to get us back home.
+
+I think about that a lot. We were {epYourTheir} monsters. But {epYouThey} helped us anyway. Maybe {epYouThey} didn't see any other choice, but still. That was pretty great of {epYouThem}.
+
+[@originalniko>|A lot of your note was illegible, and like I said, there seemed to be way too many pages, and a lot of duplicates. But toward the end I could piece together a few phrases, and I think I figured out some of how your story ended.]
+
+Once {epYouThey}'d found the flooded connection, {epYouThey} could pass through to our home universe, and help clear the way back for us. Leave guide ropes. Make it easy. One of {epYouThem} stayed to keep an eye on us, to make sure we “discovered” the flooded tunnel. Once we did, the plan was probably that {epYouThey}’d swim back through in advance, so that, when the time came, all four of us could pass each other, and the two of us could keep holding onto the thread of belief that synchronicity wasn't broken. At least until we were all in the right place again and what we believed no longer mattered.
+
+But then that other Niko crept up from the depths of possibility and fucked everything up. {epYouTheyCap} didn't see that coming, I don't think. How could {epYouThey} have?
+
+[Bitterness, multiplied. Multiplicious.]
+
+[@originalniko>Your counterpart, the other Niko from the twin universe---he didn't make it. {i/I always kill the Nikos first}. Well. That's what happened. I saw a finger, and I think, I'm guessing, you found a body. I can't even imagine what that must have been like. But that's why you thought the plan was fucked, that synchronicity was going to collapse the moment we survivors confronted the fact that only one Niko was left. Elder Niko's plan was to take his place, but without him, there was a gap. A flaw in the pairing. And based on everything we knew, you were sure it was a fatal one. It almost was.
+
+Who knows how much of this the other Ryan figured out. I guess all he knew is that his Niko never came back. He must have been scared, confused. Maybe that's why more of the {double things} went for him. Maybe it wasn't coincidence.
+
+So that's my theory. Probably wrong. I'm sure you have your own. 
+
+I guess the details matter less than how we left things.
+
+It feels like too late and too little to say I'm sorry, but I am. I was lost back then, too afraid to grow up and too wounded to risk being wounded again. But that's not a good enough excuse. I should have been more honest with myself. I should have been more honest with you. I wasn't, and I hurt you, and I can never pay you back for that.
+
+{pizza joke}
+
+Thinking back on it all, I do take some comfort that when push came to shove, we choose to save each other rather than turn our backs. Or maybe it wasn't a choice: that wasn't how it felt to me. We just did it. You saved me, on the bedroom {tube or set} above that awful void, and other times besides, when you had every reason to leave me behind. And I gave you the last of my air, not because I didn't want to lose you, but because you were the one who deserved it. That other Niko said it's too bad we don't get what we deserve. But deserving's just another story we tell ourselves, you know? And sometimes, if we try real hard, we can tell it right. 
+
+|Did you find your own body, murdered, mutilated, in one of those bland hallways? 
+
+I'm so sorry. I can't imagine what that must have been like.
+
+I don’t know quite how to tell you this next part. 
+
+Your Ryan never came back because he saved me. He {i/chose} to save me. I don’t know why. I didn’t deserve saving. But he did it anyway.
+
+You saved me too, of course. On the bedroom {tube or set} above that awful void, and other times besides. And I deserved even less to be saved by you, maybe. Maybe you should have let me die. But you didn't. Neither of you did. And I can never pay you back for that. 
+
+{pizza joke}]
+
+[MACRO pizza joke][~I am enclosing ten bucks, though, for the drink you bought me that night at the Russian dance club{mooch bit} I did say I'd get you back, didn't I?]
+[MACRO mooch bit][@originalniko>, lest you think I'm a total mooch.|. I assume your Ryan was as much of a mooch as me.]
+
+I should wrap this up. If I spend all day writing mysterious letters to another man, my boyfriend might get jealous.[{pp}|]
+[STICKY_MACRO boyfriend][Adam|Luke|Donovan|Kevin|Austin|Devin|Jaden|Leon|Amir]
+[{boyfriend}. {bf_pro_cap} name’s {boyfriend}.|{boyfriend}. That's {bf_pro} name. {boyfriend}.]
+[MACRO bf_pro_cap][85>His|Their]
+[MACRO bf_pro][85>his|their]
+
+Maybe it's ridiculous to think something as tiny as a triple-bagged USB key wrapped in a ten-spot could possibly find its way to you. If our two universes connect at all any more, it's far down in knotted skeins, hopelessly tangled. I imagine this baggie winding its way through miles of piping, tumbling down moss-covered tunnels, floating through submerged, warped bedrooms. Somehow making its way back up to another surface, another flood. Seems silly. But I see it in my head, vivid. I try to believe [@possibles>it, to possible it|there's a world where it could reach you], even though the odds seem astronomical.  
+
+On the other hand, with so many possibilities down there, maybe it's inevitable. [Maybe this message will multiply, splitting off into thousands of fractal copies, a million USB keys floating to a million surfaces, ending up in the hands of a lot of confused people but also, too, in yours.
+
+{maybe extra ep coda}|{pp}]Irrational, but true.
+[MACRO maybe extra ep coda][Maybe one of those versions will even seem right to you. ]
+
+I haven’t dreamt about you in years, but I did last night. Not in particulars. Your name [just sort of] floated through me, troubling in some way but not defined. A word repeated until it loses its meaning, becomes obsessed with itself. A reflection's reflection. It’s why I came by the old house, but all that was here was a flooded yard. All it reflected was me.
+
+I never knew what we were to each other back then. Something less than all those things we never were, but more than a friendship. An else-ship, maybe. An other-ship. Traces of mingled shrapnel under shared skin. Broken pieces of each other we tried to make our own.
+
+I guess we’re left with what we had. {i/Have.} Definitely have, yeah? Because we’re gone to each other, but not dead. We survived.
+
+So hey. I hope you're doing all right [@originalniko>and you found your way back to a world where people say “fourd” like God intended.|in your weird world where people say “fourth” instead of “fourd.”] I hope you found better people to hang out with and a new set of hobbies and someone to appreciate your fashion sense. I hope you realized you were someone worth saving, too.
+
+I miss you sometimes, but that’s okay.
+
+We made it. And [I think…] I think we’ll be alright. 
+
+[Nah. Scratch that.|Or hey. How about this.]
+
+I trust we will.
+

@@ -1,0 +1,63 @@
+# QUANT
+
+{endmatter/ABOUT THIS COPY}
+
+{i/There are several hundred places in the master copy of} Subcutanean {i/where text can vary. Here is a sampling of some of the decisions made by the rendering code when this copy was generated.}
+
+{vspace/1}
+
+[@wordy>‣ Your narrator preferred wordier ways of saying things.|@succinct>‣ Your narrator preferred more succinct ways of saying things.]
+
+[@depressive>‣ Your narrator was a bit more pessimistic than the norm.|@optimist>‣ Your narrator was a bit more optimistic than the norm.]
+
+[@slang>‣ Your narrator preferred to use slang.|@formal>‣ Your narrator preferred to avoid slang.]
+
+[66>‣ Some proper nouns in this copy that might be different in others include {double things}, {grapples}, and {FavBook}.]
+
+[35>‣ Your version of Downstairs was on the site of {siteexpl}.]
+[MACRO siteexpl][@vortex>an old roadside attraction called The Vortex|@gardens>a mysteriously fecund garden|@snakeoil>a disgraced doctor's healing grottos|@caves>a cave where two boys had died]
+
+[45>{maybedrink}]
+[MACRO maybedrink][@alcohol>‣ Your Ryan had a bit of a drinking problem.]
+
+[@convopit>‣ Your Big Room had a conversation pit (most don't).]
+
+[45>{maybe fridgedeet}]
+[MACRO maybe fridgedeet][@fridgetunnel>‣ Your Ryan and Niko found the endless fridge tunnel.|‣ Your Ryan and Niko lost the keys to re-open the fridge.]
+
+[33>‣ The progression of your glowstick colors was {color1}, {color2}, {color3}, {color4}. Read into that what you will.]
+
+[45>{maybe found ch8extra}]
+[MACRO maybe found ch8extra][@hamsterwheel>‣ Your versions of Ryan and Niko found the Hamster Wheel.|@stageladder>‣ Your versions of Ryan and Niko found the ladder to nowhere.]
+
+[55>{ch8excitement}]
+[MACRO ch8excitement][@spiralhall>‣ Your Ryan and Niko found the spiral hall. {pp} ‣ Your Niko didn't fall when climbing the vertical hall.|‣ Your Niko fell when climbing the vertical hall.]
+
+[33>‣ Your version of Niko got the Thoreau quote wrong.|25>‣ Your Ryan and Niko didn't find the Library Chasm.|25>‣ Your copy of {i/Subcutanean} contains this stats page.]
+
+[55>{phonedeet}]
+[MACRO phonedeet][@dadphone>‣ Your Ryan spoke to his father on the pay phone.|‣ Your version of Ryan spoke to Bradley on the pay phone.]
+
+[55>‣ At the bottom of your Downstairs was {floordeets}.]
+[MACRO floordeets][@TheCity>a city of recursive houses|an endless empty space, the Basement]
+
+[55>‣ In this version, the final fight took place {fightdeets} {localedeets}.]
+[MACRO fightdeets][@ffset>on a floating set|on a tube of bedroom-stuff]
+[MACRO localedeets][@ffdropoff>suspended over an endless dropoff|between two endless walls]
+
+[55>{maybe cdbit}]
+[MACRO maybe cdbit][@cdrom>‣ Your Ryan never solved the weird CD-ROM game. Maybe none of them did.]
+
+[55>‣ In your ending, Orion swam through the final gateway {swimdeets}.]
+[MACRO swimdeets][@originalniko>with Niko, not alone|alone, rather than with Niko]
+
+[40>‣ Your epigraph authors included {epgroup1} and {epgroup2}.]
+[MACRO epgroup1][@epi_group1a>Gwendolyn MacEwen|@epi_group1b>Walt Whitman|@epi_group1c>Italo Calvino|@epi_group1d>Leo Tolstoy|@epi_group1e>Sarah Teasdale]
+[MACRO epgroup2][@epi_group2a>Abraham Cowley|@epi_group2b>W. H. Auden|@epi_group2c>Charlotte Mary Mew|@epi_group2d>Reinaldo Arenas]
+
+[55>{gaynikobit}]
+[MACRO gaynikobit][@gayniko>‣ Your Ryan lost his original Niko, but saved a different one.|‣ Your Ryan never found the version of Niko he thought he was looking for. That's probably for the best.]
+
+[@singular01>{singstat}][@singular02>{singstat}][@singular03>{singstat}][@singular04>{singstat}][@singular05>{singstat}][@singular06>{singstat}][@singular07>{singstat}][@singular08>{singstat}][@singular09>{singstat}][@singular10>{singstat}][@singular11>{singstat}]
+[MACRO singstat][~‣ Your copy contained a piece of text that appeared only in this version and no other copy ever printed (location noted in the inscription on the title page)---thank you for being a Singular Subcutanean backer!]
+

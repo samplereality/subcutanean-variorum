@@ -1,0 +1,278 @@
+# QUANT
+
+
+
+
+
+
+# In "nikofalls" there's a premature chapter break
+
+[@nikofalls>{section_break}|{chapter/9}]
+
+I woke to [the smell of] stale nicotine. Niko [@convopit>was sitting hunched over in the conversation pit|leaned against the stairs back up to my room], staring into the dark, a lit cigarette between his fingers.
+
+“Our lease says no smoking in here,” I grunted, still shaking off nightmares.
+
+He took another drag. “Blow me.”
+
+I laughed and he flashed me a wicked grin. It felt good to laugh. Even if it was a little bit forced, to make sure he knew that I knew he was kidding.
+
+Rubbing my eyes, I sat up in my sleeping bag. After a moment I scrunched over [@convopit>and lowered myself into the pit opposite him, still encased in my bag|beside him, back against the stairs].
+
+We steeped in smoke and silence for a long minute. [@singular03>I was thinking how unlikely it was that we were friends. Still, or ever. Maybe it was the lingering nightmares, but for a minute I couldn't see how {i/any} two people could fall into sync for more than an accidental moment, keep aligned enough to share velocity. How often those coincidental locksteps ended up misaligned, mangled: in sadness and tears. In betrayal.]
+
+“Did I ever tell you,” he finally said, “about that time I went camping by myself, up in Brushwillow?” I shook my head. “Used to do that a lot, after the, uh. Accident.”
+
+I took that in. He hadn't brought it up in a long time. Neither had I.
+
+[DEFINE 25>@thoreaujoke]
+“I went by myself, cause I didn't want a lot of people around just then, and it's easier than twisting people's arms to get them to come with you. Planning around schedules, all that bullshit.” He shifted into citation voice. “‘[@thoreaujoke>The man who goes alone can leave today, but the man who goes with others must wait until they're fucking ready.|{thoreau variants}]'”
+# Between Niko's imperfect memorization and parallel Thoreaus, no version of this is quite correct.
+[MACRO thoreau variants][The man who goes with another must wait until they're ready. The man who goes alone can leave today.|He who goes alone can start today. He who goes with another must wait until they're ready.|The man who goes alone might start today, but if he travels with another he must wait till that other is ready.|Who goes alone may start today; who travels with another must wait till the other is ready.|The one who goes alone can start today; but the one who travels with another must wait until they are ready.|If a man goes alone, he might leave today; but if he travels with friends, he must wait till each one is ready.]
+
+“Yeah, Thoreau. [@thoreaujoke>I'm pretty sure he didn't cuss quite that much, but something like that, yeah.|You quote that one a lot.]”
+
+He shrugged. “I like it up there. Anyway.”
+
+I waited, staring into the whorled beige universe of the carpet.
+
+“So this one night I'm up there, alone. I'm in my tent, and it's dark. Cloudy, no moon. I'm sleeping fine, on my back, you know, head up against the edge of the tent. And then I wake up, cause I hear something, just outside.”
+
+He sucked on the cigarette. “Something breathing. Low, hissing, gurgling breathing. Sounded huge, like a bear or something, a big-ass wolf. And it was right on the other side of the tent flap. Inches from my face. Like something had pressed its muzzle against the nylon, that thin nothing sheet of ultralight fabric, and was waiting. [It could smell my breath, maybe. Waiting for me to move. And as soon as I did, it would get me.]
+
+“I still remember what that felt like. Fucking terrifying.
+
+“I was too scared to move, so I lay there a long time, hoping it would go away. But it didn't. The thing stayed where it was. Kept making those horrible breathing sounds. Inhale. Exhale. Raspy, choking.”
+
+He [flicked the cigarette onto the carpet, rubbed it out with his foot|dropped the cigarette into an empty soup can we'd brought down as an ashtray].
+
+“And then I realized where the sound was coming from. The breathing was coming from me. I was sleeping on a root or something, my head had gotten into some funny angle. I was snoring, basically, and woke myself up. But I didn't realize what woke me was a sound I was making myself.”
+
+[80>I was too tired to process this. “Cool story.”
+
+“Do you get what I mean, though?”
+
+I rubbed a hand over my face, tried to think.
+
+|“Okay.” I rubbed a hand over my face, tried to think. ]“You're saying maybe there's not… a {i/thing} down there. That somehow, all of it is us.”
+
+“Echoes,” he said. “Reflections. The rooms are reflections of our shitty old house, and the things we're seeing, experiencing down there, maybe they're not alive. We're causing them, somehow. And now we're ascribing intentionality to side effects. Jumping at our own shadows.” He [@convopit>leaned back against the carpeted wall|lay back down on his sleeping bag], staring up at the ceiling.
+
+[@gorilla>I remembered something from a neurobiology class. “Did you know there are more neurons going from your brain to your eyes than in the other direction?”
+
+“So?”
+
+“From your brain to your eyes,” I repeated, “not the other way around.”
+
+He blinked. “That doesn't make sense.”
+
+“It does if you realize that vision is mostly the brain telling the eyes what it expects them to see.” I rubbed my face again, trying to wipe off the exhaustion. “We think we have two little cameras in our head. We don't. They're little yes-men, reassuring us nothing unexpected is happening. That's why that trick works, with the guy in the gorilla suit. You ever see that video in school?”
+
+He nodded. “You're watching a bunch of people toss a ball around, and the guy in the gorilla suit walks right through them, and it's like he's invisible. He even waves. But you don't see him the first time, because you're watching the ball. Then you watch it again looking for him and your mind's blown.” He smiled faintly. “Dude in my high school science class swore the teacher changed the tape.”
+
+“You don't see the gorilla because you don't expect to. There's no reason he'd be there, so your eyes don't notice him. Even though he's in plain sight. Standing right in front of you.”
+
+|@cdrom>“There was this weird CD-ROM game I was playing,” I said after a while. “It doesn't exist over here, I guess. You spent all your time wandering around listening to these crazy scientists rant and banging your head against bizarre alien puzzles. I couldn't make any goddamn sense of it.” I pulled my knees up to my chin. “But I keep thinking about it. Maybe even more, now that I can't actually play. I'm turning the pieces I have over and over, trying to fit them together, figure it out. But I can't. I'm missing something, and it's probably not even something I can find. It's locked on a CD in another universe. So it's pointless, but I can't stop obsessing over it. Just endless frustration, with no way to ever make progress.”
+
+“Yeah, dude, that's how I feel about all those games. Especially {i/Return to Zork}.”
+
+“But that's the thing,” I said, earnest. “They all feel like that until you see the solution. The clue you walked past ten times without noticing. The right spot to stand at, the right place to click. Once you find it, everything pops into place. It's plain as day and you can't believe you didn't see it before.”]
+
+We were both quiet for a while.
+
+“So maybe we're somehow looking at this wrong,” I finally said. “We're not seeing something. We keep saying it doesn't make any sense. Maybe we're just not seeing it the right way.”
+
+“Maybe.” He closed his eyes. “Or maybe there's nothing there to see.”
+
+[
+“Niko. About the accident.” I swallowed. “That night.”
+
+He rolled over. “Don't want to talk about it.”
+
+“I know. But if you ever did want to, I mean, if you ever needed that again—”
+
+“I don't. Go the fuck to sleep, man.”
+
+We both closed our eyes and tried.
+|
+“Niko.” I swallowed. “You think our doubles are the same as us? Like, exactly the same?”
+
+“Obviously not,” he said, rolling over. “{different notes}.”
+
+“That's what I mean.” My stomach felt unsettled. I was on the verge of saying something dangerous. He felt it too. I could tell just from looking at the back of his head. “Little differences. Other versions of us. Of everything. Where there's no three dollar bill. Who knows. Maybe there's versions where both of us, where one of us...”
+
+“Go to bed, man. We need to get some fucking sleep.”
+
+We both closed our eyes and tried.
+|
+I closed my eyes too, and tried to sleep. But
+] I could feel the camcorder dream lingering, eager to take over again. I tried to fight it off, but I was so tired.
+
+[MACRO different notes][@fridgetrapped>Different notes, different video|They found different things. Made their own fucking video]
+
+
+“Even if we are the wolf,” Niko muttered, just as I was about to drift off, “that doesn't mean it's not trying to kill us.”
+
+{section_break}
+
+[DEFINE @midterm]
+[@midterm>I tried to take a midterm and it was a disaster. I hadn't been to class in weeks, which didn't help, but everything I'd learned earlier had vanished from my brain, neurons reclaimed, I supposed, for more important things. Then I started hallucinating, questions and pencil marks multiplying and layering on themselves even when I looked up from the test, abstractions filling the darkened auditorium, and I had to flee, whispering a hurried apology to the T.A. that I was having a medical emergency.|I got fired from my job, which was fair enough; I'd missed two shifts in the past week. I got a nosebleed during the meeting with my supervisor.][DEFINE @bossf] [@bossf>She|He] told me to go home and take care of myself. I was halfway home before I remembered that phrase has a positive meaning, too.
+
+I'd thought [@bossf>s]he was telling me to commit suicide.
+
+# For variety, make the scare here either a bigger or lesser deal.
+
+[MACRO bloodorpencil1][@midterm>number two pencil still clutched in my hand|dried blood on my face]
+[MACRO bloodorpencil2][@midterm>still clutching my number two pencil with a death grip|still clutching bloody tissues]
+Something was in my room when I got back. [80>I stood outside the closed door, {bloodorpencil1}, listening. It sounded like an elephant. Heavy, clopping footfalls made the floorboards groan. Wet, agitated breathing rasped. Dust motes danced at my feet in a strange breeze, sucked under and pushed back out through the space below the closed door, rhythmic. Air moved with faint fleshy sounds, like a hundred quiet people flapping their arms, flailing.
+
+I crept away, miserable, and by the time I came back with Niko and he threw open the door in some play at courage, there was nothing there.
+
+{nikos arms}|20>
+
+Niko was out---I didn't know where---and I'd trudged up the creaking stairs to my room {bloodorpencil2}. My bedroom was mostly a waystation now, a point to pass through on our way to the Big Room underneath with its piles of junk and remnants of police tape and my sleeping bag under the foosball table. I could sleep upstairs but my head always throbbed up there, and anyway Downstairs was cool and dark and quiet and all I wanted just then was to zip myself into a nylon cocoon and wait for Niko to get back. 
+
+So as I reached for the doorknob outside my room, I was thinking of nothing but Downstairs, and that's when I heard the floorboards creak inside.
+
+I froze. Maybe it was Niko, heading down or coming up. I tried to think of something funny to say, a way to surprise him.
+
+Then I heard the sounds.
+
+They were like moth wings, but heavier, fleshier. Flailing, flapping sounds, like a hundred children thrashing their arms around, smacking against each other, mid-seizure.
+
+Something was breathing, too. 
+
+It was heavy, tortured, huge: the breath of a sick elephant, a dying titan. The floorboards groaned again as if something massive had taken a step, shifted its weight. The wood flexed beneath my feet.
+
+I looked down. Dust danced on the scuffed hardwood in a strange breeze, sucked under and pushed back out through the gap below the closed door, rhythmic. Each mote sparkled in the dim, distant light, except where the shadow of my legs made them invisible.
+
+The shadow of my legs. The light was coming from behind me, from the hall. 
+
+Whatever was inside could see I was standing here.
+
+It {i/spoke}. 
+
+The sound was distorted, clipped, like a hundred recordings of voices thrown together unmixed, maxing out the dynamic range of reality. It was scream and cry and laughter and words and grunting and hum and song and cough all scraping against each other like geologic faults, painful and unsteady. Unwillingly I remembered how the history lady had looked, thought of the sound something like that might make if it knew what was happening to it, if it wasn't just an optical illusion but, god, an event, a trauma; thought of the copies of {who was in hall} I'd seen in the dim hallway that first night we went Downstairs and wondered what it would be like if there were a hundred of them all squeezed together in the space where only one should be, each trying to escape and become its own person; wondered whether this was all in my head or whether it mattered if it was; wondered if it mattered that all those voices, those screams and cries and giggles and moans, were all, unmistakably, my own.
+
+I turned and ran. I half-twisted my ankle on the stairs, cracked my wrist against the banister with enough force to leave a bruise I wouldn't notice till much later, but I didn't stop. And as I tore open our front door to flee I crashed straight into Niko, coming in.
+
+{nikos arms}
+
+Eventually I led him upstairs, terrified to go back but also to let him go alone, like he'd offered to in some misplaced stab at courage. But there was nothing in my room. He'd thrown open the door brandishing a hockey stick but everything was exactly as I'd left it, nothing out of place, no cracked floorboards or lingering smell of death or signs of anything unusual at all. 
+
+He gave no sign of disbelieving me, and I loved him even more for that.
+]
+[MACRO who was in hall][@justRyan>myself|@justNiko>Niko|@ryanAndNiko>ourselves]
+
+
+[MACRO nikos arms][~I collapsed into his arms, sobbing, and he let me stay there for a while until I'd calmed down. I clung to him, afraid if I loosened my grip he’d disappear. {nikos arms dad addendum}]
+[MACRO nikos arms dad addendum][@dadphone>Like dad, tucking me in. Gone between one blink and the next.]
+
+He had a perpetual headache now. He kept describing it with the word “[stabbing|piercing|throbbing]” and only that word, as if clinging to the sound of it. Like using a different one would acknowledge the pain too had changed, grown worse, was no longer caged by the word he'd picked to trap it. I could see how much it hurt him to think, to make words, to move around. He ground his teeth. [@nikoblackout>He stood up carefully now, putting a hand against the wall each time, as if his blood was fighting his heart’s attempts to lift it to his head, to keep it from being dragged back down.|He was being worn down.]
+
+[DEFINE ^@ch9weI]
+My headaches [weren't getting worse, not yet anyway|were getting worse, too, but it wasn't the pain that bothered me]. It was the strain of always having them that wore on me. Of wondering if [@ch9weI>we'd|I'd] have [to deal with them|them] for the rest of [@ch9weI>our lives|my life].
+
+{section_break}
+
+We left to explore down the slippery tunnel late that night. It might have made more sense to [leave|start|go down|do it] after a good night's rest, but neither of us could sleep, and spending so much time down there meant night and day were becoming academic concepts anyway. Niko caffeined up (I was jittery enough already), and we loaded our packs with canned food and power bars, thick gloves, and crampons from the sporting goods store. “12 points of contact ensures solid grip on ice,” the box had said. We didn't expect the manufacturer had tested them on [slime-covered|moldy] carpet, but it was the best we could do.
+
+In my pack was also a gun. [I bought it from a place I’d driven past every day on my way to work but never gone into until that morning. The friendly clerk agreed to waive the mandatory waiting period in exchange for the last of my ATM cash.|It had been my dad's. I hadn't wanted it but I couldn't throw it away, nor could I make myself go to the safety courses mom had signed me up for, or take it out from its box at the bottom of my closet with other things I didn't want to look at. But I hadn't forgotten I had it.] I didn't tell Niko about the gun. I thought it would make me feel safer but it just felt heavy.
+
+It had been a hot day and the old house clung to that heat through the night with grim brick desperation. Descending into chillier air was a relief. With every step down the headaches diminished, our mood improved. It was almost addictive, being down there.
+
+We retraced our route through the upper halls to the top of the shaft and reset the grapples. This time Niko hammered them into the doorjamb, face set, until he'd driven the steel spikes three inches into the wood. Even so, neither of us really expected they'd still be there when we got back.
+
+When, or if.
+
+Getting down was a familiar exercise now, danger mitigated by procedure and repetition. We retraced our route to the tiled room with the sink[@spiralhall> via the shortcut we'd found]. The water was still running, hot and steaming, rushing across the floor to the corner with its angled hallway lined with slimy black carpet. We shined our lights down the hot throat and the steam grabbed their brightness, bounced it back to us [maliciously|innocently]. We couldn't see more than a few body lengths down.
+
+Niko ran a hand through his curls, deflating again in the hot moist air; scratched the hair behind his ear furiously, like a dog with an itch. [^He was shaking.] “Are we sure about this? Really really? Because it sort of seems like a colossally stupid thing to do.”
+
+“You have a better idea?”
+
+[^“No. Is that what lemmings say to each other, you think? Before jumping?”
+
+“The lemming thing is a myth.” I shrugged out of my pack and unzippered it, digging for gear. “Walt Disney made it up because a bunch of wiggling rats made for boring footage. Good story, though, isn't it?”]
+
+He sighed, looking down the steaming shaft unhappily.
+
+“No, I don't have a better idea,” he said at last.
+
+We pulled on the crampons and the heavy gloves. Harness, rope, knots. Check. Niko pounded two new {Grapples} into either side of the angled tunnel entrance. We tied on. Double-check. 
+
+Then, each holding our rope, kicking hard to sink the sharp toes of the crampons deep into the slimy carpet, we started down.
+
+It was slow, hot work. Once we got inside the slanted hall, the steam was oppressive, everywhere: we were instantly drenched with it, like rot-smelling sweat. Even with the crampons our feet slipped. The sludge was deep and slick, a stew of algae and mold and fungal slimes, green-black and stinking of putrefying jungle, of horrible things happening under your carpet, inside your walls. We held tight to the ropes with steam-wet gloves. The walls and floor twisted and bent as we descended, as if the constant moisture had warped them, but the downward angle stayed [relentless|vicious|relentlessly vicious].
+
+It was a gullet. We were letting ourselves be swallowed. No---worse. We were forcing ourselves in. Eager. Like we couldn't wait to be digested.
+
+We were nearing the end of our sixty meter ropes when everything went to shit.
+
+All at once we were sliding. Our ropes had gone slack in our hands, no longer connected to anything. There was no time to dig in the crampons; we were already moving too fast, careening down like a grotesque slalom. Neither of us screamed, focused I guess on trying to grab hold of something, anything, but there were no doorways, no light fixtures, nothing but the thick hot slime and the scalding water. I tried to dig my feet into the oozing carpet but my loose rope had entangled me, my pack was in my way, my face was smeared with scalding gunk and I couldn't open my eyes.
+
+My hand closed on Niko's leg and I grabbed it. A moment later the floor angle shifted and he cried out, threw his body sideways, brought us both to a shuddering, squelchy stop.
+
+We were soaked through, overheating. Scalding water ran past us down the slope. I blinked my eyes open and saw he'd wedged himself into a kink in the tunnel. One of his knees was scraped open and a dull red mark on his forehead was beginning to swell. But he'd done it. He'd stopped us.
+
+Ropes slithered down the tunnel past us, followed moments later by two grapples still tied to their ends. Niko reached out to grab one with his free hand, but his weight shifted, and he had to throw the hand back against a wall to re-brace, cursing. I tried to snag them with my foot, but didn't even come close. They vanished down the tunnel, trailing rope.
+
+Niko's face was tight. He tilted his head down toward me. “This was a mistake. God, we're so fucking stupid. Ryan, man. We have to go back.”
+
+“[Calm down|Hang on],” I gasped, head filled with the roaring of the water, blinking gunk from my eyes. “Don't panic. We can do this.”
+
+“Man, I'm barely holding on. I don't know how much longer I can keep from slipping. We have to try to climb back up.”
+
+“Back?” I said, confused. “You want to go back?”
+
+He stared down at me. “Of course back. Are you fucking crazy? Where the fuck else?”
+
+“There’s nothing good up there. Nothing right.” I kicked my foot for purchase, managed to rest at least some weight on a hidden protuberance. “Besides, nothing's changed. The plan's still the same.[^ This is the best lead for finding a way back to our side.]”
+
+“Are you not paying attention?” he hissed, furious. “Something is trying to kill us.”
+
+“So let's [find|figure] out how to stop it.” I tried to keep my tone reasonable. “We're halfway down already. Climbing back up will be [hard|rough], regardless. Why not get all the way to the bottom first?”
+
+“Because we don't even know if there is a bottom.” His face was blotched red with fury, with sweat, with the scorching heat of the air. “Halfway? We have no fucking idea how deep this goes. I should have said this a long time ago. You're obsessed. You get obsessed a lot, man, let it drag you down. Your stupid records.” He took a deep breath. “Well now you're obsessed with this place, and it's blinding you. It's {i/feeding} on you, your obsessions. Multiplying them. You can't see it, or maybe you don't want to, but I do. I'm looking right at it. [@gorilla>Like the gorilla in the crowd.|@cdrom>Like the answer to the puzzle.]”
+
+I was angry. “If I'm obsessed with anything, it's with finding a way back. We're running out of time. We either figure this out, or we're stuck here forever, [on the wrong side|in the wrong world|in the wrong universe]. We need each other to get through this.” [I said it again, like saying it could make it true. “We need each other.”]
+
+“You're obsessed with me, too,” he muttered. “When was the last time you hung out with someone else?”
+
+“When was the last time you did?”
+
+He shook his head angrily, dismissing this.
+
+“Our housemates,” I pushed, “when was the last time you hung out with any of them? Anyone other than me?” He stared back, seething. “Their names. I bet you can’t even remember their names.” I was bluffing. But could I remember them, either? Names, faces. No. There was nothing. None of those people mattered, not to me, not to us. We were the only thing that mattered. Getting back to where we’d been, what we’d had. What I’d wanted. 
+
+He shook his head again, violent, like there was something inside it he wanted to dislodge. “You’re living in a fantasy,” he spat, “you always have been. {i/I can’t be what you want me to be, okay?} I can’t be what anyone fucking wants me to be. You all have these versions of me in your head, these ideal perfect Nikos, but they’re not real. [They're not real.] I can’t live up to them.” He opened his eyes, stared yearningly back up the shaft. “Help me. If you really care about me, help me back up. Don’t be like everyone else. Don’t just fucking {i/use} me to get what you want.”
+
+“Going back's not going to help. There's no answers up there.” He wasn't understanding. I reached for something else. “Those headaches aren't going away. You think you can live with that pain? Forever?”
+
+“Better than being fucking dead!” He seemed to realize I wasn't changing my mind, turned away to reach for a handhold, but there was nothing there, nothing to grip, and he scrabbled pathetically at the slime.
+
+“Is it?” I shouted, angry, desperate. I had to say something, something that would make him stay, keep him here, and my mouth raced ahead of me. “You won’t make it, up there, not with pain like that. We both know you won't.”
+
+He tensed, glared down at me. “What the fuck is that supposed to mean?”
+
+“You know exactly what it means,” I said, shaking. “Never really helped you. I've done nothing but help you. I've always been there for you. Every fucking time you fall I pick you back up. {i/You’d be dead if it weren’t for me.}”
+
+He shot me with a gaze of such cold fury I cringed. “You're fucking poison,” he hissed, “you know that? A fucking snake. I wish you'd let me die that night. I wish we'd never met. {i/Let go of me!}”
+
+And his hand did close on something, and he pulled himself up, triumphant. His leg was slipping out of my hands, and I couldn't bear for him to crawl away from me, [couldn't stand it,] couldn't handle the thought of going back up to that world, to any world where everything was wrong and nothing I wanted was possible, so I pulled. I pulled, too hard, and both his hands slipped, and he crashed back into me, only I wasn't holding onto anything but him any more so both of us tumbled down, faster and faster, slipping and twisting and scraping together down the steepening blood-hot slope, down and down and down into darkness. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

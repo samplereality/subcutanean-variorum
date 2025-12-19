@@ -1,0 +1,209 @@
+# QUANT
+
+
+{chapter/13}
+
+
+[DEFINE @ch13open1|@ch13open2]
+[@ch13open1>We kept moving, but nothing else was the same.|Like a bitter parody of the exploring I'd done with my Niko, a million years ago, we kept moving.] I led, Niko following behind holding the rope wound around my neck. He'd cut the duct tape from my ankles so I could walk, but tied a blindfold made from a damp shirt tight around my face. “Little handicap,” he said, “case you decide to [run|wander] off.” I cringed [as|when] he clapped me playfully on the back. “Don't worry[, bud]. If you're good, I'll tell you when you're about to walk into a pit.”
+
+[@ch13open1>Like a bitter parody of the exploring I'd done with my Niko, a million years ago, we searched.|We searched.] At intersections he'd describe each hallway, and casually discuss which way to go, as if we were equals. As if he hadn't threatened to kill me and worse. Other than a preference for moving toward anything weird or different, he seemed content to let me choose the direction. He marked the wall, tracing our path with fastidious care---“If we're doing it on this side, they're doing it on theirs, too”---and on the whole seemed downright cheerful. For a while he whistled something I finally placed as the theme to one of our favorite shows. Just the second bar, over and over again.
+
+Like he'd forgotten the rest.
+
+[75>I made little plans for how to get away.
+
+None of them seemed very plausible.]
+
+From his descriptions, I gathered we were passing through a maze of identical drab halls. The carpet underfoot was sometimes dry, sometimes thick with something that felt like dead mulch and made me stumble, and often slick with slime and mold. We must have been only just above the water table, if such a concept made sense down here. Probably it didn't. Sometimes we'd go up dry stairs to a soaked hall at the top, or along a downward slant that went from squelchy to dusty. We were near water, anyway, moving through histories of past inundation. Niko described walls streaked with damage from it, paint browned and peeling. [Once he found some mushrooms growing from a split baseboard, and stopped to eat them. I could hear him chewing, a slimy sound. The smell as they mixed with his saliva was of pond scum and rotting dirt. He offered me one, but I declined, and he seemed unsurprised. He said they'd keep you alive but weren't especially satisfying. I tried not to hear menace in that.|More than once he had to direct me around collapsed sections of floor, sinkholes I could sense only through the hot smells of rot wafting up from them, the uneven edges of torn carpet and cracked cement at their lips. Hands on my shoulders, he told me where to step. I obeyed.|]
+
+There were few side rooms here, but he'd open the door to each we passed and check it. Bedroom-sized, he told me, [@empty>all empty except for a small drain in the center of each floor.|sometimes empty, sometimes filled with chaotic mounds of furniture in broken, ruined pieces. A small drain in the center of each floor, sometimes clogged with sawdust, splinters, and grime, leaving stagnant puddles of mold-choked sludge.]
+
+It was hard to keep my balance, blindfolded and with arms bound behind me, and I stumbled a lot. The adrenaline from earlier had worn off, leaving behind a dozen throbbing aches and a deep exhaustion. How long had I been down here? I couldn't come up with a number, but my body knew the answer. Too long.
+
+[Worse, I felt abysmally alone. To feel like the last person in the universe that cares for you is not only gone, but twisted into a thing that loathes you with active and pulsing hate, is utterly miserable. Maybe this place had twisted him, or maybe that hate had been there all along, buried under the surface, and I’d just never noticed it.]
+
+At the next intersection I tripped on a rough patch of carpet and collapsed, smacking my chin against the ground. It hurt, and I started crying. Sobbing, actually. I'd never felt more useless, pathetic. Niko told me to shut up, and I tried to pull myself together. He sighed, and suggested we take a rest. Sniffling, I agreed. 
+
+He sat me up against a wall[ and fed me a power bar, one torn-off piece at a time]. I clenched and unclenched my tingling hands; from the elbows down everything was numb. After a while the tears stopped.
+
+I wanted to sleep but couldn't bear waking back up to this. I wanted him to untie me, unwind the rope from my neck, let me go. I wanted to get away from him, or better yet for none of this to ever have happened at all. I wanted to be dreaming of something other than hallways, and him.
+
+I could have none of these things. But he hadn't gagged me. I could still talk. And maybe talking together, like we'd done so much, I could find a way to reach him.
+
+So I asked him about the things he'd seen, and he told me.
+
+[@furnished>He spoke of a room whose floor was a chaos of school desks, plastic bucket seats and flip-down wooden tops. How he’d excavated them out at least ten feet deep without seeing signs of a floor.|{maybe infinite floorboards}] [@stageladder>He spoke of corridors whose floors and ceilings began to steepen in either direction, rising up to the vertical, gigantic carpeted wheels serving no rational purpose.|He spoke of caged metal ladders climbing up through vast, dark, empty spaces, rung after rung through nothing but void.]
+# We've used this bit a few times, so only use it here if we haven't seen those.
+[MACRO maybe infinite floorboards][@fridgetrapped>{mif2}|{mif backup}]
+[MACRO mif2][@TheCity>He spoke of rooms where the carpet was worn, could be ripped up to reveal floorboards underneath. He spoke of ripping up those floorboards to find more floorboards, of excavating down ten feet with no sign the boards ever stopped.|{mif backup}]
+[MACRO mif backup][~He spoke of a hallway twelve miles long without a single door or turn. Of a huge labyrinth of circular halls he'd mapped, pressing towards the center, until at last he'd arrived triumphant in the small circular room at its core. All that was there was {center of labyrinth}.][MACRO center of labyrinth][a single unworn tennis shoe|a bent and broke bike wheel|an empty filing cabinet, slowly rusting away|a crushed plastic laundry basket with nothing inside|a muddy speaker from an old stereo, half-embedded in dirt floor|a pile of crumbling bricks, like the reward for the maze had never been built]
+
+He spoke of more connection points between paired dimensions, useless to him since he couldn't find his way to the surface of any---and all {i/tangled} down there, he said again. The connections always had some kind of airtight seal. [Steam-filled wood saunas with a door at each end|Garages with electric doors on either side|Walk-in closets with snug doors on either end]; [lobbies with revolving entryways|empty gun safes with doors on either end, just large enough to wriggle through|school lockers just big enough to stand in with doors on each end]; a shower, but vertically stretched, thirty feet of bathroom tile with frosted glass doors at the top and bottom, and climbing its steel fixtures, faucets and knobs sticking out at random from the walls, climbing it all the way to the top[@originalniko>| in absolute darkness. Because that was another universal feature of the connections, apparently. Your light, whatever its origin, would go out in the space between, like my flashlight in the fridge. He'd taken a burning two-by-four into one and as soon as the door shut behind him the flames simply stopped, not even glowing embers left behind].
+
+[Sometimes {nice room furnished bit} were part of a regular house. Out the door you could pretend there was a kitchen, maybe, with bacon frying and morning light slanting through the window, or a porch with a cool breeze. As long as you stayed put it was almost like being home. He said these rooms, by far, were the most dangerous of all.]
+[MACRO nice room furnished bit][@furnished>you found rooms so well-furnished, he said, you could almost imagine they|there were furnished rooms, he said, that you could almost imagine]
+
+He spoke of [catwalks over voids|curving tunnels made from scraps of sandpaper and carpet samples|dunes of rolling carpet], of [flooded libraries swimming with illegible books|attics that stretched on forever|ladder bridges over Niagras of scalding water], of [a maze of closet the size of a city block, endless cramped turns ducking under dusty coat hangers|treacherous mountains of abandoned silverware, poised to bury you alive at the slightest touch|hallways with vanishing points worked into their architecture, growing smaller and smaller until you couldn't wedge yourself forward any further, coming to a point some impossible-to-judge distance ahead]. [{maybe unused ch7 bit}] He spoke of vast caves made entirely of stairs: walls, floor and ceiling expanding and contracting in carpeted, ninety-degree edges. [More than a decade later, the first time I saw a blocky cavern descending into shadow in {i/Minecraft}, I had to shut the game down, right then, turn on the lights, walk away. It looked exactly how I'd imagined Niko's stair-edged pits.|Of pits with barely-heard voices rising from their invisible depths, and the things the voices said if you listened long enough.]
+[MACRO maybe unused ch7 bit][@empty>A maze of tunnels made from furniture, like a children's dream of a couch fort brought to life, that he'd been lost in for a week.|A maze of crawlways through half-sized doors, like the ones you see opening onto water heaters or the electric meter, that he'd gotten lost in for a week.]
+
+Finally, he trailed off, and we steeped together for a while in the thick, unbroken quiet. I was trying to think what I could say to keep him talking, but he broke the silence first.
+
+“You would have gone wild for some of that shit, man. Wish you could have been there.” His voice was wistful. “All our crazy, stupid theories. We were wrong about everything. But it was more fun being wrong together.”
+
+I licked my lips. Maybe this was my chance.
+
+“Yeah. Hell yeah,” I started. “Jesus, man, I can't imagine what it's been like for you.” {i/Isn't the phrase “I can only imagine?”} some part of my brain whispered. I shook it off. “I mean, I don't know what I'd have done, if it were me. Alone down here.” I took a breath, extemporizing. “You've... done things to survive, and I mean who could blame you? Who's to say when push comes to shove what's right or wrong when survival's at stake?”
+
+He didn't make a sound, and I couldn't see his face through the blindfold. But I sensed a tide shifting. I'd said something wrong. My chance was slipping away.
+
+“{i/You don't have to do this to me.}” I hadn't meant to say it and not with such pitiful desperation, but now I couldn't help myself, couldn't stop babbling. “We're friends. You're my friend. We're only going to survive by working together. You don't have to keep me tied up like this. I want the same thing you want. To get out, get the fuck out of here---”
+
+“Friends.” he interrupted, voice dangerously quiet. “Is that what we were? Back in the day?”
+
+My chest was tight. “[Yeah. I thought so. ]Weren't we?”
+
+I heard a scratching sound. A dog itching itself. I couldn't see but had a clear image: he was scratching the hair behind his ear, head tilted, half-turned down. Something he always did right before explaining something he didn't think he should have to explain.
+
+“I've had a lot of time to think, Ry.” His voice was still calm. “About our {i/friendship}. About {i/us}.” I jerked: he'd rested his fist on the top of my shoe. “Why we ended up down here.”
+
+I was losing him, or had already lost him, but I didn't know how or why or what I could say to reverse it. “Yeah?”
+
+“Yeah,” he said, lifting the fist and letting it fall back on my sneaker. “I think maybe there was more going on than I really appreciated at the time. For. Example.” He punctuated each word with a harder bap on my foot. “We only found this place because of you. Remember? Because you found it, underneath your bed.”
+
+“Okay,” I said, “but---”
+
+[“And {i/that} only happened,” he said, hitting my foot harder, “because we were both living in that house. And why was I in that house, friend? Why did I end up moving in?”
+
+“You just said it. We were friends.” But something ugly was burrowing up. I shoved it down. “I mean maybe it's my fault you were there, sure, but I didn't mean to… I mean I couldn't have known… you needed a room, and so---”
+
+“I needed a room, and you wanted to help me out. Is that it?” This time he punched my foot, hard: it ached through the shoe. “Why me, Ryan? {i/Why. Specifically. Me.}”
+
+“We were friends,” I said again, like a mantra that could save us. I was cringing back, eyes clenched shut behind the blindfold.
+
+“That's not it,” he said, but then |He shushed me, and] I sensed him stiffen, twist his head away. He switched on the flashlight and dim light filtered through the blindfold. He seemed to be pointing it down the hallway, back the way we had come.
+
+“What is it?”
+
+“Shut up. Did you hear anything?”
+
+I shook my head, [vague] distant relief mingling with fresher fear. “No.”
+
+Silence. It seemed to expand in my head, like those disposable earplugs, eating up all the empty space.
+
+Finally he turned back toward me. “I think something's following us.”
+
+Some{i/thing}. Not someone. Oh. “Like what?”
+
+“You know about the other versions of us down here.” He snickered. “More than you'd like to. The doubles, and their doubles from the other houses, and so on. They're us, more or less exactly. Which is why we get that sick feeling when they're close. And because they're us exactly, it makes them easy to take out. Don't have to learn their weaknesses, because fuck, you already know them.” He paused for a moment. “But there's... other ones.”
+
+I wasn't sure I wanted to prod, but found myself doing it anyway. “Other ones?”
+
+He shook his head. “Ever see someone watching you down here? Like at the edge of your light?”
+
+“No,” I said, hair rising. “I mean... I don't think so.”
+
+“If you get closer, you can see they look like us, too. Always a Niko or an Orion. On the outside, anyway.” The pattern of light shifted as he swung it down each of the other hallways, then back to the first again. “When you get close to a double of yourself, you can feel it. Right? Feels wrong, somehow. Bad. Something to do with the synchronicity, I think, the risk. If the two of you see each other get out of sync, if you understand you’ve broken it… bad news, and your body senses it. That danger.
+
+“But. These other things. You get close to one of them, even if it looks like you, you don't feel anything at all. And that somehow makes it so much worse.” He spat. “Because it means the {double things} aren't human. They look like us, but they're not, not really. They're something else.”
+
+
+[DEFINE 15>@lookieloos|8>@huskmen|3>@husks|7>@ringers|7>@dittomen|6>@mimeos|6>@mimickers|6>@shamfriends|5>@mockups|5>@mockeries|5>@caricatures|4>@alterboys|6>@semblances|6>@creepermen|3>@inchmen|4>@shapes|2>@lingerers|1>@lingermen|1>@likenesses]
+[MACRO double things][@singular05>Entities|{dtactual}]
+[MACRO dtactual][@lookieloos>Lookie-Loos|@huskmen>Husk-Men|@husks>Husks|@ringers>Ringers|@dittomen>Ditto-Men|@mimeos>Mimeos|@mimickers>Mimickers|@shamfriends>Sham-Friends|@mockups>Mockups|@mockeries>Mockeries|@caricatures>Caricatures|@alterboys>Alter-Boys|@semblances>Semblances|@creepermen>Creeper-Men|@inchmen>Inch-Men|@shapes>Shapes|@lingerers>Lingerers|@lingermen>Linger-Men|@likenesses>Likenesses]
+# Runner-ups: Dupe-Things, Glommers, Gawkers, Vestiges, Mimeo-Men, Reprints, Run-Offs, Terricatures, Malingerites
+
+“You named them the fucking {double things}?” I was horrified. “Thanks. Not creepy at all.”
+
+He laughed a genuine laugh, then cut it short, like he was upset with himself. Like I was pulling something over on him. “They {i/are} creepy, dumbshit. They just stand there. They don't usually come too close, but if you walk up to them, they don't move away. They don't move at all. They watch you.” He sniffed. “I mean they move their eyes, you know. To track you. Their heads. They breathe.” He unscrewed the water bottle and took a swig. “But they don't respond to anything you do. {i/Anything.}”
+
+He paused, as if to let that sink in. Or as if remembering something.
+
+“And if you walk off,” he continued, “they'll follow you. At a distance. But if you stay in one place for too long, sometimes. Sometimes. They kind of creep up on you. Slow. Edge a tiny bit forward every now and then. Like they're eager, but also real, real patient. I woke up one time and two of them, two Nikos, were bent over me. Standing there for fuck knows how long while I slept. Staring. Mona Lisa smiles.”
+
+He shrugged. “If you sprint for a while, take some twists and turns, you can shake them. Creepy, yeah, but not a problem.”
+
+{i/Oh well that's fine then.} “What are they?”
+
+“No idea.” He laughed that hollow bark-laugh again. “Maybe echoes, or waves, or something. Waves and particles. Superimpositions. This whole place, Downstairs, it's like some kind of huge multiplier. You've figured that out, right? At least that much? It multiplies. Dimensions, people. Rooms. Ideas. Emotions. Some kind of chain reaction that got started somehow, sometime. There's a spring down here,” and he was almost chanting now, murmuring, his voice gone strange, “clear waters at the source. Deep. All the water comes from there. Very, very deep. It splits, and splits, and splits again, and keeps splitting. Thousands of times. Millions. And each stream is as big as the one it's splitting from, and they shouldn't all fit but they do, and it's wrong, it can't fit in your head, it's too big {i/it's too big...}”
+
+He seemed to catch himself, stiffened.
+
+“But the {double things},” he said, in control again. “They do it too, sometimes. There'll be two of them, moving almost in sync. Or four. I think if two bump into each other, they sort of stick together, cluster up. And if those two meet others, they all join up, like a fucking molecule. Snarled in bigger and bigger tangles.” He was watching me now, I guessed; I got the sense he was smirking, enjoying the effect the story was having on me. [75>“One time I had to walk through a whole room full of them. All just standing there, packed shoulder to shoulder as I shoved my way through. They weren't doing anything. Just looking. Looking at me.”]
+
+I turned my head nervously in the direction of the hallway I couldn't see. “And you think there's one back there now?”
+
+“Oh, I know there is,” he said. “It's standing right there, watching you.”
+
+I jolted back, lost my balance, and topped over, kicking back with my feet and scrambling to right myself. My skin was crawling and all I wanted was to get farther away, except I couldn't see it, couldn't see anything, and {i/what if a second one is coming up behind me---}
+
+But Niko was laughing now, [big belly laughs,] and it slowly dawned on me through my terror what that probably meant. 
+
+“You fucking pussy.” He climbed to his feet, grunting. “Dumb of me. If you'd wet your pants I'd have to smell it the rest of the way.”
+
+I awkwardly struggled upright, stood, furious. He made no move to help.
+
+But I knew him too well. He might have been bluffing at the end, but only to cover for being legitimately scared. He {i/had} heard something down the hall, or thought he had. And he hadn't been teasing when he'd started talking.
+
+At least some of that had been true.
+
+He tugged on the rope around my neck. “Storytime's over, bitch. Get moving.”
+
+{section_break}
+
+Walking blind into the unknown isn't fun, and gets worse when you're freshly terrified of it. I kept expecting now to walk into a body, someone standing in my way, fleshy and warm and inhuman. Staring. But I didn't. To my captor's credit, he never let me walk into a wall (or a pit), although he was sometimes rough with jerks to the rope around my neck to correct me. 
+
+But I was reaching the limits of my endurance. My collapse by the nightlight felt like eons ago, and maybe I'd only slept for an hour or two there, anyway. Waves of emotion had washed through me since then, each one leaving its own high-water mark. I stumbled even over level ground. I was barely awake.
+
+Niko finally noticed, and agreed we could stop for “a sleep.” He let me lie down, but kept my head covered and hands tied. It was better than nothing.
+
+It's a testament to the depth of my exhaustion that I fell asleep within moments. This time, I didn't dream.
+
+I blinked awake some time later, not quite sure what had woken me. Niko breathed quietly, a few feet away. I got the sense he was sitting up against the wall, legs folded up, and I was lying at his feet in the center of the hall. It was dark. He must have turned the flashlight off, not that I'd be able to see much anyway with a t-shirt tied around my face.
+
+I wondered if I could, very slowly and quietly, wriggle away. Like a worm out of a tackle box.
+
+He reached out and nudged me with his foot. “Don't even think about it, bitch.” But the nudge was gentle, and his voice tired.
+
+We stayed there for a long moment, listening to each other breathe.
+
+Finally, he exhaled, loud, frustrated. “You think I want this?” He sounded desperate. Near tears. “I don't. Any of it. Scaring you like this. I'm not a monster, man, I don't get off on it. I'm doing what I have to. You don't get that, I know, but you haven't been down here long enough. Nowhere near long enough.”
+
+I stayed quiet, afraid to say something that might make him angry again.
+
+He sighed. “I don't always kill you, either. Or at least not right away. Sometimes, first. For old times’ sake, you know. I fuck you.”
+
+The word {i/fuck} stung me.
+
+He leaned forward, holding his head a foot above mine. His breath tickled the fabric at my ear. “You do remember, don't you? The time we did it?” He sounded concerned. “That night, after I tried to kill myself?”
+
+Sometimes when a person is stung their body overreacts. They swell up, maybe so much their eyes are forced shut. It's called anaphylaxis. Unprotected, in the Greek. But the point is it's not the sting that's doing it to you, not really. It's your own body, blinding you and destroying itself in a misguided attempt to keep you safe.
+
+“[Yes|No],” I whispered.
+
+“That was maybe the closest I ever felt to anyone.” His voice was calm, bland, like recounting a decent lunch he'd had. “I loved you so much. Not in that way, you know. Not the way you wanted me to. But I figured what the fuck. You saved me. No, not just that.” His finger brushed my cheek through the fabric and I flinched. “You {i/needed} me. I was {i/everything} to you. That felt so fucking good.”
+
+I was trying to stay motionless. I remembered a safety video they'd made us watch at Yellowstone. {i/If you're on the ground and a bear attacks you, curl into a ball and play dead. Don't fight back. The bear will win.}
+
+#“I tried to escape you so many times,” I said. “But you wouldn't let me go.”
+
+I couldn't open my eyes, couldn't breathe. Maybe it was the anaphylaxis. Something somewhere was terrifying. Doppelgangers lurking in basement hallways. A camper in a tent, terrified by his own snores.
+
+{i/The bear will win.}
+
+His hand moved over the shirt wrapped around my head, not quite touching it, not quite pulling away. “I want to get that feeling back sometimes, you know? It's so fucking lonely here. You can't blame me.” He laughed, so loud and close to my face I cringed. “I mean. Don't get me wrong. I'd prefer a girl but there aren't any down here. Just us. Only us.”
+
+His fingers outlined my face. “Anyway. Doesn't work. Never works. Never the same with you.” He breathed out through his nostrils and it tickled the fabric by my cheek. “I can't trust you. Any of these versions of you. Ry, Ryan, Orion. You seem different but you're all the same. Everything you ever said or did after that. Was bullshit. None of you gave a shit about me, did you? What I needed. Who I was. You just wanted it to happen again. 
+
+“And the next time I tried to off myself, that's the only reason you stopped me, isn't it?” He rapped his knuckles on my forehead, through the shirt. “Isn't it, bitch.”
+
+“No.” It was so soft, I'm not even sure he heard me.
+
+I could feel him shrug. “Anyway, that's why I kill you, after. Case you were wondering.”
+
+He sat back up, wincing. “But sorry, man, not tonight. Got a headache.” He stood, kicked me in the side. “Come on. Better keep moving. We're close. I can feel it.”
+
+
+
+
+

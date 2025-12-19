@@ -1,0 +1,20 @@
+# QUANT
+
+{start_colophon/ABOUT THE AUTHOR}
+
+Aaron A. Reed is a writer and game designer focused on exploring new ways for authors and readers to tell stories together. His award-winning games have been featured at IndieCade, South by Southwest, Slamdance, GaymerX, and the Independent Games Festival, and he has spoken about digital storytelling at Google, PAX and PAX East, WorldCon, NarraScope, and the Game Developer Conference. He holds a PhD in Computer Science and a MFA in Digital Arts and New Media, and aims to continue abusing them both in interesting ways.
+
+This is, by some definitions, his first novel. Or maybe that was {i/Blue Lacuna}. Or {i/Hollywood Visionary}. Or {i/The Ice-Bound Concordance}. It's hard to say.
+
+Aaron lives with his totally real boyfriend in Alameda, California, in a house without a basement.
+
+{vspace/2}
+
+{b/Reviews wanted!} Please share your reaction to {i/Subcutanean} on Goodreads or anywhere else readers congregate. Your voice is a huge part of helping an indie book like this succeed. {b/Thank you!}
+
+{vspace/2}
+
+{url/aaronareed.net}
+
+{finish_colophon}
+

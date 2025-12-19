@@ -1,0 +1,457 @@
+# QUANT
+
+
+{chapter/16}
+
+
+
+
+[Hunger woke me, finally rising to the top of my list of needs.|I woke up from a dreamless sleep to face the unpleasant truth that we couldn't stay here forever.]
+
+[@fftubeweird>Getting back on top of the cylinder had been a problem of broken physics. We couldn't just climb back up, because there was nothing heavy enough to grip. Maybe a master climber could have started from the bottom of a giant tube of carpet and made his way to the top, but even for Niko climbing had only ever been a fleeting hobby.
+
+I'd managed to pull myself up to the top of the rope on the last of my shredded muscles and shove my arms into the gap between the bed and the floor, dangling by my armpits. Niko, farther up, worked out a plan. I wasn't too coherent, but I gather he'd {tube parkour bit}
+
+{getting to top of weird tube}|@fftube>Getting back on top of the cylinder had been like navigating an especially surreal and challenging climbing gym. From his perch on the bookshelf, Niko had {tube parkour bit} From there he could pull me up; all I had to do with my shredded muscles was keep hanging on, although that was hard enough. Once we'd made it,|@ffset>With Niko's help I'd made it back to the top of the suspended bedroom set, as exhausted as I'd ever been.]
+I thought nothing in the world had ever felt so good as lying on my back on a floor, every muscle gloriously unclenched.
+[@ffset>|{pp}]Wedged in between two dressers, so as not to roll off the edge, we slept. [@gayniko>His idea.]
+
+[MACRO tube parkour bit][~scoped out a route from one piece of furniture to the next, and then, in what would have been the most viral parkour video ever if YouTube had been invented yet, leapt from one to the other{tpb weird}, till gasping, he scrabbled up to the top of the tube.]
+[MACRO tpb weird][@fftubeweird>, pushing off each one as his weight lifted it off the ground]
+[MACRO getting to top of weird tube][@ffchandelier>From there it was simply a matter of detaching the chandelier net from its anchor point at the base of the hallway floating above us.
+
+I never would have thought of this. But Niko figured all those glass baubles together ought to weigh more than we did. That the chandelier-web, part of the Confusion, should follow its own gravitational rules, not the ones that dragged us downwards. Like a cloth thrown over a crystal ball, the detached net would wrap around the curvature of the bedroom tube, with both of us inside but not heavy enough to pull it free. We'd be able to crawl back around to the top, ants between the cloth and the glass.
+
+It worked. There must have been some complicated gymnastics up there, and I'm fuzzy on how he got the net loose---maybe he had his own serrated knife---but it worked. Back on top, the net of glass now a glittering ceiling over the bedroom furniture like the world's most fabulous couch fort,|From there it was simply a matter of making an anchor of a stack of fallen books, and flinging it around the tube to make a circular guide rope.
+
+I had to rest for a while before I felt confident enough to make the climb around. But it was only thirty feet, and only a small part of that vertical. Before I could overthink it I'd done it and was back on top.] 
+
+When we woke we ate power bars from Niko's pack: my own had gotten lost somewhere in the fight, probably [@ffset>kicked off|sliding off the curve] and down into the darkness below. I had no idea where to go from here[@ffset>{set escape}|{tube escape}]
+[MACRO tube escape][~---although it seemed like there were only two options, one way down the tube or the other---but Niko had found a better option while he'd been scrambling around up top. Directly {trapdoor under what}, {trapdoor description}
+
+]
+[MACRO trapdoor under what][@ffchandelier>under the invisible anchor point of the densest part of the web, the chandelier itself|at the foot of the bookshelf, whose fractal overspill had all collapsed and fallen into darkness]
+[MACRO trapdoor description][~was a trapdoor. It opened downward with a creak when you pushed on it, releasing fold-up stairs like the ones that sometimes climb into attics. The stairs descended some fifteen feet to a cement floor bisecting the cylinder. Its upper half was a domed tunnel, vanishing into the distance in either direction. Bare bulbs hung from the roof every fifty feet or so, leaking dim puddles of yellow-orange glow. Water ran down the center in a foot-deep trench, fast enough to gurgle.]
+
+[MACRO set escape][@ffdropoff>, but Niko had noticed something while scrambling around up top. One of the guy-wires sloping down into darkness had loops of rope tied to it every couple of feet, sized just right to be handholds. You could swing from one to the other, like monkey bars, working your way along and underneath. Unlike the guy-wires themselves which were coated in ages of grime, the loops of rope were clean. They looked like recent additions.
+
+A night's rest had knitted our muscles back together enough to make the traversal merely painful rather than fatal. Grunting and moaning like old men, we swung away from the set into darkness, hand over hand.
+
+Before long our headlamps picked out a looming shape ahead: a huge concrete tube snaking horizontal through the blackness and cutting across our path on a diagonal. The wire ran just above it, so when we reached it we could simply step down onto its curving top side to shake out our weary arms.
+
+Exactly underneath where the cable's path crossed the tube {trapdoor description}
+
+Niko thought we should head upstream, follow the water toward its source. Too worn down to argue, I agreed.|@ffthewalls>, but Elder Niko's plan still seemed sound: get across to a hallway on the other side. On the opposite wall of pink foam from the one we'd entered from, what seemed like ages ago, only one open hall was in reach of our floating set. It took some careful grapple work with our tired muscles, but in the end we managed to traverse over to the hallway, relieved to be standing on solid ground once again.
+
+This hallway had a floor of concrete, and was wider. A trench of water ran down its center, spilling out into the canyon behind us and cascading down.] We kept to the level ground on either side of the trench, and started trudging.
+
+We moved slowly. Niko had cleaned up the cut in my lower leg as best he could, [@gayniko>surprisingly tender,] bandaging it with some socks from a dresser drawer and a tight-wrapped bungee cord from his pack. But it hurt, a lot. I hobbled more than walked, had to stop for frequent breaks, or lean on him for support. He helped me without comment, when I needed it.
+
+I couldn't help notice, up close to him like that, that he seemed to have all his fingers.
+
+Unsaid things festered between us.
+
+The tunnel had no perceptible slope, but the water in the trench ran fast, rushing eagerly past us. [@ffdropoff>The path curved gently left, then gently right.|The path stayed straight at first but then began to curve gently leftward.] We walked for what felt like a long time.
+
+[@ffset>{maybe back inside set bit}|{back inside bit}]
+[MACRO maybe back inside set bit][@ffdropoff>{back inside bit}]
+[MACRO back inside bit][~Gradually, the perfect curve of the ceiling began to straighten. The roof above flattened, the curves at its edge sharpening, until they squared off entirely. At the same time the tunnel gradually shrunk back to house-sized dimensions. Presently we were walking down a rectangular hall of concrete, like some forgotten subbasement in a shuttered factory. {dropoff addendum}]
+[MACRO dropoff addendum][@ffdropoff>It felt like we were back “inside” again. The sensation of walking through a pipe suspended over empty space receded, and we felt once again embedded in earth.]
+
+There were no side doors, no [@ffset>junctions, no rooms|other stairs up]. There were no decisions to make. We just walked. Other than an occasional grunt or word of coordination, we didn't speak. [@gayniko>I sometimes saw him looking at me, out of the corner of my eye, but I couldn’t look back.] A small part of me wanted to ask a million questions. Another part didn't want the answers. There was a tautness between us, a strain, like a handshake stripped down to bone and gristle, rubbing, raw. [I realized maybe it|It] had been there a long time, underneath everything we'd [each] wrapped around it.
+
+Mostly we were just too tired for talking.
+
+Up ahead, the [@ffset>hallway|tunnel] [@originalniko>ended in a cramped|opened into a larger] room. After a few more minutes of trudging we reached it.
+
+It was a [@originalniko>squat and] vaulted brick antechamber, maybe [@originalniko>twelve|thirty] feet across and hexagonal, with tunnels coming in from all six sides. Each seemed identical to the one we'd entered from. Water flooded the sunken floor of the chamber and ran out the trenches in the middle of each tunnel. 
+
+In the center of the room, under the water, was a stubby concrete pillar topped by a metal hatchway with a wheel, like something you'd see on a submarine.
+
+I knew before checking that the hatch would have a keyhole.
+
+Once we confirmed it did, we became strangely hesitant, our momentum lost. We perched on the lip of a tunnel, dangling our feet in the water, using the excuse that we needed a rest.
+
+There was so much I should be asking him, so much I should be saying, but I couldn't find a way to start.
+
+Well. I had pretended nothing was wrong for such a long time. Maybe another few minutes wouldn't hurt.
+
+{section_break}
+
+The rippling sounds of the water were peaceful, and I didn't want to break the silence. But someone had to.
+
+“So.” The sound [@originalniko>bounced|echoed] off vaulted brick[@originalniko>, making the chamber even more claustrophobic]. I coughed. “We've come all this way. We going through, or what?”
+
+[@gayniko>The words seemed to shake him out of a daze, and he perked up, flashing a huge grin. “Hell yeah! Let's do it. Let’s go home.”|He seemed curiously reluctant, but managed a weak smile. “Sure! Yeah. Let's do it.”]
+
+We waded over to the hatchway. The wheel was inches under the surface of the water. I pulled the key from my pocket and slipped it into the lock, and it went in smoothly. I spun it through a full turn till it made a tiny {i/chunk}, then turned the wheel. After a few revolutions, something gave, and we found we could swing the circular hatch open along one hinged side.
+
+We held our glowsticks underwater near the opening. The hatch opened into an ordinary-looking but flooded room beneath us with a yellow-tiled floor. Chrome and porcelain rippled up at us. We realized after a moment it was a flooded bathroom.
+
+[“If this portal thing leads through a toilet,” Niko said, “I'm out.”
+
+We could only assume the way through was somewhere out of sight, around a corner or down an unseen hall. But how far?
+]
+
+“The other guys are probably doing the same thing on their side,” [@originalniko>I|Niko] said hopefully. “Maybe we'll swim through at exactly the same time, go past each other.”
+
+[@originalniko>“Huh.” I looked over; he was staring uneasily into the flooded opening. He caught me looking and forced a smile. “Why not, right? Makes as much sense as anything else.” But his gaze slipped off me and up to the vaulted ceiling, like he was interested in the architecture. He wasn't.
+
+He was worried about something. 
+
+I turned away, ignoring the upwelling of unease, and frowned at the hatch. There was something familiar inside it. |“You really think we're still in sync? After everything that's happened? Our doubles defeated their own evil Niko with exactly the same strategy and ended up here at precisely the same time as us?”
+
+He shrugged. “Might as well believe that. Because if we don't, and, uh, there's no way back… that would kind of suck.”
+
+“We don't even know if this goes anywhere,” I said. “For all we know, there's a mile of flooded tunnel down there before it mirrors back to our world, if it ever does. You know what would suck more? Drowning.”
+
+“No, look,” he said with a grin, thrusting his light deeper into the circular opening. “There's a guide rope.”
+
+]I squinted, trying to make the wavering underwater shapes resolve. Tied to something just under the hatchway was a climbing rope, the same kind we'd used with our {Grapples}. It stretched down in a taut line out of sight, towards the hidden wall of the room beneath us.
+
+[MACRO wait][I don’t know. Shit.|Wait.]
+Niko[@originalniko>'d seen it too and] reached into the hatch to give it a tug; it seemed taut. [@originalniko>“Thirty-five meter rope,” he said. “Looks like someone marked the way through.”
+
+“Our doubles?”
+
+He shrugged. “Sure.”
+
+“And this goes through to another hatch like this one, you think? One that opens up onto our original side?”
+
+He nodded, still not looking at me. “What my evil twin was looking for. The way back through. And if we're lucky, our doubles will be waiting on the other side. Just like this. Getting ready to swap places, swim through. Get everyone back where they belong, all neat and tidy.”
+
+“And, uh. You know this how?” I swallowed. Here was the discussion I'd been too afraid to start, happening anyway.
+
+He tensed, frowning at his submerged shoes. “I don't {i/know} it. But we might as well believe it, because if they're not there, and there's no more synchronicity between us at all any more? Then who the fuck knows where this rope leads.” He shook his head. “No. They're over there. We have to believe that. They're having this same discussion, right now.”
+
+“{i/They.}”
+
+My voice broke and he looked up startled, guilty, afraid. Like a texting jaywalker realizing too late he's wandered into traffic.
+
+“Niko,” I said, trembling. “Are you sure you're... I mean, when we got separated...”
+
+{rumblefirst} We both dropped half into a crouch, but the earthquake stopped, the low rumbles far beneath us faded. The water we stood in sloshed drunkenly.
+
+“What the shit was that?” I breathed.
+
+“I don't know.” He nodded, coming to a decision. “But we'd better hurry this up. So. You should go first.”
+
+“Excuse me?” I blinked.
+
+“You're the better swimmer.” He was talking fast, shooting uneasy glances at the walls around us. “If there's anything unexpected or it's too far or whatever, you can come on back. But if you make it through safe, tug the rope a couple times and I'll follow.”
+
+“I thought we'd go together.”|“Thirty-five meter rope,” he said. “And the end's cut off, so it's got to be shorter than that. Looks like someone marked the way through.” He pulled off his shirt and started emptying his pockets.
+
+“What are you doing?” I asked, unsettled.
+
+“No time like the present,” he said. “Might as well get it over with. Come on in, the water's fine.”
+
+] Something was wrong again. The dark circle of the submerged porthole was ominous. Unknown. This was happening way too fast. [@originalniko>“I don't want to go alone.”
+
+“It's the only way.” He gazed at me, fierce. “Orion, just trust me, okay? This will all work out, but you need to trust me right now. Can you do that?”
+
+{trust intro}
+
+“No.” I shook my head, mind racing. {bike bit}|“{wait} What if something happens down there? What if one of us gets stuck, or needs help? We could fucking {i/drown}.” My mind was racing. {bike bit}
+
+“Let's just do it,” Niko said brightly. “I mean, the sooner we go through, the sooner we'll be home.”
+
+“How did you even know this was here?” My throat tightened. His eyes widened.] “No. I can't do this again. Why won't any of you be honest with me? Stop it. I know. {i/I know.}[@originalniko>| You're not... you're not really...]”
+
+[MACRO bike bit][~It felt like riding a bike that kept slipping gears, nothing quite fitting together, accelerating down a hill with less and less control, no way to stop.]
+[@originalniko>{JUMP originalNikoFinale}]
+
+{rumblefirst} [@originalniko>{pp} |And just as this happened Niko reached up, eyes wide, and touched two fingers to my lips. Made a zipping motion across them. I was shocked into silence by it all: the sound, the absurdity of the gesture, his fingers on my lips. The fear on his face.
+
+“Don't,” he said, quiet. “Please.”
+
+We both took a breath.]
+
+“You have to trust me, Orion. Everything will work out[@gayniko> for us]. Everything. But you have to {i/trust me}, now, here, about this if nothing else.”
+
+The rumbling receded. The water smoothed out.
+
+He took another breath[@gayniko>, seemed to notice his fingers were still touching my lips, pulled them back. Stared at them.
+
+And as his eyes flicked back to mine I saw something there I’d never seen, no matter how much I’d wanted to. Something hot and desperate, yearning, vulnerable. Something that rippled in the space between us, flickered and grew, a mass, almost a shape.|@firmniko>, dropped his arms to his sides. Fixed me with a look.
+
+“You have to go back,” he said.]
+
+And I understood.
+
+{evidence}
+
+How easily he’d found the [@ffset>right route|trapdoor], led us straight here to the way back through. How sure he was about what I’d find on the other side.
+
+[@gayniko>And the way he’d fought for me. The way he’d been looking at me.]
+
+He wasn’t my Niko.
+
+The ground groaned again beneath us, more dangerous this time. A brick fell from somewhere above, made a splash loud enough to make us both flinch. But we didn’t break eye contact.
+
+“Don’t say it,” he breathed.
+
+{synchronicity bit}
+
+[@gayniko>Somehow we were closer than we’d been a moment before. The curves of his jaw, his cheek, were aches inside me, blood-memorized, bone-familiar.]
+
+The air around us held its breath. Where the water touched my knees, it thrummed.
+
+[MACRO ch16possiblebit][@possibles>The possible|What]
+[@gayniko>His lips were too close to mine. It would be so easy. It would last forever, like dying winter sunlight slanting into a room through melting icicles, lighting it up, setting fire to the neurons that had always struggled to keep truths and fictions apart and burning them away forever, every universe fading away like stage lights until the spotlight of that kiss would be the only thing left. {ch16possiblebit} I’d always wanted made real, at last.
+
+“I want to,” I breathed.
+
+“Then do it.” The need in his eyes was almost too bright to bear.
+
+I shook my head. “Not that. I want to trust you.”
+
+He blinked. “Then do that.” But I pulled back, biting my lip, and his brow creased with worry. “Can’t you?”
+
+{trust intro} Trust. What a beautiful, fucked-up, irrational concept.
+
+He kept his gaze locked on mine.
+
+{really see him} {notshadows}
+
+“I’m going through.” I took a deep breath. “But it’s not because I trust you.” He looked alarmed but I raised a hand. “It’s okay. Let me finish. {trustspeech} But Niko, you can’t come with me.” Tears sprung like pinpricks to my eyes, but I blinked them back, fierce. “You {i/can’t come with me}.”
+
+“Bullshit,” he said, stepping forward, even though I could see he knew I was right, see it in how his faced creased with pain. “I belong with you. Your double, on the other side...” An ominous crack sounded from somewhere above us, but he pressed on. “He doesn’t feel the same way about me. I don’t {i/belong} with him.” 
+
+{rumble1}
+
+“Niko, stop,” I said, afraid to look away, to even glance at the walls around us, as if they could read the truth in our eyes. “You can’t come through. You know why you can’t.”
+
+|@firmniko>“No,” I said. “I'm not leaving you.”
+
+“You can't stay here,” he said, shaking his head. “You know why you can't.”
+]
+
+“I can live with pain,” [@gayniko>he|I] said, [@gayniko>reaching out for me; but I must have looked shocked, because his expression changed to placating alarm.|stepping toward him; but he recoiled, and I couldn't bear to see him do that, wanted more than anything to make him understand:] “No, it’s okay. [They’re just headaches.] The pain doesn't matter. It’d be worth it. You’re worth it.”
+
+“I’m not.” [@gayniko>I shook my head, angry, never more certain of anything.|He shook his head, folding his arms to stop his hands from shaking.] “You think I could live with myself, putting you through pain like that each day?”
+
+“Everything will be all right,” [@gayniko>he|I] pleaded[@gayniko>, ignoring me]. “It’ll be fine, it’ll all be fine, just let me [@gayniko>come through|stay here with you]. Let me try. {i/Let me try.}”
+
+[@gayniko>And I couldn’t bear to see that need in his face, reflected back at last after all this time, and wondered if he’d seen it too, how sad and jagged and pathetic and painful it was, and how the way I’d hidden it for so long had only made it more of all those things, and I couldn’t stand hurting him anymore, and then the words came that we should have said to each other long before, not that any words could fill the gaps inside us but these were the ones I had and they were better than nothing, so I said them: “I’m not the only one who can love you.”
+
+He stopped dead, face draining of color. 
+
+{rumblepause}
+
+I took a long, ragged breath and realized what I'd said was true. And not just for him.
+
+He broke our gaze. His eyes fell to the water beneath us like he’d dropped something, watched resigned as it sunk away for good, no longer trying to save it.
+
+“Guess, from your perspective,” he said carefully, “that should have been my line.”
+
+“Yeah, well.” I waved my hand at the architecture around us. “Life’s got a funny way of fucking everything up.”
+
+|@firmniko>
+
+A sharp crack sounded from the wall behind him, but I refused to look away from his eyes, even though all I saw reflected there was my own pain, bitter and jagged. 
+
+“And when your double swims through,” he said, lips tight. “The one who belongs on this side. What'll we do with him? Will we kill him, too?”
+
+“Yes,” I said.
+
+{rumble1} I felt a rush of power. I felt filled with potency. Charged. I could bring this whole place down if I wanted. I could change everything.
+
+“Orion,” Niko shouted over the noise, staggering on the unsteady ground. “Stop this. You don't belong here. {i/You have to go back.}”
+
+“There's nothing for me there.” But the momentary flicker of power drained away as I realized I couldn't convince him, could change the architecture as much as I wanted but could never change him, could never accomplish anything from trying but killing us both. I kept my eyes locked on his, refused to blink, {firmnikobit}. “I belong with you,” I cried, “here. I can't go back there. I'd be alone. Don't leave me alone.”
+
+He froze, face draining of color, and as he did the noise stopped too. The rumbles, the distant groans and tremors, were gone. The quiet thrummed in our ears. I didn't understand.
+
+And then I remembered.
+
+Synchronicity.
+
+{i/Don't leave me alone.} It was what he'd said to me, the night of his accident. His mistake. After I'd stopped him from making it. Before the one we made together and had never made right.
+
+{rumblepause}
+
+I took a long, ragged breath. And letting it out I knew the words it should make, the ones we should have said to each other, then and now and so many other times, words that might have brought us closer together instead of the shit we'd sown by leaving them unsaid, by each being too afraid to say them, by denying what had happened and who it had been for and why it had only happened then; and it wasn't that any words could fill the gaps inside us but these were better than nothing, so I said them:
+
+“I love you, Niko.”
+
+It seemed impossible that I'd never said it before.
+
+He let out his breath and looked down, unable to meet my eyes. Clenched his fists. “I love you too. But you can't stay here.”
+
+“I know,” I whispered, and closed my eyes.
+
+He wasn't my Niko, but of course none of them were, had been, could ever be. The Nikos down here, the Nikos in my head; the ones I'd saved, damned, slept with; the ones who needed me, who hated me, who wanted me dead. {notshadows}
+
+“I know,” I said again, “I'll do it. I'll go back. I'll swim through. But not because I trust you.” He looked up, alarmed, but I raised a hand. “{trustspeech}”
+
+I didn't believe it, not really. But saying the words was a good start.
+
+“Sorry I fucked everything up,” I added.
+
+“Yeah, bit late for that.” He waved a hand. “Whatever. Tsunami under the bridge. Apology accepted, I mean.”
+
+]
+
+He laughed, sudden and loud, and even if things weren’t right, even if the edge between us was jagged and always would be, it was good to hear that laugh again.
+
+We breathed. It was settled.
+
+“So,” he said. “You’ll swim through. Pass your other.” He swallowed; I nodded. {i/Just my other. Not his.} “And then we’ll each be where we should be.” [@gayniko>His face hardened into a mask as he said this, grim and colorless. Then he looked at me, the corner of his mouth twisting in pain but also a challenge, flinging some of the pain back: “You’ll be fine without me, I guess. Yeah?”
+
+It did hurt, like he knew it would. Well. At least we were saying truths to each other. Not quite the same as trust, but a good start.|I noticed he didn't say “where we belong” and silently thanked him for that. Belonging was just another kind of longing, I thought, equally stupid to yearn for, to think you could only get from somebody else.]
+
+I stripped down to my jeans, self-conscious, but Niko was spinning a theory about the identical set of clothes I'd find on the other side. If alter-me was swimming through too, he should have had this same thought, and we'd both have dry shirts and shoes waiting, and wasn't that cool?
+
+I wasn't really processing this, still overwhelmed. Trust. Pairs of universes, pulling apart. Drowning, death. Dry clothes seemed like insubstantial details. I tied the glow stick to my belt loop, emptied my pockets of everything non-essential.
+
+“Oh hey,” he said as I did this, affecting it as a casual afterthought, “I want you to take something through for me.” He pulled a plastic bag from his pocket, folded-up pages with something written on them inside. “Hold onto it for a while, okay? Just till you get back through.”
+
+“Sure.” I took the bag. “I suppose I shouldn't read it until---?” A faint judder rippled through the ground; for an instant the water danced in interference patterns.
+
+He looked pained. “Please, please don't.” Glancing around, he took a deep breath. “Okay. You ready?”
+
+I wasn't, so {final hug}
+
+“Are you going to be okay?” he asked[@gayniko>, without spite this time].
+
+I didn't know how to answer, because despite these tidy revelations, the thought of never seeing him again still stabbed at something deep inside me, and maybe always would; and the idea that anyone in this or any world would ever know me as well as he did seemed impossible. But I nodded. Eventually, maybe, it would be true.
+
+“How about you?” 
+
+He grinned. “I don't plan to spend a couple decades sulking down here like that asshole, if that's what you mean.” He looked up at the arched roof above us, scanning the bricks like there might be constellations in them. “I’ve never known what I wanted, man. Just what everybody else wants me to want. I’m sorry I mixed you up in all that.” He shrugged. “Guess I should figure that out, yeah? Spend some time with myself. Maybe more solo camping, you know? Wandering in the wilderness. Worked for Jesus.”
+
+“Sure,” I said. “You see that wolf again up there, man... you fucking wreck it.”
+
+We grinned at each other, one last time, or maybe for the first time, depending on how you looked at it: and then {JUMP ch16goodbye}
+
+
+
+
+[LABEL originalNikoFinale]
+
+The ground trembled again, and Niko took a staggering step toward me, grabbing my arm. “Stop,” he gasped, “Ryan, stop. Don't say it.”
+
+“He showed me a finger,” I whispered.
+
+“Shut up,” he shouted. “Look. Here's what's going to happen. You and your double will swim through together, then me and mine after, and everything will be {i/fine}.”
+
+“But the other Niko,” I gasped, shaking my head, “he's---”
+
+{rumble1} I tripped and plunged into water up to my neck as the earth swayed, groaned like a buried titan coming back to life.
+
+Niko grabbed my arm and pulled me up, put his other on my shoulder, pulled me against him and shouted in my face: “Shut up! Shut up, you fucking idiot, stop talking, stop overthinking everything and just swim through the goddamned tunnel, just swim the fuck through, it's the only way you're going to---” And he cut himself off, biting his lip, his eyes filling up with tears.
+
+And then I got it.
+
+{synchronicity bit}
+
+He knew. He knew there was no other Niko to swim through. Not any more. 
+
+{rumblepause}
+
+He let go of me, took a step back, face reddening. “I just think,” he said quietly, miserable, “that you should go first, okay?”
+
+The walls around us crunched, coughed, like millions of brick bones having chiropractic work done.
+
+Maybe it was my imagination, but the room seemed smaller.
+
+And then something else hit me. Something so hard and huge I forgot how to breathe, and staggered back away from it.
+
+{i/I let you swim through first. Can't remember. Why.}
+
+Bricks cracked and popped around us, exploding like popcorn.
+
+{i/Couldn't find my way. Back up.}
+
+He was reaching for me but I tripped backwards, reflecting his concern with horror. {i/No. No, no, no.} As each brick popped others surged into the gaps they made. The walls were squeezing closer. The room was barely nine feet across, now. Water surged into the runnels leading out, cascading away in all directions like it, too, was terrified.
+
+“It's okay,” Niko was saying, smiling through the tears. But it wasn't. He hadn't been close enough to hear what his elder had been whispering. {i/He didn't know.} “If it doesn't work I'll just stay on this side, retrace our route. No biggie. Get back to the top and so what if there's some headaches[@shadows> and the shadows are weird]. I'll deal.”
+
+“No.” I shook my head. “This can't be what happens, it's not right, it's not fair, it can't end like this...” Something was slipping from my grasp. I tried to hold on to all the stories I'd told myself about Niko, about me; all the endings I'd wanted for us. {notshadows}
+
+“No,” I said again, but stronger this time, stepping forward into the shrinking space, barely the size of a closet now and still getting smaller, “No. This isn't how this ends.”
+
+And as the words bounced off the contracting brick that had nearly reached our heads, it held still. The rumbles and groans around us went dead. Everything paused. Everything held its breath.
+
+I looked at him and {really see him}
+
+None of them were here. The only one here was him.
+
+“You don't owe me anything,” I said, “but I owe you this. At least this.” My voice was hoarse at first but I willed more of my growing conviction into it. “Maybe you're right and going through together, coming face to face with it, would be bad. But maybe not. You think it's coincidence that every cockeyed theory we've had about this place has turned out right? I don't. If it's feeding off us, multiplying us, then we're the prime factor. The base case. You think that if we see the truth, we'll be destroyed. Well, fuck that. I reject it. I reject it with every ounce of my goddamn being.”
+
+I took a deep breath. “Maybe synchronicity matters, maybe it doesn't. I don't really give a shit. What I want is to get us both back home. Look, {trustspeech} And you are fucking coming with me, because I may be the reason you're down here but I swear to god I will also be the reason you get back out.”
+
+The words lingered in the air. We stayed suspended for a moment, unable to break eye contact, afraid, maybe, to look at anything but each other.
+
+A single brick tumbled from the ceiling and made a tremendous splash. We both started, then laughed, and couldn't stop laughing. We were buried alive and almost certainly going to die but goddamn, we were going to do it together.
+
+“Yeah.” He took a breath, then another. “Yeah, okay. We'll try it your way. You win. This time, dipshit.”
+
+It was decided. It felt good, and yet painful, too, as some pinprick of knowledge stabbed into me, saying even if we did survive, nothing would ever be the same between us. So without overthinking it {final hug}
+
+[LABEL ch16goodbye] I turned away, toward the submerged portal, the way out, the way home. I stared down at it.
+
+The thought of swimming into that hole without knowing the way to the other side stabbed a different part of me, the one concerned with oxygen and continued existence. I pushed the fear down but it kept manufacturing images for me: jeans snagging on hidden nails that held me back while I flailed uselessly; huge dead fish swimming the flooded halls with flaking gray skin, bulging eyes growing larger and larger as they closed on me. I imagined drowning. Breathing water instead of air. Spasms of lungs. Knowing you were about to die, only not soon enough. Not nearly soon enough.
+
+[@originalniko>Almost on autopilot I guided Niko through what to expect, through breathing exercises, stroke technique. Calming him down as much as myself. Preparing.
+
+We started to breathe, deeper and deeper. Priming our lungs with all the air we could.|I took a deep breath, then another. I tried to slow my heartbeat. I didn't look at Niko.
+
+Another breath. {i/Breathe.} Deeper and deeper.]
+
+I stared at the circular opening, visualized the motions I'd make. I tried to believe I could do this. I tried to push down the sliver of doubt lodged somewhere in my throat.
+
+Gripping the sides of the hatch, I paused. I wasn't ready. But if I waited any longer, I'd never be.
+
+[@originalniko>“Last one back to the right dimension buys the drinks,” I said,|“Later, skater,” I said, not looking back,] then took one last huge breath and dove headfirst into the hatch.
+
+
+
+
+[MACRO rumblefirst][~Somewhere far below us, something {i/groaned}, low, immense. The ground quivered, like a mountain turning over in its sleep, and the surface of the water pinched and jittered in sympathy.]
+[MACRO rumble1][~The ground dropped out from under us, like a plane hitting turbulence. Rumbles quivered in stone far below.]
+[MACRO rumblepause][~The surface of the water twitched, rippled. Waiting.
+]
+# Brickwork cracked around us like gunshots.
+
+[MACRO evidence][~The finger, lying cold on the carpet inches from my eye, the whorled texture of his fingerprints.
+
+{i/I’ll hunt that bitch down, and kill him. Again.}
+]
+
+[MACRO synchronicity bit][~Synchronicity.
+
+I felt like we were balanced on an impossibly heavy pivot, a mountain peak turned upside down. If we leaned too far in any direction...
+
+Two soap bubbles, pressed together, floating in a vast empty void. Trembling.]
+
+[MACRO firmnikobit][@dadphone>afraid if I did he'd be gone|@bradphone>afraid he'd be someone else if I did, another Niko, another Bradley]
+[MACRO notshadows][~Each of them were tales disguised as truths; worlds that I yearned to slip into like tailored gloves, sized just right; stories reassuring me that I finally understood what I deserved, good or bad, where I belonged and who I belonged to, and who belonged to me, where I didn’t have to be {notshadows dadbit} 
+
+But people don’t wrap up like that into nice little cages, contained. We weren't each others' stories. {nikoloveaddendum} We’d mistaken shadows for substance, all of us: chased them and failed, of course, to grab them, become shadows ourselves in failing.
+
+But we weren’t shadows. We were more than that. We deserved more.
+
+Something swayed inside me, as if I’d let go of one handhold and gripped another, shifting my weight even though I wasn't sure the new grip would hold. But by then I'd already done it, already committed. And it held. It didn’t let me fall.]
+[MACRO notshadows dadbit][@dadphone>alone in a dark bedroom any more with no one who loved me to tuck me in, too afraid to fall asleep.|@bradphone>afraid that I'd love the wrong person or the wrong person would love me.]
+
+[MACRO nikoloveaddendum][@gayniko>He wasn’t the Niko I wanted. None of them had been, even if this one thought maybe he could be, was as deluded as I’d been.|{nla2}]
+[MACRO nla2][@bradphone>I wasn't Bradley's and Niko wasn't mine and I wasn't his, no matter how much at times we'd wanted to be.|He couldn't be mine, and I couldn't be his.]
+
+[MACRO trust intro][~I wanted to laugh. {i/Trust?} Could we {i/trust} each other? The question unraveled into a million strands, tendrils stretching back through everything that had happened down here, and everything that had happened before that.]
+
+[MACRO trustspeech][~I don't deserve your trust, and maybe I don't know how to give it to anyone else. But if I have to start somewhere I should start with myself. And I think I can do this. I {i/trust} I can. Okay? I made Tiger Shark in swim club and I can hold my breath for three minutes and I can make it. I can make it through. I can.]
+
+[MACRO really see him][~I tried to see him. Really see him. I willed the layers of muck and confusion between us to pull back, to clear away and reveal someone, at last, who I could understand. The Niko who forgave me. The Niko I’d hurt. The Nikos I’d saved, damned, slept with; the ones who needed me, who hated me, who wanted me dead. The one I’d tried so hard to find, looked everywhere for, down here, up there, inside us both and beyond possibility.]
+
+[MACRO final hug][~I stepped forward and hugged him, fierce as the roiling lump in my throat.
+
+His bare skin, still damp, felt hot against my own. He held me tight, wet curls rubbing against my face. Heat passed between us, but it was the least of what had.
+
+We'd loved each other, at times. Even if the people we'd loved were mostly in our heads.
+
+It was nice, but his curls were tickling my nose, and I pulled back before I meant to, reflecting his surprise at this with embarrassment. For a second it looked like he thought I was going to kiss him, and then I thought maybe he was thinking of kissing me, {gnaddendum}and we both stood uncertain for a second or two before dropping arms and stepping back.
+
+Awkward. But sort of perfect for the mismatched shape of us, which was, if nothing else, our own.]
+[MACRO gnaddendum][@gayniko>|out of some kind of misplaced solidarity, ]

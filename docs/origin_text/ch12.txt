@@ -1,0 +1,195 @@
+# QUANT
+
+
+{chapter/12}
+
+
+
+I wanted to find my Niko, but this [strange alternate|surrogate|one] [argued|kept arguing] against it. Impossible, he said. Like finding a needle in a haystack. Except this haystack went [@TheCity>down|on] forever. In the best-case scenario, he explained patiently, we'd wander until our food ran out, [^and] then with our last dregs of energy and luck find our way back up [to the surface] and out, empty-handed.
+
+He didn't mention the worst-case scenario. 
+
+[We argued.|Pacing up and down up a hallway anchored only by the {color3} beacon of the glowstick, we argued.|Decamped in a small empty side room with low ceilings and walls bulging with water damage, we argued. A single weak light bulb stuck in the center of one wall made stark shadow-men play across the other.] He insisted the smart[est] strategy was for us to retrace my steps to the base of the slide and [find a way to] climb back up. “The closer to the top, the fewer possibilities,” he said, “the fewer choices. And fewer chances of making the wrong one.” When he found out I hadn't seen my Niko since we got separated in the shaft, he grew even more convinced. “Maybe he's not down here at all. Maybe he caught himself on the way down, like you said, and he's up there now waiting for you. Worrying.” He gave up convincing me. “Or if he's not, he'll realize heading back is the smart option. I {i/know} he would, buddy.” He tapped his head. “Trust me.”
+
+I couldn't deny this plan made sense, but I felt sick. Too much was wrong. “Look. Even if I take you back up there, it won't be your world. You can't stay. If you're on the wrong side too long, you start to feel---detached.” I shuddered without meaning to. “Like it's rejecting you. Like antibodies swarming. It'll kill you.”
+
+He shrugged. “[You|We] don't know that. I'll risk it. Anything's better than staying down here.”
+
+“It's not just that.” I felt like a coward, but desperately wanted an excuse, a reason he couldn't come back with us. “You know about that sick feeling when you're too close to a twin. That's even worse than the headaches. So say we find my Niko and get you both back to the surface. Then what? The two of you get a double on campus, move in together?”
+
+[^“No.”] He sighed, impatient. “You think I haven't thought this through, all the time I've had? You help me get back up, I'm gone. It's a big planet. I've learned how to survive. I'll never get within a hundred miles of either of you again.”
+
+“Wait a minute.” I'd had an idea. “That sick sensation, when you're too close. We can use that to find him.” He raised an eyebrow. “Okay, maybe you're right, and there's too much space [^here] to find him by dumb luck. But you've got a sixth sense for where he is. You're like a magnet we can move through that haystack, feeling for tugs. Any twinges and we steer closer, till we're close enough to do the rest by shouting.”
+
+“You're not listening to me, Orion.” He was getting angry. [He realized it, took a moment to collect himself.] “There's a lot of space down here. You have no idea how much space. You're never going to find him. You need to accept that. You'll get us both lost. And I'm {i/sick} of being lost, buddy. Fucking sick of it.”
+
+He had an intensity my Niko never had---though maybe there'd been something like it latent in him, waiting for the right trauma to pull it out like a loose thread. It scared me. [It scared me that I'd never noticed it before.]
+
+He was right. I didn't want to get lost down here, either. I didn't want to end up like him.
+
+But I also wasn't willing to give up on my Niko.
+
+I dug out my keys, held them up. “Look. I've been using these to mark my way. There's no chance of getting lost. And I've got plenty of food, still. For both of us. So we keep searching. Keep marking the way. Be methodical, map it out. And if the food runs low...” My throat felt tight. “If that happens, we'll turn back. But I can't give up on him yet. I can't.”
+
+His eyes narrowed, and I could see him weighing something behind them.
+[But then his face relaxed. A huge smile broke across it, and it was so familiar, so him, that when he threw his arms around me and squeezed me tight, I hugged him back.
+
+“Goddammit, man, you haven't changed at all. Okay.” He pulled back, still grinning, and laughed---a real laugh, the one I remembered. “Shit. Like you'd give me up without a fight. Course not. The fuck we waiting for, then?”
+
+He hoisted his pack, started down the hall. “Come on, Ry,” he shouted back over his shoulder, “let's go find me.”|“Fine,” he said at last. “Until the food runs low. But look. Buddy.” He put a hand on my shoulder, squeezed it, tighter than I would have liked. “I've been down here a lot longer than you. These halls are deceptive.” He kept his eyes locked with mine, not looking around, like the walls would notice him if he did. “We'll look as long as we can. But if we do this, you've got to trust me. When I say it's time to turn back. We turn back.” He wasn't asking. It was an order. His eyes drilled into mine and there was something cold and grim in them, like a general leading his troops to slaughter.
+
+But then a corner of his mouth lifted and he clapped my shoulder, dropped the hand. “That okay with you, man?” he asked, and he sounded so much like his old self it ached. 
+
+“Fair enough,” I said, even though I didn't want to. It made sense, I supposed, for him to play guide. But my stomach twisted when I realized what I was agreeing to, realized the power I was ceding. Realized I'd agreed to trust someone who, in every way that mattered, I barely knew at all.]
+
+{section_break}
+
+Elder Niko was obsessive about marking our way---I could[n't| hardly] blame him---so we made slow progress. But despite his initial misgivings he seemed committed now to finding his younger double. Even downright cheerful about it. 
+
+[DEFINE @ch12light]
+We slipped into something like a rhythm, despite the surreal circumstances. [@ch12light>He declined my offer of a glowstick, and didn't pull out the penlight or whatever from his shirt pocket, instead keeping close to me as I swung my light around,|He borrowed a glowstick---the penlight or whatever in his shirt pocket must have been dead---and kept up conversation as he swung it around,] peering down all the hallways we passed. Sometimes, for a moment, I'd forget it wasn't him. Then the light would catch the hard-edged crow's feet around his eyes, or he'd ask in nostalgia-tinged tones if I remembered something that happened a week or a month ago, and reality crashed back into me. I supposed from his perspective I was like a long-lost friend at a high school reunion, so as woozy as it made me feel I could understand this behavior.
+
+I thought I could, anyway.
+
+[@singular06>He unnerved me. At first I thought it was simply because of what had happened to him. But then I realized it wasn't that, not really.
+
+It hadn't broken him. He'd survived. And I couldn't begin to imagine what he'd have to have done to himself to become a person who could do that.
+
+The first time you turn after the werewolf bites you, it must be terrifying. But eventually it's just another month.]
+
+[@ch12light>He didn't seem to need much light. I asked about this and he shrugged, saying he spent most of his time in total darkness. Sometimes, he said, there were long stretches between lit-up rooms, between scavenged batteries or glowsticks. My skin crawled when I imagined trying to navigate this endless labyrinth by feel, never knowing when you might step into a puddle of water, a bottomless shaft. A body. I thought of him wandering these halls in utter darkness, face placid, eyes unfocused, fingers skimming the paneled wall, the only sound the scuff of sneakers on carpet. Sniffing for rot at hallway junctions. Feeling on hands and knees for corpses and their backpacks of supplies, like a blind crab scavenging for leavings at the bottom of the sea. I thought of getting so used to this that it no longer seemed awful. That it seemed perfectly normal.]
+
+[The|As the hours passed the] sense that he was keeping something from me, that something was wrong, only grew. He kept asking about the way back up: casually, like making conversation. But he wanted to know what was above the slide, [^the layout of the rooms before that, ][whether we'd come through a fridge or a sliding glass door, ][whether the junction before the long stairs down had eight doors or six or five, ][which pit exactly we'd rappelled down, ][@hamsterwheel>whether I'd found the hamster wheel,|{maybe red herring}] which branch I'd taken off the Big Room to get down here. He was trying to reconstruct the route back out. Maybe this made sense---maybe he was just curious, or hedging his bets in case we got split up, like I had with my Niko---but behind the jokes and easy laughter I sensed calculation. A front. [And I had no idea what could be behind it.|Performance.]
+[MACRO maybe red herring][whether we'd found the Lamp Room,|whether we'd found the Library Chasm,|whether I'd found the Bathtub Funnel,|]
+
+Now and then I'd ask if he'd gotten any twinges of feeling, hints we were getting close to another Niko. He'd answer right away: [Nope. Nothing. Sorry.|Sorry. Nope. Nothing.|Nothing. Nope. Sorry.] At one point, annoyed, I demanded he stop for a minute and really try. [He put on a show of being abashed, of closing his eyes and concentrating---but I could tell it was only an act. He wasn't expecting to find anyone.|He apologized with abashed sincerity, and we stood at a junction for ten long minutes while he concentrated, the wrinkles around his eyes creasing as he squeezed them closed---but when he opened them again, he shook his head. Nothing. He seemed sad but not surprised.]
+
+Like he [already] knew there was no one [there] to find.
+
+{section_break}
+
+[DEFINE @ch12ducts|@ch12pantry]
+We'd come to a [@ch12ducts>place of endless ducts and exposed plumbing. Bulky metal curves and protrusions poked from the walls: the bones of water heaters, of central air. The ground was dry, but the room felt hot and moist, dripping all around us.|maze of endless narrow rooms and hallways lined with empty shelves of all shapes and sizes, like a fractal pantry. Stairs twisted up and down through shelf-lined landings, doors opening onto endless dead-ends lined with more shelves, stained and bent from past weight but supporting nothing.] We poked around a space the size of a mansion, cluttered with oddly-sized corners and crannies, finally realizing the whole area was a dead end. There was no other way out.
+
+“Maybe it's time to turn back,” Elder Niko said when we realized this, solemn. We were near the back of the big cluttered space[@ch12ducts>. A smell like rotting leaves wafted from the sharp metal ruins of a boiler that looked like it had ruptured from the inside. The carpet was mottled with rusty blotches, like overlapping pools of dried-up blood.|, in a long narrow dead-end with twenty-foot ceilings, flimsy shelves stretching all the way to the top. The air was dry and smelled of dust.] “Man, it's going to be hilarious when we find out my younger self's been topside this whole time. Lounging on a blanket in the backyard, you know, under the sky. Catching some rays. [^Listening to tunes.] Waiting for you to get out.” He laughed, and his voice [@ch12ducts>echoed off a thousand metal boxes|sounded hollow, swallowed up by endless rows of empty shelves].
+
+His face grew more serious. “Or maybe he's so lost we'll never find him. Orion. I tried to tell you. This place is too big.” He gestured around us, took a deep breath, looked chagrined. “It's a lost cause, buddy. I think it's time to give it up.”
+
+He took a step toward the door, but I was in his way, bristling. Holding my ground. 
+
+[I said, “No.”]
+
+He stopped, looking confused. “What's up?”
+
+I couldn't explain my trembling, except for a deep-seated certainty that this was wrong. Everything about it was wrong, just generally, but a specific wrong thing was the way this place had taken Niko from me and done this to him, made him into something I couldn't understand and didn't trust, and I couldn't stand [it|this stalemate] any more. Some yawning possibility loomed before me, like I was [blindfolded on a precipice, about to step forward. But I had to know. Better to fall than stay lingering on the edge.|on my knees proposing and had no idea if the answer would be yes. But I had to know. Better to get shot down than keep wondering forever.]
+
+I met his eyes. “Tell me.”
+
+“Hmm?”
+
+“Tell me whatever [it is] you're not telling me. [Tell me what's|What's] really going on. I want to know.”
+
+He frowned. “What do you mean?”
+
+“Damn it, stop {i/pretending}. Everything is not okay. You're stringing me along and you need to stop it. Be honest with me.”
+
+“Oh?” His expression [had started to shift. Something was slipping.|stayed pleasantly neutral. I could project on it anything I wanted.]
+
+“Stop playing games.” I clenched my fists. “Stop {i/using} me. Look, we can do this together. You need me to get out of here. Both of you do. I know the way back, and I'll help you, but I need to trust you. And you need to trust me. Okay?”
+
+[He nodded, looking serious, and bowed his head. Then gave himself one final nod. As if coming to a decision. {pp} He looked up smiling, |Looking annoyed, he scratched furiously behind one ear, not meeting my eye. He sighed, heavy. {pp} Then, looking up at me with a resigned expression and shaking his head, he] stepped forward, and punched me in the throat.
+
+I staggered back, pain exploding from my neck, but he stepped forward at the same time, looking bored. He punched me in the face so hard I spun sideways and slammed into the [@ch12ducts>wall|wall of shelves], something crunching in my nose, and he kept stepping forward, grabbing my wrists and kicking my feet out from under me. He twisted my arms as I fell so I landed face first, and still he kept moving with me, descending with his knee in my back so when I hit the ground his full weight slammed down on top of me. He punched me hard in the kidney, twice, grinding my face into the carpet with his other hand now somehow on my head. 
+
+My mouth was open but I couldn't breathe, or scream or speak or think for lack of breathing. My throat felt crushed, my lungs paralyzed. Pain like a stab wound tore open my side. I couldn't think enough to move [^my] muscles. 
+
+Never taking his weight off the knee digging into my spine, he pulled something from his bag. I heard a rip, and was so sure it was some part of myself it confused me when I felt no pain. Something sticky wrapped around my wrists, tugging [^at] the hairs on my forearm. Duct tape. And now I did struggle, feebly trying to dislodge him, kicking my legs. Pathetic as a half-squashed bug, twitching, not realizing it's already dead. In moments he'd bound my ankles, too, and then my knees.
+
+[^It had all taken maybe ten seconds.]
+
+I tried to make a sound, to beg him to stop, or ask why he was doing this, but all that came out was a coarse rasp, not even a gasp. So I begged with my eyes instead.
+
+[He met them and laughed. He knew what I was trying to say. It amused him.|He met my gaze, then looked away, dispassionate. He knew what I was trying to say. He didn't care.]
+
+He frisked me: hands patting my ass, my pockets, my crotch. “Gun,” he said, impatient, “where's the gun?”
+
+I had just enough breath back to grunt a word. “[Dropped.|Gone.|Lost.]”
+
+“Stupid.” He cuffed the back of my head. “There's worse things than me down here. And worse {i/me}s.” He smirked, but his hands had found my back pocket, felt what was inside. They reached in, urgent, and dragged out the key. His breath caught.
+
+He bent down and shoved it in my face, angrier now than he'd looked while beating the shit out of me. “What's this? How long ago did you find this?”
+
+My head spun, trying to think of some way to regain control. “Couple,” I gasped. “Hours.”
+
+“Have you used it yet? Gone through?”
+
+I didn't want to answer his questions, but I couldn't see how lying would help me, either. I shook my head.
+
+He stood up and [@ch12ducts>punched the wall, leaving his fist in the cracked indentation it made for a long moment|slammed his fist down on a shelf, cracking the flimsy wood]. Then he started to pace, furious. Thinking. I groaned and rolled partway onto my side. The pain in my kidney was evolving from a stabbing into a roiling burning sickness, like something inside me boiled, threatened to burst. Breathing felt like forcing air through pipes sealed with rust.
+
+“My Niko,” I rasped. “Looking for me. Won't let you. Do this.”
+
+“Your Niko's dead,” he said, and he said it so simply, so matter-of-fact, it sunk into me like another punch. “Found him and got rid of him before I found you. I always kill the Nikos first. Makes the headaches go away faster.”
+
+It felt like the room was dropping[^, like he'd cut some elevator cable I hadn't known was holding me up]. I didn't want to believe him. I fought not to. “No,” I gasped. “Bull. Shit.”
+
+He reached into his shirt pocket and pulled out what I'd thought was a penlight. It wasn't. It was a finger.
+
+He tossed it onto the carpet by my face and it rolled once, coming stiffly to rest a few inches from my eye. It was cut through at the knuckle and pale and dead. But more or less the right color. 
+
+“I've killed him hundreds of times,” he said, sounding bored again. He was watching me, though, and as he noticed my tears he gave them a small, sad smile, as if touched by my naiveté. “And you, too, you little bitch. You're even easier. Always freeze up at first. Or if you don't, you try to grab my arm. But the same way every time, right? So that makes it simple to break your wrist. When you double over whining, it's easy to grab your skull and smash it into the ground until you stop moving.”
+
+He knelt down, turning his head sideways to study my face, as if curious about the effect his words were having on me. “This time's different, though. {i/You're} not lost yet. {i/You} know the way back.” He reached out and tousled my hair, playful-rough. “And you're going to take me there, Orion. Take me back up. Or you're going to die.”
+
+He stood up again. “But this fucking key. Complicates things. You said you're on the wrong side, from your perspective. Yeah?” I didn't answer; he went on as if I had. “That means there's another you who's also found a key. The twin key to this one, on the twin side. And if that other you didn't get ambushed by his old bestie”---a wicked grin---“he'll pop through to this side soon enough. Because. You find a key, you're [^almost certainly only|just] a few hours away from finding its door.”
+
+I couldn't see how this changed things. “Why does that m-matter?”
+
+He turned the key over and over in his hand, staring at it. “Staying in sync. Wasn't that always our theory?[^” It was like he was asking the key. “| ]I think we have to. Buddy. I told a lie earlier. I don't always kill you both right away. Sometimes I... ask questions.” He scraped a thumbnail along the key. “Find out where you've been. What happened before. The ones who have it worst are always the ones who got too out of sync. With their doubles. [@fridgetunnel>There's lots of connection points but the higher-up they are, the easier to get---misaligned. Two lasers pointing at each other, yeah? Nudge them just a bit, and instead of meeting, the beams go on forever.” I thought of the tunnel with the infinite fridge, and shuddered. “And if two sides lose sync|And if they lose it] entirely... if things warp too out of true...” He made a sucking sound through his teeth, bringing it to a crescendo and then cutting it off, like a tire popping in reverse. 
+
+He glanced at me, then back to the key. “That's what happened to me. My double and I, we... diverged. And something tore. Or popped, maybe. [@fridgetunnel>Forget lasers.] Think pairs of soap bubbles, floating in infinite void. They need each other to stay stable. Our universes got too far apart and it wasn't good for them. They're gone now, or too far to ever reach. Dark.
+
+“But yours...” He grinned even more broadly. “A ripe pair. Undamaged. Still connected. To each other, and to you. You. I can follow you back into them like a thread. Like a fucking thread, Orion. Up and out and back [and] into the light.”
+
+This is the part where if I was a spy or an action hero, I'd be secretly digging a knife out of my pocket, working my way free of the bonds, taking advantage of the villain's distracted ranting to try for my freedom. But I wasn't a spy. I was a Bio major. I'd never been in a fight. I was trussed up, I couldn't move, the pain was still excruciating, and I had no idea what to do.
+
+As if to reinforce my stupid squandered opportunity, Niko seemed to notice me again. Abruptly he put the key in his pocket (his front right pocket, I noticed, desperate not to be completely helpless) and dug through my pack. With a satisfied grunt, he pulled out rope, and proceeded to tie my hands and lower arms behind my back, so tight my elbows almost touched. 
+
+My freedom was slipping away. I tried to keep him talking. “But...” I had to clear my throat, heavy. “[If you... if|If] [Niko's dead---my Niko---isn't|my Niko's dead, isn't] it too late? How can anything be in sync now?”
+
+He paid no attention to this, continuing his rope work. When [he was done|he'd finished] he wrapped the end a few times around my neck and fear spiked through me, but then he [grabbed under my arms and] lifted me gently to a sitting position, leaning against the wall.
+
+He went to the pack and pulled out my flashlight, shaking it. “This thing work?” I didn't answer: he was already toggling the switch on and off with no effect. He grunted, dug some batteries from his own pack and slipped them in, nodding in satisfaction as the light came on. Pocketing it, he rummaged through my pack, eyes lighting up when he found my cache of food. He ripped open the wrapper on a power bar and took a huge bite, grunting in satisfaction. [^Ignoring me.]
+
+“Niko,” I said, trying not to cry. “Please let me go.”
+
+He grimaced, like what I'd said had hurt him, and scooted closer to me, still chewing. He [grabbed my chin and forced up my head|touched his fingers to my chin and lifted my head, gentle|grabbed my hair and pulled back my head|ran his fingers gently through my hair, tugged back my head]. Stared into my eyes with a frown. Like he'd lost something in them.
+
+“I told another [little fib|lie] earlier, bud,” he said, swallowing. “[@TheCity>Sometimes those houses down there|Sometimes those dead and bricked-up houses] do have power, like I said. Who knows why or where it comes from, but sometimes they do.”
+
+I kept my eyes on his, hoping to find some empathy or humanity there.
+
+He took another bite. Chewed more slowly this time.
+
+There was nothing in his eyes.
+
+“Power,” he said, mouth half-full, “[but the fridges and pantries, in all those houses?|cold fridges. Sometimes. But nothing inside.] They're empty. All of them. There's no food [@TheCity>down there|down here], [Orion|buddy]. None at all.”
+
+I [was|couldn't stop] trembling. I couldn't look away from his eyes.
+
+He swallowed again, shoved the last of the bar into his mouth. [Still gripping me with his other hand, he turned my head from side to side, like he was admiring it.] “But you and me,” he said, mouth full, “other versions. Man, there's {i/so many} of us. Popping up [@TheCity>out of those houses, those millions of houses|or tripping down those stairs, those millions of stairs]. Lost. Always lost. Pathetic. Eaten all their food. Starving, out of their minds. They're already dead, really. Or a nudge away.”
+
+He swallowed the last of the power bar, licked his lips and the crumbs off his fingers. Then he leaned forward, slow, like he was going in for a kiss.
+
+He stopped, face inches from mine.
+
+“Wouldn't it be such a waste?” [^He spoke quietly, carefully.] His breath smelled of processed figs. “Such a shame for all those deaths to have been for nothing. To have served no purpose. Don't you think?”
+
+“Niko,” I begged, wanting it to mean so many things.
+
+[He touched a finger to|His finger touched] my lips. “I think you get it. So. We have to find the door this key connects to. [^Yeah?] We have to wait for your doubles to come through---yours, and your dead friend's. Swap places with them. Pass back to your side. Keep things {i/synchronous}. And then head up, up, up into the shallows, back to the surface, away from this place forever, and synchronicity can go fuck itself.” He stood up, reaching down, and grabbed my shirt to jerk me to my feet. He wrapped the end of the rope around his arm.
+
+“But we'd better get moving. Cause your door's going to be farther down from here. And best for both of us if we [get to the surface|find it] before I get too fucking hungry.” He gestured back toward the way out of the jumbled [@ch12ducts>room of metal tubes|maze of shelves], mockingly polite. “After you, amigo.” 
+
+
+

@@ -1,0 +1,21 @@
+# QUANT
+
+
+{part/PART THREE/MANIFOLDWISE}
+
+[@epi_group2a>{epigraph/Some things do through our judgment pass \\
+As through a multiplying glass. \\
+And sometimes, if the object be too far, \\
+We take a falling meteor for a star./“Ode: Of Wit,” Abraham Cowley (1618-1667)}
+
+|@epi_group2b>{epigraph/How should we like it were stars to burn \\
+With a passion for us we could not return?/W. H. Auden}
+
+|@epi_group2c>{epigraph/...before I die I want to see \\ The world that lies behind the strangeness of your eyes, \\ There is nothing gay or green there for my gathering, it may be, \\ Yet on brown fields there lies \\ A haunting purple bloom: is there not something in grey skies \\ And in grey sea?/“On The Road To The Sea,” Charlotte Mary Mew (1869-1928)}
+
+|@epi_group2d>{epigraph/As long as the sky whirls \\
+You will be my redemption and my doom/Reinaldo Arenas}
+
+]
+
+{end_part_page}

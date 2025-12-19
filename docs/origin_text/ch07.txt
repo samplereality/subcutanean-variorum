@@ -1,0 +1,167 @@
+# QUANT
+
+
+{chapter/7}
+
+
+
+We [turned the wall of his bedroom into a map, taping up big sheets of artist's paper{maybe from class}|taped big sheets of artist's paper to the wall of his bedroom to make a map], shoving piles of [CDs|books] and unwashed dishes and dirty [underwear|socks|t-shirts] and two scuffed snowboards out of the way to [make room|clear space]. He transferred our notebook sketches to the wall and we [filled|tried to fill] in the rest from memory. It was imperfect, [80>because stairs down there ran up and down and the wall was flat, and also] because the hallways twisted at weird angles and we didn't have surveying equipment to sort them out. But it was a start. 
+[MACRO maybe from class][ from an old class]
+
+It was also painfully incomplete. [There were dozens of doors we'd never tried, branches and halls we'd only glanced into.|Dozens of doors had never been opened, countless halls had only been glanced into.] Almost everything we had seen was from that single hall off the big room, the one we'd tried on a whim our first time down. Other than peering around the first couple corners, we hadn't explored the other four halls at all.
+
+Niko swept a hand across all the empty space. “We're fucked.”
+
+“Look,” I countered, “we know the other versions of us found a key, somewhere. And we also know the two sides are staying almost exactly in sync. Close enough to spill coffee the same way.”
+
+“Not close enough to leave [@fridgetrapped>the same fucking note|each others' fucking sticky notes alone].”
+
+“Still,” I pressed on, “that means the keys can't have been too well-hidden. We could have almost found one, walked right past it. Maybe the only difference was a momentary decision about which door to go through, what wall to glance at.”
+
+“Doesn't matter.” He stirred his coffee, morose, and sat it down to cool on his dresser, next to [@singular09>a brass model of a harpoon attached to what appeared to be a real whale tooth---he'd gone through a yard sale phase and loved to collect anything that changing laws, morals, or fashion sensibilities made no longer possible to acquire|a half-empty older mug growing a skim of mold]. “[@fridgetrapped>The other me already got to the key on this side and took it through with him. There's no key left to find.”
+
+“We don't know that.|The keys are useless now, anyway.”
+
+“If there's one set of keys, there might be more. Other keys, other doors.] And besides, we have no idea what else might be down there. We need to keep looking.”
+
+He ran a hand through his hair, a familiar gesture, but he looked changed. His eyes were getting sunken, from lack of sleep or some more worrisome deficiency. His face, so often laughing, hadn't smiled in days.
+
+“Synchronicity,” he said. “That's the problem.”
+
+“How do you mean?”
+
+“I think we're getting out of sync with them. Day by day, decision by decision, we're losing our lockstep. And the [farther|further|more] out of sync we [drift, the harder it gets|get, the harder it is] to go back.”
+
+“[Speculation|Is that so][,” I said, tired.|.”]
+
+“And the deeper,” he pressed on, “the deeper we'll have to go to find another way through.”
+
+“[Bullshit|Nice. You're leaping all the way past conclusions now to the realm of utter bullshit].” But I didn't have energy to argue with him. Clearly we couldn't solve anything from up here. We needed to go back down. We had to fill in the blank spaces on that map.
+
+Our first [Expedition departed the next morning. With a capital E, Niko said, to show we were taking this shit seriously now|expedition departed the next morning]. We had backpacks, trail mix and energy bars, lots of flashlights and batteries, twine, spray paint, a compass, graph paper, whistles, and rope. Despite everything, I think the prep got us fired up a bit. If answers were down there, we'd find them. We skipped class and I called in sick to work, and we both agreed if necessary we'd do the same tomorrow, and the next day. Finding a way back was top priority.
+
+[“They're not {i/our} grades anyway,” Niko said with a smirk. I sensed a slippery slope here vis-à-vis morality and nihilism, but I wasn't in the mood to debate philosophy with him. I wanted to move. To delve. Find some answers.]
+
+We chose one of the unexplored halls off the big room, and decided to [explore as much of it as we could, until we'd mapped|map as much of it as we could, until we'd explored] it all or got too tired to keep going. We picked the one at the far end[ of the room], opposite the stairs back up. Right away we found something different.
+
+The first few twists and turns were [the same as what we'd seen before|like the rest of the top level|the familiar terrain we'd come to expect]: carpet, wall sconces, scuffed doors. But after a short and confusing snarl of hallways and tiny rooms, the floorplan opened up into an area with [brighter lights in the|a slightly different style of] sconces, and longer, straighter hallways.
+
+[Except some|Some] of them went straight down.
+
+We stood at the lip of one of these pits and [stared|peered|peeked] over the edge. It was like someone had taken a regular hallway and stood it on end. The brown carpet went right over the lip and continued straight down, passing sideways doors, sideways wall sconces. Maybe seventy or eighty feet down, it hit a carpeted bottom and leveled out again, branching in opposite horizontal directions. The pit filled the exact center of a junction; we could step around the corners into hallways leading off in the three other directions from the one we'd arrived. It was a five-way intersection, all at right-angles.
+
+A couple dozen paces down one of those halls was another pit.
+
+“What is this,” Niko sighed, “challenge mode?”
+
+When you think of treacherous terrain a basement hallway isn't the first thing that comes to mind, but clutching the corner and peering vertiginously down, the pit looked as unscalable as the Matterhorn. There was nothing to get a grip on, except the doorways every twenty feet or so. Clearly we couldn't get down without climbing gear, nor come back up without it either.
+
+If you fell... if you got stuck down there...
+
+We stepped carefully around the pit [(which was awkward and terrifying because it came right up to the ninety-degree edge of the wall)] and kept exploring on the same level. But the pits were everywhere. Each horizontal hall would dead end sooner or later, and the side rooms were all small and empty. Some of them had hallway pits, too, leading down from their exact center. [After|In half] an hour we'd mapped out everything we could get to without a climbing harness. Other than going back to the big room, there was no way forward except [eleven|fourteen|sixteen] pits, each at least fifty feet deep.
+
+“[Maybe difficult is good|Difficult could be good].” [Niko|He] perked up. “This is the first thing we've had to work for. Maybe [it] means there's something interesting down there.”
+
+“Or maybe one of [those|the] other [halls|hallways] leads to a room filled floor to ceiling with keys. No point guessing.”
+
+# If Downstairs is @empty, the setting is a maze of crawlways. If @furnished, it's a maze of furniture, with two possibilities for variety.
+[DEFINE @tables|@sofas]
+
+We went back to explore one of the other halls---we didn't have much choice---and found something different there, too. [@empty>About half the doors led not to rooms, but to crawlways.
+
+They were those half-sized doors you find sometimes that open onto water heaters or the electric meter in your house. Flush with the floor and about three-and-a-half feet tall, they opened onto similarly miniaturized corridors, snaking off in two directions for a dozen feet with T-junctions at each end.
+|All the doors on one side opened onto a vast dark room piled floor to ceiling with {furnitures}.]
+[MACRO furnitures][@tables>tables|@sofas>couches]
+
+Niko leaned casually against the door and poked his head inside with a suave expression. “Hey,” [@empty>he said to the crawlway|he called into the shadows], “How {i/you} doin'?”
+
+[@empty>We figured out pretty quick it was a maze.
+
+You could stoop-walk, but crawling on all fours was a lot more comfortable. (For me, at least. Niko kept bumping his head and swearing.) The tiny hallways branched and split constantly, keeping to neat ninety-degree angles. Those ever-present wall sconces remained brightly lit, but the crawlway never went the same direction for long. Doors were scarce, and they all led back to normal-sized halls.
+
+|The room began like all the others, although unlit: a regular door and the same style carpet. But we couldn't see a far wall, nor a wall to either side, maybe in part because the {furnitures} started a few feet in. There were a lot of them. {furniture desc}. Our flashlights cast scattering shadows through the maze, but couldn't penetrate far.]
+
+[MACRO furniture desc][@tables>Flimsy plastic folding tables, huge oak dining tables, card tables, end tables, TV trays, workbenches, school desks. {movers bit}
+
+Bending down, we shone our flashlights through an endless sea of legs. There was enough space to crawl between them, but nothing like a straight path: upended walls of wood or marble or metal made intermittent obstacles, and poles and supports of all materials and angles made a forest of the open space|@sofas>Couches, chairs, recliners, loveseats, and sectionals, upholstered or varnished in a hundred styles, all dusty but ranging in condition from falling apart to so new they were still wrapped in plastic. {movers bit}
+
+But the arrangement was orderly enough that there were pathways through the furniture. Tunnels you could stoop-walk or crawl on all fours through. They branched and split constantly, a warren walled with sofas and lazy-boys and stools, a child's dream of a couch fort city brought to life]
+[MACRO movers bit][~They were mostly upright but some were wedged in at crazy angles, like movers had started systematically and then given up halfway through, throwing the rest on top in {chaos bit}.][MACRO chaos bit][a frantic chaos|careless chaos]
+
+[@empty>Once we realized how easy it would be to get lost, we retraced our steps and sat panting by the entrance.]
+
+“Promising,” Niko said. “They're making us work for it.”
+
+“[There's no ‘they,’” I said automatically, mostly because I didn't want to think about it. “And it's|Makes no difference,” I said. “It's] the same problem again. We can't risk getting lost[ down here].”
+
+“But this is easier, man. We don't need specialized equipment. Just some way to leave a path. Hansel and Gretel, like you said.”
+
+Or maybe Ariadne. I had a ball of twine in my pack, so we settled for a simple solution: tying one end to my ankle, and the other around the [@empty>half-door's knob|doorknob]. After some deliberation, we decided to keep our packs on, despite the awkwardness of crawling the [@empty>tunnels|maze] with them. Having girded ourselves with stuff, we felt naked without it now.
+
+We set off to map. [@empty>{empty spaces or fractal}|{pp} Crawling through the maze was surreal. The furniture painted by the bright of our headlamps made us feel foolish, like kids crawling around grandma's {ch7basement} with the lights out. But the scale glimpsed in the shifting shadows, the distance traversed by our bodies and soon felt in our knees and ankles, spoke to confusing and frightening immensities, the deepness of caves, an underworld. The space went on and on. There was too much of it for reason, for safety, for sense.
+
+{maybe cardinal bit}
+
+We moved carefully at first, stopping to map each twist and turn{dancing shadows}. But as we started to realize the extent of the space, Niko developed a new strategy: push towards the center, or at least away from the long wall we'd entered from. Find the middle, if there was one. If it didn't go on forever.]
+[MACRO ch7basement][@sofas>basement|kitchen]
+[MACRO maybe cardinal bit][Of the four cardinal directions you could move in from the big room, the maze of furniture seemed to fill one of them up entirely. The few hallways stretching that direction were like jagged tendrils reaching into the world's {storetype}.][MACRO storetype][@sofas>largest furniture surplus store|emptiest jumble sale]
+[MACRO empty spaces or fractal][{pp} It wasn't long before we realized the crawlways accounted for an oddity in our mapmaking. If you look at the blueprint of a normal house, it's economical with space. Rooms and closets and halls fit into each other like well-stacked Tetris pieces. Downstairs was not like that. Large swaths of empty space surrounded most of the rooms. Hallways went farther than they needed to, adjacent to nothing. Niko'd talked about bringing a sledgehammer down and breaking through one to see what was behind it---but now we had an idea. The maze of crawlways filled up the emptiness behind the walls. Not in any logical or sensible way, though. As we started mapping them out in a notebook, I remembered the graph paper mazes I used to draw in school. A crawlway would wrap around the outlines of what must have been a room, then double back and wrap around itself again. Sometimes a bunch of branches would split off from a small area. There were dead ends. We had no sense of whether we were on the edge of the thing, near the center, or if the geography even had a regular enough shape for those terms to signify.
+
+We'd figured all this out before moving too far, comparing what we'd seen to our map. Niko developed a plan to push toward a direction where we thought there should be lots of empty space, and find out whether the crawlways filled that up too.|It wasn't long before we found another, even tinier door.
+
+This one was no more than eighteen inches high. Peering inside it, we saw an even smaller crawlway, with even smaller doors running up and down its length.
+
+“That's some Alice in Wonderland shit right there,” Niko muttered.
+
+We could maybe have squeezed into the next level of smaller crawlways without our packs, but there didn't seem to be much point. Maybe the crawlways could get fractally smaller, but we couldn't. We decided to stick to the first tier of crawlways and map out their extent.
+]
+[MACRO dancing shadows][@furnished>, trying not to be unnerved by the way our lights carved a thousand sweeping shadow-shapes out of {dunes bit}, moving and twisting like something alive]
+[MACRO dunes bit][@tables>that desert of furniture|those tunnels of furnishings]
+
+What happened next caught us completely unprepared.
+
+We'd started [@empty>crawling in a promising direction|moving in a steady direction, as near as we could manage]. I'd begun to feel almost cheerful: we were solving the mystery, peeling back this place's secrets. Surely it was just a matter of time before we found a way back home.
+
+[And then s|S]omething {i/yanked} my ankle from behind.
+
+I gasped and twisted around[@furnished>{maybe furnished reflection}|. The] twine tied to my ankle was taut, and pulling me with terrible force, starting to drag me back[@empty> the crawlway|wards]. I cried out, digging my fingers into the carpet.
+[MACRO maybe furnished reflection][@tables>, dozens of metal legs reflecting my headlamp back at me; I could only see a few dozen feet. But the|. The]
+
+[@empty>The twine scraping against the edge of the junction behind us sounded coarse and ugly, like a rusty knife dragged over the hairy skin of a coconut.|I collided with {furniture collide item} and heard a clattering groan as furniture shifted all around me, pushed out of place. Weight shifted alarmingly above.]
+[MACRO furniture collide item][@tables>the metal leg of a folding table|@sofas>the padded side of a dusty couch]
+
+“What the fuck, {i/help me!}” I shouted. The loop around my ankle was viciously tight, cutting off circulation. My fingers scrabbled for purchase but the carpet wasn't shaggy enough to grip.
+
+Niko scrambled back towards me, shrugging out of his pack and grabbing my arm. But as he pulled me back the twine dug into my ankle like a vise, like the pressure would saw the line straight through my foot. It {i/hurt}. [I couldn't understand why it hadn't snapped.] “Cut it, fucking cut it!” I gasped.
+
+He cursed and let me go, whipping back around to zipper open his pack, letting the line start to drag me away. [@empty>The sound of the twine scraping the corner seemed way too loud, like someone was holding a mike against it. I reached up to grab a wall sconce and the cheap thing twisted off in my hand, sparking as the bulb went out. I held onto it stupidly as the line around my ankle dragged us both away, reeling out drywall-dusted power cable from the wall.|I reached out to grab {furniture protrusion} but only succeeded in dragging the whole thing along with me, screeches of metal-on-wood and the ominous clutter of shifting weights and balances sounding above and all around; and I let go before the whole nightmare could crash down around {ch7us}, dividing {ch7us}, burying {ch7us} alive.]
+[MACRO furniture protrusion][@tables>another table leg|@sofas>a chair leg]
+[STICKY_MACRO ch7us][us|me]
+
+I panicked. My mind flashed through visions of monsters waiting [@empty>just around the corner|at the edge of the maze], reeling me in[@furnished>, each sway of my headlamp birthing a new imagined terror out of the confusion of shapes around me]. A horned demon. Some evil-eyed little girl from a shitty horror movie. And then the history lady flashed into my head, inside-out and distorted past the breaking point, eyes white and wide; and I [@empty>jabbed my fingers into the grooves in the fake wooden wall paneling and started babbling|started babbling]
+{verse_inline_sc/[@vortex>DESCEND|@gardens>ACRES AND ACRES|@snakeoil>SUCH WONDERS AWAIT YOU|@caves>SURELY NO HOPE LEFT]}
+mind slipping towards the only place it might be safe 
+[@vortex>{verse_inline_sc/IF YOU ONLY KNEW WHAT AWAITS YOU}|@gardens>{verse_inline_sc/YOUR FUTURES ARE SAFE WITH US}|@snakeoil>{verse_inline_sc/EXPANDING ONCE AGAIN}|@caves>{verse_inline/How a child wishes \\ To live down there!}]
+and Niko cut the twine.
+
+I missed the lead-up in my nightmare, but he'd dug through his pack for the Swiss army knife, lost at the bottom with the camping gear, then struggled to squeeze ahead of me without kicking me in the face[@furnished or knocking anything down on top of us]. He told me later he’d barely touched the blade to the twine when the taut line snapped, whipping [@empty>around the corner|away] in a fraction of a second.
+
+He had to spend a minute calming me down. [Maybe it would be a better story if I left this out, but I was crying, bawling like a baby, and my pants were wet.|My mind had skidded toward some rarely glimpsed drop-off, pulled edgeward by a dark and primal gravity, and it took time to climb handhold by handhold back up to the light.]
+
+What brought me back, prosaically enough, was the growing unpleasant tingling in my foot. Pins and needles: painful, but familiar. The knot on the twine had slipped down and pulled a tight loop around my leg just above the ankle, digging half an inch into my jeans. Niko helped me cut it off and I sat rubbing my foot for a long time, calming down, waiting.
+
+Listening.
+
+After maybe fifteen minutes we started back, Niko up front with the knife. I was equally terrified bringing up the rear, though, constantly looking over my shoulder, miserable and afraid. [@furnished>The furniture right around us had been dragged out of shape, {unstable bit}but the rest of the way back was unchanged. We swung the lights back and forth ahead but could see nothing but a forest of shadows.
+
+Maybe they really were alive.]
+[MACRO unstable bit][@sofas>the first few feet of couch fort distorted, unstable, ]
+
+[@empty>The fact that the lighting was so bright and consistent, so cheery, only tinged my fear a more metallic shade.|]
+
+[@empty>Around the corner we|After a few dozen feet we] found the cut end of the twine, slack and unmoving. We followed it all the way back to where we'd come in.
+
+It was no longer tied to the doorknob, like we'd left it. The twine lay coiled up in a neat loop. Right outside the threshold.
+
+
+

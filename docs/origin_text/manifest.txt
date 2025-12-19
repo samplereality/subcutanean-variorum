@@ -1,0 +1,27 @@
+# MANIFEST
+# The chapters, in order.
+
+globals.txt
+
+#test.txt
+#promo_card.txt
+
+ch01.txt
+ch02.txt
+ch03.txt
+ch04.txt
+ch05.txt
+ch06.txt
+ch07.txt
+ch08.txt
+ch09.txt
+ch10.txt
+ch11.txt
+ch12.txt
+ch13.txt
+ch14.txt
+ch15.txt
+ch16.txt
+ch17.txt
+ch_epilogue.txt
+

@@ -1,0 +1,132 @@
+# QUANT
+
+# ************************************************************
+# Major variants with cross-chapter implications.
+# ************************************************************
+
+# Do we include the possibles story, or not?
+[DEFINE ^@possibles]
+
+# Is Ryan's "can't control who you love trauma" because of his dad's sudden death, or his toxic relationship with Bradley? 
+[DEFINE @dadphone|@bradphone]
+
+# Does this Ryan have a drinking problem?
+[DEFINE ^@alcohol]
+
+# Do they lose the way back because of losing the keys, or because the connection through the fridge snaps?
+[DEFINE @fridgetrapped|@fridgetunnel]
+
+# Downstairs is mostly empty vs mostly full of anonymous abandoned furniture. I like that both of these are creepy in different ways.
+[DEFINE @empty|@furnished]
+
+# Is Elder's story of an epic lower level a huge city of houses, or an endless basement floor?
+[DEFINE @TheCity|@TheBasement]
+
+# Details for the final fight scene
+[DEFINE @ffdropoff|@ffthewalls]
+[DEFINE @fftubeweird|@fftube|@ffset]
+[DEFINE @ffchandelier|@ffbookshelves]
+
+# Niko dreams & gorilla plot thread, or weird CD-ROM game plot thread?
+[DEFINE @cdrom|@gorilla]
+
+# Final Niko is in love with Ryan, is not, or ... ?
+# Last to do is "angryniko"
+[DEFINE @gayniko|@firmniko|@originalniko]
+
+
+
+
+# ************************************************************
+# Define book-wide independent variables affecting random text.
+# ************************************************************
+
+# Is this narrator wordy, succinct, or no preference?
+[DEFINE 25>@wordy|25>@succinct|50>@noverbositypref]
+
+# Does this narrator prefer sentences with a strong negative polarity?
+[DEFINE 33>@depressive|33>@optimist|34>@nopolaritypref]
+
+# Does this narrator have a tendency to use big words?
+[DEFINE @bigwords]
+
+# Does this narrator prefer or avoid slang/swears?
+[DEFINE 25>@slang|25>@formal|50>@noslangpref]
+
+# Does this narrator tend towards more subjective or objective statements or have no preference?
+[DEFINE 25>@subjective|25>@objective|50>@neithersubjnorobj]
+
+# Does this narrator prefer alliteration in sentences?
+[DEFINE @alliteration|@noalliteration|@noalitpref]
+
+# Does this narrator like to avoid making "I" statements about himself?
+[DEFINE @avoidme]
+
+# Does this narrator prefer using simile/metaphor when possible?
+[DEFINE 33>@likesimile|33>@dislikesimile|34>@nosimilepref]
+
+# Does this narrator avoid quoted dialogue.
+[DEFINE @avoiddialogue]
+
+
+
+# ************************************************************
+# Incidental cross-chapter stuff.
+# ************************************************************
+
+
+[DEFINE 50>@favdelany|35>@favbarker|15>@favcrowley]
+[MACRO FavBook][@favdelany>{i/Dhalgren}|@favbarker>{i/Imajica}|@favcrowley>{i/Little, Big}]
+[MACRO AltBook][@favdelany>{i/They Fly at Çiron}|@favbarker>{i/Sacrament}|@favcrowley>{i/The Deep}]
+[MACRO FavAuthor][@favdelany>Samuel Delany|@favbarker>Clive Barker|@favcrowley>John Crowley]
+[MACRO FavAuthorHisHers][~his]
+[MACRO AnotherAuthor][Joanna Russ|Ursula Le Guin|Douglas Adams|Terry Brooks]
+
+# Epigraphs
+[DEFINE 40>@epi_group1a|30>@epi_group1b|20>@epi_group1c|7>@epi_group1d|3>@epi_group1e]
+[DEFINE 25>@epi_group2a|25>@epi_group2b|25>@epi_group2c|25>@epi_group2d]
+
+# Glowstick colors.
+# The symbolism of these color sequences is left as an exercise for the reader.
+[DEFINE @colorseq1|@colorseq2|@colorseq3]
+
+[MACRO color1][@colorseq1>blue|@colorseq2>red|@colorseq3>red]
+[MACRO color1poetic][@colorseq1>sea-blue|@colorseq2>blood-red|@colorseq3>blood-red]
+[MACRO color1shades][@colorseq1>Black and blue.|@colorseq2>Black and blood.|@colorseq3>Black and blood.]
+
+[MACRO color2][@colorseq1>yellow|@colorseq2>orange|@colorseq3>silver]
+[MACRO color2edge][@colorseq1>amber|@colorseq2>ochre|@colorseq3>pale gray]
+
+[MACRO color3][@colorseq1>orange|@colorseq2>yellow|@colorseq3>yellow]
+
+[MACRO color4][@colorseq1>red|@colorseq2>blue|@colorseq3>green]
+[MACRO color4adj][@colorseq1>fiery|@colorseq2>cerulean|@colorseq3>emerald]
+
+
+# ************************************************************
+# Custom text for "Singular Subcutanean" crowdfunders.
+# ************************************************************
+
+# These control text that will never appear naturally; it will only be selected when that variable is manually turned on during generation of a specific backer's book. For privacy reasons, the contributor and the original creative prompt are not tracked here.
+
+[DEFINE 0>@singular01]
+[DEFINE 0>@singular02]
+[DEFINE 0>@singular03]
+[DEFINE 0>@singular04]
+[DEFINE 0>@singular05]
+[DEFINE 0>@singular06]
+[DEFINE 0>@singular07]
+[DEFINE 0>@singular08]
+[DEFINE 0>@singular09]
+[DEFINE 0>@singular10]
+[DEFINE 0>@singular11]
+[DEFINE 0>@singular12]
+
+
+
+
+
+
+
+
+

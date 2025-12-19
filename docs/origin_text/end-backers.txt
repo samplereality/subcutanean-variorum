@@ -1,0 +1,193 @@
+# QUANT
+
+{endmatter/BACKER ACKNOWLEDGMENTS}
+
+Countless permutations of thanks to my crowdfunding backers who helped make this project happen!
+
+{columns/3} Adam Marshall Smith \\
+Adam Summerville \\
+Aidan Linder \\
+Alan Hinchcliffe \\
+Alex Hutchinson \\
+Alex Mitchell  \\
+Alexander Davis \\
+Alexis Ong \\
+Alice Southey \\
+Allison Parrish \\
+Anastasia M Salter \\
+Andrew Ferguson \\
+Andrew Plotkin \\
+Andrew Vestal \\
+Andy Whitmire \\
+Anonymous backers \\
+Anne Sullivan \\
+Bay Chang \\
+Benjamin J Robertson \\
+Bogi Takács and R.B. Lemberg \\
+Brett Witty \\
+Brian Jenkins \\
+Byron Alexander Campbell \\
+Candice Majewski  \\
+Chad Barb \\
+Chris Rees \\
+Clara Fernández-Vara \\
+Clifton Royston \\
+Craig D Hewitt \\
+Damien Neil \\
+Damien Neil \\
+Dan Cox \\
+Dana Duffield \\
+Daniel Dresser \\
+Daniel Ravipinto \\
+Dave LeCompte \\
+David G Tubby \\
+David J. Allison \\
+David Masad \\
+David Szydloski \\
+Dawn Sueoka \\
+Derek Donahue \\
+Diane Heaton \\
+Dietrich Squinkifer \\
+Dionysus Blazakis \\
+Doni Faber \\
+Duncan Bowsman \\
+Dylan Lederle-Ensign \\
+Ed Washburn \\
+Eli Zupke \\
+Elizabeth Goss \\
+Ellie Yee \\
+Emily Hopson-Hill \\
+Emily Shearer \\
+Emily Short \\
+Evan Balster \\
+Evan Marzahn \\
+Felicity Drake \\
+Finn Ellis \\
+Florian Mehm \\
+Frank Lantz \\
+freddy elbaiady \\
+Freya Campbell \\
+Gabriel Smedresman \\
+Gillian Smith \\
+Greg Dember \\
+Hamish McIntyre \\
+Hartmut Koenitz \\
+Heather Albano  \\
+Herb Swift \\
+ian michael waddell \\
+Isaac Karth \\
+Isaac Schankler \\
+Jacob Garbe \\
+Jacob Topp-Mugglestone \\
+James Ryan \\
+Jane Clark  \\
+Jason Grinblat \\
+Jay Edelson \\
+Jenni Polodna \\
+Jeremy Rishe \\
+Jessica Rivera \\
+Jinjin Wu \\
+John Leen \\
+John Maullin \\
+John Murray \\
+John Urquhart Ferguson \\
+Johnnemann Nordhagen \\
+Jonathan Reyes \\
+Jordan Han \\
+Josh \& Amber Fitzgerald  \\
+Josh Lawrence \\
+Joshua McCoy \\
+Julian Togelius \\
+Jurie Horneman \\
+K.DeFlane \\
+Karen Vaughan \\
+Katherine Morayati \\
+Katrina Kinsley \\
+kay walker \\
+Kerry Garvin \\
+Kevin Langevin \\
+Kimberly Shannon \\
+Krauseman \\
+Kyle Haas \\
+Kylie Taylor \\
+Lara Martin \\
+Laura E Hall \\
+Lyle Skains \\
+Malin Rozon \\
+Marcelo D. Viana Neto \\
+Mari Page \\
+Marina Rossi \\
+Mark C. Marino \\
+Mark McGurl \\
+Mark Rickerby \\
+Martin Ralya \\
+Matt Sinclair \\
+Matthew Campbell \\
+Matthew Ivan Bennett \\
+Matthew Kirschenbaum \\
+Matthew R.F. Balousek \\
+Max Kreminski \\
+Maya Sonenberg \\
+Megha Baikadi  \\
+Melanie Dickinson \\
+Michael Bikovitsky \\
+Michael Janes \\
+Michael Mateas \\
+Michael Rubin \\
+Michiel Trimpe  \\
+Mike Treanor \\
+Molly O'Brien-Manley \\
+Nick Junius \\
+Nick Scheiblauer \\
+Noah Wardrip-Fruin  \\
+Noel Warford \\
+NPCDev \\
+Patrick R \\
+Paul Benzon \\
+Peep van der Molen \\
+Peter Mawhorter \\
+Phoenix Toews \\
+Rae Tay \\
+Raphael D'Amico \\
+Rax Green \\
+Richard Eriksson \\
+Richard Roberts \\
+Rick Dean \\
+Robb Sherwin \\
+Robert Fletcher \\
+Robert Giusti \\
+Sam Kabo Ashwell \\
+Sam Roberts \\
+Scott Hardwick \\
+Scott M. Bruner \\
+Sebastian ‘achlys' Stein \\
+Shannon Prickett, Patron of the Arts \\
+Simon Sarginson  \\
+Stephen G. Ware \\
+Stephen Granade \\
+Sterling Keeley  \\
+Storme Winfield \\
+stricken.messenger \\
+Sydney Ellis \\
+tablesaw \\
+Tara Liu \\
+Tarn Adams \\
+Terry Beyak \\
+Theresa Jean Tanenbaum \\
+Thomas Dinneny \\
+Thomas Gizbert \\
+Tim Chaplin \\
+tobbsvensson \\
+Tracy O'Brien \\
+Travis Capener \\
+Ty Eckley \\
+tyler burns \\
+Valentina \\
+Vallia Yu \\
+Will Jennings \\
+William Hampton \\
+Yuu Gamon \\
+Zack Urlocker \\
+
+{end_columns}
+

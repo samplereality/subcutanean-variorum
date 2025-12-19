@@ -1,0 +1,462 @@
+# QUANT
+
+
+
+{chapter/8}
+
+
+# Pick one of two significant moments: either a spiral hallway that one of them doesn't see, or Niko almost falling and Ryan having to talk him to safety.
+
+[DEFINE 50>@spiralhall|50>@nikofalls]
+
+# Optionally include an extra sequence exploring a weird example of architecture.
+
+[DEFINE 34>@noch8extra|33>@hamsterwheel|33>@stageladder]
+
+
+[DEFINE @ch8intro1|@ch8intro2|@ch8intro3]
+“[@ch8intro1>So it's progress, right?|@ch8intro2>So this is huge,|@ch8intro3>This changes everything,]” Niko was saying. We were in [@dustyroom>the {funnyshaped} room behind the closet with the {doomed} board game, dust gathering on unresolved plans for world domination.|a little side room off the kitchen, too small for a bedroom and too big for a closet, which the housemates had set up some complicated, doomed board game in. The pieces were gathering dust.] We'd moved all our expedition gear in here; we didn't want to explain things to anyone else, and the rest of the housemates had forgotten this room even existed. I rubbed the ugly bruise ringing my ankle, sitting on the grimy hardwood floor with my pant leg rolled up. 
+
+[MACRO funnyshaped][funny-shaped|weird little]
+[MACRO doomed][never-to-be-completed|doomed|unfinished]
+
+“[@ch8intro1>Progress?|@ch8intro2>Oh yeah?|Does it? How?]” I winced, prodding a tender spot.
+
+“[@ch8intro1>The|It's the] first concrete sign there's something down there. Not glints of light. Not sounds. Something physical.”
+
+“Yeah, reassuring.”
+
+He conceded the point, slumping down next to me. “But why now? What brought this on? Is the maze forbidden? Did we [violate some kind of policy|break some kind of rule]?”
+
+“Marking our way.”
+
+“What?”
+
+[25>I sniffled. |25>I sniffed.|50> ]“It's the first time we've tried to leave a permanent trail, something unambiguously marking the way back. Maybe whatever it is... ugh.” It still felt awful to verbalize it, give it that kind of [legitimacy. That kind of power|legitimacy|power]. “Maybe it didn't [like|care for|appreciate|approve of] that.”
+
+“[66>What about the spilled coffee? That's a kind of a marker. We didn't get in trouble for that, and it didn't disappear or anything. Maybe|Or maybe] whatever's down there doesn't want us exploring the [@empty>crawlways. Because they lead|furniture maze. Because it leads] to something. Something big.” [He punched the wall, suddenly angry. “Who fucking knows? None of it makes any goddamn sense.”
+
+“That'll go on our tombstones. A week from now, when we're dead of dimension poisoning.” He raised an eyebrow at me: {i/Really?} I shrugged. “Either that or lung cancer from the smokes, bro. You pick.”|
+
+I punched the wall, suddenly angry. “Who knows? None of it makes any sense anyway.”
+
+“That'll go on our tombstones. A week from now, when we're dead of fucking dimension poisoning.” 
+
+“Well hey, dude, it's either that or lung cancer thirty years from now.” I mimed taking a drag off a smoke. “At least dimension poisoning's probably quicker.”]
+
+He laughed despite himself, and I chalked up a mental win. Cheering him up, making him smile, was so ingrained in me I barely noticed I was doing it any more. Maybe that day, I shouldn't have been. It wasn't exactly a situation to be cheerful about.
+
+{i/Do I do it because I really want him to be happy? Or is it that I can't stand it when he's sad?}
+
+“I'm not going down there again,” he said with grim finality.
+
+[Neither of us said anything|We were quiet|We both contemplated that] for a long minute.
+
+“Okay fine, I am. You're right. You win. We find a way back. Somehow.”
+
+“There's monsters up here, too,” I said softly.
+
+He sniffed. “Or maybe we're the monsters, man. Crawled out from under[neath] the bed.”
+
+{section_break}
+
+We decided to explore the vertical shafts, instead of going back into the [@empty>crawlways|maze]. We didn't know whether what had happened was a message or a provocation. I thought the bruises on my ankle were message enough: Keep Out. Niko argued that was exactly why we should ignore it. Wherever they don't want you to go is probably the most interesting place to be. On the other hand, maybe the message had been like fences around Chernobyl.
+
+Maybe what[ever] was farther in was worse.
+
+[STICKY_MACRO Grapples][Grapple Buddies|Grip Monkeys]
+So we settled on the shafts, which [had the virtue of being|were] unusual and promising terrain without even mild signs of demonic infestation. One of Niko's ex-hobbies was rock climbing, but he'd stopped after the accident jacked up his wrists. Bits of gear still lingered around his overstuffed bedroom, though, so we'd assembled some rope, harnesses, carabiners, and a couple of grappling hooks [we found at|from] the sporting goods store. The box called them “{Grapples},” which seemed incongruously cheerful.
+
+[DEFINE ^@canyons]
+[@canyons>Niko took me up into the canyons to teach me some climbing and test the {Grapples}. It felt strange to leave the house, breathe hot air and smell external things, outside things, moss and leaves and rain. Climbing didn't come naturally to me but Niko was patient and a good teacher, and knew his knots and technique. By the time we were loading our packs for the next expedition, I felt reasonably confident I wouldn't immediately kill us both.]
+
+We picked the first pit, since they all seemed about the same, and set about securing the grapples in a doorjamb in a way that would hold our weight. We'd each go down on our own rope, one at a time and using the second as backup. We also had extra {Grapples} in our pack, in case something happened to these. 
+
+Along with the usual gear, we also brought down a camcorder. We were too broke to afford the newer all-digital cameras, so we borrowed one that shot on Hi-8 tape. This was before the whole found footage craze, so we didn't think to take the camera down the pit with us and record weepy confessionals into it: we were going to leave it down the hall from the shaft, trained on the pit and our ropes and the {Grapples}, hopefully capturing anything that tried to mess with us. 
+
+When we were ready, and since we didn't have a tripod, I left the camera on the floor a dozen paces back, pointed at the pit, and hit record. We shouldered our packs and Niko tied on to the rope. Moving carefully, he stepped over the lip, and started to rappel down the carpeted “floor” of the shaft. I watched his grapple nervously, but it held his weight, tines set deep into the solid wood of the door frame. 
+
+The bottom of the shaft seemed a mile down with Niko dangling above it, but probably only dropped about seventy feet. He moved fast and soon was stepping onto the once-again-horizontal carpet at the bottom. He shined his light back up at me and gave the all-clear.
+
+I followed him down, trying to think only in particulars about what was happening and not the terrifying big picture. I focused on [@canyons>what Niko had taught me|old climbing lessons], what my hands were doing. One thing at a time. Presently I'd made it down too.
+
+The hall at the bottom of the pit stretched off to either side, like we were at the junction of an upside-down T. Detaching from our dangling ropes, we picked a direction and began to explore.
+
+Things got weird down there.
+
+The hallways continued on as they had above, and there were more pits. But [now they|these] didn't go straight down. Not quite. They descended at angles ranging from [severe to subtle|subtle to severe], never quite true to vertical. Some were almost ramps. Others changed their angle or gradually twisted as they dropped. And while the pit we'd rappelled down was lit, none of these were. [All of them|Each|They|They each] plunged down into darkness.
+
+[There were more of them, too|And there were more of them]. A lot more. [Maybe hundreds|Hundreds|Hundreds, maybe|Dozens and dozens]. Most opened from the middle of a hallway, filling its width: easy to jump across, but wearing a pack you felt clumsy, were acutely aware you were one stumble away from a very bad time.
+
+We decided to avoid [any] unnecessary leaps, but the pits were so thick they hedged us in, pushed us inexorably [towards an unknown destination|in certain directions|in a certain direction]. If we tried to veer too far off course, they'd get denser, and we'd have to backtrack or turn aside, angling back to our former heading. And the [farther we went that way|longer we followed it], the more the hallway angles edged off true.
+
+It was subtle at first. But the horizontal [hallways|halls] [were getting|became|were becoming] less and less level. We'd stumble on a floor that canted slightly left, or tilted [a half-degree|half a degree] up or down. The walls, too, were growing angled, some leaning outward a degree or two instead of staying neatly parallel, or bent a little bit inward at mismatched angles. It made us feel drunk. You've seen so many well-constructed hallways in your life, your brain doesn't know how to process ones that don't behave.
+
+[*Ch8SpiralHall*@spiralhall>
+We passed through one long hall that started leaning left and kept going as we moved down its length, twisting through a full three hundred and sixty degrees. I don't mean it was actually moving: imagine holding a long strip of paper, a hand gripping each end, and rotating one wrist to twist an end around. That was the shape the hallway made. The wall tilted and became the floor as we walked, and we tromped across closed doors, the rooms beneath them echoing. Then we were walking on the ceiling, stepping over light fixtures. By the time the hall ended it had rotated all the way around, and we were back on carpet again.
+
+That wasn't the weird part.
+
+The helix hall had opened into a grid of rooms with open doorways and no connecting corridors. After moving through these into an exit hallway, I called for a break. We hadn't been talking much, lost in our own thoughts. I said something about the weird hallway and Niko seemed confused.
+
+“Weird how?”
+
+“Twisting all the way around like that. You think it's significant?”
+
+He didn't know what I was talking about.
+
+I asked him to describe the path we'd taken to get here. Raising a skeptical eyebrow, he did. Everything was right except he called the part before the grid “a long, straight hallway.”
+
+“Nothing unusual about it?”
+
+He blinked. “No, not that I saw. What are you getting at?”
+
+“You don't remember, like, walking on the ceiling.”
+
+He frowned. “Are you fucking with me?”
+
+I closed my eyes. I could remember the awkwardness of walking against that steepening angle, shifting a foot to shuffle awkward through the trough of an edge turned into two sloping floors. The way the sound had changed as the surface beneath our shoes went from carpet to drywall. The changing angle of the light as it hit us from below, from the side, from above.
+
+I told him. When I'd finished, he looked sick, and angry.
+
+“If you're messing with me, man...”
+
+“I'm not. I swear. I'm not.”
+
+He hunched back into himself, looking despite his height like a tiny, cornered animal. Hunted.
+
+“This changes things.” His voice was small.
+
+“How do you mean?”
+
+He sniffed. “Alters the equation, you know. If you and I can't even see the same things any more... we're lost. In every sense that matters.”
+
+We vividly described our current surroundings to each other. Past things we'd seen: the {room shape name} room, the pool.
+
+Everything matched up.
+
+It didn't make us feel any better.
+
+“Maybe...” I grasped for something to say. Niko was scared now, I could tell, more scared than me. He needed me to calm him down. “Maybe I imagined it. You get that sense down here sometimes, right? Like thinking's almost enough to make it real?” He eyed me, uncertain. “Maybe I was daydreaming and got confused. We've been under a lot of pressure. I mean I don't know. A mistake.”
+
+He stared right through me. “You don't really believe that, do you?”
+
+My face flushed. “I—”
+
+“Don't just tell me what I want to hear, Ry. Don’t ever do that. You got me? If I can't trust you...” He swallowed. My face flushed. The accusation stung.
+
+“Let's go back,” he said. “Let's go back and look, right now. Sort this out.”
+
+“No,” I said at once, instantly terrified. I didn't want to know. Because no resolution to this was good. One of us couldn't trust our senses, or both of us couldn't. Or something was much more wrong than that.
+
+{i/Or}, a voice whispered in my head, {i/maybe he's lying. Maybe he} did {i/see it, and he's just pretending he didn't.} I shook my head, but the voice persisted. {i/Who knows what else he's pretending about?}
+
+Maybe he was thinking the same thing about me.
+
+“We should go back,” Niko said, miserable. “And if we don't both see the same thing in that hall, we need to abort. Get the fuck out of here, rethink this whole thing. This is {i/fucked up}, man. We're out of our depth. We're losing control.”
+
+“We can't quit now.” I felt unaccountably calm. “If we let ourselves get spooked by every new thing that happens down here, we'll never figure out what we came down here to figure out. That's what we're looking for, right? The strange bits?” I gestured ahead. “We should see where this leads. Explore as far as we can before turning back. That was the plan, right?”
+
+He stared yearningly back at the entrance to the grid of rooms, the path to the hallway that was or wasn't a helix. Then he turned his eyes to me. Resentful.
+
+Suspicious.
+
+“Yeah,” he said. “It was.”
+]
+
+[|Once at the peak of my swimming days I'd had a chance to swim in the ocean. It was a school trip and there was a beach day and some of the other guys were going to do it but the thought alone terrified me. Not because of waves or rip tides or sharks. In a pool, you know, through goggles, the universe becomes a smooth abstraction: white and well-lit concrete on all sides, contained, chemicals and filters flushing out anything but you. Sounds are muffled. Gravity's on break. There's no place for anything to hide, and even when you can't touch bottom, you know it's there, a few feet below.
+
+The ocean is different in every conceivable way. Standing in the surf would be one thing, but swimming out past where my feet could touch the sand? The thought crushed me with primal terror, compressed me. An unknowable void stretching down beyond my flailing bare feet. What it might contain. Years later I tried reading Lovecraft and thought of that sensation again when he talked about cosmic horror, something so vast and inhuman it could shatter you, so close it could reach out and brush your toes. I couldn't make it through more than a couple stories. I couldn't shake that image.
+
+I couldn't shake it now.]
+
+We kept going.
+
+The halls branched and spread [^out] endlessly. We gave up trying to map, other than [our|the] route back. We passed through regions of dark[ness] and regions of light. The decor rarely varied from its ubiquitous blandness. Sometimes little things were wrong. [A door, off its hinges, lying neat and flat in the center of the hall.|A door turned sideways, opening outward.] [A light fixture sticking out of the carpet.|A knob embedded in the ceiling, unable to be turned.] [Crown molding running in a line a foot above the carpet.] We searched around these anomalies, but never found anything useful.
+
+Some of the rooms got larger, too big for rooms in a house. More like a school gymnasium. Still the same carpet, though. And it felt like we were seeing more of the anomalies, the farther in and deeper down we got. [An explosion of pipes and plumbing, sticking out of a wall for no particular reason|Doors or sections of hallway paved in bathroom tile]; [weird cube-shaped extrusions or cavities in the edges of rooms|rooms that were two feet wide or with fifty-foot ceilings]. It was like the deeper we went, the more flexible the rules became—of architecture, of stability, of god knows what else.
+
+[MACRO maybe you see that][@spiralhall>“You see that, right?” Niko asked, wide-eyed. I did.]
+[*Ch8HamsterWheel*@hamsterwheel>
+At one point we came to a low-ceilinged room maybe twenty feet across, unlit, too big for our flashlights to see the far end. But at the edge of their reach, in the dimness, the floor began to curve up.
+
+{maybe you see that}
+
+We started forward. The ceiling stayed at the same low height, maybe seven feet up, but its angle began to steepen, in lockstep with the angle of the floor. After a few minutes, the slope was too severe for our shoes to get purchase on the carpet. For as far as our flashlight beams could show the slope kept on steepening, although we couldn't see too far around the curve ahead. It was like walking up the inside of a giant carpeted hamster wheel.
+
+“This proves it,” Niko said.
+
+“Proves what?”
+
+He threw his hands up. “Downstairs can't possibly exist.”
+
+“No shit, Sherlock.”
+
+“I mean not in real, physical space.” He swayed, shifting his balance on the awkward carpeted slope. “This is too big. We haven't gone down nearly far enough for this whole curve to fit underground.”
+
+“I don't know about that. It doesn't feel like we've climbed enough to hit ground level yet. And maybe this isn't a full wheel. Maybe it stops just up ahead.”
+
+He scowled. “Man, why are you always {i/defending} this place? Making excuses for it? Okay, Einstein. Why wouldn't it go all the way around?”
+
+“Well, why {i/would} it?”
+
+We stared at each other, but there was nothing else to say.
+
+“Maybe it's more like a message,” he muttered as we started back down the slope. “Rats in a cage, you know. Spinning our wheels. Getting nowhere.” He shot a vicious glance at the curving ceiling. “Funny.”
+
+There were no doors out of the hamster wheel other than the one we'd come in from, where the slope had flattened out again. We left it behind, another baffling mystery. 
+]
+
+[*Ch8StageLadder*@stageladder>
+Behind one unassuming door we found something that looked almost like a backstage, with a wood floor painted black instead of a carpet, cinderblock walls with folding chairs stacked against them by the hundreds. But no curtain, no audience, no racks of lights above. In fact there was nothing above: the walls rose up beyond the range of our flashlights.
+
+In the exact center of the room was one of those caged metal utility ladders, climbing up into that darkness.
+
+{maybe you see that}
+
+Mostly because it was going up and not down, we decided to try it. Or I decided, anyway, hands gripping the cool metal rungs before Niko could raise an objection. I felt reckless down here, brave enough to try anything. The exact opposite of the me on the surface.
+
+Besides, the ladder looked just like the one at my junior high when I'd been on stage crew. I'd climbed it a million times. The metalwork of the cage felt like a blanket. Safe.
+
+Within a minute I'd climbed disturbingly high. I didn't look down but the beam of Niko's flashlight, trained on me, had faded to glimmers, washed out by my own. Everything around and above was dark. And {i/quiet}. All Downstairs was quiet, of course, but here it seemed monstrously so, a quiet of infinitudes, even the sounds of my own body sucked away into the emptiness around me. 
+
+Niko seemed so far away.
+
+“Find anything up there?” he asked, putting a hand on my shoulder. Startled, I looked down. My hands were still gripping the rungs of the ladder, but my foot was on the floor of the stage. I was on the ground. Niko was beside me.
+
+“What happened?” I felt dizzy.
+
+He frowned. “You climbed up for a while, then you came back down. Anything up there?”
+
+I made him try. The same thing happened. I watched him climb up, high into the darkness above. Then, without missing a beat, he reversed course and came back down. When he made it back to me he was as startled as I'd been. He felt like he'd been climbing up the whole time.
+
+We tried experiments. Keeping in verbal contact. Focusing on our movements. With enough of that, it was possible to realize that you'd started moving down again before you'd come all the way back. But always with a sick and juddering sense of grinding gears: one part of your brain kicking in and telling another it had been looking at things wrong. It took a moment to perceive, like an optical illusion. We stopped after a particularly nauseating moment when I was listening to Niko below me chanting {i/You're coming down, you're coming down, you're coming down}, and all my senses were telling me that was wrong, that I was still climbing up, climbing up, climbing up, and when the truth crashed into my perception I felt such a wave of sickness that I almost lost my grip on the ladder, had to clutch it shivering for minutes, cold sweat breaking out all over my body. After that we decided to stop experimenting.
+]
+
+We were getting tired. Just before turning back, though, we found one last curious room. We could hear it before we opened the door.
+
+The room was the size of a squash court, though not quite as tall, the whole thing covered in green bathroom tile, even the inside of the door we came through. A sink rose serenely from its center. Scalding water blasted from the faucet, releasing clouds of billowing steam and filling the air with a moist, sticky warmth. The sink was full, water spilling over its sides and flowing down the porcelain like some artsy fountain, then streaming away across the tile, presumably according to some imperceptible tilt in the floor. It vanished down an open hallway, carpeted once again, slanting down at a steep angle from a corner of the room.
+
+We walked over to the hallway to peer down. It was closer to vertical than horizontal, dropping at a vicious angle. Where the hot stream hit the tilted carpet it became black with mold, and the walls and ceiling [^of the tunnel] were stained with rust and moss. Like water had been coursing through it for a long, long time.
+
+From the slanting darkness rose a hot smell of rot.
+
+“This feels different,” Niko said.
+
+We walked back to the sink and tried to turn off the faucet, but the hot and cold knobs spun loose. The scalding water rushed full force out of the tap, churning noisily in the basin.
+
+“[We're going to|Gonna] have a hell of a water bill,” I joked, but then remembered something. The newspaper article from the history lady, about [@vortex>the old fort built on the site of our house. It had said something about a natural spring, an underground cavern.|@gardens>the gardens that once grew wild here, fed by a spring from deep underground that kept the unlikely menagerie of plants alive. Kept them multiplying. A bank that grew and grew until it had far more money than had ever been deposited.|@snakeoil>Dr. Henneson's wondrous elixirs. It said he'd bottled them in an underground grotto. A natural spring welling up from deep beneath the earth.|@caves>the boys lost in the cave whose entrance had once been on the site of our house. The spring that bubbled up from beneath it. The spring that had been bricked up.]
+
+[@caves>Looking-Glass Cave.]
+
+[Something felt|I felt as if something was] on the verge of snapping into place, making sense. But I couldn't quite see it.
+
+[@vortex>{verse/A looking-glass held above this stream \\ Will show your troubles like a dream}
+
+{mirror poem bit}|@caves>{verse/We can see our coloured faces \\ Floating on the shaken pool}
+
+I got down on hands and knees to stare into the running water, not sure what I expected to see. But there was nothing. The billowing steam and rippling of the water meant I couldn't even see my own reflection.
+
+I got to my feet, feeling deflated.|@snakeoil>Tentative, I cupped my hands in the scalding hot water and brought a sip to my mouth. It had the familiar flat and faintly chemical taste of tap water. It did not seem effervescent. I did not feel healed.]
+
+[MACRO mirror poem bit][~I dug through my pack and found a tiny mirror in the survival kit. You were supposed to use it to signal planes. I held it above the running water, angling it around, not sure what I expected to see.
+
+There was nothing. Just the two of us, reflected back.
+
+After a moment the billowing steam fogged the mirror, erasing the reflection.
+
+I put it away, feeling deflated.]
+
+Niko was beaming his flashlight down the tunnel, chasing the descending path of the stream. “This would be rough going. Steep and slick. We’d need better climbing gear. And I can't see how far down it goes.”
+
+I took a deep breath. “It feels like that's the way, though. Doesn't it?”
+
+He ran a hand through [his|steam-wilted] hair, eyes still pulled down the shaft. “[Jesus, I hope not.|Yeah. Yeah, it sure does.]”
+
+{section_break}
+
+I couldn't stop thinking about the wet tunnel as we retraced our steps. Images of it flashed through my mind. The [desire to know what was|thought of what might be] past the reach of our flashlight beams, what was down there, was maddening. I was planning how soon we could come back down, what we'd have to bring with us. What it would take to keep pushing deeper.
+
+[@spiralhall>
+For better or worse, we ended up missing the long twisting hallway on our way back. From the grid of rooms we found a different door that let out much closer to the bottom of our pit, and decided without too much discussion to take it. I was glad Niko didn't press the point. Maybe he'd forgotten.
+
+I couldn’t stand the thought of our perceptions of the world not agreeing.
+]
+
+We passed through the last few hallways to the base of shaft we'd come down. On the carpet directly underneath were our ropes, coiled up neat, {Grapples} still tied to the end.
+
+“God damn it,” Niko said with feeling, craning his head to glare accusingly at the shaft and fling curses up its length. We couldn't see anything unusual up there, not from down here.
+
+Our way back up had been cut off.
+
+We had extra grapples in our packs, but the originals didn't seem damaged: just detached. The shaft was too narrow to throw one all the way back up [to the top] without hitting a wall, so we settled for hooking a doorway, halfway up.
+
+Our position now was much more precarious. We couldn't tell if the grapple was set properly: we just had to trust it. Niko volunteered to go first. From the ground below, I watched him climb, anxious.
+
+[DEFINE ^@acceptedLove]
+[@acceptedLove>And for some reason, that was the moment I finally accepted that I was still in love with him. I’d tried so hard to convince myself I wasn’t, that I’d moved on, wrung him out of my heart, that all we had was an especially deep friendship. But watching him dangle from that rope, knowing he could fall at any second, I couldn’t pretend any more. I’d never stopped loving him. I didn't know how. Maybe I never would. {spiralHallLoveAddendum}]
+
+[MACRO spiralHallLoveAddendum][@spiralHall>Our perceptions of the world had never fucking agreed.]
+
+[MACRO nikoFallsIntro][@acceptedLove>And that was also the moment|But I felt too bone-tired to worry much about anything by then. Niko was a good climber. We'd made it down without incident. I was confident we'd make it back up. {pp} So I was caught completely by surprise when]
+
+[@nikofalls>{nikoFallsIntro}
+the grappling hook ripped through the molding of the wooden doorframe far above, and Niko fell.
+
+{chapter/9}
+
+Time seemed to snap and twist back on itself in opposing directions, both too fast and too slow. Terror struck me like lightning, searing me with unbearable matching thoughts: {i/he's going to die} and {i/there's nothing I can do to help him}.
+
+Then he grabbed the edge of the next doorframe down and his body slammed against the horizontal door beneath. I watched the bottoms of his sneakers as they kicked and flailed at the smooth beige wall, scrabbling for purchase.
+
+He was still too far up. {i/Too far.} If he fell...
+
+“Are you okay?” I shouted up at him, or something equally useless. My lungs were clenched so tight that for a minute I couldn't breathe back in.
+
+He'd managed to press the toes of his sneakers up against the wall, but there was nothing to stand on. His position was desperate, hands gripping the inch of molding like claws. I could see muscles trembling even from here. He clung to the wall quivering like a caught-out insect, paralyzed with indecision.
+
+“You're okay.” I tried to keep my voice light, in control, willing confidence into it and up to him. My mind thrummed as it raced to find him a way out. He was still clipped on to the climbing rope but the grapple now swayed useless beneath him. The hallway pit ran featureless above and below the doorframe he clung to: there was nothing else to get a grip on, not for a dozen feet in either direction.
+
+“The door.” I projected calm authority. “You need to get the door open. If there's a room inside, it'll only be a little drop. Niko. Are you listening to me?”
+
+He shook his head, as if snapping out of shock, found the doorknob beneath him and focused on it. It was on the bottom side of the door from our perspective, at waist-height for Niko, but too far off to the side to easily reach. 
+
+He lifted an ineffectual foot to try kicking at it, but it was too high. I watched his fingers slip towards the edge of the molding.
+
+“Nice idea.” I tried to keep my voice steady. “Just try again, okay? I'm right here. If you fall, I've got you.” But did I, really? My arms were stretched out stupidly, but if he fell into them from that height it would break us both. 
+
+He kicked again, more desperate this time, foot still far from the knob. His shoe scudded across the smooth paint of the door. His fingers gripped the molding so tight they'd gone white. He couldn't hold a grip like that much longer.
+
+“You almost had it,” I lied. “Come on, buddy, you got this.”
+
+“Just shut up for a second,” he shouted, flashing a glare down at me. “Stop fucking telling me what you think I want to hear and shut up.”
+
+I fell silent, face flushed, paralyzed. Singed. 
+
+He stared at the knob, and the silence sharpened until I couldn't help but break it, to say out loud what I knew he was thinking.
+
+“You'll have to let go with one hand.” I said it as even as I could. “Just for a second. To turn the knob.” I breathed. “There's no other way.”
+
+He nodded. I stood helpless below him, arms still stretched up, aching.
+
+Then he did it.
+
+In one quick move he pressed his body in toward the door, letting his toes take as much weight as they could, let go of the frame with his left hand and thrust it out hard toward the knob. He brushed it and for a horrible moment it looked like he wouldn't be able to grip it and turn it, the angle all wrong, and so was his balance, now; but then his fingers wrapped around the knob, his wrist twisted and it turned.
+
+The door clunked and swung inwards from the bottom as his weight pushed against it, and he half-collapsed, half-scrambled through as his balance was lost, fingers slipping off the frame. He tumbled inside, banging knees and shins, and fell through, the door swinging shut behind him like a cat flap, muffled thumps and curses making their way through the walls. 
+
+But before I could even breathe out, a shock of awful, sawtoothed sound smacked into me from above, and I was so startled I bit my tongue. It was utterly alien, a juddering metallic {i/twang} that lingered in the air, throbbing, jittery, reluctant to die away.
+
+And then I realized what it was.
+
+The sound turned in an instant from monstrous to mundane. Niko must have thwacked it as he tumbled past, flailing: one of those springy metal doorstoppers, no doubt surprised to meet a falling body instead of a hastily opened door.
+
+{section_break}
+
+We made it to the top, in the end. It took a series of shorter climbs to each sideways room, treating them like miniature base camps, places to rest before flinging the grapple up another dozen feet to the next door, the next cube of safety; testing each set of the grapple more thoroughly, belaying each other as best we could in the patently unsafe circumstances. But at length, we'd made it back out.
+
+“Sorry about earlier. What I said.” I'd just grabbed his hand pulling me up the last few feet, and now we were sprawled on the carpet, mercifully horizontal again, like two mountaineers on the world's blandest summit.
+
+“Don't worry about it. You just... do that sometimes, and it bugs me.” {i/Tell him what I think he wants to hear.} I shut my eyes. “I wish you'd...” He lifted a hand, gestured vaguely in the air, dropped it in defeat. “Whatever, forget it. There's a million more important things to worry about.”
+
+|
+
+He was a good climber. He made it to the sideways door without incident. From there, it was a matter of taking things in stages to get back up to the top. Each of the vertical rooms we passed served as a miniature base camp, a place to rest before flinging the grapple another few dozen feet to the next doorway. We'd both climb up and do it again. Eventually we made it back to the top. It was like a mountaineering expedition, kind of, except inside a house. So not at all, I suppose.
+]
+
+
+The camcorder was where we'd left it, sitting on the carpet pointed at the pit.
+
+The door frame where [@nikofalls>our original|the] grapples had been attached wasn't damaged. We'd seated them pretty firmly, so this suggested that rather than being yanked free from below, someone had carefully unhooked them from up here.
+
+Of course, the ropes had also been neatly coiled at the bottom. Someone had to have done that from down there.
+
+[I didn't want to watch the tape, not while we were still Downstairs. But Niko, face grim, insisted. So I huddled miserably beside him|Niko didn't want to watch the tape, not while we were still Downstairs. But I couldn't stand not knowing. So he huddled miserably beside me] while we watched the footage on the tiny flip-out screen.
+
+[DEFINE ^@tapeTooShort]
+The tape had run to the end, so we backed it up a bit and hit play. To our dismay, the ropes were going over the edge right to the end; whatever happened, it had been after the tape ran out. Niko held down the rewind button and we settled in for a long haul[@tapeTooShort>: but after only a few seconds we saw ourselves spring back up from the pit in fast motion, first me and then him; dicker with the grapples and rope for a few minutes; then zip over to the camera to turn it on.
+
+“I swear the tape was at the beginning,” Niko said. “There should have been two hours of space. This is like five minutes at most. What the hell?”
+
+He let go of the rewind button and let the tape play.|. We spooled back through the whole tape, but nothing changed: it was two hours of motionless footage of the hallway and our ropes. Finally we saw ourselves spring back up from the pit at high speed, first me and then him; dicker with the grapples and rope, then zip over to the camera to turn it on. The tape clunked to a stop.
+
+Cursing up a blue streak, Niko hit play.]
+We watched in numb frustration as everything we'd done earlier played back: the same discussions about rope and seating the grapples, the same lame jokes failing to ease tension. There wasn't much point to watching it all unfold again. We just didn't know what else to do.
+
+On the tiny screen, I was standing a pace or two back, wondering aloud how much [stuff|gear] we should take down with us. I hated how my voice sounded on tape, how my face looked. I always had. Even on the tiny screen I could see red blotches. On the screen a miniature Niko sat on the edge of the pit, adjusting his ropes.
+
+Distorted by the shitty camcorder speaker, he said, “How far down do you think this goes?”
+
+My image shrugged, said “We [should|could] possibly go [much|far] deeper.”
+
+My skin crawled. “Oh my god.”
+
+Niko glanced at me. “What?”
+
+“That's not what I said.” My head was spinning. What {i/had} I said? Something like {i/It can't possibly go much deeper}, maybe. Not that. 
+
+Screen-Niko said “[You're|Yes,] right. [In fact|Actually], we shouldn't [you and I|the two of us] come back [^up] this [way|route] at all. [^No.] We should [go down|descend|go deeper] and we should let's stay down[^ there], down and deep.” His voice sounded strained, but he pulled his rope tight smartly. “[Don't|And don't] come back [up] [till|until] we find it, [man|Ry|friend]. What it is we [need|ought] to find.”
+
+Where it gripped the camcorder, Niko's hand was pale. “I didn't say that either,” he breathed. “I mean I said something about that long, some of those words and phrases maybe. But they're {i/different they're fucking different—}”
+
+I shushed him, because the voices on the tape were speaking again. But now the words were familiar, mundane. We both watched the screen, afraid to blink, but nothing else seemed changed. Everything played out as we remembered. Except now every word and gesture caused a spike of uncertainty. {i/Had} I said that, exactly that? Had I moved my arm that way, stood in precisely that spot?
+
+[Screen-|Video ]Niko started to rappel. The camera focused on my legs as I stood up top, watching him descend. On the screen I waited, then clipped onto the rope once he'd made it to the bottom. 
+
+[Video |Screen-]Ryan checked his harness, took a deep breath, and started down.
+
+He paused before his head dropped out of frame to call down to Niko: “Coming down.” I remembered saying that[, I thought].
+
+Then he turned and looked straight at the camera.
+
+Straight into the lens.
+
+He held the gaze for a long moment.
+
+Then [^he ]glanced, deliberate, down the shaft. Then back to the camera.
+
+Wide-eyed.
+
+His head dropped out of sight.
+
+We sat frozen, watching the video of the empty hall [@tapeTooShort>for another thirty seconds, until the tape reached its end and clunked to a stop|for a minute, two, the grainy image showing nothing but the empty hall and our ropes].
+
+Niko breathed out. “Jesus.” He closed the screen and sat the camera down, backing away from it like it was a bomb. “Jesus fucking Christ.”
+
+I kept staring at it. [@vortex>{i/A looking-glass held above this stream...}|@gardens>{sc/EXPANDING ONCE AGAIN} floated through my head, the copy from the old newspaper ad. {sc/WE ARE ALWAYS AVAILABLE, EVERY DAY AT ANY HOUR.} {pp} {sc/WE NEVER TIRE.}|@snakeoil>{sc/EXPANDING ONCE AGAIN} floated through my head, the copy from the old newspaper ad. {pp} {sc/SUCH WONDERS AWAIT YOU.}|@caves>{sc/CAVE SEARCH CALLED OFF} floated through my head, the headline from the old newspaper article. {sc/SURELY NO HOPE LEFT FOR YOUNG SPELUNKERS.} {pp} Pools as clear as air.]
+
+“Jesus,” he kept muttering. “Jesus.”
+
+{section_break}
+
+We slept in the big room that night because we always had low-level headaches now when we went upstairs. [^(Also, because I thought I heard someone up there, rummaging in the kitchen. The housemates were all supposed to be at a party. “Hello?” I'd called, but no one answered. The noises stopped, though.)] We were becoming trolls, hiding from sounds, afraid to go out under the sky, only venturing from our cave to get more supplies, stock up for further ventures down. I slept under the foosball table, gathering dust. No one but us had been down here for weeks.
+
+[You won't be surprised|It won't surprise you] to hear I had nightmares.
+
+[I replayed the tape in my dreams|In my dreams I replayed the tape], over and over. Each time I rewound all the way to the start, intent to watch it through, [to] make sure there wasn't some clue I'd missed. And each time the tape was different. It was always Niko and the pit and I, but never the same. And whenever something changed, fresh dread [flooded through me|filled me up again].
+
+[Some of the changes|Sometimes the changes] were slight, [barely|hardly] there, and I [strained|struggled] to catch the altered words, the different glances. Sometimes our words were rearranged, as if to make cryptic cyphers, [hidden|buried] meanings on the verge of making sense but never quite resolving.
+
+In some of these variations, Niko and I were [together|boyfriends|dating]. A couple. I could tell from the words we used, the way we looked at each other. Nothing that would have been obvious to anyone but me. I [watched|replayed] these scenes over and over, rewinding to catch the little glances, secret smiles.
+
+There were other, worse versions.
+
+There were dream-tapes where a gaunt Ryan and Niko [fought each other for control of the camera, staring manic into the lens with frantic mouths full of rotting teeth, skin flaking beneath torn and faded rags sticky with dried blood, like they'd been trapped down there for months. They clawed at the lens, as if trying to climb into it. As if it somehow were a way back out.|with aged and wrinkled faces hobbled up to the camera in wonder, picked it up, passed it back and forth between them in awe. Like they'd been trapped down there for a lifetime. They pawed at the lens in a stupid glee, as if they'd forgotten what a camera even was. As if it might somehow be a portal back through time.]
+
+There were tapes where we [screamed at our watcher-selves to go away|cursed out our watcher-selves, told them to go away], to never come [down|back] again, that what was down [there|here] would [kill|destroy] us. There were others, far worse, where we [grinned|smiled|laughed] like [wolves|sharks|demons], invited ourselves to come [down deep|down|down there], and stay. 
+
+[STICKY_MACRO tapes1][tapes|shots|versions|scenes]
+[STICKY_MACRO tapes2][shots|tapes|versions|scenes]
+
+[There were {tapes1} where the grapple failed and Niko or I fell, the sound of a sickening crunch reverberating up the shaft. There were {tapes1} where we looked right into the lens and stepped willingly off the edge.|There were {tapes1} with two Nikos or two Ryans, pretending to be two different people. There were {tapes1} where we {i/were} different people, people I'd never seen. There were {tapes1} where we spoke other languages, or babbled idiot sounds and pretended they were speech.|There were {tapes1} where my acne was miraculously gone, where a version of myself that looked almost handsome checked ropes and called confidently down the shaft. There were {tapes1} where our voices were wrong, like they'd been spliced together from a dozen different tapes, some of the sounds played backwards, pitch-shifted, noise-reduced.]
+
+[There were {tapes2} of the pit with nothing else there: no grapples, no ropes, no us. There were {tapes2} where the carpet was crawling with beetles. There were {tapes2} where the walls were made of meat.|There were {tapes2} where something was wrong with our faces, something the camera couldn't quite pick up, shimmering between the pixels of the flip-out screen. There were {tapes2} where we were a few frames out of sync, my voice always cutting Niko's off, his always lagging an uncomfortable moment behind.|There were {tapes2} where the carpet turned soft and we sunk into it like quicksand, Niko screaming while I smiled until fibers closed over my head. There were {tapes2} where hurricane winds sucked us screaming into the pit.]
+
+[^|There were tapes where I couldn't see anything wrong, and those were the worst because I knew something was.]
+
+And on one tape—and I rewound and re-watched this over and over, in the dream—water from all the hallways poured into the pit, a four-sided waterfall. The carpets were black and sticky with moss trailing down into the vertical shaft, [@gardens>the walls dense with masses of plant life, vines and fronds and branches and leaves,|@caves>the walls not smooth and white but rocky like cave tunnels,] the air thick with steam. Something jostled the camera and it surged forward with the tide, water sloshing against the lens, until the scalding stream carried it over the edge and it fell, straight down into that boiling pit, surrounded by water on every side, gathering speed, falling into wet and steaming dark, faster and faster and faster...
+
+I would jerk awake at this point, coated in sweat, and try not to fall back asleep. But when I did I'd find myself rewinding the tape yet again and pressing play, hoping this time the footage would return to normal. It was always changed, and I'd have to watch it all over from the beginning, hoping this [version would show|time I'd catch] something useful, a hint, a clue, an answer.
+
+
+
