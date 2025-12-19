@@ -1595,6 +1595,31 @@ function deleteCustomVersion(versionId) {
     showUploadStatus(`Deleted Seed ${versionId}`, 'success');
 }
 
+// Manage Uploads Info Modal functionality
+function hasSeenManageInfoNotice() {
+    return localStorage.getItem('subcutanean_manage_info_seen') === 'true';
+}
+
+function markManageInfoNoticeSeen() {
+    localStorage.setItem('subcutanean_manage_info_seen', 'true');
+}
+
+function openManageInfoModal() {
+    const modal = document.getElementById('manage-info-modal');
+    modal.classList.remove('hidden');
+}
+
+function closeManageInfoModal() {
+    const modal = document.getElementById('manage-info-modal');
+    modal.classList.add('hidden');
+}
+
+function acceptManageInfoAndProceed() {
+    markManageInfoNoticeSeen();
+    closeManageInfoModal();
+    openManageUploadsModal();
+}
+
 // About Modal functionality
 
 function openAboutModal() {
@@ -2380,13 +2405,35 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeManageModalBtn = document.getElementById('close-manage-modal-btn');
     const manageModal = document.getElementById('manage-uploads-modal');
 
-    manageUploadsBtn.addEventListener('click', openManageUploadsModal);
+    manageUploadsBtn.addEventListener('click', () => {
+        // Show info modal on first use, then open manage uploads modal
+        if (!hasSeenManageInfoNotice()) {
+            openManageInfoModal();
+        } else {
+            openManageUploadsModal();
+        }
+    });
     closeManageModalBtn.addEventListener('click', closeManageUploadsModal);
 
     // Close modal when clicking outside
     manageModal.addEventListener('click', (e) => {
         if (e.target === manageModal) {
             closeManageUploadsModal();
+        }
+    });
+
+    // Manage Info modal event listeners
+    const closeManageInfoModalBtn = document.getElementById('close-manage-info-modal-btn');
+    const manageInfoUnderstandBtn = document.getElementById('manage-info-understand-btn');
+    const manageInfoModal = document.getElementById('manage-info-modal');
+
+    closeManageInfoModalBtn.addEventListener('click', closeManageInfoModal);
+    manageInfoUnderstandBtn.addEventListener('click', acceptManageInfoAndProceed);
+
+    // Close manage info modal when clicking outside
+    manageInfoModal.addEventListener('click', (e) => {
+        if (e.target === manageInfoModal) {
+            closeManageInfoModal();
         }
     });
 
