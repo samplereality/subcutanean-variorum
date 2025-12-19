@@ -360,7 +360,7 @@ function displayDiff(container, paragraphsA, paragraphsB) {
     div.className = 'diff-view';
 
     const heading = document.createElement('h2');
-    heading.textContent = `Comparing Seeds ${versionA} → ${versionB}`;
+    heading.textContent = `Tracking Changes: ${versionA} → ${versionB}`;
     div.appendChild(heading);
 
     // Use alignment algorithm to match paragraphs intelligently
@@ -1074,7 +1074,7 @@ function calculateWordDifferential() {
 
     // Update description with seed numbers
     const description = document.getElementById('word-diff-description');
-    description.textContent = `Words that appear in Seed ${versionA} but which do not appear in Seed ${versionB}, and vice-versa. Click any word to see which chapters it appears in.`;
+    description.textContent = `Words in Seed ${versionA} that are not in Seed ${versionB}, and vice-versa. Select any word to see which chapters it appears in. Select the chapters to see the word in context.`;
 
     // Display words with current sort mode
     displayWordLists();
