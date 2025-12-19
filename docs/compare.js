@@ -9,6 +9,11 @@ let versionB = null;
 let customVersions = {}; // Store uploaded versions
 let mostRecentUploadId = null; // Track most recently uploaded version for Jaccard analysis
 
+function getAllVersionIds() {
+    const combined = new Set([...versionIds, ...Object.keys(customVersions)]);
+    return Array.from(combined).sort();
+}
+
 // Levenshtein Distance helper functions (global scope)
 const NARRATIVE_CHAPTERS = [
     'prologue',
@@ -187,7 +192,7 @@ function buildChapterNavigation() {
     // Convert to array and sort in a logical order
     // Exclude: epilogue, alternatescene, backers, aboutauthor, aboutcopy (per user request)
     // chapter18 is the Epilogue
-    const chapterOrder = ['introduction', 'prologue',
+    const chapterOrder = ['prologue',
                          'chapter1', 'chapter2', 'chapter3', 'chapter4', 'chapter5',
                          'chapter6', 'chapter7', 'chapter8', 'chapter9',
                          'part2', 'chapter10', 'chapter11', 'chapter12', 'chapter13',
@@ -209,7 +214,7 @@ function buildChapterNavigation() {
         if (chapterId === 'introduction') {
             buttonText = 'Intro';
         } else if (chapterId === 'prologue') {
-            buttonText = 'Prologue';
+            buttonText = 'Part I';
         } else if (chapterId === 'part2') {
             buttonText = 'Part II';
         } else if (chapterId === 'part3') {
@@ -1012,7 +1017,8 @@ function findSimilarVersions(uploadedVersionId) {
     const results = [];
 
     // Compare against all versions (preloaded and uploaded)
-    for (const versionId of versionIds) {
+    const allIds = getAllVersionIds();
+    for (const versionId of allIds) {
         if (versionId === uploadedVersionId) continue;
 
         const compareVocab = getVocabularySet(versionId);
@@ -2014,6 +2020,12 @@ function validateSubcutaneanVersion(versionData) {
     return { valid: true, foundSections };
 }
 
+function formatPartHeading(partTitle, subtitleLine) {
+    const subtitle = subtitleLine ? subtitleLine.trim() : '';
+    const heading = subtitle ? `${partTitle}: ${subtitle.toUpperCase()}` : partTitle;
+    return convertTextFormatting(normalizeTextToSmartPunctuation(heading));
+}
+
 async function processTextFile(file) {
     showUploadStatus('Processing text file...', 'processing');
 
@@ -2073,6 +2085,19 @@ async function processTextFile(file) {
         let currentChapter = null;
         let currentParagraphs = [];
         const skipLines = new Set(); // Track line indices to skip (used as PART subtitles)
+        let collectingEpigraph = false;
+        let epigraphLines = [];
+
+        const finalizeEpigraphBlock = () => {
+            if (collectingEpigraph) {
+                if (epigraphLines.length > 0) {
+                    const epigraphText = epigraphLines.join('<br>');
+                    currentParagraphs.push(epigraphText);
+                }
+                collectingEpigraph = false;
+                epigraphLines = [];
+            }
+        };
 
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i].trim();
@@ -2087,15 +2112,18 @@ async function processTextFile(file) {
             if (line === 'PART ONE') {
                 // Look ahead for the subtitle on the next non-empty line to skip it
                 let subtitleIndex = -1;
+                let subtitleText = '';
                 for (let j = i + 1; j < lines.length; j++) {
                     const nextLine = lines[j].trim();
                     if (nextLine) {
                         subtitleIndex = j;
+                        subtitleText = nextLine;
                         break;
                     }
                 }
 
                 // Save any previous prologue content (shouldn't happen, but just in case)
+                finalizeEpigraphBlock();
                 if (currentParagraphs.length > 0) {
                     versionData.prologue = [...currentParagraphs];
                 }
@@ -2103,25 +2131,35 @@ async function processTextFile(file) {
                 currentSection = 'prologue';
                 currentChapter = 'prologue';
                 currentParagraphs = [];
+                collectingEpigraph = true;
+                epigraphLines = [];
 
                 // Mark subtitle line to skip (it will be used in the title)
                 if (subtitleIndex !== -1) {
                     skipLines.add(subtitleIndex);
                 }
 
+                const headingText = formatPartHeading(line, subtitleText);
+                if (headingText) {
+                    currentParagraphs.push(headingText);
+                }
+
                 continue;
             } else if (line === 'PART TWO') {
                 // Look ahead for the subtitle on the next non-empty line to skip it
                 let subtitleIndex = -1;
+                let subtitleText = '';
                 for (let j = i + 1; j < lines.length; j++) {
                     const nextLine = lines[j].trim();
                     if (nextLine) {
                         subtitleIndex = j;
+                        subtitleText = nextLine;
                         break;
                     }
                 }
 
                 // Save previous chapter if any
+                finalizeEpigraphBlock();
                 if (currentChapter && currentParagraphs.length > 0) {
                     versionData[currentChapter] = [...currentParagraphs];
                 }
@@ -2130,25 +2168,35 @@ async function processTextFile(file) {
                 currentChapter = 'part2';
                 currentParagraphs = [];
                 currentSection = 'part2';
+                collectingEpigraph = true;
+                epigraphLines = [];
 
                 // Mark subtitle line to skip (it will be used in the title)
                 if (subtitleIndex !== -1) {
                     skipLines.add(subtitleIndex);
                 }
 
+                const headingText = formatPartHeading(line, subtitleText);
+                if (headingText) {
+                    currentParagraphs.push(headingText);
+                }
+
                 continue;
             } else if (line === 'PART THREE') {
                 // Look ahead for the subtitle on the next non-empty line to skip it
                 let subtitleIndex = -1;
+                let subtitleText = '';
                 for (let j = i + 1; j < lines.length; j++) {
                     const nextLine = lines[j].trim();
                     if (nextLine) {
                         subtitleIndex = j;
+                        subtitleText = nextLine;
                         break;
                     }
                 }
 
                 // Save previous chapter if any
+                finalizeEpigraphBlock();
                 if (currentChapter && currentParagraphs.length > 0) {
                     versionData[currentChapter] = [...currentParagraphs];
                 }
@@ -2157,10 +2205,17 @@ async function processTextFile(file) {
                 currentChapter = 'part3';
                 currentParagraphs = [];
                 currentSection = 'part3';
+                collectingEpigraph = true;
+                epigraphLines = [];
 
                 // Mark subtitle line to skip (it will be used in the title)
                 if (subtitleIndex !== -1) {
                     skipLines.add(subtitleIndex);
+                }
+
+                const headingText = formatPartHeading(line, subtitleText);
+                if (headingText) {
+                    currentParagraphs.push(headingText);
                 }
 
                 continue;
@@ -2169,6 +2224,7 @@ async function processTextFile(file) {
             // Detect chapter markers
             const chapterMatch = line.match(/^Chapter (\d+)$/);
             if (chapterMatch) {
+                finalizeEpigraphBlock();
                 // Save previous chapter if any
                 if (currentChapter && currentParagraphs.length > 0) {
                     versionData[currentChapter] = [...currentParagraphs];
@@ -2185,6 +2241,7 @@ async function processTextFile(file) {
             // Detect Epilogue (handle both "Epilogue" and "EPILOGUE")
             // Store as chapter18 to match built-in versions
             if (line === 'Epilogue' || line === 'EPILOGUE') {
+                finalizeEpigraphBlock();
                 // Save previous chapter if any
                 if (currentChapter && currentParagraphs.length > 0) {
                     versionData[currentChapter] = [...currentParagraphs];
@@ -2198,6 +2255,7 @@ async function processTextFile(file) {
 
             // Detect end sections
             if (line === 'ALTERNATE SCENE') {
+                finalizeEpigraphBlock();
                 // Save previous chapter/section if any
                 if (currentChapter && currentParagraphs.length > 0) {
                     versionData[currentChapter] = [...currentParagraphs];
@@ -2210,6 +2268,7 @@ async function processTextFile(file) {
             }
 
             if (line === 'ABOUT THIS COPY') {
+                finalizeEpigraphBlock();
                 // Save previous section if any
                 if (currentChapter && currentParagraphs.length > 0) {
                     versionData[currentChapter] = [...currentParagraphs];
@@ -2223,6 +2282,7 @@ async function processTextFile(file) {
             }
 
             if (line.startsWith('BACKER ACKNOWLEDGMENTS') || line === 'Kickstarter Backers') {
+                finalizeEpigraphBlock();
                 // Save previous section if any
                 if (currentChapter && currentParagraphs.length > 0) {
                     versionData[currentChapter] = [...currentParagraphs];
@@ -2235,6 +2295,7 @@ async function processTextFile(file) {
             }
 
             if (line === 'ABOUT THE AUTHOR' || line === 'About the Author') {
+                finalizeEpigraphBlock();
                 // Save previous section if any
                 if (currentChapter && currentParagraphs.length > 0) {
                     versionData[currentChapter] = [...currentParagraphs];
@@ -2243,6 +2304,19 @@ async function processTextFile(file) {
                 currentChapter = 'aboutauthor';
                 currentParagraphs = [];
                 currentSection = 'aboutauthor';
+                continue;
+            }
+
+            if (collectingEpigraph) {
+                if (line) {
+                    const formattedLine = convertTextFormatting(normalizeTextToSmartPunctuation(line));
+                    epigraphLines.push(formattedLine);
+                } else if (epigraphLines.length > 0) {
+                    const epigraphText = epigraphLines.join('<br>');
+                    currentParagraphs.push(epigraphText);
+                    epigraphLines = [];
+                    collectingEpigraph = false;
+                }
                 continue;
             }
 
@@ -2271,6 +2345,7 @@ async function processTextFile(file) {
         }
 
         // Save final chapter
+        finalizeEpigraphBlock();
         if (currentChapter && currentParagraphs.length > 0) {
             versionData[currentChapter] = [...currentParagraphs];
         }
@@ -2580,6 +2655,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 `${closestMatch}<br>${farthestMatch}`;
 
             // Setup Load Closest Match button
+            loadClosestBtn.style.display = '';
+            loadClosestBtn.textContent = 'Load Closest Match';
             loadClosestBtn.disabled = false;
             loadClosestBtn.style.opacity = '1';
             loadClosestBtn.onclick = () => {
