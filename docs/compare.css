@@ -199,7 +199,6 @@
 
 #word-diff-btn {
     background-color: rgba(255,255,255,0.1);
-    border-color: var(--accent-color);
 }   
 
 #word-diff-btn:hover {

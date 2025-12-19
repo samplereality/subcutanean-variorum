@@ -7,6 +7,7 @@ let currentMode = 'sidebyside';
 let versionA = null;
 let versionB = null;
 let customVersions = {}; // Store uploaded versions
+let mostRecentUploadId = null; // Track most recently uploaded version for Jaccard analysis
 
 // Levenshtein Distance helper functions (global scope)
 const NARRATIVE_CHAPTERS = [
@@ -987,6 +988,55 @@ function getAllTextForSeed(seedId) {
     return allText;
 }
 
+// Jaccard Distance Functions for comparing uploaded files
+function getVocabularySet(versionId) {
+    // Get all text and extract unique words
+    const text = getAllTextForSeed(versionId);
+    const frequencies = extractWords(text);
+    return new Set(frequencies.keys());
+}
+
+function calculateJaccardDistance(vocabA, vocabB) {
+    // Calculate Jaccard distance: 1 - (intersection / union)
+    const intersection = new Set([...vocabA].filter(word => vocabB.has(word)));
+    const union = new Set([...vocabA, ...vocabB]);
+
+    if (union.size === 0) return 0;
+
+    const similarity = intersection.size / union.size;
+    return 1 - similarity;
+}
+
+function findSimilarVersions(uploadedVersionId) {
+    const uploadedVocab = getVocabularySet(uploadedVersionId);
+    const results = [];
+
+    // Compare against all versions (preloaded and uploaded)
+    for (const versionId of versionIds) {
+        if (versionId === uploadedVersionId) continue;
+
+        const compareVocab = getVocabularySet(versionId);
+        const distance = calculateJaccardDistance(uploadedVocab, compareVocab);
+        const similarity = ((1 - distance) * 100).toFixed(1);
+
+        results.push({
+            versionId,
+            distance,
+            similarity: parseFloat(similarity),
+            isCustom: customVersions[versionId] !== undefined
+        });
+    }
+
+    // Sort by distance (ascending = most similar first)
+    results.sort((a, b) => a.distance - b.distance);
+
+    return {
+        mostSimilar: results[0],
+        mostDifferent: results[results.length - 1],
+        allResults: results
+    };
+}
+
 function calculateWordDifferential() {
     const modal = document.getElementById('word-diff-modal');
     const seedALabel = document.getElementById('seed-a-label');
@@ -1867,6 +1917,9 @@ async function processEPUBFile(file) {
         buildChapterNavigation();
         displayComparison();
 
+        // Track most recently uploaded version
+        mostRecentUploadId = versionId;
+
         // Show success message
         showUploadStatus(`Successfully loaded Seed ${versionId}!`, 'success');
 
@@ -2258,6 +2311,9 @@ async function processTextFile(file) {
         buildChapterNavigation();
         displayComparison();
 
+        // Track most recently uploaded version
+        mostRecentUploadId = versionId;
+
         // Show success message
         showUploadStatus(`Successfully loaded Seed ${versionId}!`, 'success');
 
@@ -2472,37 +2528,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Levenshtein Distance functionality
-    let levenshteinData = null;
-
-    // Load Levenshtein distance data (only for 25 built-in versions)
-    async function loadLevenshteinData() {
-        if (levenshteinData) {
-            return levenshteinData;
-        }
-
-        try {
-            const response = await fetch('extracted_text/levenshtein_distances.json');
-            levenshteinData = await response.json();
-            return levenshteinData;
-        } catch (error) {
-            console.error('Error loading Levenshtein distance data:', error);
-            return null;
-        }
-    }
-
-    function openLevenshteinModal() {
+    // Jaccard Distance functionality
+    function openJaccardModal() {
         const modal = document.getElementById('levenshtein-modal');
         modal.classList.remove('hidden');
 
-        loadLevenshteinData().then(data => {
-            if (data) {
-                displayLevenshteinSummary(data);
-            }
-        });
+        displayJaccardAnalysis();
     }
 
-    function closeLevenshteinModal() {
+    function closeJaccardModal() {
         const modal = document.getElementById('levenshtein-modal');
         modal.classList.add('hidden');
 
@@ -2511,33 +2545,73 @@ document.addEventListener('DOMContentLoaded', () => {
         matrix.classList.add('hidden');
 
         const showMatrixBtn = document.getElementById('show-matrix-btn');
-        showMatrixBtn.textContent = 'Show Complete Distance Matrix';
+        showMatrixBtn.textContent = 'Show All Uploaded Files';
     }
 
-    function displayLevenshteinSummary(data) {
-        // Display most similar
-        const [seed1, seed2] = data.most_similar.pair.split('-');
-        document.getElementById('most-similar-seeds').textContent = `${seed1} & ${seed2}`;
-        document.getElementById('most-similar-distance').textContent = data.most_similar.distance.toLocaleString();
+    function displayJaccardAnalysis() {
+        // Section 1: Jaccard distance between currently selected versions
+        const vocabA = getVocabularySet(versionA);
+        const vocabB = getVocabularySet(versionB);
+        const currentDistance = calculateJaccardDistance(vocabA, vocabB);
+        const currentSimilarity = ((1 - currentDistance) * 100).toFixed(1);
 
-        // Display most different
-        const [seed3, seed4] = data.most_different.pair.split('-');
-        document.getElementById('most-different-seeds').textContent = `${seed3} & ${seed4}`;
-        document.getElementById('most-different-distance').textContent = data.most_different.distance.toLocaleString();
+        document.getElementById('most-similar-seeds').textContent = `${versionA} & ${versionB}`;
+        document.getElementById('most-similar-distance').textContent = `${currentSimilarity}% vocabulary overlap`;
 
-        // Setup load buttons
+        // Setup load button (disabled since these are already loaded)
         const loadSimilarBtn = document.getElementById('load-most-similar-btn');
-        const loadDifferentBtn = document.getElementById('load-most-different-btn');
+        loadSimilarBtn.textContent = 'Currently Loaded';
+        loadSimilarBtn.disabled = true;
+        loadSimilarBtn.style.opacity = '0.5';
 
-        loadSimilarBtn.onclick = () => {
-            closeLevenshteinModal();
-            loadVersionPair(seed1, seed2);
-        };
+        // Section 2: Most recently uploaded file analysis
+        const loadClosestBtn = document.getElementById('load-closest-btn');
+        const loadFarthestBtn = document.getElementById('load-farthest-btn');
 
-        loadDifferentBtn.onclick = () => {
-            closeLevenshteinModal();
-            loadVersionPair(seed3, seed4);
-        };
+        if (mostRecentUploadId) {
+            const uploadResults = findSimilarVersions(mostRecentUploadId);
+
+            document.getElementById('most-different-seeds').textContent = `Seed ${mostRecentUploadId}`;
+
+            const closestMatch = `Closest: Seed ${uploadResults.mostSimilar.versionId} (${uploadResults.mostSimilar.similarity}% overlap)`;
+            const farthestMatch = `Farthest: Seed ${uploadResults.mostDifferent.versionId} (${uploadResults.mostDifferent.similarity}% overlap)`;
+
+            document.getElementById('most-different-distance').innerHTML =
+                `${closestMatch}<br>${farthestMatch}`;
+
+            // Setup Load Closest Match button
+            loadClosestBtn.disabled = false;
+            loadClosestBtn.style.opacity = '1';
+            loadClosestBtn.onclick = () => {
+                closeJaccardModal();
+                loadVersionPair(mostRecentUploadId, uploadResults.mostSimilar.versionId);
+            };
+
+            // Setup Load Farthest Match button
+            loadFarthestBtn.style.display = ''; // Show button
+            loadFarthestBtn.textContent = 'Load Farthest Match';
+            loadFarthestBtn.disabled = false;
+            loadFarthestBtn.style.opacity = '1';
+            loadFarthestBtn.onclick = () => {
+                closeJaccardModal();
+                loadVersionPair(mostRecentUploadId, uploadResults.mostDifferent.versionId);
+            };
+        } else {
+            // No uploads yet
+            document.getElementById('most-different-seeds').textContent = 'No uploads yet';
+            document.getElementById('most-different-distance').textContent = 'Upload a file to see similarity analysis';
+
+            // Make upload buttons trigger file upload
+            loadClosestBtn.textContent = 'Upload a File';
+            loadClosestBtn.disabled = false;
+            loadClosestBtn.style.opacity = '1';
+            loadClosestBtn.onclick = () => {
+                closeJaccardModal();
+                document.getElementById('epub-upload').click();
+            };
+
+            loadFarthestBtn.style.display = 'none'; // Hide second button when no uploads
+        }
     }
 
     function loadVersionPair(version1, version2) {
@@ -2556,90 +2630,81 @@ document.addEventListener('DOMContentLoaded', () => {
         displayComparison();
     }
 
-    function toggleDistanceMatrix() {
+    function toggleUploadedFilesMatrix() {
         const matrix = document.getElementById('distance-matrix');
         const showMatrixBtn = document.getElementById('show-matrix-btn');
 
         if (matrix.classList.contains('hidden')) {
-            loadLevenshteinData().then(data => {
-                if (data) {
-                    generateDistanceMatrix(data);
-                    matrix.classList.remove('hidden');
-                    showMatrixBtn.textContent = 'Hide Distance Matrix';
-                }
-            });
+            generateUploadedFilesMatrix();
+            matrix.classList.remove('hidden');
+            matrix.style.display = ''; // Ensure display is not set to none
+            showMatrixBtn.textContent = 'Hide Uploaded Files';
         } else {
             matrix.classList.add('hidden');
-            showMatrixBtn.textContent = 'Show Complete Distance Matrix';
+            matrix.style.display = 'none'; // Explicitly hide
+            showMatrixBtn.textContent = 'Show All Uploaded Files';
         }
     }
 
-    function generateDistanceMatrix(data) {
+    function generateUploadedFilesMatrix() {
         const matrixContainer = document.getElementById('distance-matrix');
-        const versionIds = data.version_ids;
 
-        // Create table
-        let html = '<table><thead><tr><th>Seeds</th>';
+        // Get all uploaded versions
+        const uploadedVersionIds = Object.keys(customVersions);
 
-        // Header row
-        versionIds.forEach(id => {
-            html += `<th>${id}</th>`;
-        });
-        html += '</tr></thead><tbody>';
+        if (uploadedVersionIds.length === 0) {
+            matrixContainer.innerHTML = '<p style="padding: 20px; text-align: center;">No uploaded files yet. Upload a file to see similarity comparisons.</p>';
+            return;
+        }
 
-        // Data rows
-        versionIds.forEach(rowId => {
-            html += `<tr><td>${rowId}</td>`;
+        let html = '<div style="padding: 20px;"><h3>Uploaded Files Jaccard Distance Analysis</h3>';
 
-            versionIds.forEach(colId => {
-                if (rowId === colId) {
-                    html += '<td>—</td>';
-                } else {
-                    const key = rowId < colId ? `${rowId}-${colId}` : `${colId}-${rowId}`;
-                    const distance = data.all_distances[key];
+        // For each uploaded file, show its closest and farthest matches
+        uploadedVersionIds.forEach(uploadId => {
+            const results = findSimilarVersions(uploadId);
 
-                    // Handle cases where distance hasn't been calculated yet
-                    if (distance === undefined || distance === null) {
-                        html += `<td class="uncalculated" title="Distance not yet calculated">N/A</td>`;
-                    } else {
-                        let className = '';
-                        if (key === data.most_similar.pair) {
-                            className = 'highlight-min';
-                        } else if (key === data.most_different.pair) {
-                            className = 'highlight-max';
-                        }
+            html += `<div style="margin-bottom: 30px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 5px;">`;
+            html += `<h4>Seed ${uploadId}</h4>`;
+            html += `<p><strong>Closest match:</strong> Seed ${results.mostSimilar.versionId} `;
+            html += `(${results.mostSimilar.similarity}% vocabulary overlap)`;
+            if (results.mostSimilar.isCustom) {
+                html += ` 📎`;
+            }
+            html += ` <button onclick="loadVersionsFromMatrix('${uploadId}', '${results.mostSimilar.versionId}')" style="margin-left: 10px;" class="tool-btn">Load</button></p>`;
 
-                        html += `<td class="${className}" data-v1="${rowId}" data-v2="${colId}" onclick="loadVersionsFromMatrix('${rowId}', '${colId}')">${distance.toLocaleString()}</td>`;
-                    }
-                }
-            });
+            html += `<p><strong>Farthest match:</strong> Seed ${results.mostDifferent.versionId} `;
+            html += `(${results.mostDifferent.similarity}% vocabulary overlap)`;
+            if (results.mostDifferent.isCustom) {
+                html += ` 📎`;
+            }
+            html += ` <button onclick="loadVersionsFromMatrix('${uploadId}', '${results.mostDifferent.versionId}')" style="margin-left: 10px;" class="tool-btn">Load</button></p>`;
 
-            html += '</tr>';
+            html += `</div>`;
         });
 
-        html += '</tbody></table>';
+        html += '</div>';
         matrixContainer.innerHTML = html;
     }
 
     // Make this function global so it can be called from onclick
     window.loadVersionsFromMatrix = function(version1, version2) {
-        closeLevenshteinModal();
+        closeJaccardModal();
         loadVersionPair(version1, version2);
     };
 
     // Event listeners
-    const levenshteinBtn = document.getElementById('levenshtein-btn');
-    const closeLevenshteinBtn = document.getElementById('close-levenshtein-modal-btn');
-    const levenshteinModal = document.getElementById('levenshtein-modal');
+    const jaccardBtn = document.getElementById('levenshtein-btn');
+    const closeJaccardBtn = document.getElementById('close-levenshtein-modal-btn');
+    const jaccardModal = document.getElementById('levenshtein-modal');
     const showMatrixBtn = document.getElementById('show-matrix-btn');
 
-    levenshteinBtn.addEventListener('click', openLevenshteinModal);
-    closeLevenshteinBtn.addEventListener('click', closeLevenshteinModal);
-    showMatrixBtn.addEventListener('click', toggleDistanceMatrix);
+    jaccardBtn.addEventListener('click', openJaccardModal);
+    closeJaccardBtn.addEventListener('click', closeJaccardModal);
+    showMatrixBtn.addEventListener('click', toggleUploadedFilesMatrix);
 
-    levenshteinModal.addEventListener('click', (e) => {
-        if (e.target === levenshteinModal) {
-            closeLevenshteinModal();
+    jaccardModal.addEventListener('click', (e) => {
+        if (e.target === jaccardModal) {
+            closeJaccardModal();
         }
     });
 });
