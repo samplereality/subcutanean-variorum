@@ -330,6 +330,21 @@
         </div>
     </div>
 
+    <div id="source-floating" class="source-floating">
+        <button id="source-toggle-btn" class="source-fab-btn" title="Source Text" aria-label="Source Text">
+            <span class="source-icon">&lt;&gt;</span>
+        </button>
+        <div id="source-panel" class="source-panel hidden">
+            <div id="source-panel-header" class="source-panel-header">
+                <span id="source-panel-title">Quant Source</span>
+                <button id="source-close-btn" class="source-close-btn" aria-label="Close source panel">&times;</button>
+            </div>
+            <div class="source-panel-body">
+                <pre id="source-content" class="source-content"></pre>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/diff@5.1.0/dist/diff.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script>

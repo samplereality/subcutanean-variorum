@@ -11,6 +11,11 @@ let mostRecentUploadId = null; // Track most recently uploaded version for Jacca
 let bookmarks = [];
 let bookmarkPanelOpen = false;
 let pendingBookmarkScroll = null;
+let originSources = null;
+let originSourcesLoaded = false;
+let originSourcePanelOpen = false;
+let currentSourceKey = null;
+let sourcePanelPosition = { x: null, y: null };
 
 function getAllVersionIds() {
     const combined = new Set([...versionIds, ...Object.keys(customVersions)]);
@@ -69,6 +74,32 @@ const CHAPTER_MAPPING = {
     'ch021.xhtml': 'chapter17',
     'ch022.xhtml': 'chapter18',
     'ch024.xhtml': 'notes'
+};
+
+const SOURCE_KEY_BY_CHAPTER = {
+    introduction: 'globals',
+    prologue: 'part01',
+    part2: 'part02',
+    part3: 'part03',
+    chapter1: 'ch01',
+    chapter2: 'ch02',
+    chapter3: 'ch03',
+    chapter4: 'ch04',
+    chapter5: 'ch05',
+    chapter6: 'ch06',
+    chapter7: 'ch07',
+    chapter8: 'ch08',
+    chapter9: 'ch09',
+    chapter10: 'ch10',
+    chapter11: 'ch11',
+    chapter12: 'ch12',
+    chapter13: 'ch13',
+    chapter14: 'ch14',
+    chapter15: 'ch15',
+    chapter16: 'ch16',
+    chapter17: 'ch17',
+    chapter18: 'epilogue',
+    notes: 'notes'
 };
 
 // Load all versions data
@@ -312,6 +343,10 @@ function displayComparison() {
                 behavior: 'auto'
             });
         });
+    }
+
+    if (originSourcePanelOpen && originSources) {
+        syncSourceToCurrentChapter();
     }
 }
 
@@ -1875,6 +1910,126 @@ function toggleBookmarkPanel() {
     }
 }
 
+function getSourceKeyForChapter(chapterId) {
+    return SOURCE_KEY_BY_CHAPTER[chapterId] || null;
+}
+
+function updateSourceContent(key) {
+    const contentEl = document.getElementById('source-content');
+    const headerTitle = document.getElementById('source-panel-title');
+    if (!contentEl) return;
+
+    if (!originSources || !originSources.chapters[key]) {
+        contentEl.textContent = 'Source not available for this selection.';
+        if (headerTitle) {
+            headerTitle.textContent = 'Source Unavailable';
+        }
+        return;
+    }
+
+    currentSourceKey = key;
+    const chapter = originSources.chapters[key];
+    contentEl.textContent = chapter.content;
+    if (headerTitle) {
+        headerTitle.textContent = `${chapter.title} Source Code`;
+    }
+}
+
+function syncSourceToCurrentChapter() {
+    if (!originSources) return;
+    const key = getSourceKeyForChapter(currentChapter);
+    if (!key || !originSources.chapters[key]) {
+        const headerTitle = document.getElementById('source-panel-title');
+        if (headerTitle) {
+            headerTitle.textContent = 'No Source Mapping';
+        }
+        return;
+    }
+    updateSourceContent(key);
+}
+
+function openSourcePanel() {
+    const panel = document.getElementById('source-panel');
+    if (!panel) return;
+    if (sourcePanelPosition.x !== null && sourcePanelPosition.y !== null) {
+        panel.style.right = 'auto';
+        panel.style.bottom = 'auto';
+        panel.style.left = `${sourcePanelPosition.x}px`;
+        panel.style.top = `${sourcePanelPosition.y}px`;
+    } else {
+        panel.style.left = 'auto';
+        panel.style.top = 'auto';
+        panel.style.right = '1.5rem';
+        panel.style.bottom = '5rem';
+    }
+    panel.classList.remove('hidden');
+    originSourcePanelOpen = true;
+    if (originSources) {
+        syncSourceToCurrentChapter();
+    }
+}
+
+function closeSourcePanel() {
+    const panel = document.getElementById('source-panel');
+    if (!panel) return;
+    panel.classList.add('hidden');
+    originSourcePanelOpen = false;
+}
+
+function toggleSourcePanel() {
+    if (originSourcePanelOpen) {
+        closeSourcePanel();
+    } else {
+        openSourcePanel();
+    }
+}
+
+function setupSourcePanelDragging() {
+    const panel = document.getElementById('source-panel');
+    const header = document.getElementById('source-panel-header') || document.querySelector('.source-panel-header');
+    if (!panel || !header) return;
+
+    let dragging = false;
+    let startX = 0;
+    let startY = 0;
+    let panelX = 0;
+    let panelY = 0;
+
+    const onPointerMove = (event) => {
+        if (!dragging) return;
+        const dx = event.clientX - startX;
+        const dy = event.clientY - startY;
+        const newX = panelX + dx;
+        const newY = panelY + dy;
+        panel.style.left = `${newX}px`;
+        panel.style.top = `${newY}px`;
+        panel.style.right = 'auto';
+        panel.style.bottom = 'auto';
+        sourcePanelPosition = { x: newX, y: newY };
+    };
+
+    const onPointerUp = () => {
+        dragging = false;
+        document.removeEventListener('pointermove', onPointerMove);
+        document.removeEventListener('pointerup', onPointerUp);
+    };
+
+    header.addEventListener('pointerdown', (event) => {
+        const target = event.target;
+        if (target && (target.closest('.source-close-btn') || target.closest('.tool-btn'))) {
+            return;
+        }
+        dragging = true;
+        panelX = panel.offsetLeft;
+        panelY = panel.offsetTop;
+        startX = event.clientX;
+        startY = event.clientY;
+        panel.setPointerCapture(event.pointerId);
+        document.addEventListener('pointermove', onPointerMove);
+        document.addEventListener('pointerup', onPointerUp);
+    });
+}
+
 // Privacy Notice Modal functionality
 
 let pendingUploadFile = null;
@@ -1933,6 +2088,25 @@ function loadCustomVersions() {
         console.error('Error loading custom versions:', error);
     }
 }
+
+async function loadOriginSources() {
+    try {
+        const response = await fetch('origin_text/origin_sources.json');
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        originSources = await response.json();
+        originSourcesLoaded = true;
+        currentSourceKey = getSourceKeyForChapter(currentChapter);
+        if (originSourcePanelOpen) {
+            syncSourceToCurrentChapter();
+        }
+    } catch (error) {
+        originSourcesLoaded = false;
+        console.error('Error loading origin sources:', error);
+    }
+}
+
 
 function saveCustomVersions() {
     try {
@@ -2623,6 +2797,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadBookmarksFromStorage();
     refreshBookmarkUI();
     loadAllVersions();
+    loadOriginSources();
 
     // Search event listeners
     const searchBtn = document.getElementById('search-btn');
@@ -2767,6 +2942,33 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!panel) return;
         if (!panel.contains(e.target) && !toggleBtn.contains(e.target)) {
             closeBookmarkPanel();
+        }
+    });
+    setupSourcePanelDragging();
+
+    // Source panel controls
+    const sourceToggleBtn = document.getElementById('source-toggle-btn');
+    const sourceCloseBtn = document.getElementById('source-close-btn');
+
+    if (sourceToggleBtn) {
+        sourceToggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleSourcePanel();
+        });
+    }
+    if (sourceCloseBtn) {
+        sourceCloseBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeSourcePanel();
+        });
+    }
+    document.addEventListener('click', (e) => {
+        if (!originSourcePanelOpen) return;
+        const panel = document.getElementById('source-panel');
+        const toggleBtn = document.getElementById('source-toggle-btn');
+        if (!panel) return;
+        if (!panel.contains(e.target) && !toggleBtn.contains(e.target)) {
+            closeSourcePanel();
         }
     });
 

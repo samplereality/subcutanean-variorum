@@ -3,9 +3,7 @@
 
 globals.txt
 
-#test.txt
-#promo_card.txt
-
+part01.txt
 ch01.txt
 ch02.txt
 ch03.txt
@@ -15,13 +13,15 @@ ch06.txt
 ch07.txt
 ch08.txt
 ch09.txt
+part02.txt
 ch10.txt
 ch11.txt
 ch12.txt
 ch13.txt
 ch14.txt
 ch15.txt
+part03.txt
 ch16.txt
 ch17.txt
-ch_epilogue.txt
-
+epilogue.txt
+notes.txt
