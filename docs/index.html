@@ -61,16 +61,9 @@
                     <button id="mode-sidebyside" class="mode-btn active" title="View two versions in parallel columns">Side-by-side</button>
                     <button id="mode-diff" class="mode-btn" title="Highlight additions and deletions between versions">Track Changes</button>
                     <button id="mode-comparison" class="mode-btn" title="Compare variations across multiple witnesses">Collation</button>
+                    <button id="macro-inspector-btn" class="mode-btn hidden" title="Inspect Quant macros and variables">Macro Inspector</button>
+                    <button id="syntax-toggle-btn" class="mode-btn hidden" title="Toggle Quant syntax highlighting">Enable Syntax Highlighting</button>
                 </div>
-            </div>
-
-            <div class="upload-section">
-                <label for="epub-upload" class="upload-btn tool-btn" title="Upload your own copy of Subcutanean">
-                    <span id="upload-text">Upload EPUB/TXT</span>
-                    <input type="file" id="epub-upload" accept=".epub,.txt" style="display: none;">
-                </label>
-                <button id="manage-uploads-btn" class="tool-btn" title="Manage uploaded versions">Manage Uploads</button>
-                <span id="upload-status" class="upload-status"></span>
             </div>
 
             <div class="tools-row">
@@ -330,6 +323,26 @@
         </div>
     </div>
 
+    <div id="files-floating" class="files-floating">
+        <button id="files-toggle-btn" class="files-fab-btn" title="Files" aria-label="Files">
+            <span class="files-icon">📂</span>
+        </button>
+        <div id="files-panel" class="files-panel hidden">
+            <div class="files-panel-header">
+                <span>Files</span>
+                <button id="files-close-btn" class="files-close-btn" aria-label="Close files panel">&times;</button>
+            </div>
+            <div class="files-panel-body">
+                <label id="files-upload-btn" for="epub-upload" class="upload-btn tool-btn full-width" title="Upload your own copy of Subcutanean">
+                    <span id="upload-text">Upload EPUB/TXT</span>
+                    <input type="file" id="epub-upload" accept=".epub,.txt" style="display: none;">
+                </label>
+                <button id="manage-uploads-btn" class="tool-btn full-width" title="Manage uploaded versions">Manage Uploads</button>
+                <span id="upload-status" class="upload-status"></span>
+            </div>
+        </div>
+    </div>
+
     <div id="source-floating" class="source-floating">
         <button id="source-toggle-btn" class="source-fab-btn" title="Source Text" aria-label="Source Text">
             <span class="source-icon">&lt;&gt;</span>
@@ -341,6 +354,20 @@
             </div>
             <div class="source-panel-body">
                 <pre id="source-content" class="source-content"></pre>
+            </div>
+        </div>
+    </div>
+
+    <div id="macro-inspector-modal" class="modal hidden">
+        <div class="modal-content macro-inspector-content">
+            <div class="modal-header">
+                <h2>Quant Macro Inspector</h2>
+                <p id="macro-inspector-context" class="modal-description"></p>
+                <button id="macro-inspector-close-btn" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body macro-inspector-body" id="macro-inspector-body"></div>
+            <div id="macro-empty-state" class="macro-empty-state hidden">
+                Load a seed alongside the Quant Source to inspect global macros.
             </div>
         </div>
     </div>

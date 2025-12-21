@@ -10,12 +10,29 @@ let customVersions = {}; // Store uploaded versions
 let mostRecentUploadId = null; // Track most recently uploaded version for Jaccard analysis
 let bookmarks = [];
 let bookmarkPanelOpen = false;
+let bookmarkPanelPosition = { x: null, y: null };
+let filesPanelOpen = false;
+let filesPanelPosition = { x: null, y: null };
 let pendingBookmarkScroll = null;
 let originSources = null;
 let originSourcesLoaded = false;
 let originSourcePanelOpen = false;
 let currentSourceKey = null;
 let sourcePanelPosition = { x: null, y: null };
+let sourceSyncState = null;
+let globalMacroConfig = null;
+let macroActivationCache = {};
+let notesOptionLookup = null;
+let macroSignalConfig = null;
+let versionChapterTextCache = {};
+let sourceSyntaxHighlightingEnabled = false;
+const SOURCE_VERSION_ID = 'quant_source';
+const SOURCE_VERSION_LABEL = 'Source Code';
+let sourceParagraphCache = {};
+
+function isSourceCodeVisible() {
+    return versionA === SOURCE_VERSION_ID || versionB === SOURCE_VERSION_ID;
+}
 
 function getAllVersionIds() {
     const combined = new Set([...versionIds, ...Object.keys(customVersions)]);
@@ -102,6 +119,619 @@ const SOURCE_KEY_BY_CHAPTER = {
     notes: 'notes'
 };
 
+function isSourceVersion(versionId) {
+    return versionId === SOURCE_VERSION_ID;
+}
+
+function formatVersionLabel(versionId) {
+    if (!versionId) return 'Version';
+    return isSourceVersion(versionId) ? SOURCE_VERSION_LABEL : `Seed ${versionId}`;
+}
+
+function getAvailableSourceChapters() {
+    if (!originSourcesLoaded || !originSources || !originSources.chapters) return [];
+    const chapters = [];
+    Object.entries(SOURCE_KEY_BY_CHAPTER).forEach(([chapterId, key]) => {
+        if (originSources.chapters[key]) {
+            chapters.push(chapterId);
+        }
+    });
+    return chapters;
+}
+
+function escapeHTML(str) {
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function normalizePlainText(str) {
+    if (!str) return '';
+    return str
+        .replace(/[\{\}\[\]\|]/g, ' ')
+        .replace(/\\+/g, ' ')
+        .replace(/[^a-z0-9\s]/gi, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .toLowerCase();
+}
+
+function normalizeHtmlContent(html) {
+    if (!html) return '';
+    const temp = document.createElement('div');
+    temp.innerHTML = html;
+    return normalizePlainText(temp.textContent || '');
+}
+
+function convertSourceContentToParagraphs(content) {
+    const normalized = (content || '').replace(/\r\n/g, '\n');
+    const blocks = normalized.split(/\n{2,}/);
+    const htmlBlocks = [];
+    const highlightedBlocks = [];
+    const normalizedBlocks = [];
+    const rawBlocks = [];
+
+    blocks.forEach(block => {
+        const withoutLeadingNewlines = block.replace(/^\n+/, '').replace(/\n+$/, '');
+        if (!withoutLeadingNewlines.trim()) return;
+        const html = escapeHTML(withoutLeadingNewlines).replace(/\n/g, '<br>');
+        htmlBlocks.push(`<div class="source-snippet">${html}</div>`);
+        highlightedBlocks.push(`<div class="source-snippet">${highlightQuantSyntax(withoutLeadingNewlines)}</div>`);
+        normalizedBlocks.push(normalizePlainText(withoutLeadingNewlines));
+        rawBlocks.push(withoutLeadingNewlines);
+    });
+    const rawText = normalized;
+
+    return {
+        html: htmlBlocks,
+        htmlHighlighted: highlightedBlocks,
+        normalized: normalizedBlocks,
+        raw: rawBlocks,
+        rawText
+    };
+}
+
+function highlightQuantSyntax(text) {
+    if (!text) return '';
+    const normalized = text.replace(/\r\n?/g, '\n');
+    return normalized.split('\n').map(highlightQuantLine).join('<br>');
+}
+
+function highlightQuantLine(line) {
+    if (!line) return '';
+    if (/^\s*#/.test(line)) {
+        return `<span class="quant-token quant-comment">${escapeHTML(line)}</span>`;
+    }
+    let result = '';
+    let index = 0;
+    while (index < line.length) {
+        const char = line[index];
+        if (char === '[') {
+            const closeIndex = findMatchingDelimiter(line, index, '[', ']');
+            if (closeIndex !== -1) {
+                const content = line.slice(index + 1, closeIndex);
+                result += wrapQuantControl('[');
+                result += highlightQuantBlock(content);
+                result += wrapQuantControl(']');
+                index = closeIndex + 1;
+                continue;
+            }
+        }
+        if (char === '{') {
+            const closeIndex = findMatchingDelimiter(line, index, '{', '}');
+            if (closeIndex !== -1) {
+                result += `<span class="quant-token quant-macro-inline">${escapeHTML(line.slice(index, closeIndex + 1))}</span>`;
+                index = closeIndex + 1;
+                continue;
+            }
+        }
+        if (char === '$') {
+            const macroMatch = line.slice(index).match(/^\$[A-Za-z0-9_-]+/);
+            if (macroMatch) {
+                result += `<span class="quant-token quant-macro-inline">${escapeHTML(macroMatch[0])}</span>`;
+                index += macroMatch[0].length;
+                continue;
+            }
+        }
+        if (char === '@') {
+            const variableMatch = line.slice(index).match(/^@[A-Za-z_][A-Za-z0-9_-]*/);
+            if (variableMatch) {
+                result += `<span class="quant-token quant-variable">${escapeHTML(variableMatch[0])}</span>`;
+                index += variableMatch[0].length;
+                continue;
+            }
+        }
+        if (char === '*') {
+            const labelMatch = line.slice(index).match(/^\*[^*]+\*/);
+            if (labelMatch) {
+                result += `<span class="quant-token quant-label">${escapeHTML(labelMatch[0])}</span>`;
+                index += labelMatch[0].length;
+                continue;
+            }
+        }
+        if (isQuantControlChar(char)) {
+            result += wrapQuantControl(char);
+            index += 1;
+            continue;
+        }
+        if (char === '^') {
+            result += `<span class="quant-token quant-author">${escapeHTML(char)}</span>`;
+            index += 1;
+            continue;
+        }
+        result += escapeHTML(char);
+        index += 1;
+    }
+    return result;
+}
+
+function highlightQuantBlock(content) {
+    const trimmedUpper = content.trimStart().toUpperCase();
+    let blockClass = 'quant-logic';
+    if (trimmedUpper.startsWith('DEFINE')) {
+        blockClass = 'quant-define';
+    } else if (trimmedUpper.startsWith('MACRO') || trimmedUpper.startsWith('STICKY_MACRO')) {
+        blockClass = 'quant-macro';
+    } else if (trimmedUpper.startsWith('@')) {
+        blockClass = 'quant-variable';
+    }
+    return `<span class="quant-token ${blockClass}">${tokenizeQuantContent(content)}</span>`;
+}
+
+function tokenizeQuantContent(content) {
+    let html = '';
+    let index = 0;
+    while (index < content.length) {
+        const remaining = content.slice(index);
+        const stickyMatch = remaining.match(/^(STICKY_MACRO)/i);
+        if (stickyMatch) {
+            html += `<span class="quant-token quant-keyword">${escapeHTML(stickyMatch[0])}</span>`;
+            index += stickyMatch[0].length;
+            continue;
+        }
+        const macroMatch = remaining.match(/^(MACRO)/i);
+        if (macroMatch) {
+            html += `<span class="quant-token quant-keyword">${escapeHTML(macroMatch[0])}</span>`;
+            index += macroMatch[0].length;
+            continue;
+        }
+        const defineMatch = remaining.match(/^(DEFINE)/i);
+        if (defineMatch) {
+            html += `<span class="quant-token quant-keyword">${escapeHTML(defineMatch[0])}</span>`;
+            index += defineMatch[0].length;
+            continue;
+        }
+        const probabilityMatch = remaining.match(/^(\d{1,3})>(?!\d)/);
+        if (probabilityMatch) {
+            html += `<span class="quant-token quant-probability">${escapeHTML(probabilityMatch[1])}&gt;</span>`;
+            index += probabilityMatch[0].length;
+            continue;
+        }
+        const variableMatch = remaining.match(/^@[A-Za-z_][A-Za-z0-9_-]*/);
+        if (variableMatch) {
+            html += `<span class="quant-token quant-variable">${escapeHTML(variableMatch[0])}</span>`;
+            index += variableMatch[0].length;
+            continue;
+        }
+        const labelMatch = remaining.match(/^\*[^*]+\*/);
+        if (labelMatch) {
+            html += `<span class="quant-token quant-label">${escapeHTML(labelMatch[0])}</span>`;
+            index += labelMatch[0].length;
+            continue;
+        }
+        const controlChar = remaining[0];
+        if (isQuantControlChar(controlChar)) {
+            html += wrapQuantControl(controlChar);
+            index += 1;
+            continue;
+        }
+        if (controlChar === '^') {
+            html += `<span class="quant-token quant-author">${escapeHTML(controlChar)}</span>`;
+            index += 1;
+            continue;
+        }
+        html += escapeHTML(controlChar);
+        index += 1;
+    }
+    return html;
+}
+
+function isQuantControlChar(char) {
+    return ['|', '>', '~', '/', '\\', '[', ']'].includes(char);
+}
+
+function wrapQuantControl(char) {
+    return `<span class="quant-control">${escapeHTML(char)}</span>`;
+}
+
+function findMatchingDelimiter(text, startIndex, openChar, closeChar) {
+    let depth = 0;
+    for (let i = startIndex; i < text.length; i++) {
+        if (text[i] === openChar) {
+            depth += 1;
+        } else if (text[i] === closeChar) {
+            depth -= 1;
+            if (depth === 0) {
+                return i;
+            }
+        }
+    }
+    return -1;
+}
+
+function getSourceChapterParagraphs(chapterId, highlighted = false) {
+    const key = getSourceKeyForChapter(chapterId);
+    if (!key || !originSourcesLoaded || !originSources || !originSources.chapters[key]) {
+        return [];
+    }
+
+    if (!sourceParagraphCache[key]) {
+        sourceParagraphCache[key] = convertSourceContentToParagraphs(originSources.chapters[key].content || '');
+    }
+
+    const cache = sourceParagraphCache[key];
+    return highlighted ? cache.htmlHighlighted : cache.html;
+}
+
+function getSourceChapterNormalizedParagraphs(chapterId) {
+    const key = getSourceKeyForChapter(chapterId);
+    if (!key || !originSourcesLoaded || !originSources || !originSources.chapters[key]) {
+        return [];
+    }
+
+    if (!sourceParagraphCache[key]) {
+        sourceParagraphCache[key] = convertSourceContentToParagraphs(originSources.chapters[key].content || '');
+    }
+
+    return sourceParagraphCache[key].normalized;
+}
+
+function getSourceChapterRawParagraphs(chapterId) {
+    const key = getSourceKeyForChapter(chapterId);
+    if (!key || !originSourcesLoaded || !originSources || !originSources.chapters[key]) {
+        return [];
+    }
+
+    if (!sourceParagraphCache[key]) {
+        sourceParagraphCache[key] = convertSourceContentToParagraphs(originSources.chapters[key].content || '');
+    }
+
+    return sourceParagraphCache[key].raw;
+}
+
+function getChapterContent(versionId, chapterId) {
+    if (!versionId) {
+        return { paragraphs: [], isSource: false };
+    }
+    if (isSourceVersion(versionId)) {
+        return {
+            paragraphs: getSourceChapterParagraphs(chapterId, sourceSyntaxHighlightingEnabled),
+            isSource: true
+        };
+    }
+    if (!allVersions || !allVersions[versionId]) {
+        return { paragraphs: [], isSource: false };
+    }
+    const versionData = allVersions[versionId];
+    return {
+        paragraphs: (versionData && versionData[chapterId]) || [],
+        isSource: false
+    };
+}
+
+function updateToolbarVisibility() {
+    const sourceSelected = isSourceCodeVisible();
+    const macroAvailable = sourceSelected && !!globalMacroConfig;
+    const diffBtn = document.getElementById('mode-diff');
+    const comparisonBtn = document.getElementById('mode-comparison');
+    const macroBtn = document.getElementById('macro-inspector-btn');
+    const syntaxBtn = document.getElementById('syntax-toggle-btn');
+
+    if (diffBtn) diffBtn.classList.toggle('hidden', sourceSelected);
+    if (comparisonBtn) comparisonBtn.classList.toggle('hidden', sourceSelected);
+    if (macroBtn) {
+        macroBtn.classList.toggle('hidden', !macroAvailable);
+        macroBtn.disabled = !macroAvailable;
+    }
+    if (syntaxBtn) {
+        syntaxBtn.classList.toggle('hidden', !sourceSelected);
+        syntaxBtn.disabled = !sourceSelected;
+        if (!sourceSelected && sourceSyntaxHighlightingEnabled) {
+            sourceSyntaxHighlightingEnabled = false;
+        }
+        syntaxBtn.classList.toggle('syntax-active', sourceSyntaxHighlightingEnabled);
+        syntaxBtn.textContent = sourceSyntaxHighlightingEnabled ? 'Disable Syntax Highlighting' : 'Enable Syntax Highlighting';
+    }
+}
+
+function getChapterParagraphs(versionId, chapterId) {
+    return getChapterContent(versionId, chapterId).paragraphs;
+}
+
+function getNormalizedParagraphsForVersion(versionId, chapterId) {
+    const paragraphs = getChapterParagraphs(versionId, chapterId) || [];
+    return paragraphs.map(para => normalizeHtmlContent(para));
+}
+
+function getChaptersForVersion(versionId) {
+    if (isSourceVersion(versionId)) {
+        return getAvailableSourceChapters();
+    }
+    if (!allVersions) return [];
+    const versionData = allVersions[versionId];
+    if (!versionData) return [];
+    return Object.keys(versionData).filter(key => key !== 'version_id');
+}
+
+function getVersionForMacroAnalysis() {
+    const sourceOnA = isSourceVersion(versionA);
+    const sourceOnB = isSourceVersion(versionB);
+    if (sourceOnA && !sourceOnB) return versionB;
+    if (sourceOnB && !sourceOnA) return versionA;
+    return null;
+}
+
+function getMacroActivationData(versionId) {
+    if (!versionId) return null;
+    if (macroActivationCache[versionId]) {
+        return macroActivationCache[versionId];
+    }
+    if (!allVersions || !allVersions[versionId]) {
+        macroActivationCache[versionId] = null;
+        return null;
+    }
+
+    const versionData = allVersions[versionId];
+    const notes = Array.isArray(versionData.notes) ? versionData.notes : [];
+    const normalizedNotes = notes
+        .map(note => normalizePlainText(note))
+        .filter(Boolean);
+
+    const activation = {
+        versionId,
+        notesAvailable: normalizedNotes.length > 0,
+        options: {}
+    };
+
+    if (!notesOptionLookup) {
+        macroActivationCache[versionId] = activation;
+        return activation;
+    }
+
+    const noteSet = new Set(normalizedNotes);
+    Object.entries(notesOptionLookup.byOption).forEach(([optionId, cues]) => {
+        const matchedCue = cues.find(cue => noteSet.has(cue.normalized));
+        if (matchedCue) {
+            activation.options[optionId] = {
+                status: 'active',
+                note: matchedCue.text
+            };
+        }
+    });
+
+    const signalMatches = detectMacroSignalsForVersion(versionId);
+    Object.entries(signalMatches).forEach(([optionId, matchInfo]) => {
+        if (!activation.options[optionId]) {
+            activation.options[optionId] = matchInfo;
+        }
+    });
+
+    macroActivationCache[versionId] = activation;
+    return activation;
+}
+
+function getVersionChapterIds(versionId) {
+    if (!allVersions || !allVersions[versionId]) return [];
+    const versionData = allVersions[versionId];
+    return Object.keys(versionData).filter(key => {
+        if (key === 'version_id') return false;
+        const value = versionData[key];
+        return Array.isArray(value);
+    });
+}
+
+function htmlToPlainText(html) {
+    if (!html) return '';
+    const temp = document.createElement('div');
+    temp.innerHTML = html;
+    return temp.textContent || '';
+}
+
+function getVersionChapterText(versionId, chapterId, normalized = false) {
+    if (!versionId || !chapterId || !allVersions || !allVersions[versionId]) return '';
+    if (!versionChapterTextCache[versionId]) {
+        versionChapterTextCache[versionId] = { raw: {}, normalized: {} };
+    }
+    const bucket = normalized ? 'normalized' : 'raw';
+    if (versionChapterTextCache[versionId][bucket][chapterId]) {
+        return versionChapterTextCache[versionId][bucket][chapterId];
+    }
+    const paragraphs = getChapterParagraphs(versionId, chapterId);
+    if (!paragraphs || !paragraphs.length) return '';
+    const plain = paragraphs.map(htmlToPlainText).join('\n');
+    const text = normalized ? normalizePlainText(plain) : plain;
+    versionChapterTextCache[versionId][bucket][chapterId] = text;
+    return text;
+}
+
+function detectMacroSignalsForVersion(versionId) {
+    const matches = {};
+    if (!macroSignalConfig || !allVersions || !allVersions[versionId]) return matches;
+    Object.entries(macroSignalConfig).forEach(([optionKey, rules]) => {
+        const optionId = normalizeOptionId(optionKey);
+        if (!Array.isArray(rules) || rules.length === 0) return;
+        const matched = rules.some(rule => {
+            const matchText = (rule && rule.match) ? rule.match : '';
+            if (!matchText) return false;
+            if (rule.type && rule.type !== 'text') return false;
+            const useNormalized = rule.normalized !== false;
+            const chapters = Array.isArray(rule.chapters) && rule.chapters.length > 0
+                ? rule.chapters
+                : getVersionChapterIds(versionId);
+            const preparedNeedle = useNormalized
+                ? normalizePlainText(matchText)
+                : (rule.caseSensitive ? matchText : matchText.toLowerCase());
+            if (!preparedNeedle) return false;
+            return chapters.some(chapterId => {
+                const chapterText = getVersionChapterText(versionId, chapterId, useNormalized);
+                if (!chapterText) return false;
+                const haystack = useNormalized
+                    ? chapterText
+                    : (rule.caseSensitive ? chapterText : chapterText.toLowerCase());
+                if (!haystack) return false;
+                if (haystack.includes(preparedNeedle)) {
+                    matches[optionId] = {
+                        status: 'active',
+                        note: rule.note || `Detected via signal in ${formatChapterName(chapterId)}`
+                    };
+                    return true;
+                }
+                return false;
+            });
+        });
+        if (matched) {
+            return;
+        }
+    });
+    return matches;
+}
+
+function invalidateVersionCaches(versionId) {
+    if (!versionId) return;
+    if (macroActivationCache[versionId]) {
+        delete macroActivationCache[versionId];
+    }
+    if (versionChapterTextCache[versionId]) {
+        delete versionChapterTextCache[versionId];
+    }
+}
+
+function createMacroOptionBadge(option, activation) {
+    const badge = document.createElement('div');
+    badge.className = 'macro-option';
+    const label = document.createElement('span');
+    label.className = 'macro-option-label';
+    label.textContent = option.display || formatOptionName(option.id);
+    badge.appendChild(label);
+
+    const statusEl = document.createElement('span');
+    statusEl.className = 'macro-option-status';
+    const optionState = activation && activation.options && activation.options[option.id];
+    if (optionState && optionState.status === 'active') {
+        badge.classList.add('macro-option-active');
+        statusEl.textContent = 'Detected';
+    } else {
+        statusEl.textContent = activation && activation.notesAvailable ? 'Not detected' : 'Unknown';
+    }
+    badge.appendChild(statusEl);
+
+    if (optionState && optionState.note) {
+        const noteEl = document.createElement('div');
+        noteEl.className = 'macro-option-note';
+        noteEl.textContent = optionState.note;
+        badge.appendChild(noteEl);
+    }
+
+    return badge;
+}
+
+function createMacroCard(entry, activation) {
+    const card = document.createElement('div');
+    card.className = 'macro-card';
+    const header = document.createElement('div');
+    header.className = 'macro-card-header';
+
+    const title = document.createElement('h4');
+    title.textContent = entry.title || entry.description || entry.options.map(opt => opt.display).join(', ');
+    header.appendChild(title);
+
+    if (entry.description && entry.description !== entry.title) {
+        const desc = document.createElement('p');
+        desc.className = 'macro-card-description';
+        desc.textContent = entry.description;
+        header.appendChild(desc);
+    }
+    card.appendChild(header);
+
+    const optionsWrap = document.createElement('div');
+    optionsWrap.className = 'macro-options';
+    entry.options.forEach(option => {
+        optionsWrap.appendChild(createMacroOptionBadge(option, activation));
+    });
+    card.appendChild(optionsWrap);
+
+    return card;
+}
+
+function populateMacroInspector() {
+    const contextEl = document.getElementById('macro-inspector-context');
+    const container = document.getElementById('macro-inspector-body');
+    const emptyState = document.getElementById('macro-empty-state');
+    if (!container || !contextEl || !emptyState) return;
+
+    container.innerHTML = '';
+
+    const analysisVersion = getVersionForMacroAnalysis();
+    const activation = analysisVersion ? getMacroActivationData(analysisVersion) : null;
+
+    if (contextEl) {
+        const versionLabel = analysisVersion ? formatVersionLabel(analysisVersion) : 'No version selected';
+        contextEl.textContent = `Source chapter: ${formatChapterName(currentChapter)} · Compared with: ${versionLabel}`;
+    }
+
+    if (!globalMacroConfig || !analysisVersion || !activation) {
+        emptyState.textContent = 'Load a seed alongside the Quant Source to inspect global macros.';
+        emptyState.classList.remove('hidden');
+        return;
+    }
+
+    if (activation.notesAvailable) {
+        emptyState.classList.add('hidden');
+    } else {
+        emptyState.textContent = 'This version does not include the stats page, so detection may be incomplete.';
+        emptyState.classList.remove('hidden');
+    }
+
+    globalMacroConfig.groups.forEach(group => {
+        const groupEl = document.createElement('div');
+        groupEl.className = 'macro-group';
+        const heading = document.createElement('h3');
+        heading.textContent = group.title || 'Global macros';
+        groupEl.appendChild(heading);
+
+        group.entries.forEach(entry => {
+            if (entry.options.length === 0) return;
+            groupEl.appendChild(createMacroCard(entry, activation));
+        });
+
+        container.appendChild(groupEl);
+    });
+}
+
+function openMacroInspector() {
+    if (!globalMacroConfig || !isSourceCodeVisible()) return;
+    const modal = document.getElementById('macro-inspector-modal');
+    if (!modal) return;
+    populateMacroInspector();
+    modal.classList.remove('hidden');
+}
+
+function closeMacroInspector() {
+    const modal = document.getElementById('macro-inspector-modal');
+    if (!modal) return;
+    modal.classList.add('hidden');
+}
+
+function isVersionSelectable(versionId) {
+    if (isSourceVersion(versionId)) {
+        return originSourcesLoaded;
+    }
+    return !!allVersions[versionId];
+}
+
 // Load all versions data
 async function loadAllVersions() {
     try {
@@ -138,10 +768,22 @@ async function loadAllVersions() {
 function populateVersionSelectors() {
     const selectorA = document.getElementById('version-a-select');
     const selectorB = document.getElementById('version-b-select');
+    if (!selectorA || !selectorB) return;
+
+    const previousValueA = selectorA.value;
+    const previousValueB = selectorB.value;
 
     // Clear existing options
     selectorA.innerHTML = '';
     selectorB.innerHTML = '';
+
+    const addSourceOption = (select) => {
+        const option = document.createElement('option');
+        option.value = SOURCE_VERSION_ID;
+        option.textContent = originSourcesLoaded ? '📜 Source Code' : '📜 Source Code (loading...)';
+        option.disabled = !originSourcesLoaded;
+        select.appendChild(option);
+    };
 
     // Add built-in versions
     versionIds.forEach(vid => {
@@ -155,6 +797,9 @@ function populateVersionSelectors() {
         optionB.textContent = `Seed ${vid}`;
         selectorB.appendChild(optionB);
     });
+
+    addSourceOption(selectorA);
+    addSourceOption(selectorB);
 
     // Add separator if there are custom versions
     const customIds = Object.keys(customVersions);
@@ -183,12 +828,32 @@ function populateVersionSelectors() {
         });
     }
 
+    const desiredA = versionA || previousValueA;
+    const desiredB = versionB || previousValueB;
+
+    if (desiredA) {
+        selectorA.value = desiredA;
+    }
+
+    if (!selectorA.value && selectorA.options.length > 0) {
+        selectorA.value = selectorA.options[0].value;
+    }
+
+    if (desiredB) {
+        selectorB.value = desiredB;
+    }
+
+    if (!selectorB.value && selectorB.options.length > 0) {
+        selectorB.value = selectorB.options[0].value;
+    }
+
     // Add change handlers (only once)
     if (!selectorA.dataset.hasListener) {
         selectorA.addEventListener('change', (e) => {
             versionA = e.target.value;
             buildChapterNavigation();
             displayComparison();
+            updateToolbarVisibility();
         });
         selectorA.dataset.hasListener = 'true';
     }
@@ -198,6 +863,7 @@ function populateVersionSelectors() {
             versionB = e.target.value;
             buildChapterNavigation();
             displayComparison();
+            updateToolbarVisibility();
         });
         selectorB.dataset.hasListener = 'true';
     }
@@ -210,19 +876,8 @@ function buildChapterNavigation() {
     // Get chapters from both selected versions (to show all available chapters)
     const chaptersSet = new Set();
 
-    // Add chapters from version A
-    if (allVersions[versionA]) {
-        Object.keys(allVersions[versionA]).forEach(key => {
-            if (key !== 'version_id') chaptersSet.add(key);
-        });
-    }
-
-    // Add chapters from version B
-    if (allVersions[versionB]) {
-        Object.keys(allVersions[versionB]).forEach(key => {
-            if (key !== 'version_id') chaptersSet.add(key);
-        });
-    }
+    getChaptersForVersion(versionA).forEach(chapterId => chaptersSet.add(chapterId));
+    getChaptersForVersion(versionB).forEach(chapterId => chaptersSet.add(chapterId));
 
     // Convert to array and sort in a logical order
     // Exclude: epilogue, alternatescene, backers, aboutauthor, aboutcopy (per user request)
@@ -307,6 +962,17 @@ function setViewMode(mode) {
 
 function displayComparison() {
     const display = document.getElementById('comparison-display');
+    if (!allVersions || !versionA || !versionB) {
+        return;
+    }
+    if (isSourceCodeVisible() && (currentMode === 'diff' || currentMode === 'comparison')) {
+        currentMode = 'sidebyside';
+        document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+        const sideBtn = document.getElementById('mode-sidebyside');
+        if (sideBtn) sideBtn.classList.add('active');
+    }
+    teardownSourceSync();
+    updateToolbarVisibility();
 
     // Clear any search highlights when changing view (but preserve search state)
     const hadActiveSearch = currentSearchTerm !== '';
@@ -314,17 +980,19 @@ function displayComparison() {
     clearSearchHighlights(false);
 
     // Get chapter text from both versions
-    const textA = allVersions[versionA][currentChapter] || [];
-    const textB = allVersions[versionB][currentChapter] || [];
+    const chapterDataA = getChapterContent(versionA, currentChapter);
+    const chapterDataB = getChapterContent(versionB, currentChapter);
+    const textA = chapterDataA.paragraphs;
+    const textB = chapterDataB.paragraphs;
 
     if (currentMode === 'unified') {
-        displayUnified(display, textA, versionA);
+        displayUnified(display, chapterDataA, versionA);
     } else if (currentMode === 'sidebyside') {
-        displaySideBySide(display, textA, textB);
+        displaySideBySide(display, chapterDataA, chapterDataB);
     } else if (currentMode === 'diff') {
-        displayDiff(display, textA, textB);
+        displayDiff(display, chapterDataA, chapterDataB);
     } else if (currentMode === 'comparison') {
-        displayParagraphComparison(display, textA, textB);
+        displayParagraphComparison(display, chapterDataA, chapterDataB);
     }
 
     // Re-apply search highlights if there was an active search
@@ -350,7 +1018,29 @@ function displayComparison() {
     }
 }
 
-function displayUnified(container, paragraphs, version) {
+function renderParagraphs(container, paragraphs, isSource, versionId) {
+    if (!paragraphs || paragraphs.length === 0) {
+        const empty = document.createElement('p');
+        empty.className = 'empty-note';
+        empty.textContent = isSource ? 'Source code not available for this chapter.' : 'No content available for this chapter.';
+        container.appendChild(empty);
+        return;
+    }
+
+    paragraphs.forEach((para, index) => {
+        const element = document.createElement(isSource ? 'div' : 'p');
+        element.innerHTML = para;
+        if (isSource) {
+            element.classList.add('source-paragraph');
+        }
+        element.dataset.versionId = versionId || '';
+        element.dataset.paragraphIndex = index;
+        container.appendChild(element);
+    });
+}
+
+function displayUnified(container, chapterData, version) {
+    const { paragraphs, isSource } = chapterData;
     container.innerHTML = '';
     container.className = '';
 
@@ -358,19 +1048,17 @@ function displayUnified(container, paragraphs, version) {
     div.className = 'unified-view';
 
     const heading = document.createElement('h2');
-    heading.textContent = `Seed ${version}`;
+    heading.textContent = formatVersionLabel(version);
     div.appendChild(heading);
 
-    paragraphs.forEach(para => {
-        const p = document.createElement('p');
-        p.innerHTML = para;
-        div.appendChild(p);
-    });
+    renderParagraphs(div, paragraphs, isSource, version);
 
     container.appendChild(div);
 }
 
-function displaySideBySide(container, paragraphsA, paragraphsB) {
+function displaySideBySide(container, dataA, dataB) {
+    const { paragraphs: paragraphsA, isSource: isSourceA } = dataA;
+    const { paragraphs: paragraphsB, isSource: isSourceB } = dataB;
     container.innerHTML = '';
     container.className = 'side-by-side';
 
@@ -379,34 +1067,35 @@ function displaySideBySide(container, paragraphsA, paragraphsB) {
     panelA.className = 'version-panel';
 
     const headingA = document.createElement('h2');
-    headingA.textContent = `Seed ${versionA}`;
+    headingA.textContent = formatVersionLabel(versionA);
     panelA.appendChild(headingA);
 
-    paragraphsA.forEach(para => {
-        const p = document.createElement('p');
-        p.innerHTML = para;
-        panelA.appendChild(p);
-    });
+    renderParagraphs(panelA, paragraphsA, isSourceA, versionA);
 
     // Version B panel
     const panelB = document.createElement('div');
     panelB.className = 'version-panel';
 
     const headingB = document.createElement('h2');
-    headingB.textContent = `Seed ${versionB}`;
+    headingB.textContent = formatVersionLabel(versionB);
     panelB.appendChild(headingB);
 
-    paragraphsB.forEach(para => {
-        const p = document.createElement('p');
-        p.innerHTML = para;
-        panelB.appendChild(p);
-    });
+    renderParagraphs(panelB, paragraphsB, isSourceB, versionB);
 
     container.appendChild(panelA);
     container.appendChild(panelB);
+
+    initializeSourceSync({
+        panelA,
+        panelB,
+        dataA,
+        dataB
+    });
 }
 
-function displayDiff(container, paragraphsA, paragraphsB) {
+function displayDiff(container, dataA, dataB) {
+    const paragraphsA = dataA.paragraphs;
+    const paragraphsB = dataB.paragraphs;
     container.innerHTML = '';
     container.className = '';
 
@@ -414,7 +1103,7 @@ function displayDiff(container, paragraphsA, paragraphsB) {
     div.className = 'diff-view';
 
     const heading = document.createElement('h2');
-    heading.textContent = `Tracking Changes: ${versionA} → ${versionB}`;
+    heading.textContent = `Tracking Changes: ${formatVersionLabel(versionA)} → ${formatVersionLabel(versionB)}`;
     div.appendChild(heading);
 
     // Use alignment algorithm to match paragraphs intelligently
@@ -669,7 +1358,9 @@ function alignParagraphs(paragraphsA, paragraphsB) {
     return alignments;
 }
 
-function displayParagraphComparison(container, paragraphsA, paragraphsB) {
+function displayParagraphComparison(container, dataA, dataB) {
+    const paragraphsA = dataA.paragraphs;
+    const paragraphsB = dataB.paragraphs;
     container.innerHTML = '';
     container.className = '';
 
@@ -677,7 +1368,7 @@ function displayParagraphComparison(container, paragraphsA, paragraphsB) {
     div.className = 'comparison-view';
 
     const heading = document.createElement('h2');
-    heading.textContent = `Collation: Seed ${versionA} vs Seed ${versionB}`;
+    heading.textContent = `Collation: ${formatVersionLabel(versionA)} vs ${formatVersionLabel(versionB)}`;
     div.appendChild(heading);
 
     // Add legend
@@ -694,11 +1385,11 @@ function displayParagraphComparison(container, paragraphsA, paragraphsB) {
         </div>
         <div class="legend-item">
             <div class="legend-color unique-a"></div>
-            <span>Unique to Seed ${versionA}</span>
+            <span>Unique to ${formatVersionLabel(versionA)}</span>
         </div>
         <div class="legend-item">
             <div class="legend-color unique-b"></div>
-            <span>Unique to Seed ${versionB}</span>
+            <span>Unique to ${formatVersionLabel(versionB)}</span>
         </div>
     `;
     div.appendChild(legend);
@@ -721,7 +1412,7 @@ function displayParagraphComparison(container, paragraphsA, paragraphsB) {
             if (type !== 'unique-b') {
                 const numberA = document.createElement('div');
                 numberA.className = 'comparison-paragraph-number';
-                numberA.textContent = `${versionA} [${indexA + 1}]`;
+                numberA.textContent = `${formatVersionLabel(versionA)} [${indexA + 1}]`;
                 if (type === 'modified' && similarity > 0) {
                     numberA.innerHTML += `<span class="similarity-score">${(similarity * 100).toFixed(0)}% similar</span>`;
                 }
@@ -746,7 +1437,7 @@ function displayParagraphComparison(container, paragraphsA, paragraphsB) {
             if (type !== 'unique-a') {
                 const numberB = document.createElement('div');
                 numberB.className = 'comparison-paragraph-number';
-                numberB.textContent = `${versionB} [${indexB + 1}]`;
+                numberB.textContent = `${formatVersionLabel(versionB)} [${indexB + 1}]`;
                 divB.appendChild(numberB);
 
                 const contentB = document.createElement('div');
@@ -766,6 +1457,256 @@ function displayParagraphComparison(container, paragraphsA, paragraphsB) {
 
     div.appendChild(grid);
     container.appendChild(div);
+}
+
+function teardownSourceSync() {
+    if (!sourceSyncState) return;
+    window.removeEventListener('scroll', sourceSyncState.onScroll);
+    if (sourceSyncState.sourcePanel) {
+        sourceSyncState.sourcePanel.classList.remove('source-column');
+        if (sourceSyncState.onSourceClick) {
+            sourceSyncState.sourcePanel.removeEventListener('click', sourceSyncState.onSourceClick);
+        }
+    }
+    if (sourceSyncState.seedPanel && sourceSyncState.onSeedClick) {
+        sourceSyncState.seedPanel.removeEventListener('click', sourceSyncState.onSeedClick);
+    }
+    if (sourceSyncState.activeSourceEl) {
+        sourceSyncState.activeSourceEl.classList.remove('active-source-snippet');
+    }
+    sourceSyncState = null;
+}
+
+function calculatePlainSimilarity(textA, textB) {
+    if (!textA || !textB) return 0;
+    if (textA === textB) return 1;
+    const wordsA = new Set(textA.split(/\s+/).filter(Boolean));
+    const wordsB = new Set(textB.split(/\s+/).filter(Boolean));
+    if (wordsA.size === 0 || wordsB.size === 0) return 0;
+    const intersection = new Set([...wordsA].filter(word => wordsB.has(word)));
+    const union = new Set([...wordsA, ...wordsB]);
+    return intersection.size / union.size;
+}
+
+function buildSourceMapping(seedTexts, sourceTexts) {
+    const seedToSource = new Map();
+    const sourceToSeed = new Map();
+    for (let i = 0; i < seedTexts.length; i++) {
+        const seedText = seedTexts[i];
+        if (!seedText) continue;
+        let bestIndex = -1;
+        let bestScore = 0.35;
+        for (let j = 0; j < sourceTexts.length; j++) {
+            const sourceText = sourceTexts[j];
+            if (!sourceText) continue;
+            let score = 0;
+            if (sourceText.includes(seedText)) {
+                score = seedText.length / sourceText.length;
+            } else if (seedText.includes(sourceText)) {
+                score = sourceText.length / seedText.length;
+            } else {
+                score = calculatePlainSimilarity(seedText, sourceText);
+            }
+            if (score > bestScore) {
+                bestScore = score;
+                bestIndex = j;
+            }
+        }
+        if (bestIndex !== -1) {
+            seedToSource.set(i, bestIndex);
+            if (!sourceToSeed.has(bestIndex)) {
+                sourceToSeed.set(bestIndex, i);
+            }
+        }
+    }
+
+    const pairs = Array.from(seedToSource.entries()).map(([seedIndex, sourceIndex]) => ({
+        seedIndex,
+        sourceIndex
+    })).sort((a, b) => a.sourceIndex - b.sourceIndex);
+    const pairsBySeed = [...pairs].sort((a, b) => a.seedIndex - b.seedIndex);
+
+    const getClosestSeedForSource = (sourceIndex) => {
+        if (pairs.length === 0) return null;
+        let closest = pairs[0];
+        let minDiff = Math.abs(sourceIndex - closest.sourceIndex);
+        for (let i = 1; i < pairs.length; i++) {
+            const diff = Math.abs(sourceIndex - pairs[i].sourceIndex);
+            if (diff < minDiff) {
+                minDiff = diff;
+                closest = pairs[i];
+            }
+        }
+        return closest ? closest.seedIndex : null;
+    };
+
+    const getClosestSourceForSeed = (seedIndex) => {
+        if (pairsBySeed.length === 0) return null;
+        let closest = pairsBySeed[0];
+        let minDiff = Math.abs(seedIndex - closest.seedIndex);
+        for (let i = 1; i < pairsBySeed.length; i++) {
+            const diff = Math.abs(seedIndex - pairsBySeed[i].seedIndex);
+            if (diff < minDiff) {
+                minDiff = diff;
+                closest = pairsBySeed[i];
+            }
+        }
+        return closest ? closest.sourceIndex : null;
+    };
+
+    return {
+        hasMatches: seedToSource.size > 0,
+        getSourceForSeed(index) {
+            return seedToSource.has(index) ? seedToSource.get(index) : null;
+        },
+        getSeedForSource(index) {
+            return sourceToSeed.has(index) ? sourceToSeed.get(index) : null;
+        },
+        getClosestSeedForSource,
+        getClosestSourceForSeed,
+        pairs
+    };
+}
+
+function initializeSourceSync({ panelA, panelB, dataA, dataB }) {
+    if (currentMode !== 'sidebyside') return;
+    const sourcePanel = dataA.isSource ? panelA : (dataB.isSource ? panelB : null);
+    const seedPanel = dataA.isSource ? panelB : (dataB.isSource ? panelA : null);
+    if (!sourcePanel || !seedPanel) return;
+
+    const seedVersionId = dataA.isSource ? versionB : versionA;
+    if (!seedVersionId) return;
+
+    const seedParagraphEls = Array.from(seedPanel.querySelectorAll('[data-paragraph-index]'));
+    const sourceParagraphEls = Array.from(sourcePanel.querySelectorAll('[data-paragraph-index]'));
+    if (seedParagraphEls.length === 0 || sourceParagraphEls.length === 0) return;
+
+    const seedIndexToElement = new Map();
+    seedParagraphEls.forEach(el => {
+        const idx = parseInt(el.dataset.paragraphIndex || '-1', 10);
+        if (!Number.isNaN(idx)) {
+            seedIndexToElement.set(idx, el);
+        }
+    });
+
+    const normalizedSeed = getNormalizedParagraphsForVersion(seedVersionId, currentChapter);
+    const normalizedSource = getSourceChapterNormalizedParagraphs(currentChapter);
+    const mapping = buildSourceMapping(normalizedSeed, normalizedSource);
+    if (!mapping.hasMatches) return;
+
+    sourcePanel.classList.add('source-column');
+
+    const sourceIndexToElement = new Map();
+    sourceParagraphEls.forEach(el => {
+        const idx = parseInt(el.dataset.paragraphIndex || '-1', 10);
+        if (!Number.isNaN(idx)) {
+            sourceIndexToElement.set(idx, el);
+        }
+    });
+
+    const getActiveSeedIndex = () => {
+        const thresholdTop = window.innerHeight * 0.2;
+        for (const el of seedParagraphEls) {
+            const rect = el.getBoundingClientRect();
+            if (rect.bottom >= thresholdTop) {
+                const idx = parseInt(el.dataset.paragraphIndex || '-1', 10);
+                if (!Number.isNaN(idx)) {
+                    return idx;
+                }
+            }
+        }
+        return null;
+    };
+
+    const scrollSourceToIndex = (targetSourceIndex, options = { smooth: true }) => {
+        if (targetSourceIndex === null || targetSourceIndex === undefined) return;
+        const targetEl = sourceIndexToElement.get(targetSourceIndex);
+        if (!targetEl) return;
+
+        if (sourceSyncState.activeSourceEl !== targetEl) {
+            if (sourceSyncState.activeSourceEl) {
+                sourceSyncState.activeSourceEl.classList.remove('active-source-snippet');
+            }
+            targetEl.classList.add('active-source-snippet');
+            sourceSyncState.activeSourceEl = targetEl;
+        }
+
+        const desiredTop = targetEl.offsetTop - 16;
+        sourcePanel.scrollTo({
+            top: desiredTop >= 0 ? desiredTop : 0,
+            behavior: options.smooth === false ? 'auto' : 'smooth'
+        });
+    };
+
+    const updateActiveSource = () => {
+        if (!sourceSyncState) return;
+        const activeSeedIndex = getActiveSeedIndex();
+        if (activeSeedIndex === null) return;
+        const targetSourceIndex = mapping.getSourceForSeed(activeSeedIndex);
+        if (targetSourceIndex === null || targetSourceIndex === undefined) return;
+        scrollSourceToIndex(targetSourceIndex);
+    };
+
+    const onScroll = () => {
+        if (!sourceSyncState) return;
+        if (sourceSyncState.rafId) {
+            cancelAnimationFrame(sourceSyncState.rafId);
+        }
+        sourceSyncState.rafId = requestAnimationFrame(updateActiveSource);
+    };
+
+    const scrollSeedToIndex = (seedIndex) => {
+        const targetSeedEl = seedIndexToElement.get(seedIndex);
+        if (!targetSeedEl) return;
+        const offset = targetSeedEl.getBoundingClientRect().top + window.scrollY - 100;
+        window.scrollTo({
+            top: offset >= 0 ? offset : 0,
+            behavior: 'smooth'
+        });
+    };
+
+    const onSourceClick = (event) => {
+        if (!sourceSyncState) return;
+        const target = event.target.closest('.source-paragraph');
+        if (!target) return;
+        const sourceIndex = parseInt(target.dataset.paragraphIndex || '-1', 10);
+        if (Number.isNaN(sourceIndex)) return;
+        const exactSeed = mapping.getSeedForSource(sourceIndex);
+        const seedIndex = exactSeed !== null && exactSeed !== undefined
+            ? exactSeed
+            : mapping.getClosestSeedForSource(sourceIndex);
+        if (seedIndex === null || seedIndex === undefined) return;
+        scrollSeedToIndex(seedIndex);
+    };
+
+    const onSeedClick = (event) => {
+        if (!sourceSyncState) return;
+        const target = event.target.closest('[data-paragraph-index]');
+        if (!target) return;
+        const seedIndex = parseInt(target.dataset.paragraphIndex || '-1', 10);
+        if (Number.isNaN(seedIndex)) return;
+        const exactSource = mapping.getSourceForSeed(seedIndex);
+        const sourceIndex = exactSource !== null && exactSource !== undefined
+            ? exactSource
+            : mapping.getClosestSourceForSeed(seedIndex);
+        if (sourceIndex === null || sourceIndex === undefined) return;
+        scrollSourceToIndex(sourceIndex);
+    };
+
+    sourceSyncState = {
+        onScroll,
+        sourcePanel,
+        seedPanel,
+        activeSourceEl: null,
+        rafId: null,
+        onSourceClick,
+        onSeedClick
+    };
+
+    window.addEventListener('scroll', onScroll);
+    sourcePanel.addEventListener('click', onSourceClick);
+    seedPanel.addEventListener('click', onSeedClick);
+    updateActiveSource();
 }
 
 // Search functionality
@@ -868,15 +1809,15 @@ function findAllOccurrences(searchTerm) {
         let textToSearch = '';
 
         if (currentMode === 'unified') {
-            const paragraphs = allVersions[versionA][chapterId] || [];
+            const paragraphs = getChapterParagraphs(versionA, chapterId);
             textToSearch = paragraphs.join(' ');
         } else if (currentMode === 'sidebyside') {
-            const paragraphsA = allVersions[versionA][chapterId] || [];
-            const paragraphsB = allVersions[versionB][chapterId] || [];
+            const paragraphsA = getChapterParagraphs(versionA, chapterId);
+            const paragraphsB = getChapterParagraphs(versionB, chapterId);
             textToSearch = paragraphsA.join(' ') + ' ' + paragraphsB.join(' ');
         } else if (currentMode === 'diff') {
-            const paragraphsA = allVersions[versionA][chapterId] || [];
-            const paragraphsB = allVersions[versionB][chapterId] || [];
+            const paragraphsA = getChapterParagraphs(versionA, chapterId);
+            const paragraphsB = getChapterParagraphs(versionB, chapterId);
             textToSearch = paragraphsA.join(' ') + ' ' + paragraphsB.join(' ');
         }
 
@@ -1057,6 +1998,18 @@ function extractWords(text) {
 }
 
 function getAllTextForSeed(seedId) {
+    if (isSourceVersion(seedId)) {
+        const chapters = getChaptersForVersion(seedId).filter(ch => ch !== 'notes');
+        let text = '';
+        chapters.forEach(chapterId => {
+            const paragraphs = getChapterParagraphs(seedId, chapterId);
+            if (paragraphs && paragraphs.length > 0) {
+                text += ' ' + paragraphs.join(' ');
+            }
+        });
+        return text;
+    }
+
     const seedData = allVersions[seedId];
     if (!seedData) return '';
 
@@ -1147,12 +2100,12 @@ function calculateWordDifferential() {
     };
 
     // Update modal labels
-    seedALabel.textContent = versionA;
-    seedBLabel.textContent = versionB;
+    seedALabel.textContent = formatVersionLabel(versionA);
+    seedBLabel.textContent = formatVersionLabel(versionB);
 
     // Update description with seed numbers
     const description = document.getElementById('word-diff-description');
-    description.textContent = `Words in Seed ${versionA} that are not in Seed ${versionB}, and vice-versa. Select any word to see which chapters it appears in. Select the chapters to see the word in context.`;
+    description.textContent = `Words in ${formatVersionLabel(versionA)} that are not in ${formatVersionLabel(versionB)}, and vice-versa. Select any word to see which chapters it appears in. Select the chapters to see the word in context.`;
 
     // Display words with current sort mode
     displayWordLists();
@@ -1227,21 +2180,21 @@ function setSortMode(mode) {
 }
 
 function findChaptersWithWord(word, seedId) {
-    const seedData = allVersions[seedId];
-    if (!seedData) return [];
-
     const chaptersWithWord = [];
     const searchRegex = new RegExp(`\\b${escapeRegex(word)}\\b`, 'i');
 
-    for (const [chapterId, paragraphs] of Object.entries(seedData)) {
-        if (chapterId === 'version_id' || chapterId === 'notes') continue;
-        if (Array.isArray(paragraphs)) {
+    const chapters = getChaptersForVersion(seedId);
+
+    chapters.forEach(chapterId => {
+        if (chapterId === 'notes') return;
+        const paragraphs = getChapterParagraphs(seedId, chapterId);
+        if (paragraphs && paragraphs.length > 0) {
             const allText = paragraphs.join(' ').replace(/<[^>]*>/g, ' ');
             if (searchRegex.test(allText)) {
                 chaptersWithWord.push(chapterId);
             }
         }
-    }
+    });
 
     return chaptersWithWord;
 }
@@ -1703,6 +2656,7 @@ function deleteCustomVersion(versionId) {
 
     // Remove from allVersions
     delete allVersions[versionId];
+    invalidateVersionCaches(versionId);
 
     // Save to localStorage
     saveCustomVersions();
@@ -1824,7 +2778,7 @@ function refreshBookmarkUI(selectedId) {
 function saveCurrentBookmark() {
     if (!versionA || !versionB) return;
 
-    const defaultName = `Seed ${versionA} vs ${versionB} – ${formatChapterLabel(currentChapter)} (${formatModeLabel(currentMode)})`;
+    const defaultName = `${formatVersionLabel(versionA)} vs ${formatVersionLabel(versionB)} – ${formatChapterLabel(currentChapter)} (${formatModeLabel(currentMode)})`;
     const label = prompt('Name this bookmark:', defaultName);
     if (label === null) return;
     const trimmed = label.trim();
@@ -1847,7 +2801,13 @@ function saveCurrentBookmark() {
 
 function applyBookmark(bookmark) {
     if (!bookmark) return;
-    if (!allVersions[bookmark.versionA] || !allVersions[bookmark.versionB]) {
+    const versionAAvailable = isVersionSelectable(bookmark.versionA);
+    const versionBAvailable = isVersionSelectable(bookmark.versionB);
+    if (!versionAAvailable || !versionBAvailable) {
+        if (isSourceVersion(bookmark.versionA) || isSourceVersion(bookmark.versionB)) {
+            alert('Source code data is still loading. Please try again in a moment.');
+            return;
+        }
         alert('One of the versions in this bookmark is no longer available.');
         if (bookmark.id) {
             bookmarks = bookmarks.filter(b => b.id !== bookmark.id);
@@ -1888,9 +2848,99 @@ function getBookmarkById(id) {
     return bookmarks.find(b => b.id === id);
 }
 
+function openFilesPanel() {
+    const panel = document.getElementById('files-panel');
+    if (!panel) return;
+    const defaultBottomOffset = 'calc(9.5rem + 4rem)';
+    if (filesPanelPosition.x !== null && filesPanelPosition.y !== null) {
+        panel.style.left = `${filesPanelPosition.x}px`;
+        panel.style.top = `${filesPanelPosition.y}px`;
+        panel.style.bottom = 'auto';
+        panel.style.right = 'auto';
+    } else {
+        panel.style.left = '1.5rem';
+        panel.style.bottom = defaultBottomOffset;
+        panel.style.top = 'auto';
+        panel.style.right = 'auto';
+    }
+    panel.classList.remove('hidden');
+    filesPanelOpen = true;
+}
+
+function closeFilesPanel() {
+    const panel = document.getElementById('files-panel');
+    if (!panel) return;
+    panel.classList.add('hidden');
+    filesPanelOpen = false;
+}
+
+function toggleFilesPanel() {
+    if (filesPanelOpen) {
+        closeFilesPanel();
+    } else {
+        openFilesPanel();
+    }
+}
+
+function setupFilesPanelDragging() {
+    const panel = document.getElementById('files-panel');
+    const header = panel ? panel.querySelector('.files-panel-header') : null;
+    if (!panel || !header) return;
+
+    let dragging = false;
+    let startX = 0;
+    let startY = 0;
+    let panelX = 0;
+    let panelY = 0;
+
+    const onPointerMove = (event) => {
+        if (!dragging) return;
+        const dx = event.clientX - startX;
+        const dy = event.clientY - startY;
+        const newX = panelX + dx;
+        const newY = panelY + dy;
+        panel.style.left = `${newX}px`;
+        panel.style.top = `${newY}px`;
+        panel.style.bottom = 'auto';
+        panel.style.right = 'auto';
+        filesPanelPosition = { x: newX, y: newY };
+    };
+
+    const onPointerUp = () => {
+        dragging = false;
+        document.removeEventListener('pointermove', onPointerMove);
+        document.removeEventListener('pointerup', onPointerUp);
+    };
+
+    header.addEventListener('pointerdown', (event) => {
+        const target = event.target;
+        if (target && target.closest('.files-close-btn')) {
+            return;
+        }
+        dragging = true;
+        panelX = panel.offsetLeft;
+        panelY = panel.offsetTop;
+        startX = event.clientX;
+        startY = event.clientY;
+        panel.setPointerCapture(event.pointerId);
+        document.addEventListener('pointermove', onPointerMove);
+        document.addEventListener('pointerup', onPointerUp);
+    });
+}
+
 function openBookmarkPanel() {
     const panel = document.getElementById('bookmark-panel');
     if (!panel) return;
+    const defaultBottomOffset = 'calc(5.5rem + 4rem)';
+    if (bookmarkPanelPosition.x !== null && bookmarkPanelPosition.y !== null) {
+        panel.style.left = `${bookmarkPanelPosition.x}px`;
+        panel.style.top = `${bookmarkPanelPosition.y}px`;
+        panel.style.bottom = 'auto';
+    } else {
+        panel.style.left = '1.5rem';
+        panel.style.bottom = defaultBottomOffset;
+        panel.style.top = 'auto';
+    }
     panel.classList.remove('hidden');
     bookmarkPanelOpen = true;
 }
@@ -1908,6 +2958,51 @@ function toggleBookmarkPanel() {
     } else {
         openBookmarkPanel();
     }
+}
+
+function setupBookmarkPanelDragging() {
+    const panel = document.getElementById('bookmark-panel');
+    const header = panel ? panel.querySelector('.bookmark-panel-header') : null;
+    if (!panel || !header) return;
+
+    let dragging = false;
+    let startX = 0;
+    let startY = 0;
+    let panelX = 0;
+    let panelY = 0;
+
+    const onPointerMove = (event) => {
+        if (!dragging) return;
+        const dx = event.clientX - startX;
+        const dy = event.clientY - startY;
+        const newX = panelX + dx;
+        const newY = panelY + dy;
+        panel.style.left = `${newX}px`;
+        panel.style.top = `${newY}px`;
+        panel.style.bottom = 'auto';
+        bookmarkPanelPosition = { x: newX, y: newY };
+    };
+
+    const onPointerUp = () => {
+        dragging = false;
+        document.removeEventListener('pointermove', onPointerMove);
+        document.removeEventListener('pointerup', onPointerUp);
+    };
+
+    header.addEventListener('pointerdown', (event) => {
+        const target = event.target;
+        if (target && target.closest('.bookmark-close-btn')) {
+            return;
+        }
+        dragging = true;
+        panelX = panel.offsetLeft;
+        panelY = panel.offsetTop;
+        startX = event.clientX;
+        startY = event.clientY;
+        panel.setPointerCapture(event.pointerId);
+        document.addEventListener('pointermove', onPointerMove);
+        document.addEventListener('pointerup', onPointerUp);
+    });
 }
 
 function getSourceKeyForChapter(chapterId) {
@@ -1951,19 +3046,25 @@ function syncSourceToCurrentChapter() {
 function openSourcePanel() {
     const panel = document.getElementById('source-panel');
     if (!panel) return;
+    const defaultBottomOffset = 'calc(5.5rem + 4rem)';
+    closeFilesPanel();
     if (sourcePanelPosition.x !== null && sourcePanelPosition.y !== null) {
         panel.style.right = 'auto';
         panel.style.bottom = 'auto';
         panel.style.left = `${sourcePanelPosition.x}px`;
         panel.style.top = `${sourcePanelPosition.y}px`;
     } else {
-        panel.style.left = 'auto';
+        panel.style.left = '1.5rem';
+        panel.style.bottom = defaultBottomOffset;
         panel.style.top = 'auto';
-        panel.style.right = '1.5rem';
-        panel.style.bottom = '5rem';
+        panel.style.right = 'auto';
     }
     panel.classList.remove('hidden');
     originSourcePanelOpen = true;
+    const filesFloating = document.getElementById('files-floating');
+    if (filesFloating) {
+        filesFloating.classList.add('fab-hidden');
+    }
     if (originSources) {
         syncSourceToCurrentChapter();
     }
@@ -1974,6 +3075,10 @@ function closeSourcePanel() {
     if (!panel) return;
     panel.classList.add('hidden');
     originSourcePanelOpen = false;
+    const filesFloating = document.getElementById('files-floating');
+    if (filesFloating) {
+        filesFloating.classList.remove('fab-hidden');
+    }
 }
 
 function toggleSourcePanel() {
@@ -2091,16 +3196,29 @@ function loadCustomVersions() {
 
 async function loadOriginSources() {
     try {
-        const response = await fetch('origin_text/origin_sources.json');
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
+        const [originResponse, signalResponse] = await Promise.all([
+            fetch('origin_text/origin_sources.json'),
+            fetch('origin_text/macro_signals.json').catch(() => null)
+        ]);
+        if (!originResponse.ok) {
+            throw new Error(`HTTP ${originResponse.status}`);
         }
-        originSources = await response.json();
+        originSources = await originResponse.json();
+        macroSignalConfig = signalResponse && signalResponse.ok ? await signalResponse.json() : null;
         originSourcesLoaded = true;
+        sourceParagraphCache = {};
+        globalMacroConfig = parseGlobalMacroConfig(originSources);
+        notesOptionLookup = buildNotesOptionLookup(originSources, globalMacroConfig);
+        macroActivationCache = {};
+        versionChapterTextCache = {};
         currentSourceKey = getSourceKeyForChapter(currentChapter);
         if (originSourcePanelOpen) {
             syncSourceToCurrentChapter();
         }
+        populateVersionSelectors();
+        buildChapterNavigation();
+        updateToolbarVisibility();
+        displayComparison();
     } catch (error) {
         originSourcesLoaded = false;
         console.error('Error loading origin sources:', error);
@@ -2944,6 +4062,37 @@ document.addEventListener('DOMContentLoaded', () => {
             closeBookmarkPanel();
         }
     });
+    const filesToggleBtn = document.getElementById('files-toggle-btn');
+    const filesCloseBtn = document.getElementById('files-close-btn');
+    const filesUploadTrigger = document.getElementById('files-upload-btn');
+    if (filesToggleBtn) {
+        filesToggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleFilesPanel();
+        });
+    }
+    if (filesCloseBtn) {
+        filesCloseBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeFilesPanel();
+        });
+    }
+    if (filesUploadTrigger) {
+        filesUploadTrigger.addEventListener('click', () => {
+            closeFilesPanel();
+        });
+    }
+    document.addEventListener('click', (e) => {
+        if (!filesPanelOpen) return;
+        const panel = document.getElementById('files-panel');
+        const toggleBtn = document.getElementById('files-toggle-btn');
+        if (!panel) return;
+        if (!panel.contains(e.target) && !toggleBtn.contains(e.target)) {
+            closeFilesPanel();
+        }
+    });
+    setupFilesPanelDragging();
+    setupBookmarkPanelDragging();
     setupSourcePanelDragging();
 
     // Source panel controls
@@ -2972,6 +4121,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Macro Inspector events
+    const macroBtn = document.getElementById('macro-inspector-btn');
+    const macroModal = document.getElementById('macro-inspector-modal');
+    const macroCloseBtn = document.getElementById('macro-inspector-close-btn');
+    if (macroBtn) {
+        macroBtn.addEventListener('click', () => {
+            if (!globalMacroConfig || !isSourceCodeVisible()) return;
+            openMacroInspector();
+        });
+    }
+    if (macroCloseBtn) {
+        macroCloseBtn.addEventListener('click', closeMacroInspector);
+    }
+    if (macroModal) {
+        macroModal.addEventListener('click', (e) => {
+            if (e.target === macroModal) {
+                closeMacroInspector();
+            }
+        });
+    }
+
+    const syntaxToggleBtn = document.getElementById('syntax-toggle-btn');
+    if (syntaxToggleBtn) {
+        syntaxToggleBtn.addEventListener('click', () => {
+            if (!isSourceCodeVisible()) return;
+            sourceSyntaxHighlightingEnabled = !sourceSyntaxHighlightingEnabled;
+            updateToolbarVisibility();
+            displayComparison();
+        });
+    }
+
+    updateToolbarVisibility();
+
 
     // Manage uploads event listeners
     const manageUploadsBtn = document.getElementById('manage-uploads-btn');
@@ -2979,6 +4161,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const manageModal = document.getElementById('manage-uploads-modal');
 
     manageUploadsBtn.addEventListener('click', () => {
+        closeFilesPanel();
         // Show info modal on first use, then open manage uploads modal
         if (!hasSeenManageInfoNotice()) {
             openManageInfoModal();
@@ -3072,7 +4255,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentDistance = calculateJaccardDistance(vocabA, vocabB);
         const currentSimilarity = ((1 - currentDistance) * 100).toFixed(1);
 
-        document.getElementById('most-similar-seeds').textContent = `${versionA} & ${versionB}`;
+        document.getElementById('most-similar-seeds').textContent = `${formatVersionLabel(versionA)} & ${formatVersionLabel(versionB)}`;
         document.getElementById('most-similar-distance').textContent = `${currentSimilarity}% vocabulary overlap`;
 
         // Setup load button (disabled since these are already loaded)
@@ -3227,3 +4410,162 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+function normalizeOptionId(name) {
+    return (name || '').replace(/^@/, '').trim().toLowerCase();
+}
+
+function formatOptionName(id) {
+    if (!id) return '';
+    const cleaned = id.replace(/^@/, '').replace(/_/g, ' ').trim();
+    return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+}
+
+function parseGlobalMacroConfig(originData) {
+    if (!originData || !originData.chapters || !originData.chapters.globals) return null;
+    const globalsContent = originData.chapters.globals.content || '';
+    const lines = globalsContent.split(/\r?\n/);
+    const groups = [];
+    const optionIndex = {};
+    let currentGroup = { title: 'Global Macros', entries: [] };
+    groups.push(currentGroup);
+    let pendingDescription = [];
+
+    lines.forEach(line => {
+        const trimmed = line.trim();
+        if (!trimmed) {
+            return;
+        }
+        if (trimmed.startsWith('#')) {
+            const text = trimmed.replace(/^#\s*/, '').trim();
+            if (/^\*+/.test(text)) {
+                const title = text.replace(/\*/g, '').trim() || 'Global Macros';
+                currentGroup = { title, entries: [] };
+                groups.push(currentGroup);
+                pendingDescription = [];
+            } else {
+                pendingDescription.push(text);
+            }
+            return;
+        }
+        const defineMatch = trimmed.match(/^\[DEFINE\s+([^\]]+)\]/i);
+        if (defineMatch) {
+            const body = defineMatch[1].trim();
+            const optionTokens = body.split('|').map(token => token.trim()).filter(Boolean);
+            const options = [];
+            optionTokens.forEach(token => {
+                const withoutChance = token.replace(/^\d{1,3}>/, '').trim();
+                const cleaned = withoutChance.replace(/^\^/, '').trim();
+                if (!cleaned.startsWith('@')) return;
+                const id = normalizeOptionId(cleaned);
+                options.push({
+                    id,
+                    display: formatOptionName(id),
+                    raw: cleaned
+                });
+            });
+            const entry = {
+                id: options.map(opt => opt.id).join('-') || `define-${currentGroup.entries.length}`,
+                title: pendingDescription[0] || options.map(opt => formatOptionName(opt.id)).join(' vs '),
+                description: pendingDescription.join(' ').trim(),
+                options
+            };
+            currentGroup.entries.push(entry);
+            entry.options.forEach(opt => {
+                optionIndex[opt.id] = entry;
+            });
+            pendingDescription = [];
+        }
+    });
+
+    return { groups, optionIndex };
+}
+
+function buildNotesOptionLookup(originData, config) {
+    if (!originData || !originData.chapters || !originData.chapters.notes || !config) return null;
+    const notesContent = originData.chapters.notes.content || '';
+    const regex = /\[([\s\S]*?)\]/g;
+    const cues = {};
+    let match;
+
+    while ((match = regex.exec(notesContent)) !== null) {
+        const block = (match[1] || '').trim();
+        if (!block) continue;
+        if (/^(MACRO|STICKY_MACRO)\s/i.test(block)) {
+            continue;
+        }
+        const segments = splitQuantOptions(block);
+        if (!segments.length) continue;
+        let entryContext = null;
+        const assigned = [];
+
+        segments.forEach(segment => {
+            const trimmed = segment.trim();
+            if (!trimmed) return;
+            let optionId = null;
+            let text = trimmed;
+            const optMatch = trimmed.match(/^@([A-Za-z_][A-Za-z0-9_-]*)>([\s\S]*)$/);
+            if (optMatch) {
+                optionId = normalizeOptionId(optMatch[1]);
+                text = optMatch[2];
+                entryContext = config.optionIndex[optionId] || entryContext;
+            } else if (entryContext && entryContext.options.length === 2) {
+                const remaining = entryContext.options
+                    .map(opt => opt.id)
+                    .filter(id => !assigned.includes(id));
+                if (remaining.length === 1) {
+                    optionId = remaining[0];
+                }
+            }
+            if (!optionId) return;
+            assigned.push(optionId);
+            const plain = quantOptionToPlain(text);
+            const normalized = normalizePlainText(plain);
+            if (!plain || !normalized) return;
+            if (!cues[optionId]) cues[optionId] = [];
+            cues[optionId].push({ text: plain, normalized });
+        });
+    }
+
+    return { byOption: cues };
+}
+
+function splitQuantOptions(text) {
+    if (!text) return [];
+    const parts = [];
+    let current = '';
+    let braceDepth = 0;
+    for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        if (char === '{') {
+            braceDepth += 1;
+            current += char;
+            continue;
+        }
+        if (char === '}') {
+            braceDepth = Math.max(0, braceDepth - 1);
+            current += char;
+            continue;
+        }
+        if (char === '|' && braceDepth === 0) {
+            parts.push(current);
+            current = '';
+            continue;
+        }
+        current += char;
+    }
+    if (current) parts.push(current);
+    return parts;
+}
+
+function quantOptionToPlain(text) {
+    if (!text) return '';
+    let output = text.replace(/~/g, '');
+    output = output.replace(/\{([^{}]+)\}/g, (_, inner) => {
+        const slashIndex = inner.indexOf('/');
+        if (slashIndex !== -1) {
+            return inner.slice(slashIndex + 1);
+        }
+        return inner;
+    });
+    return output.replace(/\s+/g, ' ').trim();
+}

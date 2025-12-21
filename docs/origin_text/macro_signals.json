@@ -1,0 +1,56 @@
+{
+  "alcohol": [
+    {
+      "type": "text",
+      "chapters": ["chapter4"],
+      "match": "or not vertigo, exactly",
+      "normalized": true,
+      "note": "The @alcohol variable is true, which means extra passages occur that suggest Ryan has a drinking problem."
+    }
+  ],
+  "furnished": [
+    {
+      "type": "text",
+      "chapters": ["chapter1"],
+      "match": "a piece or two of abandoned furniture",
+      "normalized": true,
+      "note": "The Downstairs is full of anonymous abandoned furniture, rather than empty."
+    }
+  ],
+  "possibles": [
+    {
+      "type": "text",
+      "chapters": ["chapter1"],
+      "match": "I could feel that old part of me fighting this",
+      "normalized": true,
+      "note": "The @possible global variable is true, so the “possible” story is included."
+    }
+  ],
+  "dadphone": [
+    {
+      "type": "text",
+      "chapters": ["chapter10"],
+      "match": "between one blink and the next",
+      "normalized": true,
+      "note": "The @dadphone global variable is true, meaning Ryan's trauma is attributed to his father's sudden death."
+     }
+  ],
+  "bradphone": [
+    {
+      "type": "text",
+      "chapters": ["chapter17"],
+      "match": "my first love had betrayed me",
+      "normalized": true,
+      "note": "The @bradphone global variable is true, meaning the source of Ryan's trauma is his toxic relationship with Bradley."
+    }
+  ],
+  "fridgetrapped": [
+    {
+      "type": "text",
+      "chapters": ["chapter4"],
+      "match": "checked my pockets",
+      "normalized": true,
+      "note": "The @fridgetrapped variable is true. Ryan lost the key."
+    }
+  ]
+}
