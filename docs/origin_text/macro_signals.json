@@ -17,6 +17,15 @@
       "note": "The Downstairs is full of anonymous abandoned furniture, rather than empty."
     }
   ],
+    "empty": [
+    {
+      "type": "text",
+      "chapters": ["chapter2"],
+      "match": "Some of the rooms seemed like bedrooms",
+      "normalized": true,
+      "note": "The Downstairs is mostly empty."
+    }
+  ],
   "possibles": [
     {
       "type": "text",
@@ -51,6 +60,87 @@
       "match": "checked my pockets",
       "normalized": true,
       "note": "The @fridgetrapped variable is true. Ryan lost the key."
+    }
+  ],
+    "TheCity": [
+    {
+      "type": "text",
+      "chapters": ["chapter12"],
+      "match": "out of those houses, those millions of houses",
+      "normalized": true,
+      "note": "@TheCity variable is true. The Elder Niko recounts a story of a lower level full of huge houses."
+    }
+  ],
+      "TheBasement": [
+    {
+      "type": "text",
+      "chapters": ["chapter11"],
+      "match": "they open up into black empty spaces",
+      "normalized": true,
+      "note": "@TheBasement variable is true. The Elder Niko recounts a story of a vast endless basement at the bottom of The Downstairs."
+    }
+  ],
+      "ffdropoff": [
+    {
+      "type": "text",
+      "chapters": ["chapter14"],
+      "match": "The door opened onto nothing. Past the frame, the floor dropped away into blackness.",
+      "normalized": true,
+      "note": "The @ffdropoff variable is true. The final fight occurs amidst an endless dropoff into a void."
+    }
+  ],
+        "ffthewalls": [
+    {
+      "type": "text",
+      "chapters": ["chapter14"],
+      "match": "Perspectives change. Architecture gets stretched to breaking.",
+      "normalized": true,
+      "note": "The @ffthewalls variable is true. The final fight occurs amidst endless walls stretching into the gloom."
+    }
+  ],
+        "fftubeweird": [
+    {
+      "type": "text",
+      "chapters": ["chapter15"],
+      "match": "I was at a forty-five-degree angle",
+      "normalized": true,
+      "note": "The @fftubeweird variable is true. The final fight gets especially weird."
+    }
+  ],
+        "fftube": [
+    {
+      "type": "text",
+      "chapters": ["chapter15"],
+      "match": "never skydived or bungee jumped before;",
+      "normalized": true,
+      "note": "The @fftube variable is true."
+    }
+  ],
+        "ffset": [
+    {
+      "type": "text",
+      "chapters": ["chapter15"],
+      "match": "I dangled thirty or forty feet below the underside of the bedroom platform",
+      "normalized": true,
+      "note": "The @ffset variable is true. The final fight takes place amid a giant bedroom set on a platform in a void."
+    }
+  ],
+        "cdrom": [
+    {
+      "type": "text",
+      "chapters": ["chapter4"],
+      "match": "a CD-ROM adventure set on a space station",
+      "normalized": true,
+      "note": "The @cdrom variable is true. Ryan plays a weird computer game set on a space station where everyone has gone insane."
+    }
+  ],
+        "gorilla": [
+    {
+      "type": "text",
+      "chapters": ["chapter9"],
+      "match": "I remembered something from a neurobiology class.",
+      "normalized": true,
+      "note": "The @gorilla variable is true. Ryan recalls a famous study in which people do not notice a person in a gorilla suit in a crowd of people."
     }
   ]
 }
