@@ -125,6 +125,24 @@
       "note": "The @ffset variable is true. The final fight takes place amid a giant bedroom set on a platform in a void."
     }
   ],
+        "ffchandelier": [
+    {
+      "type": "text",
+      "chapters": ["chapter14"],
+      "match": "a filigreed structure I couldn't at first identify",
+      "normalized": true,
+      "note": "The @ffchandelier variable is true. A giant crystal chandelier is a dominant set piece in the final fight."
+    }
+  ],
+        "ffbookshelves": [
+    {
+      "type": "text",
+      "chapters": ["chapter14"],
+      "match": "I crashed into the mountain of books.",
+      "normalized": true,
+      "note": "The @ffbookshelves variable is true. A giant bookshelf is a dominant set piece in the final fight."
+    }
+  ],
         "cdrom": [
     {
       "type": "text",
@@ -141,6 +159,33 @@
       "match": "I remembered something from a neurobiology class.",
       "normalized": true,
       "note": "The @gorilla variable is true. Ryan recalls a famous study in which people do not notice a person in a gorilla suit in a crowd of people."
+    }
+  ],
+        "gayniko": [
+    {
+      "type": "text",
+      "chapters": ["chapter16"],
+      "match": "I sometimes saw him looking at me, out of the corner of my eye",
+      "normalized": true,
+      "note": "The Niko at the end of the novel harbors feelings towards Ryan."
+    }
+  ],
+        "firmniko": [
+    {
+      "type": "text",
+      "chapters": ["chapter16"],
+      "match": "dropped his arms to his sides. Fixed me with a look",
+      "normalized": true,
+      "note": "The Niko at the end of the novel has no feelings toward Ryan."
+    }
+  ],
+        "originalniko": [
+    {
+      "type": "text",
+      "chapters": ["chapter4"],
+      "match": "I lost my grip on the flashlight, and it tumbled out of my hands, hit the hard shelf underneath me with a crack",
+      "normalized": true,
+      "note": "The @originalniko variable is true."
     }
   ]
 }
