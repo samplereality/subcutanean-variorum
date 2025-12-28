@@ -25,6 +25,9 @@ let macroActivationCache = {};
 let notesOptionLookup = null;
 let macroSignalConfig = null;
 let versionChapterTextCache = {};
+let versionNarrativeStatsCache = {};
+let coreVersionIds = [];
+let narrativeMetricBaselines = null;
 let sourceSyntaxHighlightingEnabled = false;
 const SOURCE_VERSION_ID = 'quant_source';
 const SOURCE_VERSION_LABEL = 'Source Code';
@@ -118,6 +121,18 @@ const SOURCE_KEY_BY_CHAPTER = {
     chapter18: 'epilogue',
     notes: 'notes'
 };
+
+const NON_NARRATIVE_SECTIONS = new Set([
+    'introduction',
+    'notes',
+    'backers',
+    'aboutauthor',
+    'alternatescene'
+]);
+
+const SLANG_REGEX = /\b(thing|things|stuff|okay|ok|cool|guys|dude|junk|sucks|sucked|whatever|wanna|gonna|gotta|dunno|kinda|whatcha|lemme|outta|gimme|ain't|yeah|yep|yup|actually|shit|shitty|fuck|fucking|fucked|till|little|nope|huh|uh|um|umm|ah|ahh|aha|aww|eh|er|eww|hey|hmm|uh-huh|wow|yay|lot|lots|tons|'em|weird|jet|poke)\b/gi;
+const ME_WORD_REGEX = /\b(i|i'm|i'll|i'd|me|my|myself|mine)\b/gi;
+const SIMILE_REGEX = /\b(like|as if)\b/gi;
 
 function isSourceVersion(versionId) {
     return versionId === SOURCE_VERSION_ID;
@@ -519,6 +534,13 @@ function getMacroActivationData(versionId) {
         }
     });
 
+    const heuristicMatches = detectNarrativeStyleHeuristics(versionId, activation.options);
+    Object.entries(heuristicMatches).forEach(([optionId, matchInfo]) => {
+        if (!activation.options[optionId]) {
+            activation.options[optionId] = matchInfo;
+        }
+    });
+
     macroActivationCache[versionId] = activation;
     return activation;
 }
@@ -607,9 +629,188 @@ function invalidateVersionCaches(versionId) {
     if (versionChapterTextCache[versionId]) {
         delete versionChapterTextCache[versionId];
     }
+    if (versionNarrativeStatsCache[versionId]) {
+        delete versionNarrativeStatsCache[versionId];
+    }
 }
 
-function createMacroOptionBadge(option, activation) {
+function detectNarrativeStyleHeuristics(versionId, existingOptions = {}) {
+    const stats = getNarrativeStats(versionId);
+    if (!stats) return {};
+    const matches = {};
+    const hasOption = (optionId) => !!(existingOptions && existingOptions[optionId]);
+
+    const setMatch = (optionId, note) => {
+        matches[optionId] = {
+            status: 'active',
+            note
+        };
+    };
+
+    const alliterationRate = stats.significantWordCount > 0 ? stats.alliterationCount / stats.significantWordCount : 0;
+    if (!hasOption('alliteration') && !hasOption('noalliteration')) {
+        if (narrativeMetricBaselines && narrativeMetricBaselines.alliteration.std > 0) {
+            const z = (alliterationRate - narrativeMetricBaselines.alliteration.mean) / narrativeMetricBaselines.alliteration.std;
+            if (z >= 1.25) {
+                setMatch('alliteration', 'Frequent alliteration detected in narration');
+            } else if (z <= -1.25) {
+                setMatch('noalliteration', 'Alliteration is rarely used in narration');
+            }
+        }
+    }
+
+    const slangRate = stats.totalWords > 0 ? (stats.slangCount / stats.totalWords) * 1000 : 0;
+    if (!hasOption('slang') && !hasOption('formal')) {
+        if (slangRate >= 10) {
+            setMatch('slang', 'High density of informal/slang vocabulary detected');
+        } else if (slangRate <= 1.5) {
+            setMatch('formal', 'Very little slang detected across narration');
+        }
+    }
+
+    if (!hasOption('bigwords')) {
+        const avgSignificantWordLength = stats.significantWordCount > 0 ? stats.significantWordLength / stats.significantWordCount : 0;
+        if (avgSignificantWordLength >= 5.3) {
+            setMatch('bigwords', 'Narrator favors longer word choices throughout the text');
+        }
+    }
+
+    if (!hasOption('avoidme')) {
+        const meWordRate = stats.totalWords > 0 ? (stats.meWordCount / stats.totalWords) * 1000 : 0;
+        if (meWordRate <= 6) {
+            setMatch('avoidme', 'First-person pronouns appear relatively rarely');
+        }
+    }
+
+    if (!hasOption('likesimile') && !hasOption('dislikesimile')) {
+        const simileRate = stats.totalWords > 0 ? (stats.simileCount / stats.totalWords) * 1000 : 0;
+        if (narrativeMetricBaselines && narrativeMetricBaselines.simile.std > 0) {
+            const z = (simileRate - narrativeMetricBaselines.simile.mean) / narrativeMetricBaselines.simile.std;
+            if (z >= 1.25) {
+                setMatch('likesimile', 'Similes and analogies appear frequently in narration');
+            } else if (z <= -1.25) {
+                setMatch('dislikesimile', 'Similes are rarely employed in narration');
+            }
+        }
+    }
+
+    if (!hasOption('avoiddialogue')) {
+        const dialogueRatio = stats.totalParagraphs > 0 ? stats.dialogueParagraphs / stats.totalParagraphs : 0;
+        if (dialogueRatio <= 0.08) {
+            setMatch('avoiddialogue', 'Quoted dialogue is rarely present in this version');
+        }
+    }
+
+    return matches;
+}
+
+function getNarrativeStats(versionId) {
+    if (!versionId || !allVersions || !allVersions[versionId]) return null;
+    if (versionNarrativeStatsCache[versionId]) {
+        return versionNarrativeStatsCache[versionId];
+    }
+    const stats = {
+        totalParagraphs: 0,
+        totalWords: 0,
+        significantWordCount: 0,
+        significantWordLength: 0,
+        alliterationCount: 0,
+        slangCount: 0,
+        meWordCount: 0,
+        simileCount: 0,
+        dialogueParagraphs: 0
+    };
+    const chapterIds = getVersionChapterIds(versionId).filter(ch => !NON_NARRATIVE_SECTIONS.has(ch));
+    chapterIds.forEach(chapterId => {
+        const paragraphs = getChapterParagraphs(versionId, chapterId) || [];
+        paragraphs.forEach(html => {
+            const plain = htmlToPlainText(html);
+            if (!plain || plain.includes('{')) {
+                return;
+            }
+            stats.totalParagraphs += 1;
+            if (/“.*”/.test(plain)) {
+                stats.dialogueParagraphs += 1;
+            }
+            const words = plain.match(/[\w']+/g) || [];
+            if (!words.length) return;
+            stats.totalWords += words.length;
+            const significantWords = words.filter(word => word.length >= 4);
+            stats.significantWordCount += significantWords.length;
+            stats.significantWordLength += significantWords.reduce((sum, word) => sum + word.length, 0);
+            stats.alliterationCount += countAlliteration(significantWords);
+            stats.slangCount += countRegexMatches(SLANG_REGEX, plain);
+            stats.meWordCount += countRegexMatches(ME_WORD_REGEX, plain);
+            stats.simileCount += countRegexMatches(SIMILE_REGEX, plain);
+        });
+    });
+    versionNarrativeStatsCache[versionId] = stats;
+    return stats;
+}
+
+function countAlliteration(words) {
+    if (!Array.isArray(words) || words.length === 0) return 0;
+    let count = 0;
+    let lastLetter = '';
+    words.forEach(word => {
+        const letter = word.charAt(0).toLowerCase();
+        if (!letter) return;
+        if (letter === lastLetter) {
+            count += 1;
+        }
+        lastLetter = letter;
+    });
+    return count;
+}
+
+function countRegexMatches(regex, text) {
+    if (!text) return 0;
+    const re = new RegExp(regex.source, regex.flags);
+    const matches = text.match(re);
+    return matches ? matches.length : 0;
+}
+
+function computeNarrativeMetricBaselines() {
+    if (!coreVersionIds.length) {
+        narrativeMetricBaselines = null;
+        return;
+    }
+    const simileRates = [];
+    const alliterationRates = [];
+    coreVersionIds.forEach(versionId => {
+        const stats = getNarrativeStats(versionId);
+        if (!stats || !stats.totalWords || !stats.significantWordCount) return;
+        simileRates.push((stats.simileCount / stats.totalWords) * 1000);
+        alliterationRates.push(stats.alliterationCount / stats.significantWordCount);
+    });
+    narrativeMetricBaselines = {
+        simile: calculateMeanStd(simileRates),
+        alliteration: calculateMeanStd(alliterationRates)
+    };
+}
+
+function calculateMeanStd(values) {
+    if (!values || values.length === 0) {
+        return { mean: 0, std: 0 };
+    }
+    const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
+    const variance = values.reduce((acc, value) => acc + Math.pow(value - mean, 2), 0) / values.length;
+    return {
+        mean,
+        std: Math.sqrt(variance)
+    };
+}
+
+const DEFAULT_OPTION_IDS = new Set([
+    'noverbositypref',
+    'nopolaritypref',
+    'noslangpref',
+    'neithersubjnorobj',
+    'noalitpref',
+    'nosimilepref'
+]);
+
+function createMacroOptionBadge(option, activation, assumedDefault = false) {
     const badge = document.createElement('div');
     badge.className = 'macro-option';
     const label = document.createElement('span');
@@ -624,7 +825,12 @@ function createMacroOptionBadge(option, activation) {
         badge.classList.add('macro-option-active');
         statusEl.textContent = 'Detected';
     } else {
-        statusEl.textContent = activation && activation.notesAvailable ? 'Not detected' : 'Unknown';
+        if (assumedDefault) {
+            badge.classList.add('macro-option-assumed');
+            statusEl.textContent = 'Assumed';
+        } else {
+            statusEl.textContent = activation && activation.notesAvailable ? 'Not detected' : 'Unknown';
+        }
     }
     badge.appendChild(statusEl);
 
@@ -632,6 +838,11 @@ function createMacroOptionBadge(option, activation) {
         const noteEl = document.createElement('div');
         noteEl.className = 'macro-option-note';
         noteEl.textContent = optionState.note;
+        badge.appendChild(noteEl);
+    } else if (assumedDefault) {
+        const noteEl = document.createElement('div');
+        noteEl.className = 'macro-option-note';
+        noteEl.textContent = 'Not listed; assuming default setting';
         badge.appendChild(noteEl);
     }
 
@@ -658,12 +869,25 @@ function createMacroCard(entry, activation) {
 
     const optionsWrap = document.createElement('div');
     optionsWrap.className = 'macro-options';
+    const activeOptions = new Set();
     entry.options.forEach(option => {
-        optionsWrap.appendChild(createMacroOptionBadge(option, activation));
+        if (activation && activation.options && activation.options[option.id]) {
+            activeOptions.add(option.id);
+        }
+    });
+    const defaultOption = activeOptions.size === 0 ? getDefaultOption(entry.options) : null;
+    entry.options.forEach(option => {
+        const assumedDefault = defaultOption && defaultOption.id === option.id;
+        optionsWrap.appendChild(createMacroOptionBadge(option, activation, assumedDefault));
     });
     card.appendChild(optionsWrap);
 
     return card;
+}
+
+function getDefaultOption(options) {
+    if (!Array.isArray(options)) return null;
+    return options.find(opt => DEFAULT_OPTION_IDS.has(opt.id));
 }
 
 function populateMacroInspector() {
@@ -696,6 +920,9 @@ function populateMacroInspector() {
     }
 
     globalMacroConfig.groups.forEach(group => {
+        if (!group.entries || group.entries.length === 0) {
+            return;
+        }
         const groupEl = document.createElement('div');
         groupEl.className = 'macro-group';
         const heading = document.createElement('h3');
@@ -738,6 +965,8 @@ async function loadAllVersions() {
         const response = await fetch('extracted_text/all_versions.json');
         allVersions = await response.json();
         versionIds = Object.keys(allVersions).sort();
+        coreVersionIds = [...versionIds];
+        computeNarrativeMetricBaselines();
 
         // Load custom versions from localStorage
         loadCustomVersions();
@@ -3211,6 +3440,7 @@ async function loadOriginSources() {
         notesOptionLookup = buildNotesOptionLookup(originSources, globalMacroConfig);
         macroActivationCache = {};
         versionChapterTextCache = {};
+        versionNarrativeStatsCache = {};
         currentSourceKey = getSourceKeyForChapter(currentChapter);
         if (originSourcePanelOpen) {
             syncSourceToCurrentChapter();
@@ -4429,6 +4659,8 @@ function parseGlobalMacroConfig(originData) {
     let currentGroup = { title: 'Global Macros', entries: [] };
     groups.push(currentGroup);
     let pendingDescription = [];
+    let awaitingGroupTitle = false;
+    let previousLineWasTitle = false;
 
     lines.forEach(line => {
         const trimmed = line.trim();
@@ -4438,13 +4670,24 @@ function parseGlobalMacroConfig(originData) {
         if (trimmed.startsWith('#')) {
             const text = trimmed.replace(/^#\s*/, '').trim();
             if (/^\*+/.test(text)) {
-                const title = text.replace(/\*/g, '').trim() || 'Global Macros';
+                if (previousLineWasTitle) {
+                    previousLineWasTitle = false;
+                } else {
+                    awaitingGroupTitle = true;
+                }
+                return;
+            }
+            if (awaitingGroupTitle) {
+                const title = text || 'Global Macros';
                 currentGroup = { title, entries: [] };
                 groups.push(currentGroup);
                 pendingDescription = [];
-            } else {
-                pendingDescription.push(text);
+                awaitingGroupTitle = false;
+                previousLineWasTitle = true;
+                return;
             }
+            previousLineWasTitle = false;
+            pendingDescription.push(text);
             return;
         }
         const defineMatch = trimmed.match(/^\[DEFINE\s+([^\]]+)\]/i);
@@ -4463,21 +4706,31 @@ function parseGlobalMacroConfig(originData) {
                     raw: cleaned
                 });
             });
+            const filteredOptions = options.filter(opt => !isSingularOption(opt.id));
+            if (filteredOptions.length === 0) {
+                pendingDescription = [];
+                return;
+            }
             const entry = {
-                id: options.map(opt => opt.id).join('-') || `define-${currentGroup.entries.length}`,
-                title: pendingDescription[0] || options.map(opt => formatOptionName(opt.id)).join(' vs '),
+                id: filteredOptions.map(opt => opt.id).join('-') || `define-${currentGroup.entries.length}`,
+                title: pendingDescription[0] || filteredOptions.map(opt => formatOptionName(opt.id)).join(' vs '),
                 description: pendingDescription.join(' ').trim(),
-                options
+                options: filteredOptions
             };
             currentGroup.entries.push(entry);
             entry.options.forEach(opt => {
                 optionIndex[opt.id] = entry;
             });
             pendingDescription = [];
+            previousLineWasTitle = false;
         }
     });
 
     return { groups, optionIndex };
+}
+
+function isSingularOption(optionId) {
+    return typeof optionId === 'string' && optionId.startsWith('singular');
 }
 
 function buildNotesOptionLookup(originData, config) {

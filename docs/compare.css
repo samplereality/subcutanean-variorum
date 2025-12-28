@@ -1111,6 +1111,12 @@
     background: rgba(255,255,255,0.08);
 }
 
+.macro-option-assumed {
+    border-style: dashed;
+    border-color: rgba(255,255,255,0.4);
+    background: rgba(255,255,255,0.04);
+}
+
 .macro-option-label {
     font-weight: 600;
     margin-right: 0.5rem;
