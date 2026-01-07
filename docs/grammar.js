@@ -1,11 +1,8 @@
-// Placeholder grammar for Subcutanean
-// This will eventually be replaced with the full Quant source
-
 function createGrammar(RiTa) {
     return RiTa.grammar({
-        start: "$prologue $chapter1",
+        start: "$part1",
 
-        prologue: "This is the prologue. [It was a dark night | The sun was shining | Rain fell steadily]. $sentence",
+        part1: "PART 1<br><br>DOWNSTAIRS<br><br>",
 
         chapter1: "Chapter 1 begins here. $sentence $sentence",
 

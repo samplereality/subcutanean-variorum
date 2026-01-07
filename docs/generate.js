@@ -113,13 +113,13 @@ function hideStatus() {
 
 function updateOutput(text) {
     const outputEl = document.getElementById('output-display');
-    outputEl.textContent = text;
+    outputEl.innerHTML = text;
     outputEl.classList.remove('empty');
 }
 
 function clearOutput() {
     const outputEl = document.getElementById('output-display');
-    outputEl.textContent = 'Generated text will appear here...';
+    outputEl.innerHTML = 'Generated text will appear here...';
     outputEl.classList.add('empty');
 }
 
@@ -149,10 +149,14 @@ async function generateNovel() {
         // Generate text from the grammar
         const output = grammar.expand();
 
-        // Format the output
-        generatedText = `Subcutanean - Generated with seed ${currentSeed}\n\n` + output;
+        // Use <br> for on-screen display but keep plain text for downloads
+        const plainText = output.replace(/<br\s*\/?>/gi, '\n');
+        const htmlText = output;
 
-        updateOutput(generatedText);
+        // Format the output
+        generatedText = `Subcutanean - Generated with seed ${currentSeed}\n\n` + plainText;
+
+        updateOutput(`Subcutanean - Generated with seed ${currentSeed}<br><br>${htmlText}`);
 
         downloadBtn.style.display = 'inline-block';
         showStatus('Generation complete!', 'success');
