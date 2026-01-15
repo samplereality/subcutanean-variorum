@@ -33,14 +33,14 @@ In 2025 Reed released the “source code, source text and all prior, current, an
 - Click any word to see which chapters it appears in
 - Click a chapter name to jump directly to that chapter with the word highlighted
 
-**Levenshtein Distance Analysis**: Measure textual similarity between the 25 built-in versions
+**Jaccard Distance Analysis**: Measure textual similarity between the 25 built-in versions
 - Shows most similar and most different version pairs
 - Interactive distance matrix showing all pairwise comparisons
 - Pre-calculated distances for instant display
 - Click any matrix cell or "Load These Versions" button to immediately compare those versions
 - Note: Only available for the 25 built-in versions (seeds 45443-45467), not uploaded files
 
-**Complete Coverage**: Browse all 23 sections including:
+**Complete Coverage**: Browse the entire text of *Subcutanean*, including:
 - Introduction and Prologue
 - Chapters 1-18
 - Part II and Part III dividers
@@ -74,7 +74,7 @@ In 2025 Reed released the “source code, source text and all prior, current, an
 3. **Navigate chapters** using the horizontal scrolling chapter menu
 4. **Search for text**: Enter a word or phrase and click "Find" to highlight all matches (click "Clear" to remove highlights)
 5. **Analyze word differences**: Click "Word Differential" to see which words are unique to each selected version
-6. **Compare textual similarity**: Click "Levenshtein Distance" to see how similar or different the 25 built-in versions are
+6. **Compare textual similarity**: Click "Jaccard Distance" to see how similar or different the 25 built-in versions are
 7. **Upload custom versions**: Click "Upload EPUB/TXT" to add your own version of the novel for comparison (supports both EPUB and plain text formats)
 8. **Manage uploaded versions**: Click "Manage Uploads" to view all uploaded versions and delete any you no longer need
 9. **Switch between versions** at any time to explore different comparisons
@@ -111,12 +111,6 @@ docs/
 - **CSS Grid & Flexbox** - Responsive layouts
 - **GitHub Pages** - Free hosting for static site
 
-### Excluded Content
-
-The following sections are excluded as they don't contain textual variations:
-- Chapter 19 (bonus content)
-- Chapter 21 (Kickstarter backers list)
-- Chapter 22 (about the author)
 
 ## Regenerating Data
 
