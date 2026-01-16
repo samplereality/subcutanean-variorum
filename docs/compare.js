@@ -37,6 +37,51 @@ let sourceParagraphCache = {};
 let activeNavDropdown = null;
 let mobileNavOpen = false;
 
+// Theme state
+let currentTheme = 'dark';
+
+// Theme functions
+function initializeTheme() {
+    // Check localStorage for saved preference
+    const savedTheme = localStorage.getItem('subcutanean_theme');
+    if (savedTheme) {
+        currentTheme = savedTheme;
+    } else {
+        // Default to dark mode
+        currentTheme = 'dark';
+    }
+    applyTheme(currentTheme);
+}
+
+function applyTheme(theme) {
+    currentTheme = theme;
+    document.documentElement.setAttribute('data-theme', theme);
+    updateThemeToggleUI();
+    localStorage.setItem('subcutanean_theme', theme);
+}
+
+function toggleTheme() {
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    applyTheme(newTheme);
+}
+
+function updateThemeToggleUI() {
+    const themeIcon = document.getElementById('theme-icon');
+    const themeLabel = document.getElementById('theme-label');
+
+    if (themeIcon && themeLabel) {
+        if (currentTheme === 'dark') {
+            // Show sun icon to indicate "click for light mode"
+            themeIcon.innerHTML = '&#9788;'; // Sun symbol
+            themeLabel.textContent = 'Light';
+        } else {
+            // Show moon icon to indicate "click for dark mode"
+            themeIcon.innerHTML = '&#9790;'; // Moon symbol
+            themeLabel.textContent = 'Dark';
+        }
+    }
+}
+
 // Navigation functions
 function initializeNavigation() {
     const navAbout = document.getElementById('nav-about');
@@ -3703,21 +3748,32 @@ class HTMLTextExtractor {
         };
     }
 
-    extractParagraphWithEm(element) {
+    extractParagraphWithFormatting(element) {
         let result = '';
 
         element.childNodes.forEach(node => {
             if (node.nodeType === Node.TEXT_NODE) {
                 result += node.textContent;
-            } else if (node.nodeName === 'EM') {
-                result += `<em>${node.textContent}</em>`;
+            } else if (node.nodeName === 'EM' || node.nodeName === 'I') {
+                // Handle italics - check for nested bold
+                const innerContent = this.extractParagraphWithFormatting(node);
+                result += `<em>${innerContent}</em>`;
+            } else if (node.nodeName === 'STRONG' || node.nodeName === 'B') {
+                // Handle bold - check for nested italics
+                const innerContent = this.extractParagraphWithFormatting(node);
+                result += `<strong>${innerContent}</strong>`;
             } else if (node.childNodes.length > 0) {
-                // Recursively handle nested elements
-                result += this.extractParagraphWithEm(node);
+                // Recursively handle other nested elements
+                result += this.extractParagraphWithFormatting(node);
             }
         });
 
         return result.trim();
+    }
+
+    // Keep old method name as alias for compatibility
+    extractParagraphWithEm(element) {
+        return this.extractParagraphWithFormatting(element);
     }
 }
 
@@ -4339,6 +4395,7 @@ function handleEPUBUpload(event) {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
+    initializeTheme();
     setupViewModeButtons();
     loadBookmarksFromStorage();
     refreshBookmarkUI();
@@ -4346,6 +4403,16 @@ document.addEventListener('DOMContentLoaded', () => {
     loadOriginSources();
     initializeNavigation();
     initializeGenerateForm();
+
+    // Theme toggle event listener
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeMobileNav();
+            toggleTheme();
+        });
+    }
 
     // Search event listeners
     const searchBtn = document.getElementById('search-btn');

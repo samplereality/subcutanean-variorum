@@ -196,20 +196,147 @@ The Apps Script logs requests to a Google Sheet, and a separate process generate
 3. **Track Changes**: Deletions struck through, additions highlighted
 4. **Collation**: Table format showing all version texts
 
-### Color Scheme
+### Color Scheme & Theming
+
+The app supports dark mode (default) and light mode via a toggle in the nav bar.
+
+**Dark Mode (default):**
 - Background: #0f1a2a (dark blue)
 - Text: #e8e8e8 (light gray)
 - Accent: #ff8800 (orange)
+- Nav bar: #0a1220
+
+**Light Mode:**
+- Background: #f5f5f5
+- Text: #2c2c2c
+- Accent: #d96800 (darker orange for contrast)
+- Nav bar: #2d2520 (stays dark for orange glow contrast)
+
+**Theme Implementation:**
+- CSS variables in `:root` and `[data-theme="light"]` selectors
+- Theme state stored in localStorage (`subcutanean_theme`)
+- Toggle button in nav bar with sun/moon icons
+- `initializeTheme()`, `applyTheme()`, `toggleTheme()` functions in compare.js
+
+**Diff highlighting (both themes):**
 - Additions: green highlights
 - Deletions: red/struck text
-- Form backgrounds: light (#fcfcfc) for contrast
 
 ## Source Data
 
-- **25 EPUB files** in `sources/subcutaneans/`
-- Versions 45443-45467 (sequential numbering)
-- **Quant source files** in `docs/origin-sources/`
+- **EPUB files** in `sources/subcutaneans/`
+- **Quant source files** in `docs/origin_text/`
 - Each chapter has its own source file with macro definitions
+
+## Processing EPUB Seeds into Variorum Data
+
+### Directory Structure
+
+```
+sources/subcutaneans/           # Source EPUB files
+├── subcutanean-45443/         # Traditional format: subcutanean-XXXXX/
+│   └── 45443.epub
+├── 60001/                     # Also supports: numeric folder names
+│   └── 60001.epub
+└── 60002/
+    └── anything.epub          # EPUB filename can vary
+
+docs/extracted_text/            # Output JSON files
+├── version_45443.json         # Individual version files
+├── version_60001.json
+├── all_versions.json          # Combined file with all versions
+└── levenshtein_distances.json # Pre-calculated similarity metrics
+
+docs/origin_text/               # Quant source files
+├── manifest.txt               # File listing in reading order
+├── globals.txt                # Global macro definitions
+├── ch01.txt ... ch17.txt      # Chapter source files
+└── origin_sources.json        # Pre-built JSON of all sources
+```
+
+### Processing Scripts
+
+All scripts are in `docs/`:
+
+| Script | Purpose | Command |
+|--------|---------|---------|
+| `extract_text_all.py` | Convert EPUBs to JSON | `python extract_text_all.py` |
+| `calculate_levenshtein.py` | Calculate similarity metrics | `python calculate_levenshtein.py` |
+| `build_origin_sources.py` | Build Quant source JSON | `python build_origin_sources.py` |
+
+### Step-by-Step: Adding New Seeds
+
+1. **Place EPUB files** in `sources/subcutaneans/`:
+   - Format: `subcutanean-XXXXX/XXXXX.epub` OR `XXXXX/XXXXX.epub`
+   - Numeric-only folder names are supported (e.g., `60001/60001.epub`)
+
+2. **Run extraction script**:
+   ```bash
+   cd docs
+   python extract_text_all.py
+   ```
+   This generates:
+   - Individual `version_XXXXX.json` files
+   - Combined `all_versions.json`
+
+3. **Recalculate similarity metrics** (recommended):
+   ```bash
+   python calculate_levenshtein.py
+   ```
+   Updates `levenshtein_distances.json`
+
+4. **Rebuild origin sources** (only if Quant source files changed):
+   ```bash
+   python build_origin_sources.py
+   ```
+
+### EPUB Chapter Mapping
+
+The extraction script maps EPUB chapters to JSON keys:
+
+| EPUB File | JSON Key | Content |
+|-----------|----------|---------|
+| ch001.xhtml | introduction | Book introduction |
+| ch002.xhtml | prologue | Part One + prologue |
+| ch003-ch011.xhtml | chapter1-9 | Chapters 1-9 |
+| ch012.xhtml | part2 | Part Two header |
+| ch013-ch018.xhtml | chapter10-15 | Chapters 10-15 |
+| ch019.xhtml | part3 | Part Three header |
+| ch020-ch022.xhtml | chapter16-18 | Chapters 16-18 |
+| ch024.xhtml | notes | Author's notes |
+
+**Excluded sections** (non-narrative, never vary):
+- ch023.xhtml - Bonus content
+- ch025.xhtml - Kickstarter backers
+- ch026.xhtml - About the author
+
+### Text Formatting Preservation
+
+The extraction preserves inline HTML formatting:
+- `<em>` and `<i>` tags for italics
+- `<strong>` and `<b>` tags for bold
+- Nested formatting is supported
+
+### Version JSON Structure
+
+```json
+{
+  "version_id": "60001",
+  "introduction": ["paragraph1", "paragraph2 with <em>italics</em>", ...],
+  "prologue": [...],
+  "chapter1": [...],
+  ...
+  "notes": [...]
+}
+```
+
+### Version ID Detection
+
+The script extracts version IDs from (in priority order):
+1. Folder name: `subcutanean-XXXXX` → XXXXX
+2. Folder name: pure numeric (e.g., `60001`)
+3. Folder name: any 4+ digit number
+4. EPUB filename: pure numeric or contains 4+ digits
 
 ## Quant Background
 
@@ -222,6 +349,14 @@ Aaron Reed's Quant markup language allows:
 The Macro Inspector feature lets users view the original Quant source to understand how variations are generated.
 
 ## Recent Changes (January 2026)
+
+### Light/Dark Mode Toggle
+- Added theme toggle button to navigation bar
+- Dark mode remains default; light mode available
+- Orange accent/glow preserved in both themes (darker in light mode)
+- Nav bar stays dark in light mode for glow contrast
+- Theme preference persists via localStorage
+- Nav bar uses system sans-serif font for legibility
 
 ### UX Consolidation
 - Replaced hamburger menu + FAB buttons with persistent navigation bar
@@ -238,6 +373,11 @@ The Macro Inspector feature lets users view the original Quant source to underst
 - `initializeGenerateForm()` handles form submission
 - Click-outside-to-close for dropdowns and modals
 - Mobile toggle preserves functionality on small screens
+
+### EPUB Processing Enhancements
+- Support for numeric-only folder names (e.g., `60001/60001.epub`)
+- Bold/strong tag preservation in text extraction
+- Both Python script and JavaScript parser updated
 
 ## Development Notes
 

@@ -11,7 +11,7 @@ from html.parser import HTMLParser
 import re
 
 class TextExtractor(HTMLParser):
-    """Extract text content from HTML, preserving paragraph structure."""
+    """Extract text content from HTML, preserving paragraph structure and formatting."""
 
     def __init__(self):
         super().__init__()
@@ -20,6 +20,7 @@ class TextExtractor(HTMLParser):
         self.current_paragraph = []
         self.in_paragraph = False
         self.in_em = False
+        self.in_strong = False
         self.in_blockquote = False
         self.in_h1 = False
         self.title = None
@@ -28,8 +29,10 @@ class TextExtractor(HTMLParser):
         if tag == 'p':
             self.in_paragraph = True
             self.current_paragraph = []
-        elif tag == 'em':
+        elif tag == 'em' or tag == 'i':
             self.in_em = True
+        elif tag == 'strong' or tag == 'b':
+            self.in_strong = True
         elif tag == 'blockquote':
             self.in_blockquote = True
         elif tag == 'h1':
@@ -44,8 +47,10 @@ class TextExtractor(HTMLParser):
                     self.text_parts.append(para_text)
             self.in_paragraph = False
             self.current_paragraph = []
-        elif tag == 'em':
+        elif tag == 'em' or tag == 'i':
             self.in_em = False
+        elif tag == 'strong' or tag == 'b':
+            self.in_strong = False
         elif tag == 'blockquote':
             self.in_blockquote = False
         elif tag == 'h1':
@@ -60,9 +65,13 @@ class TextExtractor(HTMLParser):
 
     def handle_data(self, data):
         if self.in_paragraph or self.in_h1:
-            # Preserve formatting markers for italics
-            if self.in_em:
+            # Preserve formatting markers for italics and bold
+            if self.in_em and self.in_strong:
+                self.current_paragraph.append(f'<strong><em>{data}</em></strong>')
+            elif self.in_em:
                 self.current_paragraph.append(f'<em>{data}</em>')
+            elif self.in_strong:
+                self.current_paragraph.append(f'<strong>{data}</strong>')
             else:
                 self.current_paragraph.append(data)
 
@@ -94,15 +103,52 @@ def extract_chapter_from_epub(epub_path, chapter_file):
         return None
 
 
+def get_version_id_from_folder(folder_name):
+    """Extract version ID from folder name.
+
+    Supports formats:
+    - subcutanean-45443
+    - 45443
+    - Any folder containing digits
+    """
+    # Try subcutanean-XXXXX format
+    if folder_name.startswith('subcutanean-'):
+        return folder_name.split('-')[1]
+    # Try pure numeric format
+    if folder_name.isdigit():
+        return folder_name
+    # Try to extract digits from the name
+    match = re.search(r'(\d{4,})', folder_name)
+    if match:
+        return match.group(1)
+    return None
+
+
+def is_valid_epub_folder(folder):
+    """Check if a folder contains Subcutanean EPUB files."""
+    if not folder.is_dir():
+        return False
+    # Check for subcutanean-XXXXX format or pure numeric format
+    folder_name = folder.name
+    if folder_name.startswith('subcutanean-'):
+        return True
+    if folder_name.isdigit():
+        return True
+    # Check if folder name contains a version number and has an EPUB
+    if re.search(r'\d{4,}', folder_name) and list(folder.glob('*.epub')):
+        return True
+    return False
+
+
 def extract_all_versions():
-    """Extract all sections from all 25 EPUB versions."""
+    """Extract all sections from all EPUB versions."""
 
     base_dir = Path(__file__).parent.parent / 'sources' / 'subcutaneans'
     output_dir = Path(__file__).parent / 'extracted_text'
     output_dir.mkdir(exist_ok=True)
 
-    # Find all EPUB folders
-    epub_folders = sorted([d for d in base_dir.iterdir() if d.is_dir() and d.name.startswith('subcutanean-')])
+    # Find all EPUB folders (supports subcutanean-XXXXX and numeric-only formats)
+    epub_folders = sorted([d for d in base_dir.iterdir() if is_valid_epub_folder(d)])
 
     print(f"Found {len(epub_folders)} EPUB folders")
 
@@ -145,7 +191,20 @@ def extract_all_versions():
             continue
 
         epub_path = epub_files[0]
-        version_id = folder.name.split('-')[1]
+        version_id = get_version_id_from_folder(folder.name)
+
+        if not version_id:
+            # Try to get version ID from the EPUB filename itself
+            epub_name = epub_path.stem  # filename without extension
+            if epub_name.isdigit():
+                version_id = epub_name
+            else:
+                match = re.search(r'(\d{4,})', epub_name)
+                if match:
+                    version_id = match.group(1)
+                else:
+                    print(f"Could not determine version ID for {folder.name}")
+                    continue
 
         print(f"Processing version {version_id}...")
 

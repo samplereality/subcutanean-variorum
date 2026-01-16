@@ -6,6 +6,37 @@
     --variant-color: #5a6d8a;
     --header-bg: #0f1a2a;
     --max-width: 800px;
+    /* Additional dark mode variables */
+    --panel-bg: #243447;
+    --control-bg: rgba(255,255,255,0.1);
+    --control-border: rgba(255,255,255,0.3);
+    --input-bg: rgba(255,255,255,0.9);
+    --input-text: #2c2c2c;
+    --nav-bg: #0a1220;
+    --dropdown-bg: rgba(15, 26, 42, 0.98);
+    --border-subtle: rgba(255, 255, 255, 0.1);
+    --text-muted: #a0a0a0;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+}
+
+/* Light mode */
+[data-theme="light"] {
+    --bg-color: #f5f5f5;
+    --text-color: #2c2c2c;
+    --accent-color: #d96800;
+    --highlight-color: #e8e0d8;
+    --variant-color: #8b7355;
+    --header-bg: #faf8f5;
+    --panel-bg: #ffffff;
+    --control-bg: rgba(0,0,0,0.05);
+    --control-border: rgba(0,0,0,0.2);
+    --input-bg: #ffffff;
+    --input-text: #2c2c2c;
+    --nav-bg: #2d2520;
+    --dropdown-bg: rgba(255, 255, 255, 0.98);
+    --border-subtle: rgba(0, 0, 0, 0.1);
+    --text-muted: #666666;
+    --shadow-color: rgba(0, 0, 0, 0.1);
 }
 
 * {
@@ -42,6 +73,17 @@ header h1 {
         0 0 30px rgba(255, 136, 0, 0.4),
         0 0 40px rgba(255, 136, 0, 0.2);
     letter-spacing: 0.05em;
+}
+
+[data-theme="light"] header h1 {
+    text-shadow:
+        0 0 8px rgba(217, 104, 0, 0.6),
+        0 0 16px rgba(217, 104, 0, 0.4),
+        0 0 24px rgba(217, 104, 0, 0.2);
+}
+
+[data-theme="light"] header {
+    color: var(--text-color);
 }
 
 .subtitle {
