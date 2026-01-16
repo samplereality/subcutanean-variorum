@@ -33,6 +33,137 @@ const SOURCE_VERSION_ID = 'quant_source';
 const SOURCE_VERSION_LABEL = 'Source Code';
 let sourceParagraphCache = {};
 
+// Navigation state
+let activeNavDropdown = null;
+let mobileNavOpen = false;
+
+// Navigation functions
+function initializeNavigation() {
+    const navAbout = document.getElementById('nav-about');
+    const navBookmarks = document.getElementById('nav-bookmarks');
+    const navFiles = document.getElementById('nav-files');
+    const navSource = document.getElementById('nav-source');
+    const navMobileToggle = document.getElementById('nav-mobile-toggle');
+
+    if (navAbout) {
+        navAbout.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeAllNavDropdowns();
+            closeMobileNav();
+            // Toggle the About modal
+            const modal = document.getElementById('about-modal');
+            if (modal && !modal.classList.contains('hidden')) {
+                closeAboutModal();
+            } else {
+                openAboutModal();
+            }
+        });
+    }
+
+    if (navBookmarks) {
+        navBookmarks.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeMobileNav();
+            toggleNavDropdown('bookmarks-dropdown', 'nav-bookmarks');
+        });
+    }
+
+    if (navFiles) {
+        navFiles.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeMobileNav();
+            toggleNavDropdown('files-dropdown', 'nav-files');
+        });
+    }
+
+    if (navSource) {
+        navSource.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeMobileNav();
+            toggleNavDropdown('source-dropdown', 'nav-source');
+            if (activeNavDropdown === 'source-dropdown') {
+                syncSourceToCurrentChapter();
+            }
+        });
+    }
+
+    const navGenerate = document.getElementById('nav-generate');
+    if (navGenerate) {
+        navGenerate.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeAllNavDropdowns();
+            closeMobileNav();
+            // Toggle the Generate modal
+            const modal = document.getElementById('generate-modal');
+            if (modal && !modal.classList.contains('hidden')) {
+                closeGenerateModal();
+            } else {
+                openGenerateModal();
+            }
+        });
+    }
+
+    if (navMobileToggle) {
+        navMobileToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleMobileNav();
+        });
+    }
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.nav-dropdown') && !e.target.closest('.nav-item')) {
+            closeAllNavDropdowns();
+        }
+        if (!e.target.closest('.nav-links') && !e.target.closest('.nav-mobile-toggle')) {
+            closeMobileNav();
+        }
+    });
+
+    // Close mobile nav on window resize
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 640 && mobileNavOpen) {
+            closeMobileNav();
+        }
+    });
+}
+
+function toggleNavDropdown(dropdownId, navItemId) {
+    const dropdown = document.getElementById(dropdownId);
+    const navItem = document.getElementById(navItemId);
+
+    if (activeNavDropdown === dropdownId) {
+        closeAllNavDropdowns();
+    } else {
+        closeAllNavDropdowns();
+        if (dropdown) dropdown.classList.add('open');
+        if (navItem) navItem.classList.add('active');
+        activeNavDropdown = dropdownId;
+    }
+}
+
+function closeAllNavDropdowns() {
+    document.querySelectorAll('.nav-dropdown').forEach(d => d.classList.remove('open'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    activeNavDropdown = null;
+}
+
+function toggleMobileNav() {
+    const navLinks = document.getElementById('nav-links');
+    mobileNavOpen = !mobileNavOpen;
+    if (navLinks) {
+        navLinks.classList.toggle('mobile-open', mobileNavOpen);
+    }
+}
+
+function closeMobileNav() {
+    const navLinks = document.getElementById('nav-links');
+    mobileNavOpen = false;
+    if (navLinks) {
+        navLinks.classList.remove('mobile-open');
+    }
+}
+
 function isSourceCodeVisible() {
     return versionA === SOURCE_VERSION_ID || versionB === SOURCE_VERSION_ID;
 }
@@ -2949,6 +3080,73 @@ function closeAboutModal() {
     modal.classList.add('hidden');
 }
 
+// Generate Copy Modal functionality
+
+function openGenerateModal() {
+    const modal = document.getElementById('generate-modal');
+    modal.classList.remove('hidden');
+}
+
+function closeGenerateModal() {
+    const modal = document.getElementById('generate-modal');
+    modal.classList.add('hidden');
+}
+
+function initializeGenerateForm() {
+    const form = document.getElementById('subcutanean-form');
+    const closeBtn = document.getElementById('close-generate-modal-btn');
+    const modal = document.getElementById('generate-modal');
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeGenerateModal);
+    }
+
+    // Close on click outside modal content
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeGenerateModal();
+            }
+        });
+    }
+
+    if (form) {
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbyVPhAw1dq7B0aCkh12o19yrNrsu7ezzvfV0hXdkVoojoiST9ViBuaPT5p_rk-BERMS/exec';
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const btn = document.getElementById('generate-submit-btn');
+            btn.disabled = true;
+            btn.innerText = 'Sending Request...';
+
+            // Gather optional formats
+            const checkboxes = document.querySelectorAll('input[name="format_choice"]:checked');
+            const formatsString = Array.from(checkboxes).map(cb => cb.value).join(', ');
+
+            // Prepare data for Apps Script
+            const formData = new FormData();
+            formData.append('email', document.getElementById('generate-email').value);
+            formData.append('formats', formatsString);
+            formData.append('honeypot', document.getElementById('generate-honeypot').value);
+
+            // Post to Google Sheets
+            fetch(scriptURL, { method: 'POST', body: formData })
+                .then(response => {
+                    form.style.display = 'none';
+                    document.getElementById('generate-response-msg').classList.remove('hidden');
+                    console.log('Success!', response);
+                })
+                .catch(error => {
+                    console.error('Error!', error.message);
+                    alert('Something went wrong. Please check your connection and try again.');
+                    btn.disabled = false;
+                    btn.innerText = 'Generate My Variant';
+                });
+        });
+    }
+}
+
 // Bookmark functionality
 
 function loadBookmarksFromStorage() {
@@ -4146,6 +4344,8 @@ document.addEventListener('DOMContentLoaded', () => {
     refreshBookmarkUI();
     loadAllVersions();
     loadOriginSources();
+    initializeNavigation();
+    initializeGenerateForm();
 
     // Search event listeners
     const searchBtn = document.getElementById('search-btn');
@@ -4269,88 +4469,6 @@ document.addEventListener('DOMContentLoaded', () => {
         deleteBookmarkBtn.addEventListener('click', deleteSelectedBookmark);
     }
 
-    const bookmarkToggleBtn = document.getElementById('bookmark-toggle-btn');
-    const bookmarkCloseBtn = document.getElementById('bookmark-close-btn');
-    if (bookmarkToggleBtn) {
-        bookmarkToggleBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            toggleBookmarkPanel();
-        });
-    }
-    if (bookmarkCloseBtn) {
-        bookmarkCloseBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            closeBookmarkPanel();
-        });
-    }
-    document.addEventListener('click', (e) => {
-        if (!bookmarkPanelOpen) return;
-        const panel = document.getElementById('bookmark-panel');
-        const toggleBtn = document.getElementById('bookmark-toggle-btn');
-        if (!panel) return;
-        if (!panel.contains(e.target) && !toggleBtn.contains(e.target)) {
-            closeBookmarkPanel();
-        }
-    });
-    const filesToggleBtn = document.getElementById('files-toggle-btn');
-    const filesCloseBtn = document.getElementById('files-close-btn');
-    const filesUploadTrigger = document.getElementById('files-upload-btn');
-    if (filesToggleBtn) {
-        filesToggleBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            toggleFilesPanel();
-        });
-    }
-    if (filesCloseBtn) {
-        filesCloseBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            closeFilesPanel();
-        });
-    }
-    if (filesUploadTrigger) {
-        filesUploadTrigger.addEventListener('click', () => {
-            closeFilesPanel();
-        });
-    }
-    document.addEventListener('click', (e) => {
-        if (!filesPanelOpen) return;
-        const panel = document.getElementById('files-panel');
-        const toggleBtn = document.getElementById('files-toggle-btn');
-        if (!panel) return;
-        if (!panel.contains(e.target) && !toggleBtn.contains(e.target)) {
-            closeFilesPanel();
-        }
-    });
-    setupFilesPanelDragging();
-    setupBookmarkPanelDragging();
-    setupSourcePanelDragging();
-
-    // Source panel controls
-    const sourceToggleBtn = document.getElementById('source-toggle-btn');
-    const sourceCloseBtn = document.getElementById('source-close-btn');
-
-    if (sourceToggleBtn) {
-        sourceToggleBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            toggleSourcePanel();
-        });
-    }
-    if (sourceCloseBtn) {
-        sourceCloseBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            closeSourcePanel();
-        });
-    }
-    document.addEventListener('click', (e) => {
-        if (!originSourcePanelOpen) return;
-        const panel = document.getElementById('source-panel');
-        const toggleBtn = document.getElementById('source-toggle-btn');
-        if (!panel) return;
-        if (!panel.contains(e.target) && !toggleBtn.contains(e.target)) {
-            closeSourcePanel();
-        }
-    });
-
     // Macro Inspector events
     const macroBtn = document.getElementById('macro-inspector-btn');
     const macroModal = document.getElementById('macro-inspector-modal');
@@ -4391,7 +4509,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const manageModal = document.getElementById('manage-uploads-modal');
 
     manageUploadsBtn.addEventListener('click', () => {
-        closeFilesPanel();
+        closeAllNavDropdowns();
         // Show info modal on first use, then open manage uploads modal
         if (!hasSeenManageInfoNotice()) {
             openManageInfoModal();
@@ -4424,11 +4542,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // About modal event listeners
-    const aboutBtn = document.getElementById('about-btn');
     const closeAboutModalBtn = document.getElementById('close-about-modal-btn');
     const aboutModal = document.getElementById('about-modal');
 
-    aboutBtn.addEventListener('click', openAboutModal);
     closeAboutModalBtn.addEventListener('click', closeAboutModal);
 
     // Close modal when clicking outside

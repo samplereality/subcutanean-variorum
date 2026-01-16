@@ -28,12 +28,84 @@
     <link rel="stylesheet" href="compare.css">
 </head>
 <body>
-    <header>
-        <button id="about-btn" class="hamburger-btn" title="About this project">
-            <span class="hamburger-line"></span>
-            <span class="hamburger-line"></span>
-            <span class="hamburger-line"></span>
+    <!-- Main Navigation Bar -->
+    <nav class="main-nav" id="main-nav">
+        <div class="nav-brand">
+            <span class="nav-logo">SV</span>
+            <span class="nav-title">Subcutanean Variorum</span>
+        </div>
+
+        <div class="nav-links" id="nav-links">
+            <button class="nav-item" id="nav-about" title="About this project">
+                <span class="nav-icon">?</span>
+                <span class="nav-label">About</span>
+            </button>
+            <button class="nav-item" id="nav-bookmarks" title="Saved views">
+                <span class="nav-icon">&#128278;</span>
+                <span class="nav-label">Bookmarks</span>
+            </button>
+            <button class="nav-item" id="nav-files" title="Upload files">
+                <span class="nav-icon">&#128194;</span>
+                <span class="nav-label">Files</span>
+            </button>
+            <button class="nav-item" id="nav-source" title="Quant source">
+                <span class="nav-icon">&lt;&gt;</span>
+                <span class="nav-label">Source</span>
+            </button>
+            <button class="nav-item" id="nav-generate" title="Generate your own copy">
+                <span class="nav-icon">&#128214;</span>
+                <span class="nav-label">Generate</span>
+            </button>
+        </div>
+
+        <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Menu">
+            <span class="nav-toggle-line"></span>
+            <span class="nav-toggle-line"></span>
+            <span class="nav-toggle-line"></span>
         </button>
+    </nav>
+
+    <!-- Navigation Dropdown Panels -->
+    <div class="nav-dropdown" id="bookmarks-dropdown">
+        <div class="dropdown-header">
+            <span>Bookmarks</span>
+        </div>
+        <div class="dropdown-body">
+            <button id="save-bookmark-btn" class="tool-btn full-width" title="Save the current versions, chapter, and view">Save Current View</button>
+            <label class="bookmark-label" for="bookmark-select">Saved views:</label>
+            <select id="bookmark-select" class="bookmark-select" title="Saved comparisons"></select>
+            <div class="bookmark-actions">
+                <button id="load-bookmark-btn" class="tool-btn" title="Load selected bookmark">Load</button>
+                <button id="delete-bookmark-btn" class="tool-btn" title="Delete selected bookmark">Delete</button>
+            </div>
+            <div id="bookmark-empty" class="bookmark-empty hidden">No bookmarks yet.</div>
+        </div>
+    </div>
+
+    <div class="nav-dropdown" id="files-dropdown">
+        <div class="dropdown-header">
+            <span>Files</span>
+        </div>
+        <div class="dropdown-body">
+            <label id="files-upload-btn" for="epub-upload" class="upload-btn tool-btn full-width" title="Upload your own copy of Subcutanean">
+                <span id="upload-text">Upload EPUB/TXT</span>
+                <input type="file" id="epub-upload" accept=".epub,.txt" style="display: none;">
+            </label>
+            <button id="manage-uploads-btn" class="tool-btn full-width" title="Manage uploaded versions">Manage Uploads</button>
+            <span id="upload-status" class="upload-status"></span>
+        </div>
+    </div>
+
+    <div class="nav-dropdown" id="source-dropdown">
+        <div class="dropdown-header">
+            <span id="source-panel-title">Quant Source</span>
+        </div>
+        <div class="dropdown-body source-dropdown-body">
+            <pre id="source-content" class="source-content"></pre>
+        </div>
+    </div>
+
+    <header>
         <h1>Subcutanean Variorum</h1>
         <p class="subtitle">Compare multiple versions of Aaron Reed’s variable novel, <em>Subcutanean</em> (2020)</p>
 
@@ -263,6 +335,58 @@
         </div>
     </div>
 
+    <!-- Generate Copy Modal -->
+    <div id="generate-modal" class="modal hidden">
+        <div class="modal-content generate-modal-content">
+            <div class="modal-header">
+                <h2>Generate Your Own <em>Subcutanean</em></h2>
+                <button id="close-generate-modal-btn" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body generate-modal-body">
+                <p>In 2025, Aaron Reed released the source text and code of <em>Subcutanean</em> under a CC-BY 4.0 license. This Creative Commons license means anyone can copy, share, modify, or remix the novel as long as credit is given to Reed.</p>
+
+                <p>Submit this form to request a freshly generated copy of <em>Subcutanean</em>. Each copy will have a unique seed number that determines its specific textual variations.</p>
+
+                <form id="subcutanean-form">
+                    <label for="generate-email">Email Address:</label>
+                    <input type="email" name="email" id="generate-email" required placeholder="you@example.com">
+
+                    <p class="format-note">By default you will receive your unique variant in both PDF and EPUB (for e-readers) formats. Would you also like a plain text version and/or HTML version?</p>
+
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="format_choice" value="plain text"> Plain Text</label>
+                        <label><input type="checkbox" name="format_choice" value="HTML (web)"> HTML (Web)</label>
+                    </div>
+
+                    <hr>
+
+                    <label class="license-check">
+                        <input type="checkbox" id="license-check" required>
+                        I agree to the CC-BY 4.0 license for these unique files.
+                    </label>
+
+                    <div style="display:none;">
+                        <label>Leave this field blank</label>
+                        <input type="text" name="honeypot" id="generate-honeypot" tabindex="-1" autocomplete="off">
+                    </div>
+
+                    <button type="submit" id="generate-submit-btn" class="tool-btn">Generate My Variant</button>
+                </form>
+
+                <div id="generate-response-msg" class="response-msg hidden">
+                    <strong>Success!</strong> Your request has been logged.
+                    Your unique variant of <em>Subcutanean</em> should arrive in your inbox in 5-10 minutes. Look for an email from samplereality@gmail.com.
+                </div>
+
+                <h4>Using Your Copy with the Variorum</h4>
+                <p>Once you have a copy of <em>Subcutanean</em>, you can upload it to the variorum browser to compare it with other versions using the <strong>Files</strong> button in the navigation bar.</p>
+
+                <h4>Buy a Paperback or Download Existing Variants</h4>
+                <p>You can always <a href="https://aaronareed.net/subcutanean/" target="_blank">purchase a bound paperback copy</a> of <em>Subcutanean</em> directly from its author, Aaron Reed. Reed has also made <a href="https://subcutanean.textories.com/seeds/" target="_blank">10,000 unique variants readily available</a> as text files for download from the Textories archive.</p>
+            </div>
+        </div>
+    </div>
+
     <!-- Jaccard Distance Modal -->
     <div id="levenshtein-modal" class="modal hidden">
         <div class="modal-content">
@@ -297,63 +421,6 @@
                     <button id="show-matrix-btn" class="tool-btn">Show All Uploaded Files</button>
                     <div id="distance-matrix" class="distance-matrix hidden"></div>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="bookmark-floating" class="bookmark-floating">
-        <button id="bookmark-toggle-btn" class="bookmark-fab-btn" title="Bookmarks" aria-label="Bookmarks">
-            <span class="bookmark-icon">🔖</span>
-        </button>
-        <div id="bookmark-panel" class="bookmark-panel hidden">
-            <div class="bookmark-panel-header">
-                <span>Bookmarks</span>
-                <button id="bookmark-close-btn" class="bookmark-close-btn" aria-label="Close bookmarks">&times;</button>
-            </div>
-            <div class="bookmark-panel-body">
-                <button id="save-bookmark-btn" class="tool-btn full-width" title="Save the current versions, chapter, and view">Save Current View</button>
-                <label class="bookmark-label" for="bookmark-select">Saved views:</label>
-                <select id="bookmark-select" class="bookmark-select" title="Saved comparisons"></select>
-                <div class="bookmark-actions">
-                    <button id="load-bookmark-btn" class="tool-btn" title="Load selected bookmark">Load</button>
-                    <button id="delete-bookmark-btn" class="tool-btn" title="Delete selected bookmark">Delete</button>
-                </div>
-                <div id="bookmark-empty" class="bookmark-empty hidden">No bookmarks yet.</div>
-            </div>
-        </div>
-    </div>
-
-    <div id="files-floating" class="files-floating">
-        <button id="files-toggle-btn" class="files-fab-btn" title="Files" aria-label="Files">
-            <span class="files-icon">📂</span>
-        </button>
-        <div id="files-panel" class="files-panel hidden">
-            <div class="files-panel-header">
-                <span>Files</span>
-                <button id="files-close-btn" class="files-close-btn" aria-label="Close files panel">&times;</button>
-            </div>
-            <div class="files-panel-body">
-                <label id="files-upload-btn" for="epub-upload" class="upload-btn tool-btn full-width" title="Upload your own copy of Subcutanean">
-                    <span id="upload-text">Upload EPUB/TXT</span>
-                    <input type="file" id="epub-upload" accept=".epub,.txt" style="display: none;">
-                </label>
-                <button id="manage-uploads-btn" class="tool-btn full-width" title="Manage uploaded versions">Manage Uploads</button>
-                <span id="upload-status" class="upload-status"></span>
-            </div>
-        </div>
-    </div>
-
-    <div id="source-floating" class="source-floating">
-        <button id="source-toggle-btn" class="source-fab-btn" title="Source Text" aria-label="Source Text">
-            <span class="source-icon">&lt;&gt;</span>
-        </button>
-        <div id="source-panel" class="source-panel hidden">
-            <div id="source-panel-header" class="source-panel-header">
-                <span id="source-panel-title">Quant Source</span>
-                <button id="source-close-btn" class="source-close-btn" aria-label="Close source panel">&times;</button>
-            </div>
-            <div class="source-panel-body">
-                <pre id="source-content" class="source-content"></pre>
             </div>
         </div>
     </div>
