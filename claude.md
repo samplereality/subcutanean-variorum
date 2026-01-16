@@ -1,0 +1,279 @@
+# Subcutanean Variorum Browser - Development Notes
+
+## Project Overview
+
+A web-based variorum browser for exploring textual variations across 25 versions of Aaron Reed's novel *Subcutanean*. Each copy of the novel is unique, generated from Quant markup language with different variations. This tool allows scholars and readers to compare variations across different witnesses, as well as upload additional versions of *Subcutanean* that they can also compare.
+
+## Current Status
+
+### Core Features
+
+1. **Two-Version Comparison Mode**
+   - Compare any two versions side-by-side
+   - Four view modes: Unified, Side-by-side, Track Changes, and Collation
+   - 25 pre-loaded versions (seeds 45443-45467)
+   - Upload additional EPUB or TXT versions
+
+2. **Navigation & UI**
+   - Persistent navigation bar with dropdowns for Bookmarks, Files, Source, and Generate
+   - Mobile-responsive with hamburger toggle on small screens
+   - Modal dialogs for About, Generate Copy, Jaccard Distance, and Macro Inspector
+
+3. **Analysis Tools**
+   - Cross-chapter search with keyboard shortcuts (F3, Shift+F3)
+   - Word differential analysis showing unique vocabulary
+   - Jaccard Distance similarity measurement between versions
+   - Quant Macro Inspector for viewing source markup
+
+4. **File Management**
+   - Upload EPUB or TXT versions of Subcutanean
+   - Convert TXT files to EPUB format
+   - Manage uploaded files with delete capability
+   - LocalStorage persistence for uploads and bookmarks
+
+5. **Generate Copy Feature**
+   - Modal form to request a freshly generated unique copy
+   - Submits to Google Apps Script which logs to Google Sheets
+   - User receives PDF and EPUB (optionally TXT/HTML) via email
+
+## Technical Implementation
+
+### Architecture
+
+```
+docs/
+├── index.html              # Main HTML structure with all modals
+├── styles.css              # Base styling
+├── compare.css             # Comparison UI and nav bar styles
+├── compare.js              # Main application JavaScript (~4400 lines)
+├── origin-sources/         # Quant source files for macro inspection
+│   ├── prologue.txt
+│   ├── chapter-01.txt
+│   └── ... (all chapters)
+├── extracted_text/         # JSON of extracted paragraphs per version
+└── variorum_data/
+    └── variorum.json       # Aligned variorum data
+```
+
+### Key JavaScript Functions (compare.js)
+
+**Navigation:**
+- `initializeNavigation()` - Sets up nav bar click handlers
+- `toggleNavDropdown(dropdownId, navItemId)` - Opens/closes dropdown panels
+- `closeAllNavDropdowns()` - Closes all open dropdowns
+- `toggleMobileNav()` / `closeMobileNav()` - Mobile menu handling
+
+**Modals:**
+- `openAboutModal()` / `closeAboutModal()` - About dialog
+- `openGenerateModal()` / `closeGenerateModal()` - Generate copy form
+- `initializeGenerateForm()` - Form submission to Google Apps Script
+
+**Comparison:**
+- `loadAllVersions()` - Loads version list and populates selectors
+- `loadComparison()` - Main comparison renderer
+- `renderUnifiedView()` / `renderSideBySideView()` / `renderTrackChangesView()` / `renderCollationView()`
+
+**Search:**
+- `performSearch()` - Cross-chapter text search
+- `navigateSearchResults(direction)` - F3/Shift+F3 navigation
+
+**Analysis:**
+- `calculateJaccardDistance()` - Vocabulary similarity
+- `analyzeWordDifferences()` - Unique words per version
+- `inspectMacro(macroName)` - Quant source lookup
+
+**File Management:**
+- `handleEpubUpload(event)` - Process uploaded EPUB/TXT
+- `parseEpub(arrayBuffer, filename)` - Extract text from EPUB
+- `convertTxtToEpub(versionId)` - Generate EPUB from TXT
+
+**Bookmarks:**
+- `saveBookmark()` / `loadBookmark()` / `deleteBookmark()`
+- `loadBookmarksFromStorage()` / `saveBookmarksToStorage()`
+
+### HTML Structure (index.html)
+
+```html
+<!-- Navigation Bar -->
+<nav class="main-nav">
+    <div class="nav-brand">...</div>
+    <div class="nav-links">
+        <button id="nav-about">About</button>
+        <button id="nav-bookmarks">Bookmarks</button>
+        <button id="nav-files">Files</button>
+        <button id="nav-source">Source</button>
+        <button id="nav-generate">Generate</button>
+    </div>
+    <button class="nav-mobile-toggle">...</button>
+</nav>
+
+<!-- Dropdown Panels -->
+<div class="nav-dropdown" id="bookmarks-dropdown">...</div>
+<div class="nav-dropdown" id="files-dropdown">...</div>
+<div class="nav-dropdown" id="source-dropdown">...</div>
+
+<!-- Main Content -->
+<header>...</header>
+<main id="comparison-container">...</main>
+
+<!-- Modals -->
+<div id="about-modal" class="modal hidden">...</div>
+<div id="generate-modal" class="modal hidden">...</div>
+<div id="levenshtein-modal" class="modal hidden">...</div>
+<div id="macro-inspector-modal" class="modal hidden">...</div>
+<div id="manage-uploads-modal" class="modal hidden">...</div>
+```
+
+### CSS Organization (compare.css)
+
+- **Navigation Bar**: `.main-nav`, `.nav-brand`, `.nav-links`, `.nav-item`
+- **Dropdowns**: `.nav-dropdown`, `.dropdown-header`, `.dropdown-body`
+- **Modals**: `.modal`, `.modal-content`, `.modal-header`, `.modal-body`
+- **Generate Form**: `.generate-modal-content`, `#subcutanean-form`
+- **View Modes**: `.unified-view`, `.side-by-side-view`, `.track-changes-view`, `.collation-view`
+- **Responsive**: Media queries at 900px, 768px, 640px breakpoints
+
+### Generate Copy Form
+
+The generate form submits to a Google Apps Script endpoint:
+```javascript
+const scriptURL = 'https://script.google.com/macros/s/AKfycby.../exec';
+// Sends: email, formats (optional: "plain text", "HTML (web)"), honeypot
+```
+
+The Apps Script logs requests to a Google Sheet, and a separate process generates and emails the unique variant.
+
+## Data Structures
+
+### Uploaded Versions (LocalStorage)
+
+```javascript
+// Key: 'subcutanean_uploaded_versions'
+{
+  "uploaded_12345": {
+    "id": "uploaded_12345",
+    "name": "My Copy",
+    "chapters": {
+      "prologue": ["paragraph1", "paragraph2", ...],
+      "chapter-01": [...],
+      ...
+    }
+  }
+}
+```
+
+### Bookmarks (LocalStorage)
+
+```javascript
+// Key: 'subcutanean_bookmarks'
+[
+  {
+    "name": "Ch5 comparison",
+    "versionA": "45443",
+    "versionB": "45467",
+    "chapter": "chapter-05",
+    "viewMode": "side-by-side"
+  }
+]
+```
+
+## UI/UX Design
+
+### Navigation Bar
+- Fixed position at top (z-index: 5000)
+- Dark background (#0a1220) with orange accent
+- Dropdown panels slide down with animation
+- Mobile: collapses to hamburger menu at 640px
+
+### Modals
+- Dark overlay with centered content
+- Close via X button or click outside
+- Scrollable body for long content
+
+### View Modes
+1. **Unified**: Single column, differences highlighted inline
+2. **Side-by-side**: Two columns, synchronized scrolling
+3. **Track Changes**: Deletions struck through, additions highlighted
+4. **Collation**: Table format showing all version texts
+
+### Color Scheme
+- Background: #0f1a2a (dark blue)
+- Text: #e8e8e8 (light gray)
+- Accent: #ff8800 (orange)
+- Additions: green highlights
+- Deletions: red/struck text
+- Form backgrounds: light (#fcfcfc) for contrast
+
+## Source Data
+
+- **25 EPUB files** in `sources/subcutaneans/`
+- Versions 45443-45467 (sequential numbering)
+- **Quant source files** in `docs/origin-sources/`
+- Each chapter has its own source file with macro definitions
+
+## Quant Background
+
+Aaron Reed's Quant markup language allows:
+- Conditional text based on variables
+- Macro expansion with multiple variants
+- Probabilistic selection
+- Complex dependency trees
+
+The Macro Inspector feature lets users view the original Quant source to understand how variations are generated.
+
+## Recent Changes (January 2026)
+
+### UX Consolidation
+- Replaced hamburger menu + FAB buttons with persistent navigation bar
+- Moved Bookmarks, Files, and Source panels into nav dropdowns
+- Added "Generate" button to nav bar
+
+### Generate Copy Modal
+- Converted separate generate.html page into modal on index.html
+- Form submits to Google Apps Script for processing
+- Users can request PDF, EPUB, TXT, or HTML formats
+
+### Navigation Implementation
+- `initializeNavigation()` sets up all nav handlers
+- `initializeGenerateForm()` handles form submission
+- Click-outside-to-close for dropdowns and modals
+- Mobile toggle preserves functionality on small screens
+
+## Development Notes
+
+### Adding New Modals
+1. Add HTML structure with `class="modal hidden"`
+2. Add open/close functions in compare.js
+3. Add click handler for trigger button
+4. Add close button and click-outside handlers
+
+### Adding Nav Items
+1. Add button in `.nav-links` div in index.html
+2. Add dropdown panel if needed (`.nav-dropdown`)
+3. Add click handler in `initializeNavigation()`
+
+### Form Submission Pattern
+```javascript
+function initializeMyForm() {
+    const form = document.getElementById('my-form');
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append('field', form.field.value);
+        fetch(scriptURL, { method: 'POST', body: formData })
+            .then(response => { /* success */ })
+            .catch(error => { /* error */ });
+    });
+}
+```
+
+## Credits
+
+- **Novel**: *Subcutanean* by Aaron Reed (CC-BY 4.0 as of 2025)
+- **Quant Language**: Aaron Reed
+- **Variorum Browser**: Mark Sample, developed with Claude Code
+- **Book History Practices**: Following TEI/scholarly variorum standards
+
+## License
+
+*Subcutanean* source and text released under CC-BY 4.0 by Aaron Reed in 2025.
