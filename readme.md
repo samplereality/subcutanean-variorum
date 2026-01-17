@@ -10,24 +10,22 @@ In 2025 Reed released the “source code, source text and all prior, current, an
 
 ## Features
 
-**Four View Modes:**
+**Multiple View Modes:**
 - **Unified**: Read a single version as clean, uninterrupted text
 - **Side-by-side**: Compare two versions in parallel columns
 - **Track Changes**: Inline highlighting shows exact additions (green) and deletions (red/strikethrough) between two selected versions
 - **Collation**: View textual variations across multiple witnesses in a variorum-style format
+- **Source Code**: View the original source code alongside a variant
 
 **Search Functionality**: Find any word or phrase across all chapters
 - Searches all chapters in the selected version(s)
 - Navigate forward and backward through all occurrences
 - Current result highlighted in orange, other matches in yellow
-- Shows total count and current position (e.g., "3 of 15")
 - Automatically switches chapters when navigating to matches in other sections
 - Keyboard shortcuts: F3 (next), Shift+F3 (previous), Escape (clear search)
-- Floating navigation buttons stay visible while scrolling for easy access
 
 **Word Differential Analysis**: Compare the unique vocabulary between any two seeds
 - Shows words that appear in one version but not the other
-- Excludes the Notes chapter for focused textual analysis
 - Sort options: alphabetical or by frequency
 - Frequency view displays word counts in parentheses (only shown when count > 1)
 - Click any word to see which chapters it appears in
@@ -40,30 +38,11 @@ In 2025 Reed released the “source code, source text and all prior, current, an
 - Click any matrix cell or "Load These Versions" button to immediately compare those versions
 - Note: Only available for the 25 built-in versions (seeds 45443-45467), not uploaded files
 
-**Complete Coverage**: Browse the entire text of *Subcutanean*, including:
-- Introduction and Prologue
-- Chapters 1-18
-- Part II and Part III dividers
-- Notes
-
 **25 Unique Editions**: This variorum includes 25 variations of *Subcutanean*, generated from unique seeds, numbered 45443-45467. Why these 25 variations? Because these are 25 copies I purchased for a course I taught at Davidson College called [Transmedia and Vast Narrative](https://docs.google.com/document/d/1SAFwyC6OS1WtbQcql81rMdjFS3JAiHwBSFU2gRd4YlY/edit?usp=sharing). Now that the novel and its source code have been released into the Creative Commons, these versions made a good starting point for the variorum.
 
-**Upload Custom Versions**: Upload additional EPUB or TXT versions of *Subcutanean* to compare with built-in versions or other uploaded versions
-- Drag and drop or click to select EPUB or TXT files
-- Automatically extracts and parses text from all sections
-- EPUB files: Extracts all 23 sections with full HTML formatting
-- TXT files: Parses chapters using "Chapter X" markers and PART dividers, with smart punctuation normalization
-- Stored in browser's localStorage for persistence
-- Custom versions appear in dropdowns with a 📎 icon and seed number
-- Supports both standard naming (subcutanean-XXXXX.epub, 50000.txt) and custom filenames
-- Manage Uploads: View all uploaded versions and delete them from localStorage
+**Generate New Variants**: Request a never-before-seen variant of the novel and receive it in PDF and epub formats in a matter of minutes.
 
-**Download as EPUB**: Convert uploaded text files to properly formatted EPUB files
-- Generate EPUB files from any uploaded TXT version
-- Includes cover image, table of contents, and proper metadata
-- Works on modern Kindles (August 2022 and later), Apple Books, Google Play Books, and most e-readers
-- For older Kindles: Use free [Calibre](https://calibre-ebook.com/) software to convert EPUB to MOBI format
-- Each EPUB follows the same structure as the original *Subcutanean* editions
+**Upload Custom Versions**: Upload additional EPUB or TXT versions of *Subcutanean* to compare with built-in versions or other uploaded versions. The uploads are stored in your browser's localStorage (rather than the cloud). View all uploaded versions and delete them from localStorage with the Files button. If you've uploaded a plain text version, you can convert it to an EPUB format for e-readers using the Manage Uploads option under Files.
 
 **Mobile-Friendly**: Fully responsive design optimized for phones, tablets, and desktop browsers
 
