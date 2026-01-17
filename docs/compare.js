@@ -177,6 +177,9 @@ function toggleNavDropdown(dropdownId, navItemId) {
     const dropdown = document.getElementById(dropdownId);
     const navItem = document.getElementById(navItemId);
 
+    // Close any open modals when opening a dropdown
+    document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
+
     if (activeNavDropdown === dropdownId) {
         closeAllNavDropdowns();
     } else {
@@ -1118,6 +1121,7 @@ function openMacroInspector() {
     if (!globalMacroConfig || !isSourceCodeVisible()) return;
     const modal = document.getElementById('macro-inspector-modal');
     if (!modal) return;
+    closeAllModals();
     populateMacroInspector();
     modal.classList.remove('hidden');
 }
@@ -2975,6 +2979,7 @@ async function downloadEPUB(versionId) {
 // Manage Uploads functionality
 
 function openManageUploadsModal() {
+    closeAllModals();
     const modal = document.getElementById('manage-uploads-modal');
     const uploadsList = document.getElementById('uploads-list');
     const noUploadsMessage = document.getElementById('no-uploads-message');
@@ -3098,6 +3103,7 @@ function markManageInfoNoticeSeen() {
 }
 
 function openManageInfoModal() {
+    closeAllModals();
     const modal = document.getElementById('manage-info-modal');
     modal.classList.remove('hidden');
 }
@@ -3113,9 +3119,31 @@ function acceptManageInfoAndProceed() {
     openManageUploadsModal();
 }
 
+// Close all modals helper
+function closeAllModals() {
+    const modalIds = [
+        'about-modal',
+        'generate-modal',
+        'levenshtein-modal',
+        'manage-uploads-modal',
+        'manage-info-modal',
+        'privacy-notice-modal',
+        'macro-inspector-modal'
+    ];
+    modalIds.forEach(id => {
+        const modal = document.getElementById(id);
+        if (modal) {
+            modal.classList.add('hidden');
+        }
+    });
+    // Also close any open nav dropdowns
+    closeAllNavDropdowns();
+}
+
 // About Modal functionality
 
 function openAboutModal() {
+    closeAllModals();
     const modal = document.getElementById('about-modal');
     modal.classList.remove('hidden');
 }
@@ -3128,6 +3156,7 @@ function closeAboutModal() {
 // Generate Copy Modal functionality
 
 function openGenerateModal() {
+    closeAllModals();
     const modal = document.getElementById('generate-modal');
     modal.classList.remove('hidden');
 }
@@ -3620,6 +3649,7 @@ function markPrivacyNoticeSeen() {
 }
 
 function openPrivacyNoticeModal() {
+    closeAllModals();
     const modal = document.getElementById('privacy-notice-modal');
     modal.classList.remove('hidden');
 }
@@ -4643,6 +4673,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Jaccard Distance functionality
     function openJaccardModal() {
+        closeAllModals();
         const modal = document.getElementById('levenshtein-modal');
         modal.classList.remove('hidden');
 

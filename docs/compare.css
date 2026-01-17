@@ -516,7 +516,9 @@ header {
 
 /* Generate Modal Styles */
 .modal-content.generate-modal-content {
-    max-width: 600px;
+    max-width: 650px;
+    align-self: flex-start;
+    margin-top: 5vh;
 }
 
 .generate-modal-body {
@@ -2055,7 +2057,9 @@ main {
 /* About Modal */
 
 .about-modal-content {
-    max-width: 600px;
+    max-width: 650px;
+    align-self: flex-start;
+    margin-top: 5vh;
 }
 
 .about-modal-body {
