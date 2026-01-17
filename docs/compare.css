@@ -515,8 +515,8 @@ header {
 }
 
 /* Generate Modal Styles */
-.generate-modal-content {
-    max-width: 550px;
+.modal-content.generate-modal-content {
+    max-width: 600px;
 }
 
 .generate-modal-body {
@@ -2055,7 +2055,7 @@ main {
 /* About Modal */
 
 .about-modal-content {
-    max-width: 700px;
+    max-width: 600px;
 }
 
 .about-modal-body {
