@@ -86,6 +86,7 @@ function updateThemeToggleUI() {
 function initializeNavigation() {
     const navAbout = document.getElementById('nav-about');
     const navBookmarks = document.getElementById('nav-bookmarks');
+    const navAnnotations = document.getElementById('nav-annotations');
     const navFiles = document.getElementById('nav-files');
     const navSource = document.getElementById('nav-source');
     const navMobileToggle = document.getElementById('nav-mobile-toggle');
@@ -110,6 +111,14 @@ function initializeNavigation() {
             e.stopPropagation();
             closeMobileNav();
             toggleNavDropdown('bookmarks-dropdown', 'nav-bookmarks');
+        });
+    }
+
+    if (navAnnotations) {
+        navAnnotations.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeMobileNav();
+            toggleNavDropdown('annotations-dropdown', 'nav-annotations');
         });
     }
 
@@ -1425,6 +1434,9 @@ function displayComparison() {
     if (originSourcePanelOpen && originSources) {
         syncSourceToCurrentChapter();
     }
+
+    // Mark paragraphs that have annotations
+    markAnnotatedParagraphs();
 }
 
 function renderParagraphs(container, paragraphs, isSource, versionId) {
@@ -1518,10 +1530,11 @@ function displayDiff(container, dataA, dataB) {
     // Use alignment algorithm to match paragraphs intelligently
     const alignments = alignParagraphs(paragraphsA, paragraphsB);
 
-    for (const alignment of alignments) {
+    alignments.forEach((alignment, index) => {
         const { textA, textB, type } = alignment;
 
         const p = document.createElement('p');
+        p.dataset.paragraphIndex = index;
 
         if (type === 'identical') {
             // No change - show normal paragraph
@@ -1562,7 +1575,7 @@ function displayDiff(container, dataA, dataB) {
         }
 
         div.appendChild(p);
-    }
+    });
 
     container.appendChild(div);
 }
@@ -1810,11 +1823,12 @@ function displayParagraphComparison(container, dataA, dataB) {
     const grid = document.createElement('div');
     grid.className = 'comparison-grid';
 
-    for (const alignment of alignments) {
+    alignments.forEach((alignment, rowIndex) => {
         const { indexA, indexB, textA, textB, similarity, type } = alignment;
 
         // Create paragraph A (or placeholder)
         const divA = document.createElement('div');
+        divA.dataset.paragraphIndex = rowIndex;
         if (textA) {
             divA.className = `comparison-paragraph ${type === 'unique-b' ? 'placeholder' : type}`;
 
@@ -1840,6 +1854,7 @@ function displayParagraphComparison(container, dataA, dataB) {
 
         // Create paragraph B (or placeholder)
         const divB = document.createElement('div');
+        divB.dataset.paragraphIndex = rowIndex;
         if (textB) {
             divB.className = `comparison-paragraph ${type === 'unique-a' ? 'placeholder' : type}`;
 
@@ -1862,7 +1877,7 @@ function displayParagraphComparison(container, dataA, dataB) {
 
         grid.appendChild(divA);
         grid.appendChild(divB);
-    }
+    });
 
     div.appendChild(grid);
     container.appendChild(div);
@@ -3128,7 +3143,9 @@ function closeAllModals() {
         'manage-uploads-modal',
         'manage-info-modal',
         'privacy-notice-modal',
-        'macro-inspector-modal'
+        'macro-inspector-modal',
+        'annotation-modal',
+        'export-modal'
     ];
     modalIds.forEach(id => {
         const modal = document.getElementById(id);
@@ -3246,6 +3263,7 @@ function refreshBookmarkUI(selectedId) {
     const emptyState = document.getElementById('bookmark-empty');
     const loadBtn = document.getElementById('load-bookmark-btn');
     const deleteBtn = document.getElementById('delete-bookmark-btn');
+    const notesDisplay = document.getElementById('bookmark-notes-display');
 
     if (!select) return;
 
@@ -3256,6 +3274,7 @@ function refreshBookmarkUI(selectedId) {
         select.disabled = true;
         if (loadBtn) loadBtn.disabled = true;
         if (deleteBtn) deleteBtn.disabled = true;
+        if (notesDisplay) notesDisplay.classList.add('hidden');
         return;
     }
 
@@ -3274,6 +3293,25 @@ function refreshBookmarkUI(selectedId) {
     if (selectedId) {
         select.value = selectedId;
     }
+
+    // Update notes display for selected bookmark
+    updateBookmarkNotesDisplay();
+}
+
+function updateBookmarkNotesDisplay() {
+    const select = document.getElementById('bookmark-select');
+    const notesDisplay = document.getElementById('bookmark-notes-display');
+    const notesText = document.getElementById('bookmark-notes-text');
+
+    if (!select || !notesDisplay || !notesText) return;
+
+    const selectedBookmark = getBookmarkById(select.value);
+    if (selectedBookmark && selectedBookmark.notes && selectedBookmark.notes.trim()) {
+        notesText.textContent = selectedBookmark.notes;
+        notesDisplay.classList.remove('hidden');
+    } else {
+        notesDisplay.classList.add('hidden');
+    }
 }
 
 function saveCurrentBookmark() {
@@ -3285,6 +3323,10 @@ function saveCurrentBookmark() {
     const trimmed = label.trim();
     if (!trimmed) return;
 
+    // Get notes from textarea
+    const notesInput = document.getElementById('bookmark-notes-input');
+    const notes = notesInput ? notesInput.value.trim() : '';
+
     const bookmark = {
         id: `bookmark-${Date.now()}`,
         name: trimmed,
@@ -3292,12 +3334,18 @@ function saveCurrentBookmark() {
         versionB: versionB,
         chapter: currentChapter,
         mode: currentMode,
-        scrollPosition: window.scrollY
+        scrollPosition: window.scrollY,
+        notes: notes
     };
 
     bookmarks.push(bookmark);
     saveBookmarksToStorage();
     refreshBookmarkUI(bookmark.id);
+
+    // Clear the notes input
+    if (notesInput) {
+        notesInput.value = '';
+    }
 }
 
 function applyBookmark(bookmark) {
@@ -3347,6 +3395,641 @@ function deleteSelectedBookmark() {
 
 function getBookmarkById(id) {
     return bookmarks.find(b => b.id === id);
+}
+
+// Annotation functionality
+
+let annotations = {};
+let currentAnnotationId = null;
+
+function loadAnnotationsFromStorage() {
+    try {
+        const stored = localStorage.getItem('subcutanean_annotations');
+        annotations = stored ? JSON.parse(stored) : {};
+    } catch (error) {
+        console.error('Error loading annotations:', error);
+        annotations = {};
+    }
+}
+
+function saveAnnotationsToStorage() {
+    try {
+        localStorage.setItem('subcutanean_annotations', JSON.stringify(annotations));
+    } catch (error) {
+        console.error('Error saving annotations:', error);
+    }
+}
+
+function createAnnotationKey(version, chapter, paragraphIndex) {
+    return `${version}:${chapter}:${paragraphIndex}`;
+}
+
+function getAnnotationByKey(key) {
+    return Object.values(annotations).find(a =>
+        createAnnotationKey(a.version, a.chapter, a.paragraphIndex) === key
+    );
+}
+
+function openAnnotationModal(paragraphIndex, paragraphText, version) {
+    closeAllModals();
+
+    const modal = document.getElementById('annotation-modal');
+    const title = document.getElementById('annotation-modal-title');
+    const preview = document.getElementById('annotation-paragraph-preview');
+    const location = document.getElementById('annotation-location');
+    const textarea = document.getElementById('annotation-text');
+    const deleteBtn = document.getElementById('delete-annotation-btn');
+
+    if (!modal) return;
+
+    // Check for existing annotation for this specific version
+    const key = createAnnotationKey(version, currentChapter, paragraphIndex);
+    const existing = getAnnotationByKey(key);
+
+    // Set up modal content
+    const cleanText = paragraphText.replace(/<[^>]*>/g, '');
+    preview.textContent = cleanText.length > 200 ? cleanText.substring(0, 200) + '...' : cleanText;
+    location.textContent = `${formatVersionLabel(version)} — ${formatChapterLabel(currentChapter)}, Paragraph ${paragraphIndex + 1}`;
+
+    if (existing) {
+        title.textContent = 'Edit Annotation';
+        textarea.value = existing.note;
+        currentAnnotationId = existing.id;
+        deleteBtn.classList.remove('hidden');
+    } else {
+        title.textContent = 'Add Annotation';
+        textarea.value = '';
+        currentAnnotationId = null;
+        deleteBtn.classList.add('hidden');
+    }
+
+    // Store paragraph info for save
+    modal.dataset.paragraphIndex = paragraphIndex;
+    modal.dataset.paragraphPreview = cleanText.substring(0, 50);
+    modal.dataset.version = version;
+
+    modal.classList.remove('hidden');
+    textarea.focus();
+}
+
+function closeAnnotationModal() {
+    const modal = document.getElementById('annotation-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+    currentAnnotationId = null;
+}
+
+function saveAnnotation() {
+    const modal = document.getElementById('annotation-modal');
+    const textarea = document.getElementById('annotation-text');
+
+    if (!modal || !textarea) return;
+
+    const note = textarea.value.trim();
+    if (!note) {
+        alert('Please enter a note.');
+        return;
+    }
+
+    const paragraphIndex = parseInt(modal.dataset.paragraphIndex);
+    const paragraphPreview = modal.dataset.paragraphPreview;
+    const version = modal.dataset.version;
+    const now = new Date().toISOString();
+
+    if (currentAnnotationId) {
+        // Update existing
+        annotations[currentAnnotationId].note = note;
+        annotations[currentAnnotationId].modified = now;
+    } else {
+        // Create new
+        const id = `annotation-${Date.now()}`;
+        annotations[id] = {
+            id: id,
+            created: now,
+            modified: now,
+            version: version,
+            chapter: currentChapter,
+            paragraphIndex: paragraphIndex,
+            paragraphPreview: paragraphPreview,
+            note: note
+        };
+    }
+
+    saveAnnotationsToStorage();
+    closeAnnotationModal();
+    refreshAnnotationsUI();
+    markAnnotatedParagraphs();
+}
+
+function deleteAnnotation(annotationId) {
+    if (!annotationId) return;
+
+    const confirmed = confirm('Delete this annotation?');
+    if (!confirmed) return;
+
+    delete annotations[annotationId];
+    saveAnnotationsToStorage();
+    closeAnnotationModal();
+    refreshAnnotationsUI();
+    markAnnotatedParagraphs();
+}
+
+function getAnnotationsForCurrentView() {
+    return Object.values(annotations).filter(a =>
+        (a.version === versionA || a.version === versionB) &&
+        a.chapter === currentChapter
+    );
+}
+
+function getAllAnnotationsCount() {
+    return Object.keys(annotations).length;
+}
+
+function refreshAnnotationsUI() {
+    const list = document.getElementById('annotations-list');
+    const empty = document.getElementById('annotations-empty');
+    const countBadge = document.getElementById('annotations-count');
+
+    if (!list) return;
+
+    const allAnnotations = Object.values(annotations);
+    const count = allAnnotations.length;
+
+    // Update badge
+    if (countBadge) {
+        countBadge.textContent = count;
+        if (count > 0) {
+            countBadge.classList.remove('hidden');
+        } else {
+            countBadge.classList.add('hidden');
+        }
+    }
+
+    // Update list
+    list.innerHTML = '';
+
+    if (count === 0) {
+        if (empty) empty.style.display = 'block';
+        return;
+    }
+
+    if (empty) empty.style.display = 'none';
+
+    // Group annotations by version and chapter
+    const byVersionChapter = {};
+    allAnnotations.forEach(a => {
+        const key = `${a.version}:${a.chapter}`;
+        if (!byVersionChapter[key]) {
+            byVersionChapter[key] = {
+                version: a.version,
+                chapter: a.chapter,
+                annotations: []
+            };
+        }
+        byVersionChapter[key].annotations.push(a);
+    });
+
+    // Render grouped annotations
+    Object.values(byVersionChapter).forEach(group => {
+        const groupEl = document.createElement('div');
+        groupEl.className = 'annotation-group';
+
+        const header = document.createElement('div');
+        header.className = 'annotation-group-header';
+        header.textContent = `${formatVersionLabel(group.version)} — ${formatChapterLabel(group.chapter)}`;
+        groupEl.appendChild(header);
+
+        group.annotations.sort((a, b) => a.paragraphIndex - b.paragraphIndex).forEach(ann => {
+            const item = document.createElement('div');
+            item.className = 'annotation-item';
+            item.innerHTML = `
+                <div class="annotation-item-header">
+                    <span class="annotation-para-num">¶${ann.paragraphIndex + 1}</span>
+                    <span class="annotation-preview-text">${ann.paragraphPreview}...</span>
+                    <span class="annotation-item-actions">
+                        <button class="annotation-action-btn edit-btn" title="Edit annotation">&#9998;</button>
+                        <button class="annotation-action-btn delete-btn" title="Delete annotation">&#128465;</button>
+                    </span>
+                </div>
+                <div class="annotation-item-note">${ann.note.substring(0, 100)}${ann.note.length > 100 ? '...' : ''}</div>
+            `;
+
+            // Click on item jumps to annotation
+            item.addEventListener('click', (e) => {
+                // Don't jump if clicking action buttons
+                if (e.target.closest('.annotation-action-btn')) return;
+                jumpToAnnotation(ann);
+            });
+
+            // Edit button
+            const editBtn = item.querySelector('.edit-btn');
+            editBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                closeAllNavDropdowns();
+                openAnnotationModal(ann.paragraphIndex, ann.paragraphPreview, ann.version);
+            });
+
+            // Delete button
+            const deleteBtn = item.querySelector('.delete-btn');
+            deleteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (confirm(`Delete this annotation?\n\n"${ann.note.substring(0, 50)}${ann.note.length > 50 ? '...' : ''}"`)) {
+                    delete annotations[ann.id];
+                    saveAnnotationsToStorage();
+                    refreshAnnotationsUI();
+                    markAnnotatedParagraphs();
+                }
+            });
+
+            groupEl.appendChild(item);
+        });
+
+        list.appendChild(groupEl);
+    });
+}
+
+function jumpToAnnotation(annotation) {
+    // Navigate to the annotation's context
+    // Set the annotated version as versionA if it's not already one of the current versions
+    if (annotation.version !== versionA && annotation.version !== versionB) {
+        // Load the annotated version as version A
+        versionA = annotation.version;
+        const selectA = document.getElementById('version-a-select');
+        if (selectA) selectA.value = versionA;
+    }
+
+    currentChapter = annotation.chapter;
+
+    buildChapterNavigation();
+    displayComparison();
+
+    // Close dropdown
+    closeAllNavDropdowns();
+
+    // Scroll to the annotated paragraph after render
+    // Use longer timeout to ensure content is fully rendered
+    setTimeout(() => {
+        scrollToAnnotatedParagraph(annotation);
+    }, 500);
+}
+
+function scrollToAnnotatedParagraph(annotation) {
+    const container = document.getElementById('comparison-display');
+    if (!container) return;
+
+    // Find the paragraph with matching index in the correct version panel
+    const versionPanels = container.querySelectorAll('.version-panel');
+    const comparisonGrid = container.querySelector('.comparison-grid');
+
+    let targetPara = null;
+
+    if (versionPanels.length === 2) {
+        // Side-by-side view: find paragraph in the correct panel
+        const panelIndex = annotation.version === versionA ? 0 : 1;
+        const panel = versionPanels[panelIndex];
+        if (panel) {
+            targetPara = panel.querySelector(`[data-paragraph-index="${annotation.paragraphIndex}"]`);
+        }
+    } else if (comparisonGrid) {
+        // Collation view: find paragraph in correct column
+        const allDivs = Array.from(comparisonGrid.children);
+        const startIndex = annotation.version === versionA ? 0 : 1;
+        for (let i = startIndex; i < allDivs.length; i += 2) {
+            if (allDivs[i].dataset.paragraphIndex === String(annotation.paragraphIndex)) {
+                targetPara = allDivs[i];
+                break;
+            }
+        }
+    } else {
+        // Diff or unified view - try multiple selectors
+        targetPara = container.querySelector(`[data-paragraph-index="${annotation.paragraphIndex}"]`);
+
+        // Fallback: try finding by paragraph number in any view
+        if (!targetPara) {
+            const allParas = container.querySelectorAll('[data-paragraph-index]');
+            for (const p of allParas) {
+                if (parseInt(p.dataset.paragraphIndex) === annotation.paragraphIndex) {
+                    targetPara = p;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (targetPara) {
+        targetPara.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Add a brief highlight effect
+        targetPara.classList.add('annotation-jump-highlight');
+        setTimeout(() => {
+            targetPara.classList.remove('annotation-jump-highlight');
+        }, 2000);
+    }
+}
+
+function markAnnotatedParagraphs() {
+    // Remove existing markers
+    document.querySelectorAll('.annotation-indicator').forEach(el => el.remove());
+    document.querySelectorAll('.has-annotation').forEach(el => el.classList.remove('has-annotation'));
+
+    const currentAnnotations = getAnnotationsForCurrentView();
+    if (currentAnnotations.length === 0) return;
+
+    const container = document.getElementById('comparison-display');
+    if (!container) return;
+
+    // Get all version panels for side-by-side detection
+    const versionPanels = container.querySelectorAll('.version-panel');
+    const comparisonGrid = container.querySelector('.comparison-grid');
+
+    currentAnnotations.forEach(ann => {
+        // Find paragraphs with matching index
+        const matchingParas = container.querySelectorAll(`[data-paragraph-index="${ann.paragraphIndex}"]`);
+
+        matchingParas.forEach(para => {
+            // Skip placeholders
+            if (para.classList.contains('placeholder')) return;
+
+            // Determine if this paragraph matches the annotation's version
+            let paraVersion = null;
+
+            if (para.dataset.versionId) {
+                paraVersion = para.dataset.versionId;
+            } else if (versionPanels.length === 2) {
+                // Side-by-side view: determine by panel position
+                const panel = para.closest('.version-panel');
+                if (panel) {
+                    const panelIndex = Array.from(versionPanels).indexOf(panel);
+                    paraVersion = panelIndex === 0 ? versionA : versionB;
+                }
+            } else if (comparisonGrid) {
+                // Collation view: even = A, odd = B
+                const allDivs = Array.from(comparisonGrid.children);
+                const divIndex = allDivs.indexOf(para);
+                paraVersion = (divIndex % 2 === 0) ? versionA : versionB;
+            } else if (para.closest('.diff-view')) {
+                // Diff view: only mark for versionA annotations
+                paraVersion = versionA;
+            } else {
+                // Unified or other view
+                paraVersion = versionA;
+            }
+
+            // Only mark if the version matches
+            if (paraVersion !== ann.version) return;
+
+            para.classList.add('has-annotation');
+
+            // Add indicator icon
+            const indicator = document.createElement('span');
+            indicator.className = 'annotation-indicator';
+            indicator.innerHTML = '&#128221;';
+            indicator.title = 'View/edit annotation';
+            indicator.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openAnnotationModal(ann.paragraphIndex, para.innerHTML || para.textContent, ann.version);
+            });
+
+            // Insert at beginning of paragraph
+            para.insertBefore(indicator, para.firstChild);
+        });
+    });
+}
+
+function setupParagraphClickHandlers() {
+    const container = document.getElementById('comparison-display');
+    if (!container) return;
+
+    container.addEventListener('click', (e) => {
+        // Don't open if clicking on the annotation indicator
+        if (e.target.classList.contains('annotation-indicator')) return;
+
+        // Find the clicked paragraph - check for various paragraph types
+        // Priority: specific classes first, then general p elements in version panels/diff view
+        let para = e.target.closest('.comparison-paragraph, .source-paragraph');
+
+        if (!para) {
+            // Check for regular p elements in version panels or diff view
+            const pElement = e.target.closest('p');
+            if (pElement) {
+                // Make sure it's within a content area, not a header or other element
+                const isInVersionPanel = pElement.closest('.version-panel');
+                const isInDiffView = pElement.closest('.diff-view');
+                const isInUnifiedView = pElement.closest('#comparison-display') && !pElement.closest('.modal');
+                if (isInVersionPanel || isInDiffView || isInUnifiedView) {
+                    // Exclude non-content paragraphs
+                    if (!pElement.classList.contains('empty-note') &&
+                        !pElement.classList.contains('word-count') &&
+                        !pElement.closest('.modal')) {
+                        para = pElement;
+                    }
+                }
+            }
+        }
+
+        if (!para) return;
+
+        // Find paragraph index - prefer the data attribute if available
+        let index = -1;
+        if (para.dataset.paragraphIndex !== undefined) {
+            index = parseInt(para.dataset.paragraphIndex);
+        } else {
+            // Fallback: find index by searching in DOM
+            const allParas = getParagraphsInCurrentView();
+            index = Array.from(allParas).indexOf(para);
+        }
+
+        // Determine which version this paragraph belongs to
+        let version = null;
+
+        // Check for explicit version ID on the paragraph
+        if (para.dataset.versionId) {
+            version = para.dataset.versionId;
+        } else {
+            // Determine version by context
+            const versionPanel = para.closest('.version-panel');
+            if (versionPanel) {
+                // In side-by-side view, check which panel (first = A, second = B)
+                const allPanels = document.querySelectorAll('.version-panel');
+                const panelIndex = Array.from(allPanels).indexOf(versionPanel);
+                version = panelIndex === 0 ? versionA : versionB;
+            } else if (para.closest('.comparison-grid')) {
+                // In collation view, check if this is in an odd or even position
+                const grid = para.closest('.comparison-grid');
+                const allDivs = Array.from(grid.children);
+                const divIndex = allDivs.indexOf(para);
+                // Even indices (0, 2, 4...) are version A, odd (1, 3, 5...) are version B
+                version = (divIndex % 2 === 0) ? versionA : versionB;
+            } else if (para.closest('.diff-view')) {
+                // In diff/track changes view - use versionA as the base
+                version = versionA;
+            } else if (para.closest('.unified-view')) {
+                // Unified view shows one version - check current selector
+                const selectA = document.getElementById('version-a-select');
+                version = selectA ? selectA.value : versionA;
+            } else {
+                // Default fallback
+                version = versionA;
+            }
+        }
+
+        if (index >= 0 && version) {
+            openAnnotationModal(index, para.innerHTML || para.textContent, version);
+        }
+    });
+}
+
+function getParagraphsInCurrentView() {
+    const container = document.getElementById('comparison-display');
+    if (!container) return [];
+
+    // Get paragraphs based on current view mode
+    const comparisonParas = container.querySelectorAll('.comparison-paragraph:not(.placeholder)');
+    if (comparisonParas.length > 0) {
+        return comparisonParas;
+    }
+
+    const sourceParas = container.querySelectorAll('.source-paragraph');
+    if (sourceParas.length > 0) {
+        return sourceParas;
+    }
+
+    // For side-by-side, diff, and unified views - get p elements
+    // Exclude empty notes and other non-content paragraphs
+    const pElements = container.querySelectorAll('.version-panel p:not(.empty-note), .diff-view p:not(.empty-note)');
+    if (pElements.length > 0) {
+        return pElements;
+    }
+
+    // Fallback for unified view
+    return container.querySelectorAll('p:not(.empty-note):not(.word-count)');
+}
+
+// Export/Import functionality
+
+function openExportModal() {
+    closeAllModals();
+    const modal = document.getElementById('export-modal');
+    if (modal) modal.classList.remove('hidden');
+}
+
+function closeExportModal() {
+    const modal = document.getElementById('export-modal');
+    if (modal) modal.classList.add('hidden');
+}
+
+function exportToJSON() {
+    const data = {
+        exportDate: new Date().toISOString(),
+        version: '1.0',
+        bookmarks: bookmarks,
+        annotations: annotations
+    };
+
+    const json = JSON.stringify(data, null, 2);
+    downloadFile(json, 'subcutanean-notes.json', 'application/json');
+    closeExportModal();
+}
+
+function exportToMarkdown() {
+    let md = '# Subcutanean Variorum - Research Notes\n\n';
+    md += `Exported: ${new Date().toLocaleDateString()}\n\n`;
+
+    // Bookmarks section
+    const bookmarksWithNotes = bookmarks.filter(b => b.notes && b.notes.trim());
+    if (bookmarksWithNotes.length > 0) {
+        md += '## Bookmarks\n\n';
+        bookmarksWithNotes.forEach(b => {
+            md += `### ${b.name}\n`;
+            md += `- **Versions:** ${formatVersionLabel(b.versionA)} vs ${formatVersionLabel(b.versionB)}\n`;
+            md += `- **Chapter:** ${formatChapterLabel(b.chapter)}\n`;
+            md += `- **View:** ${formatModeLabel(b.mode)}\n`;
+            md += `\n**Notes:**\n${b.notes}\n\n---\n\n`;
+        });
+    }
+
+    // Annotations section
+    const allAnnotations = Object.values(annotations);
+    if (allAnnotations.length > 0) {
+        md += '## Passage Annotations\n\n';
+
+        // Group by version and chapter
+        const byVersionChapter = {};
+        allAnnotations.forEach(a => {
+            const key = `${a.version}:${a.chapter}`;
+            if (!byVersionChapter[key]) byVersionChapter[key] = [];
+            byVersionChapter[key].push(a);
+        });
+
+        Object.values(byVersionChapter).forEach(anns => {
+            const first = anns[0];
+            md += `### ${formatVersionLabel(first.version)} — ${formatChapterLabel(first.chapter)}\n\n`;
+
+            anns.sort((a, b) => a.paragraphIndex - b.paragraphIndex).forEach(a => {
+                md += `**Paragraph ${a.paragraphIndex + 1}:** "${a.paragraphPreview}..."\n\n`;
+                md += `${a.note}\n\n---\n\n`;
+            });
+        });
+    }
+
+    if (bookmarksWithNotes.length === 0 && allAnnotations.length === 0) {
+        md += '*No annotations or bookmarks with notes to export.*\n';
+    }
+
+    downloadFile(md, 'subcutanean-notes.md', 'text/markdown');
+    closeExportModal();
+}
+
+function downloadFile(content, filename, mimeType) {
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function importAnnotationsFromFile(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const data = JSON.parse(e.target.result);
+
+            // Import bookmarks
+            if (data.bookmarks && Array.isArray(data.bookmarks)) {
+                data.bookmarks.forEach(b => {
+                    // Check if bookmark with same ID exists
+                    if (!bookmarks.find(existing => existing.id === b.id)) {
+                        bookmarks.push(b);
+                    }
+                });
+                saveBookmarksToStorage();
+                refreshBookmarkUI();
+            }
+
+            // Import annotations
+            if (data.annotations && typeof data.annotations === 'object') {
+                Object.entries(data.annotations).forEach(([id, ann]) => {
+                    // Check if annotation with same ID exists
+                    if (!annotations[id]) {
+                        annotations[id] = ann;
+                    }
+                });
+                saveAnnotationsToStorage();
+                refreshAnnotationsUI();
+                markAnnotatedParagraphs();
+            }
+
+            alert('Import successful!');
+        } catch (error) {
+            console.error('Import error:', error);
+            alert('Failed to import file. Please ensure it is a valid JSON export.');
+        }
+    };
+    reader.readAsText(file);
 }
 
 function openFilesPanel() {
@@ -4429,6 +5112,9 @@ document.addEventListener('DOMContentLoaded', () => {
     setupViewModeButtons();
     loadBookmarksFromStorage();
     refreshBookmarkUI();
+    loadAnnotationsFromStorage();
+    refreshAnnotationsUI();
+    setupParagraphClickHandlers();
     loadAllVersions();
     loadOriginSources();
     initializeNavigation();
@@ -4564,6 +5250,76 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (deleteBookmarkBtn) {
         deleteBookmarkBtn.addEventListener('click', deleteSelectedBookmark);
+    }
+    if (bookmarkSelect) {
+        bookmarkSelect.addEventListener('change', updateBookmarkNotesDisplay);
+    }
+
+    // Annotation modal events
+    const annotationModal = document.getElementById('annotation-modal');
+    const closeAnnotationBtn = document.getElementById('close-annotation-modal-btn');
+    const saveAnnotationBtn = document.getElementById('save-annotation-btn');
+    const deleteAnnotationBtn = document.getElementById('delete-annotation-btn');
+    const cancelAnnotationBtn = document.getElementById('cancel-annotation-btn');
+
+    if (closeAnnotationBtn) {
+        closeAnnotationBtn.addEventListener('click', closeAnnotationModal);
+    }
+    if (saveAnnotationBtn) {
+        saveAnnotationBtn.addEventListener('click', saveAnnotation);
+    }
+    if (deleteAnnotationBtn) {
+        deleteAnnotationBtn.addEventListener('click', () => {
+            if (currentAnnotationId) {
+                deleteAnnotation(currentAnnotationId);
+            }
+        });
+    }
+    if (cancelAnnotationBtn) {
+        cancelAnnotationBtn.addEventListener('click', closeAnnotationModal);
+    }
+    if (annotationModal) {
+        annotationModal.addEventListener('click', (e) => {
+            if (e.target === annotationModal) {
+                closeAnnotationModal();
+            }
+        });
+    }
+
+    // Export modal events
+    const exportModal = document.getElementById('export-modal');
+    const closeExportBtn = document.getElementById('close-export-modal-btn');
+    const exportJsonBtn = document.getElementById('export-json-btn');
+    const exportMarkdownBtn = document.getElementById('export-markdown-btn');
+    const exportAnnotationsBtn = document.getElementById('export-annotations-btn');
+    const importAnnotationsInput = document.getElementById('import-annotations-input');
+
+    if (exportAnnotationsBtn) {
+        exportAnnotationsBtn.addEventListener('click', openExportModal);
+    }
+    if (closeExportBtn) {
+        closeExportBtn.addEventListener('click', closeExportModal);
+    }
+    if (exportJsonBtn) {
+        exportJsonBtn.addEventListener('click', exportToJSON);
+    }
+    if (exportMarkdownBtn) {
+        exportMarkdownBtn.addEventListener('click', exportToMarkdown);
+    }
+    if (exportModal) {
+        exportModal.addEventListener('click', (e) => {
+            if (e.target === exportModal) {
+                closeExportModal();
+            }
+        });
+    }
+    if (importAnnotationsInput) {
+        importAnnotationsInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                importAnnotationsFromFile(e.target.files[0]);
+                e.target.value = ''; // Reset to allow reimport of same file
+            }
+        });
     }
 
     // Macro Inspector events

@@ -514,6 +514,69 @@ header {
     text-align: center;
 }
 
+.bookmark-save-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.bookmark-notes-input {
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    padding: 0.5rem;
+    font-family: inherit;
+    font-size: 0.85rem;
+    resize: vertical;
+    min-height: 2.5rem;
+}
+
+.bookmark-notes-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.bookmark-notes-input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.bookmark-divider {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    margin: 0.75rem 0;
+}
+
+.bookmark-notes-display {
+    background-color: rgba(255, 136, 0, 0.1);
+    border-left: 3px solid var(--accent-color);
+    padding: 0.5rem 0.75rem;
+    margin: 0.5rem 0;
+    border-radius: 0 4px 4px 0;
+}
+
+.bookmark-notes-display.hidden {
+    display: none;
+}
+
+.bookmark-notes-display .bookmark-label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-weight: bold;
+    opacity: 1;
+    color: var(--accent-color);
+}
+
+.bookmark-notes-display p {
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--text-color);
+    white-space: pre-wrap;
+}
+
 /* Generate Modal Styles */
 .modal-content.generate-modal-content {
     max-width: 650px;
@@ -833,6 +896,14 @@ header {
     border-color: var(--accent-color);
 }
 
+.word-diff-instruction {
+    margin: 0;
+    margin-left: auto;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-style: italic;
+}
+
 .modal-body {
     padding: 2rem;
 }
@@ -871,26 +942,21 @@ header {
 }
 
 .word-list .word-item {
-    display: inline;
-    margin-right: 0.5rem;
+    display: inline-block;
+    margin: 0.2rem 0.3rem 0.2rem 0;
     color: var(--text-color);
     cursor: pointer;
     transition: all 0.2s ease;
-    padding: 0.1rem 0.3rem;
-    border-radius: 3px;
+    padding: 0.25rem 0.6rem;
+    border-radius: 12px;
+    background-color: rgba(255, 136, 0, 0.15);
+    border: 1px solid rgba(255, 136, 0, 0.25);
 }
 
 .word-list .word-item:hover {
     background-color: var(--accent-color);
+    border-color: var(--accent-color);
     color: white;
-}
-
-.word-list .word-item::after {
-    content: ", ";
-}
-
-.word-list .word-item:last-child::after {
-    content: "";
 }
 
 /* Word chapter popup */
@@ -2163,6 +2229,320 @@ main {
 #privacy-understand-btn:hover {
     background-color: #8B4513;
 }
+
+/* ============================================
+   Annotation Styles
+   ============================================ */
+
+/* Annotation badge in nav */
+.annotations-badge {
+    background-color: var(--accent-color);
+    color: white;
+    font-size: 0.75rem;
+    padding: 0.15rem 0.4rem;
+    border-radius: 10px;
+    margin-left: 0.5rem;
+}
+
+.annotations-badge.hidden {
+    display: none;
+}
+
+/* Annotations dropdown */
+.annotations-instruction {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-style: italic;
+    margin: 0 0 0.75rem 0;
+}
+
+.annotations-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.annotations-empty {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+    text-align: center;
+    padding: 1rem;
+}
+
+.annotations-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.annotation-group {
+    margin-bottom: 1rem;
+}
+
+.annotation-group-header {
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: var(--accent-color);
+    padding: 0.25rem 0;
+    border-bottom: 1px solid rgba(255, 136, 0, 0.3);
+    margin-bottom: 0.5rem;
+}
+
+.annotation-item {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.annotation-item:hover {
+    background-color: rgba(255, 136, 0, 0.15);
+}
+
+.annotation-item-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.annotation-para-num {
+    font-weight: bold;
+    color: var(--accent-color);
+    font-size: 0.85rem;
+}
+
+.annotation-preview-text {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.annotation-item-note {
+    font-size: 0.85rem;
+    color: var(--text-color);
+    line-height: 1.4;
+}
+
+.annotation-item-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 0.25rem;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.annotation-item:hover .annotation-item-actions {
+    opacity: 1;
+}
+
+.annotation-action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.9rem;
+    line-height: 1;
+    transition: background-color 0.2s ease;
+}
+
+.annotation-action-btn.edit-btn {
+    color: var(--accent-color);
+}
+
+.annotation-action-btn.edit-btn:hover {
+    background-color: rgba(255, 136, 0, 0.2);
+}
+
+.annotation-action-btn.delete-btn {
+    color: #e74c3c;
+}
+
+.annotation-action-btn.delete-btn:hover {
+    background-color: rgba(231, 76, 60, 0.2);
+}
+
+/* Annotation modal */
+.annotation-modal-content {
+    max-width: 650px;
+    align-self: flex-start;
+    margin-top: 5vh;
+}
+
+.annotation-context {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.annotation-label {
+    display: block;
+    font-weight: bold;
+    color: var(--accent-color);
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.annotation-preview {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--text-color);
+    font-style: italic;
+    margin: 0 0 0.5rem 0;
+}
+
+.annotation-location {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
+}
+
+.annotation-input-section {
+    margin-bottom: 1rem;
+}
+
+.annotation-textarea {
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    padding: 0.75rem;
+    font-family: inherit;
+    font-size: 0.95rem;
+    resize: vertical;
+    min-height: 100px;
+}
+
+.annotation-textarea::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.annotation-textarea:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.annotation-modal-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+.tool-btn.primary {
+    background-color: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+}
+
+.tool-btn.primary:hover {
+    background-color: #cc6d00;
+}
+
+.tool-btn.danger {
+    background-color: #c62828;
+    color: white;
+    border-color: #c62828;
+}
+
+.tool-btn.danger:hover {
+    background-color: #b71c1c;
+}
+
+/* Paragraph annotation indicators */
+.has-annotation {
+    position: relative;
+    border-left: 3px solid var(--accent-color) !important;
+    background-color: rgba(242, 120, 31, 0.44) !important;
+    padding-left: 5px;
+}
+
+.annotation-indicator {
+    display: inline-block;
+    margin-right: 0.5rem;
+    cursor: pointer;
+    font-size: 1rem;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+}
+
+.annotation-indicator:hover {
+    opacity: 1;
+}
+
+/* Jump-to-annotation highlight effect */
+.annotation-jump-highlight {
+    animation: annotation-pulse 2s ease-out;
+}
+
+@keyframes annotation-pulse {
+    0% {
+        background-color: rgba(255, 136, 0, 0.4) !important;
+        box-shadow: 0 0 20px rgba(255, 136, 0, 0.5);
+    }
+    100% {
+        background-color: rgba(255, 136, 0, 0.08) !important;
+        box-shadow: none;
+    }
+}
+
+[data-theme="light"] .annotation-jump-highlight {
+    animation: annotation-pulse-light 2s ease-out;
+}
+
+@keyframes annotation-pulse-light {
+    0% {
+        background-color: rgba(217, 104, 0, 0.35) !important;
+        box-shadow: 0 0 20px rgba(217, 104, 0, 0.4);
+    }
+    100% {
+        background-color: rgba(217, 104, 0, 0.06) !important;
+        box-shadow: none;
+    }
+}
+
+/* Export modal */
+.export-modal-content {
+    max-width: 450px;
+    align-self: flex-start;
+    margin-top: 5vh;
+}
+
+.export-modal-body p {
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+.export-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.export-options .tool-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem;
+    text-align: left;
+}
+
+.export-options .tool-btn strong {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+}
+
+.export-description {
+    font-size: 0.85rem;
+    opacity: 0.7;
+    font-weight: normal;
+}
+
 /* ============================================
    Light Mode Overrides
    ============================================ */
@@ -2278,6 +2658,14 @@ main {
 
 [data-theme="light"] .word-list .word-item {
     color: var(--text-color);
+    background-color: rgba(217, 104, 0, 0.12);
+    border-color: rgba(217, 104, 0, 0.25);
+}
+
+[data-theme="light"] .word-list .word-item:hover {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    color: white;
 }
 
 [data-theme="light"] .word-popup {
@@ -2384,6 +2772,10 @@ main {
     border-bottom-color: var(--border-subtle);
 }
 
+[data-theme="light"] .word-diff-instruction {
+    color: rgba(0, 0, 0, 0.5);
+}
+
 [data-theme="light"] .bookmark-select {
     background-color: var(--input-bg);
     color: var(--input-text);
@@ -2396,6 +2788,85 @@ main {
 
 [data-theme="light"] .bookmark-empty {
     color: var(--text-muted);
+}
+
+[data-theme="light"] .bookmark-notes-input {
+    background-color: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.15);
+    color: var(--text-color);
+}
+
+[data-theme="light"] .bookmark-notes-input::placeholder {
+    color: rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="light"] .bookmark-notes-input:focus {
+    background-color: rgba(0, 0, 0, 0.08);
+    border-color: var(--accent-color);
+}
+
+[data-theme="light"] .bookmark-divider {
+    border-top-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .bookmark-notes-display {
+    background-color: rgba(217, 104, 0, 0.08);
+}
+
+/* Light mode: Annotation styles */
+[data-theme="light"] .annotations-instruction {
+    color: rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="light"] .annotations-empty {
+    color: rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="light"] .annotation-item {
+    background-color: rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="light"] .annotation-item:hover {
+    background-color: rgba(217, 104, 0, 0.1);
+}
+
+[data-theme="light"] .annotation-action-btn.edit-btn:hover {
+    background-color: rgba(217, 104, 0, 0.15);
+}
+
+[data-theme="light"] .annotation-action-btn.delete-btn:hover {
+    background-color: rgba(231, 76, 60, 0.15);
+}
+
+[data-theme="light"] .annotation-preview-text {
+    color: rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="light"] .annotation-context {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .annotation-location {
+    color: rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="light"] .annotation-textarea {
+    background-color: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.15);
+    color: var(--text-color);
+}
+
+[data-theme="light"] .annotation-textarea::placeholder {
+    color: rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="light"] .annotation-textarea:focus {
+    background-color: rgba(0, 0, 0, 0.08);
+    border-color: var(--accent-color);
+}
+
+[data-theme="light"] .has-annotation {
+    background-color: rgba(217, 104, 0, 0.06) !important;
 }
 
 [data-theme="light"] .no-uploads-message {
@@ -2415,6 +2886,68 @@ main {
 [data-theme="light"] footer {
     color: var(--text-muted);
     border-top-color: var(--border-subtle);
+}
+
+/* Light mode: Track Changes diff styles */
+[data-theme="light"] .diff-line.added {
+    background-color: rgba(76, 175, 80, 0.2);
+    border-left-color: #43a047;
+    color: #2e7d32;
+}
+
+[data-theme="light"] .diff-line.removed {
+    background-color: rgba(244, 67, 54, 0.2);
+    border-left-color: #e53935;
+    color: #c62828;
+}
+
+[data-theme="light"] .diff-added {
+    background-color: rgba(76, 175, 80, 0.3);
+    color: #1b5e20;
+}
+
+[data-theme="light"] .diff-removed {
+    background-color: rgba(244, 67, 54, 0.3);
+    color: #b71c1c;
+}
+
+/* Light mode: Collation view styles */
+[data-theme="light"] .comparison-paragraph.identical {
+    background-color: rgba(76, 175, 80, 0.15);
+    border-color: #43a047;
+    color: #1b5e20;
+}
+
+[data-theme="light"] .comparison-paragraph.modified {
+    background-color: rgba(255, 193, 7, 0.2);
+    border-color: #ffa000;
+    color: #e65100;
+}
+
+[data-theme="light"] .comparison-paragraph.unique-a {
+    background-color: rgba(244, 67, 54, 0.15);
+    border-color: #e53935;
+    color: #b71c1c;
+}
+
+[data-theme="light"] .comparison-paragraph.unique-b {
+    background-color: rgba(33, 150, 243, 0.15);
+    border-color: #1e88e5;
+    color: #0d47a1;
+}
+
+[data-theme="light"] .comparison-paragraph.placeholder {
+    background-color: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.2);
+    color: rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="light"] .comparison-paragraph-number {
+    color: rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="light"] .legend-color {
+    border-color: rgba(0, 0, 0, 0.3);
 }
 
 /* Theme toggle button styling */

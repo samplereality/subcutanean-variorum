@@ -44,6 +44,10 @@
                 <span class="nav-icon">&#128278;</span>
                 <span class="nav-label">Bookmarks</span>
             </button>
+            <button class="nav-item" id="nav-annotations" title="Research notes">
+                <span class="nav-icon">&#128221;</span>
+                <span class="nav-label">Notes</span>
+            </button>
             <button class="nav-item" id="nav-files" title="Upload files">
                 <span class="nav-icon">&#128194;</span>
                 <span class="nav-label">Files</span>
@@ -75,14 +79,42 @@
             <span>Bookmarks</span>
         </div>
         <div class="dropdown-body">
-            <button id="save-bookmark-btn" class="tool-btn full-width" title="Save the current versions, chapter, and view">Save Current View</button>
+            <div class="bookmark-save-section">
+                <textarea id="bookmark-notes-input" class="bookmark-notes-input" placeholder="Add notes about this view (optional)..." rows="2"></textarea>
+                <button id="save-bookmark-btn" class="tool-btn full-width" title="Save the current versions, chapter, and view">Save Current View</button>
+            </div>
+            <hr class="bookmark-divider">
             <label class="bookmark-label" for="bookmark-select">Saved views:</label>
             <select id="bookmark-select" class="bookmark-select" title="Saved comparisons"></select>
+            <div id="bookmark-notes-display" class="bookmark-notes-display hidden">
+                <label class="bookmark-label">Notes:</label>
+                <p id="bookmark-notes-text"></p>
+            </div>
             <div class="bookmark-actions">
                 <button id="load-bookmark-btn" class="tool-btn" title="Load selected bookmark">Load</button>
                 <button id="delete-bookmark-btn" class="tool-btn" title="Delete selected bookmark">Delete</button>
             </div>
             <div id="bookmark-empty" class="bookmark-empty hidden">No bookmarks yet.</div>
+        </div>
+    </div>
+
+    <div class="nav-dropdown" id="annotations-dropdown">
+        <div class="dropdown-header">
+            <span>Research Notes</span>
+            <span id="annotations-count" class="annotations-badge hidden">0</span>
+        </div>
+        <div class="dropdown-body">
+            <p class="annotations-instruction">Click any paragraph in the comparison view to add a note.</p>
+            <div id="annotations-list" class="annotations-list"></div>
+            <div id="annotations-empty" class="annotations-empty">No annotations yet.</div>
+            <hr class="bookmark-divider">
+            <div class="annotations-actions">
+                <button id="export-annotations-btn" class="tool-btn" title="Export all notes">Export Notes</button>
+                <label class="tool-btn" title="Import notes from JSON">
+                    Import
+                    <input type="file" id="import-annotations-input" accept=".json" style="display: none;">
+                </label>
+            </div>
         </div>
     </div>
 
@@ -194,6 +226,7 @@
                     <button id="sort-alpha-btn" class="sort-btn active" title="Sort words alphabetically">Alphabetical</button>
                     <button id="sort-freq-btn" class="sort-btn" title="Sort words by frequency (most common first)">Frequency</button>
                 </div>
+                <p class="word-diff-instruction">Click any word to see it in context</p>
             </div>
             <div class="modal-body">
                 <div class="diff-results">
@@ -291,6 +324,55 @@
                 </ul>
                 <p class="privacy-note">Use this manager to view and delete uploaded versions from your browser's storage.</p>
                 <button id="manage-info-understand-btn" class="tool-btn">Got it, show my uploads</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Annotation Modal -->
+    <div id="annotation-modal" class="modal hidden">
+        <div class="modal-content annotation-modal-content">
+            <div class="modal-header">
+                <h2 id="annotation-modal-title">Add Annotation</h2>
+                <button id="close-annotation-modal-btn" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body annotation-modal-body">
+                <div class="annotation-context">
+                    <label class="annotation-label">Passage:</label>
+                    <p id="annotation-paragraph-preview" class="annotation-preview"></p>
+                    <p id="annotation-location" class="annotation-location"></p>
+                </div>
+                <div class="annotation-input-section">
+                    <label class="annotation-label" for="annotation-text">Your note:</label>
+                    <textarea id="annotation-text" class="annotation-textarea" rows="5" placeholder="Enter your scholarly note or commentary..."></textarea>
+                </div>
+                <div class="annotation-modal-actions">
+                    <button id="save-annotation-btn" class="tool-btn primary">Save Annotation</button>
+                    <button id="delete-annotation-btn" class="tool-btn danger hidden">Delete</button>
+                    <button id="cancel-annotation-btn" class="tool-btn">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div id="export-modal" class="modal hidden">
+        <div class="modal-content export-modal-content">
+            <div class="modal-header">
+                <h2>Export Research Notes</h2>
+                <button id="close-export-modal-btn" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body export-modal-body">
+                <p>Export all your bookmarks and annotations for backup or sharing.</p>
+                <div class="export-options">
+                    <button id="export-json-btn" class="tool-btn full-width">
+                        <strong>JSON Format</strong>
+                        <span class="export-description">Machine-readable, can be re-imported</span>
+                    </button>
+                    <button id="export-markdown-btn" class="tool-btn full-width">
+                        <strong>Markdown Format</strong>
+                        <span class="export-description">Human-readable document</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
