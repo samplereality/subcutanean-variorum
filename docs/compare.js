@@ -3317,7 +3317,9 @@ function updateBookmarkNotesDisplay() {
 function saveCurrentBookmark() {
     if (!versionA || !versionB) return;
 
-    const defaultName = `${formatVersionLabel(versionA)} vs ${formatVersionLabel(versionB)} – ${formatChapterLabel(currentChapter)} (${formatModeLabel(currentMode)})`;
+    const openPanels = getOpenNotePanelsState();
+    const panelInfo = openPanels.length > 0 ? ` + ${openPanels.length} note${openPanels.length > 1 ? 's' : ''}` : '';
+    const defaultName = `${formatVersionLabel(versionA)} vs ${formatVersionLabel(versionB)} – ${formatChapterLabel(currentChapter)} (${formatModeLabel(currentMode)})${panelInfo}`;
     const label = prompt('Name this bookmark:', defaultName);
     if (label === null) return;
     const trimmed = label.trim();
@@ -3335,7 +3337,8 @@ function saveCurrentBookmark() {
         chapter: currentChapter,
         mode: currentMode,
         scrollPosition: window.scrollY,
-        notes: notes
+        notes: notes,
+        openNotePanels: openPanels // Save open note panels and their positions
     };
 
     bookmarks.push(bookmark);
@@ -3379,6 +3382,14 @@ function applyBookmark(bookmark) {
     pendingBookmarkScroll = typeof bookmark.scrollPosition === 'number' ? bookmark.scrollPosition : 0;
     buildChapterNavigation();
     setViewMode(bookmark.mode || currentMode);
+
+    // Restore open note panels if saved with this bookmark
+    if (bookmark.openNotePanels && bookmark.openNotePanels.length > 0) {
+        // Delay to allow the comparison to render first
+        setTimeout(() => {
+            restoreNotePanels(bookmark.openNotePanels);
+        }, 600);
+    }
 }
 
 function deleteSelectedBookmark() {
@@ -3400,7 +3411,8 @@ function getBookmarkById(id) {
 // Annotation functionality
 
 let annotations = {};
-let currentAnnotationId = null;
+let openNotePanels = {}; // Track open floating note panels { panelId: { element, annotationKey, position } }
+let notePanelZIndex = 6000; // Starting z-index for note panels
 
 function loadAnnotationsFromStorage() {
     try {
@@ -3430,77 +3442,214 @@ function getAnnotationByKey(key) {
     );
 }
 
-function openAnnotationModal(paragraphIndex, paragraphText, version) {
-    closeAllModals();
-
-    const modal = document.getElementById('annotation-modal');
-    const title = document.getElementById('annotation-modal-title');
-    const preview = document.getElementById('annotation-paragraph-preview');
-    const location = document.getElementById('annotation-location');
-    const textarea = document.getElementById('annotation-text');
-    const deleteBtn = document.getElementById('delete-annotation-btn');
-
-    if (!modal) return;
-
-    // Check for existing annotation for this specific version
+function openAnnotationModal(paragraphIndex, paragraphText, version, clickEvent) {
+    // Create a floating note panel instead of a modal
     const key = createAnnotationKey(version, currentChapter, paragraphIndex);
+
+    // Check if panel for this annotation is already open
+    const existingPanel = Object.values(openNotePanels).find(p => p.annotationKey === key);
+    if (existingPanel) {
+        // Bring to front
+        bringNotePanelToFront(existingPanel.element);
+        existingPanel.element.querySelector('.note-panel-textarea').focus();
+        return;
+    }
+
     const existing = getAnnotationByKey(key);
-
-    // Set up modal content
     const cleanText = paragraphText.replace(/<[^>]*>/g, '');
-    preview.textContent = cleanText.length > 200 ? cleanText.substring(0, 200) + '...' : cleanText;
-    location.textContent = `${formatVersionLabel(version)} — ${formatChapterLabel(currentChapter)}, Paragraph ${paragraphIndex + 1}`;
+    const previewText = cleanText.length > 150 ? cleanText.substring(0, 150) + '...' : cleanText;
+    const locationText = `${formatVersionLabel(version)} — ${formatChapterLabel(currentChapter)}, ¶${paragraphIndex + 1}`;
 
-    if (existing) {
-        title.textContent = 'Edit Annotation';
-        textarea.value = existing.note;
-        currentAnnotationId = existing.id;
-        deleteBtn.classList.remove('hidden');
+    // Create the floating panel
+    const panelId = `note-panel-${Date.now()}`;
+    const panel = document.createElement('div');
+    panel.className = 'note-panel';
+    panel.id = panelId;
+    panel.dataset.annotationKey = key;
+    panel.dataset.paragraphIndex = paragraphIndex;
+    panel.dataset.paragraphPreview = cleanText.substring(0, 50);
+    panel.dataset.version = version;
+    panel.dataset.chapter = currentChapter;
+    panel.dataset.annotationId = existing ? existing.id : '';
+
+    // Position panel near the click location, or use default offset
+    const panelWidth = 320;
+    const panelHeight = 250; // approximate
+    let top, left;
+
+    if (clickEvent && clickEvent.clientX !== undefined) {
+        // Position near click, but ensure it stays on screen
+        left = Math.min(clickEvent.clientX + 20, window.innerWidth - panelWidth - 20);
+        top = Math.min(clickEvent.clientY - 50, window.innerHeight - panelHeight - 20);
+        top = Math.max(20, top);
+        left = Math.max(20, left);
     } else {
-        title.textContent = 'Add Annotation';
-        textarea.value = '';
-        currentAnnotationId = null;
-        deleteBtn.classList.add('hidden');
+        // Fallback: offset from other panels
+        const offset = Object.keys(openNotePanels).length * 30;
+        top = 100 + offset;
+        left = 100 + offset;
     }
 
-    // Store paragraph info for save
-    modal.dataset.paragraphIndex = paragraphIndex;
-    modal.dataset.paragraphPreview = cleanText.substring(0, 50);
-    modal.dataset.version = version;
+    panel.style.top = `${top}px`;
+    panel.style.left = `${left}px`;
+    panel.style.zIndex = ++notePanelZIndex;
 
-    modal.classList.remove('hidden');
-    textarea.focus();
+    panel.innerHTML = `
+        <div class="note-panel-header">
+            <span class="note-panel-location">${locationText}</span>
+            <button class="note-panel-close" title="Close">&times;</button>
+        </div>
+        <div class="note-panel-preview">"${previewText}"</div>
+        <textarea class="note-panel-textarea" placeholder="Add your note...">${existing ? existing.note : ''}</textarea>
+        <div class="note-panel-actions">
+            <button class="note-panel-delete ${existing ? '' : 'hidden'}" title="Delete annotation">Delete</button>
+            <button class="note-panel-save">Save</button>
+        </div>
+    `;
+
+    document.body.appendChild(panel);
+
+    // Track this panel
+    openNotePanels[panelId] = {
+        element: panel,
+        annotationKey: key,
+        position: { top: panel.style.top, left: panel.style.left }
+    };
+
+    // Set up event handlers
+    setupNotePanelEvents(panel);
+
+    // Focus the textarea
+    panel.querySelector('.note-panel-textarea').focus();
 }
 
-function closeAnnotationModal() {
-    const modal = document.getElementById('annotation-modal');
-    if (modal) {
-        modal.classList.add('hidden');
+function setupNotePanelEvents(panel) {
+    const header = panel.querySelector('.note-panel-header');
+    const closeBtn = panel.querySelector('.note-panel-close');
+    const saveBtn = panel.querySelector('.note-panel-save');
+    const deleteBtn = panel.querySelector('.note-panel-delete');
+    const textarea = panel.querySelector('.note-panel-textarea');
+
+    // Drag functionality with click-to-jump detection
+    let isDragging = false;
+    let hasMoved = false;
+    let dragOffset = { x: 0, y: 0 };
+    let startPos = { x: 0, y: 0 };
+    const DRAG_THRESHOLD = 5; // pixels - movement below this is a click, not a drag
+
+    header.addEventListener('mousedown', (e) => {
+        if (e.target === closeBtn) return;
+        isDragging = true;
+        hasMoved = false;
+        startPos.x = e.clientX;
+        startPos.y = e.clientY;
+        dragOffset.x = e.clientX - panel.offsetLeft;
+        dragOffset.y = e.clientY - panel.offsetTop;
+        bringNotePanelToFront(panel);
+        header.style.cursor = 'grabbing';
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+
+        // Check if mouse has moved beyond threshold
+        const deltaX = Math.abs(e.clientX - startPos.x);
+        const deltaY = Math.abs(e.clientY - startPos.y);
+        if (deltaX > DRAG_THRESHOLD || deltaY > DRAG_THRESHOLD) {
+            hasMoved = true;
+        }
+
+        const newLeft = e.clientX - dragOffset.x;
+        const newTop = e.clientY - dragOffset.y;
+        panel.style.left = `${Math.max(0, newLeft)}px`;
+        panel.style.top = `${Math.max(0, newTop)}px`;
+        // Update tracked position
+        if (openNotePanels[panel.id]) {
+            openNotePanels[panel.id].position = { top: panel.style.top, left: panel.style.left };
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        if (isDragging && !hasMoved) {
+            // It was a click, not a drag - jump to annotation
+            jumpToAnnotationFromPanel(panel);
+        }
+        isDragging = false;
+        hasMoved = false;
+        header.style.cursor = 'grab';
+    });
+
+    // Click to bring to front
+    panel.addEventListener('mousedown', () => {
+        bringNotePanelToFront(panel);
+    });
+
+    // Close button
+    closeBtn.addEventListener('click', () => {
+        closeNotePanel(panel.id);
+    });
+
+    // Save button
+    saveBtn.addEventListener('click', () => {
+        saveNotePanel(panel);
+    });
+
+    // Delete button
+    deleteBtn.addEventListener('click', () => {
+        const annotationId = panel.dataset.annotationId;
+        if (annotationId && confirm('Delete this annotation?')) {
+            delete annotations[annotationId];
+            saveAnnotationsToStorage();
+            closeNotePanel(panel.id);
+            refreshAnnotationsUI();
+            markAnnotatedParagraphs();
+        }
+    });
+
+    // Auto-save on Ctrl+Enter
+    textarea.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+            saveNotePanel(panel);
+        }
+    });
+}
+
+function bringNotePanelToFront(panel) {
+    panel.style.zIndex = ++notePanelZIndex;
+}
+
+function closeNotePanel(panelId) {
+    const panel = document.getElementById(panelId);
+    if (panel) {
+        panel.remove();
     }
-    currentAnnotationId = null;
+    delete openNotePanels[panelId];
 }
 
-function saveAnnotation() {
-    const modal = document.getElementById('annotation-modal');
-    const textarea = document.getElementById('annotation-text');
+function closeAllNotePanels() {
+    Object.keys(openNotePanels).forEach(id => closeNotePanel(id));
+}
 
-    if (!modal || !textarea) return;
-
+function saveNotePanel(panel) {
+    const textarea = panel.querySelector('.note-panel-textarea');
     const note = textarea.value.trim();
+
     if (!note) {
         alert('Please enter a note.');
         return;
     }
 
-    const paragraphIndex = parseInt(modal.dataset.paragraphIndex);
-    const paragraphPreview = modal.dataset.paragraphPreview;
-    const version = modal.dataset.version;
+    const paragraphIndex = parseInt(panel.dataset.paragraphIndex);
+    const paragraphPreview = panel.dataset.paragraphPreview;
+    const version = panel.dataset.version;
+    const chapter = panel.dataset.chapter;
+    const existingId = panel.dataset.annotationId;
     const now = new Date().toISOString();
 
-    if (currentAnnotationId) {
+    if (existingId) {
         // Update existing
-        annotations[currentAnnotationId].note = note;
-        annotations[currentAnnotationId].modified = now;
+        annotations[existingId].note = note;
+        annotations[existingId].modified = now;
     } else {
         // Create new
         const id = `annotation-${Date.now()}`;
@@ -3509,17 +3658,79 @@ function saveAnnotation() {
             created: now,
             modified: now,
             version: version,
-            chapter: currentChapter,
+            chapter: chapter,
             paragraphIndex: paragraphIndex,
             paragraphPreview: paragraphPreview,
             note: note
         };
+        panel.dataset.annotationId = id;
+        // Show delete button now that annotation exists
+        panel.querySelector('.note-panel-delete').classList.remove('hidden');
     }
 
     saveAnnotationsToStorage();
-    closeAnnotationModal();
     refreshAnnotationsUI();
     markAnnotatedParagraphs();
+
+    // Visual feedback
+    const saveBtn = panel.querySelector('.note-panel-save');
+    const originalText = saveBtn.textContent;
+    saveBtn.textContent = 'Saved!';
+    saveBtn.disabled = true;
+    setTimeout(() => {
+        saveBtn.textContent = originalText;
+        saveBtn.disabled = false;
+    }, 1000);
+}
+
+function getOpenNotePanelsState() {
+    // Returns the state of all open note panels for saving with bookmarks
+    return Object.values(openNotePanels).map(data => ({
+        annotationKey: data.annotationKey,
+        position: data.position
+    }));
+}
+
+function restoreNotePanels(panelStates) {
+    // Close any currently open panels
+    closeAllNotePanels();
+
+    // Restore panels from saved state
+    panelStates.forEach(state => {
+        const annotation = getAnnotationByKey(state.annotationKey);
+        if (annotation) {
+            // Open the panel
+            openAnnotationModal(annotation.paragraphIndex, annotation.paragraphPreview, annotation.version);
+            // Position it
+            const panelId = Object.keys(openNotePanels).pop();
+            if (panelId && state.position) {
+                const panel = document.getElementById(panelId);
+                if (panel) {
+                    panel.style.top = state.position.top;
+                    panel.style.left = state.position.left;
+                    openNotePanels[panelId].position = state.position;
+                }
+            }
+        }
+    });
+}
+
+// Legacy function names for compatibility
+function closeAnnotationModal() {
+    // Close the most recently opened panel
+    const panelIds = Object.keys(openNotePanels);
+    if (panelIds.length > 0) {
+        closeNotePanel(panelIds[panelIds.length - 1]);
+    }
+}
+
+function saveAnnotation() {
+    // Save the most recently opened panel
+    const panelIds = Object.keys(openNotePanels);
+    if (panelIds.length > 0) {
+        const panel = document.getElementById(panelIds[panelIds.length - 1]);
+        if (panel) saveNotePanel(panel);
+    }
 }
 
 function deleteAnnotation(annotationId) {
@@ -3672,6 +3883,29 @@ function jumpToAnnotation(annotation) {
     setTimeout(() => {
         scrollToAnnotatedParagraph(annotation);
     }, 500);
+}
+
+function jumpToAnnotationFromPanel(panel) {
+    // Extract annotation info from panel data attributes
+    const annotation = {
+        paragraphIndex: parseInt(panel.dataset.paragraphIndex),
+        version: panel.dataset.version,
+        chapter: currentChapter
+    };
+
+    // If we need to navigate to a different view, do that
+    if (annotation.version !== versionA && annotation.version !== versionB) {
+        versionA = annotation.version;
+        const selectA = document.getElementById('version-a-select');
+        if (selectA) selectA.value = versionA;
+        displayComparison();
+        setTimeout(() => {
+            scrollToAnnotatedParagraph(annotation);
+        }, 500);
+    } else {
+        // Just scroll to the paragraph
+        scrollToAnnotatedParagraph(annotation);
+    }
 }
 
 function scrollToAnnotatedParagraph(annotation) {
@@ -3874,7 +4108,7 @@ function setupParagraphClickHandlers() {
         }
 
         if (index >= 0 && version) {
-            openAnnotationModal(index, para.innerHTML || para.textContent, version);
+            openAnnotationModal(index, para.innerHTML || para.textContent, version, e);
         }
     });
 }

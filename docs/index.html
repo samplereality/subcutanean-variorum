@@ -331,25 +331,19 @@
     <!-- Annotation Modal -->
     <div id="annotation-modal" class="modal hidden">
         <div class="modal-content annotation-modal-content">
-            <div class="modal-header">
-                <h2 id="annotation-modal-title">Add Annotation</h2>
+            <div class="annotation-modal-header">
+                <span id="annotation-modal-title" class="annotation-title">Add Note</span>
+                <span id="annotation-location" class="annotation-location"></span>
                 <button id="close-annotation-modal-btn" class="close-btn">&times;</button>
             </div>
-            <div class="modal-body annotation-modal-body">
-                <div class="annotation-context">
-                    <label class="annotation-label">Passage:</label>
-                    <p id="annotation-paragraph-preview" class="annotation-preview"></p>
-                    <p id="annotation-location" class="annotation-location"></p>
-                </div>
-                <div class="annotation-input-section">
-                    <label class="annotation-label" for="annotation-text">Your note:</label>
-                    <textarea id="annotation-text" class="annotation-textarea" rows="5" placeholder="Enter your scholarly note or commentary..."></textarea>
-                </div>
-                <div class="annotation-modal-actions">
-                    <button id="save-annotation-btn" class="tool-btn primary">Save Annotation</button>
-                    <button id="delete-annotation-btn" class="tool-btn danger hidden">Delete</button>
-                    <button id="cancel-annotation-btn" class="tool-btn">Cancel</button>
-                </div>
+            <div class="annotation-passage-preview">
+                "<span id="annotation-paragraph-preview"></span>"
+            </div>
+            <textarea id="annotation-text" class="annotation-textarea" rows="3" placeholder="Add your note..."></textarea>
+            <div class="annotation-modal-actions">
+                <button id="delete-annotation-btn" class="tool-btn danger hidden">Delete</button>
+                <button id="cancel-annotation-btn" class="tool-btn">Cancel</button>
+                <button id="save-annotation-btn" class="tool-btn primary">Save</button>
             </div>
         </div>
     </div>

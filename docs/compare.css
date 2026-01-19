@@ -2367,71 +2367,244 @@ main {
 
 /* Annotation modal */
 .annotation-modal-content {
-    max-width: 650px;
+    max-width: 500px;
+    width: 90%;
+    padding: 0;
     align-self: flex-start;
-    margin-top: 5vh;
+    margin-top: 10vh;
 }
 
-.annotation-context {
-    background-color: rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
-    padding: 1rem;
-    margin-bottom: 1rem;
+.annotation-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.annotation-label {
-    display: block;
-    font-weight: bold;
+.annotation-title {
+    font-weight: 600;
     color: var(--accent-color);
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
 }
 
-.annotation-preview {
-    font-size: 0.9rem;
-    line-height: 1.5;
-    color: var(--text-color);
-    font-style: italic;
-    margin: 0 0 0.5rem 0;
-}
-
-.annotation-location {
+.annotation-modal-header .annotation-location {
     font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.6);
-    margin: 0;
+    color: rgba(255, 255, 255, 0.5);
+    flex: 1;
 }
 
-.annotation-input-section {
-    margin-bottom: 1rem;
+.annotation-modal-header .close-btn {
+    position: static;
+    margin-left: auto;
+}
+
+.annotation-passage-preview {
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: rgba(255, 255, 255, 0.7);
+    font-style: italic;
+    padding: 0.75rem 1rem;
+    background-color: rgba(0, 0, 0, 0.15);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    max-height: 80px;
+    overflow: hidden;
 }
 
 .annotation-textarea {
     width: 100%;
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: transparent;
     color: var(--text-color);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 4px;
-    padding: 0.75rem;
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.75rem 1rem;
     font-family: inherit;
     font-size: 0.95rem;
-    resize: vertical;
-    min-height: 100px;
+    resize: none;
+    min-height: 80px;
 }
 
 .annotation-textarea::placeholder {
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.4);
 }
 
 .annotation-textarea:focus {
     outline: none;
-    border-color: var(--accent-color);
-    background-color: rgba(255, 255, 255, 0.15);
+    background-color: rgba(255, 255, 255, 0.03);
 }
 
 .annotation-modal-actions {
     display: flex;
     gap: 0.5rem;
     justify-content: flex-end;
+    padding: 0.75rem 1rem;
+}
+
+.annotation-modal-actions .tool-btn {
+    padding: 0.4rem 0.9rem;
+    font-size: 0.85rem;
+}
+
+/* Floating Note Panels */
+.note-panel {
+    position: fixed;
+    width: 320px;
+    background-color: var(--bg-secondary, #1a2636);
+    border: 1px solid rgba(255, 136, 0, 0.3);
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    font-size: 0.9rem;
+    overflow: hidden;
+}
+
+.note-panel-header {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: rgba(255, 136, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 136, 0, 0.2);
+    cursor: grab;
+    user-select: none;
+}
+
+.note-panel-location {
+    flex: 1;
+    font-size: 0.8rem;
+    color: var(--accent-color);
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.note-panel-close {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0 0.25rem;
+    line-height: 1;
+}
+
+.note-panel-close:hover {
+    color: #e74c3c;
+}
+
+.note-panel-preview {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.6);
+    background-color: rgba(0, 0, 0, 0.15);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    max-height: 60px;
+    overflow: hidden;
+    line-height: 1.4;
+}
+
+.note-panel-textarea {
+    width: 100%;
+    min-height: 80px;
+    max-height: 200px;
+    padding: 0.5rem 0.75rem;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    font-family: inherit;
+    font-size: 0.85rem;
+    resize: vertical;
+}
+
+.note-panel-textarea:focus {
+    outline: none;
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+.note-panel-textarea::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.note-panel-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+}
+
+.note-panel-actions button {
+    padding: 0.3rem 0.7rem;
+    font-size: 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    transition: all 0.2s ease;
+}
+
+.note-panel-save {
+    background-color: var(--accent-color) !important;
+    border-color: var(--accent-color) !important;
+    color: white !important;
+}
+
+.note-panel-save:hover {
+    background-color: #cc6d00 !important;
+}
+
+.note-panel-delete {
+    margin-right: auto;
+    background-color: transparent !important;
+    border-color: #e74c3c !important;
+    color: #e74c3c !important;
+}
+
+.note-panel-delete:hover {
+    background-color: rgba(231, 76, 60, 0.2) !important;
+}
+
+.note-panel-actions button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Light mode for note panels */
+[data-theme="light"] .note-panel {
+    background-color: #ffffff;
+    border-color: rgba(217, 104, 0, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] .note-panel-header {
+    background-color: rgba(217, 104, 0, 0.08);
+    border-bottom-color: rgba(217, 104, 0, 0.15);
+}
+
+[data-theme="light"] .note-panel-close {
+    color: rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="light"] .note-panel-preview {
+    color: rgba(0, 0, 0, 0.6);
+    background-color: rgba(0, 0, 0, 0.03);
+    border-bottom-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .note-panel-textarea {
+    border-bottom-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .note-panel-textarea::placeholder {
+    color: rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="light"] .note-panel-actions button {
+    border-color: rgba(0, 0, 0, 0.2);
+    background-color: rgba(0, 0, 0, 0.05);
+    color: var(--text-color);
 }
 
 .tool-btn.primary {
@@ -2842,17 +3015,22 @@ main {
     color: rgba(0, 0, 0, 0.5);
 }
 
-[data-theme="light"] .annotation-context {
-    background-color: rgba(0, 0, 0, 0.05);
+[data-theme="light"] .annotation-modal-header {
+    border-bottom-color: rgba(0, 0, 0, 0.1);
 }
 
-[data-theme="light"] .annotation-location {
+[data-theme="light"] .annotation-modal-header .annotation-location {
     color: rgba(0, 0, 0, 0.5);
 }
 
+[data-theme="light"] .annotation-passage-preview {
+    background-color: rgba(0, 0, 0, 0.04);
+    color: rgba(0, 0, 0, 0.6);
+    border-bottom-color: rgba(0, 0, 0, 0.1);
+}
+
 [data-theme="light"] .annotation-textarea {
-    background-color: rgba(0, 0, 0, 0.05);
-    border-color: rgba(0, 0, 0, 0.15);
+    border-bottom-color: rgba(0, 0, 0, 0.1);
     color: var(--text-color);
 }
 
@@ -2861,8 +3039,7 @@ main {
 }
 
 [data-theme="light"] .annotation-textarea:focus {
-    background-color: rgba(0, 0, 0, 0.08);
-    border-color: var(--accent-color);
+    background-color: rgba(0, 0, 0, 0.02);
 }
 
 [data-theme="light"] .has-annotation {
