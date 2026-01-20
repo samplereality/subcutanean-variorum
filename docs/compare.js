@@ -2975,7 +2975,7 @@ ${navItems}
 async function downloadEPUB(versionId) {
     const versionData = allVersions[versionId];
     if (!versionData) {
-        alert('Version data not found');
+        showNotification('Version data not found', 'error');
         return;
     }
 
@@ -2991,7 +2991,7 @@ async function downloadEPUB(versionId) {
         URL.revokeObjectURL(url);
     } catch (error) {
         console.error('Error generating EPUB:', error);
-        alert('Error generating EPUB. See console for details.');
+        showNotification('Error generating EPUB. See console for details.', 'error');
     }
 }
 
@@ -3076,40 +3076,43 @@ function closeManageUploadsModal() {
 }
 
 function deleteCustomVersion(versionId) {
-    if (!confirm(`Are you sure you want to delete Seed ${versionId}?`)) {
-        return;
-    }
+    showConfirmDialog(
+        'Delete Version',
+        `Are you sure you want to delete Seed ${versionId}?`,
+        () => {
+            // Remove from customVersions
+            delete customVersions[versionId];
 
-    // Remove from customVersions
-    delete customVersions[versionId];
+            // Remove from allVersions
+            delete allVersions[versionId];
+            invalidateVersionCaches(versionId);
 
-    // Remove from allVersions
-    delete allVersions[versionId];
-    invalidateVersionCaches(versionId);
+            // Save to localStorage
+            saveCustomVersions();
 
-    // Save to localStorage
-    saveCustomVersions();
+            // If either selected version was deleted, reset to default versions
+            if (versionA === versionId) {
+                versionA = versionIds[0];
+                document.getElementById('version-a-select').value = versionA;
+            }
+            if (versionB === versionId) {
+                versionB = versionIds[versionIds.length - 1];
+                document.getElementById('version-b-select').value = versionB;
+            }
 
-    // If either selected version was deleted, reset to default versions
-    if (versionA === versionId) {
-        versionA = versionIds[0];
-        document.getElementById('version-a-select').value = versionA;
-    }
-    if (versionB === versionId) {
-        versionB = versionIds[versionIds.length - 1];
-        document.getElementById('version-b-select').value = versionB;
-    }
+            // Refresh version selectors
+            populateVersionSelectors();
 
-    // Refresh version selectors
-    populateVersionSelectors();
+            // Refresh the manage uploads modal
+            openManageUploadsModal();
 
-    // Refresh the manage uploads modal
-    openManageUploadsModal();
+            // Refresh display if we changed the selected version
+            displayComparison();
 
-    // Refresh display if we changed the selected version
-    displayComparison();
-
-    showUploadStatus(`Deleted Seed ${versionId}`, 'success');
+            showUploadStatus(`Deleted Seed ${versionId}`, 'success');
+        },
+        { confirmText: 'Delete', confirmIcon: 'trash-2', type: 'danger' }
+    );
 }
 
 // Manage Uploads Info Modal functionality
@@ -3234,7 +3237,7 @@ function initializeGenerateForm() {
                 })
                 .catch(error => {
                     console.error('Error!', error.message);
-                    alert('Something went wrong. Please check your connection and try again.');
+                    showNotification('Something went wrong. Please check your connection and try again.', 'error');
                     btn.disabled = false;
                     btn.innerText = 'Generate My Variant';
                 });
@@ -3361,10 +3364,10 @@ function applyBookmark(bookmark) {
     const versionBAvailable = isVersionSelectable(bookmark.versionB);
     if (!versionAAvailable || !versionBAvailable) {
         if (isSourceVersion(bookmark.versionA) || isSourceVersion(bookmark.versionB)) {
-            alert('Source code data is still loading. Please try again in a moment.');
+            showNotification('Source code data is still loading. Please try again in a moment.', 'info');
             return;
         }
-        alert('One of the versions in this bookmark is no longer available.');
+        showNotification('One of the versions in this bookmark is no longer available.', 'warning');
         if (bookmark.id) {
             bookmarks = bookmarks.filter(b => b.id !== bookmark.id);
             saveBookmarksToStorage();
@@ -3400,12 +3403,17 @@ function deleteSelectedBookmark() {
     const select = document.getElementById('bookmark-select');
     if (!select || !select.value) return;
 
-    const confirmed = confirm('Delete this bookmark?');
-    if (!confirmed) return;
-
-    bookmarks = bookmarks.filter(b => b.id !== select.value);
-    saveBookmarksToStorage();
-    refreshBookmarkUI();
+    const bookmarkId = select.value;
+    showConfirmDialog(
+        'Delete Bookmark',
+        'Are you sure you want to delete this bookmark?',
+        () => {
+            bookmarks = bookmarks.filter(b => b.id !== bookmarkId);
+            saveBookmarksToStorage();
+            refreshBookmarkUI();
+        },
+        { confirmText: 'Delete', confirmIcon: 'trash-2', type: 'danger' }
+    );
 }
 
 function getBookmarkById(id) {
@@ -3847,7 +3855,7 @@ function saveNotePanel(panel) {
     const note = textarea.value.trim();
 
     if (!note) {
-        alert('Please enter a note.');
+        showNotification('Please enter a note.', 'warning');
         return;
     }
 
@@ -3953,14 +3961,18 @@ function saveAnnotation() {
 function deleteAnnotation(annotationId) {
     if (!annotationId) return;
 
-    const confirmed = confirm('Delete this annotation?');
-    if (!confirmed) return;
-
-    delete annotations[annotationId];
-    saveAnnotationsToStorage();
-    closeAnnotationModal();
-    refreshAnnotationsUI();
-    markAnnotatedParagraphs();
+    showConfirmDialog(
+        'Delete Annotation',
+        'Are you sure you want to delete this annotation?',
+        () => {
+            delete annotations[annotationId];
+            saveAnnotationsToStorage();
+            closeAnnotationModal();
+            refreshAnnotationsUI();
+            markAnnotatedParagraphs();
+        },
+        { confirmText: 'Delete', type: 'danger', confirmIcon: 'trash-2' }
+    );
 }
 
 function getAnnotationsForCurrentView() {
@@ -4066,12 +4078,18 @@ function refreshAnnotationsUI() {
             const deleteBtn = item.querySelector('.delete-btn');
             deleteBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                if (confirm(`Delete this annotation?\n\n"${ann.note.substring(0, 50)}${ann.note.length > 50 ? '...' : ''}"`)) {
-                    delete annotations[ann.id];
-                    saveAnnotationsToStorage();
-                    refreshAnnotationsUI();
-                    markAnnotatedParagraphs();
-                }
+                const previewText = ann.note.substring(0, 50) + (ann.note.length > 50 ? '...' : '');
+                showConfirmDialog(
+                    'Delete Annotation',
+                    `Are you sure you want to delete this annotation?\n\n"${previewText}"`,
+                    () => {
+                        delete annotations[ann.id];
+                        saveAnnotationsToStorage();
+                        refreshAnnotationsUI();
+                        markAnnotatedParagraphs();
+                    },
+                    { confirmText: 'Delete', type: 'danger', confirmIcon: 'trash-2' }
+                );
             });
 
             groupEl.appendChild(item);
@@ -4463,10 +4481,10 @@ function importAnnotationsFromFile(file) {
             } else {
                 importFromJSON(content);
             }
-            alert('Import successful!');
+            showNotification('Import successful! Your annotations and bookmarks have been loaded.', 'success');
         } catch (error) {
             console.error('Import error:', error);
-            alert(`Failed to import file. ${error.message || 'Please ensure it is a valid export file.'}`);
+            showNotification(`Failed to import file. ${error.message || 'Please ensure it is a valid export file.'}`, 'error');
         }
     };
     reader.readAsText(file);
@@ -5837,7 +5855,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loadBookmarkBtn.addEventListener('click', () => {
             if (!bookmarkSelect || !bookmarkSelect.value) return;
             if (!allVersions) {
-                alert('Please wait for the versions to finish loading.');
+                showNotification('Please wait for the versions to finish loading.', 'info');
                 return;
             }
             const bookmark = getBookmarkById(bookmarkSelect.value);

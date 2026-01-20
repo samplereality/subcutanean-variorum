@@ -2703,7 +2703,127 @@ main {
     background-color: #b71c1c;
 }
 
-/* Delete confirmation modal */
+/* Notification modal */
+.notification-modal-content {
+    max-width: 350px;
+    text-align: center;
+    padding: 1.5rem;
+}
+
+.notification-icon {
+    margin-bottom: 1rem;
+}
+
+.notification-icon svg {
+    width: 48px;
+    height: 48px;
+}
+
+.notification-success .notification-icon {
+    color: #27ae60;
+}
+
+.notification-error .notification-icon {
+    color: #e74c3c;
+}
+
+.notification-warning .notification-icon {
+    color: #f39c12;
+}
+
+.notification-info .notification-icon {
+    color: var(--accent-color);
+}
+
+.notification-message {
+    margin-bottom: 1.25rem;
+    color: var(--text-color);
+    line-height: 1.5;
+}
+
+.notification-ok-btn {
+    min-width: 80px;
+}
+
+/* Confirm dialog modal */
+.confirm-dialog-content {
+    max-width: 400px;
+    text-align: center;
+}
+
+.confirm-dialog-content .modal-header {
+    padding: 1rem 1.5rem;
+}
+
+.confirm-dialog-content .modal-header h3 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.confirm-dialog-content .modal-header h3 svg {
+    width: 24px;
+    height: 24px;
+}
+
+.confirm-warning .modal-header h3 {
+    color: #f39c12;
+}
+
+.confirm-danger .modal-header h3 {
+    color: #e74c3c;
+}
+
+.confirm-info .modal-header h3 {
+    color: var(--accent-color);
+}
+
+.confirm-dialog-content .modal-body {
+    padding: 1rem 1.5rem;
+}
+
+.confirm-dialog-content .modal-body p {
+    margin: 0;
+    color: var(--text-color);
+    opacity: 0.9;
+    line-height: 1.5;
+}
+
+.confirm-dialog-content .modal-footer {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.confirm-danger .confirm-action-btn {
+    background-color: #e74c3c !important;
+    border-color: #e74c3c !important;
+    color: white !important;
+}
+
+.confirm-danger .confirm-action-btn:hover {
+    background-color: #c0392b !important;
+}
+
+.confirm-warning .confirm-action-btn {
+    background-color: #f39c12 !important;
+    border-color: #f39c12 !important;
+    color: white !important;
+}
+
+.confirm-warning .confirm-action-btn:hover {
+    background-color: #d68910 !important;
+}
+
+[data-theme="light"] .confirm-dialog-content .modal-footer {
+    border-top-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Delete confirmation modal (legacy - kept for note panel) */
 .delete-confirm-modal-content {
     max-width: 380px;
     text-align: center;
@@ -2759,7 +2879,7 @@ main {
 .has-annotation {
     position: relative;
     border-left: 3px solid var(--accent-color) !important;
-    background-color: rgba(242, 120, 31, 0.44) !important;
+    background-color: rgba(255, 255, 255, 0.1) !important;
     padding-left: 5px;
 }
 
