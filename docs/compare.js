@@ -72,12 +72,16 @@ function updateThemeToggleUI() {
     if (themeIcon && themeLabel) {
         if (currentTheme === 'dark') {
             // Show sun icon to indicate "click for light mode"
-            themeIcon.innerHTML = '&#9788;'; // Sun symbol
+            themeIcon.setAttribute('data-lucide', 'sun');
             themeLabel.textContent = 'Light';
         } else {
             // Show moon icon to indicate "click for dark mode"
-            themeIcon.innerHTML = '&#9790;'; // Moon symbol
+            themeIcon.setAttribute('data-lucide', 'moon');
             themeLabel.textContent = 'Dark';
+        }
+        // Re-render Lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
         }
     }
 }
@@ -3456,8 +3460,10 @@ function openAnnotationModal(paragraphIndex, paragraphText, version, clickEvent)
     }
 
     const existing = getAnnotationByKey(key);
-    const cleanText = paragraphText.replace(/<[^>]*>/g, '');
-    const previewText = cleanText.length > 150 ? cleanText.substring(0, 150) + '...' : cleanText;
+    // Strip HTML tags and the annotation indicator emoji
+    const cleanText = paragraphText.replace(/<[^>]*>/g, '').replace(/📝\s*/g, '').trim();
+    // Limit to ~80 chars to fit in 2 lines
+    const previewText = cleanText.length > 80 ? cleanText.substring(0, 80) + '…' : cleanText;
     const locationText = `${formatVersionLabel(version)} — ${formatChapterLabel(currentChapter)}, ¶${paragraphIndex + 1}`;
 
     // Create the floating panel
@@ -3497,17 +3503,23 @@ function openAnnotationModal(paragraphIndex, paragraphText, version, clickEvent)
     panel.innerHTML = `
         <div class="note-panel-header">
             <span class="note-panel-location">${locationText}</span>
-            <button class="note-panel-close" title="Close">&times;</button>
+            <button class="note-panel-close" title="Close"><i data-lucide="x"></i></button>
         </div>
-        <div class="note-panel-preview">"${previewText}"</div>
-        <textarea class="note-panel-textarea" placeholder="Add your note...">${existing ? existing.note : ''}</textarea>
+        <div class="note-panel-preview">${previewText}</div>
+        <textarea class="note-panel-textarea" placeholder="Add your note..." ${existing ? 'readonly' : ''}>${existing ? existing.note : ''}</textarea>
         <div class="note-panel-actions">
-            <button class="note-panel-delete ${existing ? '' : 'hidden'}" title="Delete annotation">Delete</button>
-            <button class="note-panel-save">Save</button>
+            <button class="note-panel-delete ${existing ? '' : 'hidden'}" title="Delete annotation"><i data-lucide="trash-2"></i> Delete</button>
+            <button class="note-panel-edit ${existing ? '' : 'hidden'}" title="Edit annotation"><i data-lucide="pencil"></i> Edit</button>
+            <button class="note-panel-save ${existing ? 'hidden' : ''}"><i data-lucide="save"></i> Save</button>
         </div>
     `;
 
     document.body.appendChild(panel);
+
+    // Render Lucide icons in the panel
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons({ nodes: [panel] });
+    }
 
     // Track this panel
     openNotePanels[panelId] = {
@@ -3527,6 +3539,7 @@ function setupNotePanelEvents(panel) {
     const header = panel.querySelector('.note-panel-header');
     const closeBtn = panel.querySelector('.note-panel-close');
     const saveBtn = panel.querySelector('.note-panel-save');
+    const editBtn = panel.querySelector('.note-panel-edit');
     const deleteBtn = panel.querySelector('.note-panel-delete');
     const textarea = panel.querySelector('.note-panel-textarea');
 
@@ -3594,15 +3607,19 @@ function setupNotePanelEvents(panel) {
         saveNotePanel(panel);
     });
 
-    // Delete button
+    // Edit button - enables editing mode
+    editBtn.addEventListener('click', () => {
+        textarea.removeAttribute('readonly');
+        textarea.focus();
+        editBtn.classList.add('hidden');
+        saveBtn.classList.remove('hidden');
+    });
+
+    // Delete button - shows confirmation modal
     deleteBtn.addEventListener('click', () => {
         const annotationId = panel.dataset.annotationId;
-        if (annotationId && confirm('Delete this annotation?')) {
-            delete annotations[annotationId];
-            saveAnnotationsToStorage();
-            closeNotePanel(panel.id);
-            refreshAnnotationsUI();
-            markAnnotatedParagraphs();
+        if (annotationId) {
+            showDeleteConfirmModal(panel.id, annotationId);
         }
     });
 
@@ -3628,6 +3645,201 @@ function closeNotePanel(panelId) {
 
 function closeAllNotePanels() {
     Object.keys(openNotePanels).forEach(id => closeNotePanel(id));
+}
+
+// ============================================
+// Notification and Confirmation Modals
+// ============================================
+
+// Show a notification toast/modal
+function showNotification(message, type = 'info') {
+    // Remove existing notification if any
+    const existing = document.getElementById('notification-modal');
+    if (existing) existing.remove();
+
+    const icons = {
+        success: 'check-circle',
+        error: 'x-circle',
+        warning: 'alert-triangle',
+        info: 'info'
+    };
+
+    const modal = document.createElement('div');
+    modal.id = 'notification-modal';
+    modal.className = 'modal';
+    modal.innerHTML = `
+        <div class="modal-content notification-modal-content notification-${type}">
+            <div class="notification-icon">
+                <i data-lucide="${icons[type] || icons.info}"></i>
+            </div>
+            <div class="notification-message">${message}</div>
+            <button class="tool-btn notification-ok-btn">OK</button>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons({ nodes: [modal] });
+    }
+
+    const okBtn = modal.querySelector('.notification-ok-btn');
+    okBtn.addEventListener('click', () => modal.remove());
+
+    // Close on click outside
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
+    });
+
+    // Close on Escape
+    const handleEscape = (e) => {
+        if (e.key === 'Escape') {
+            modal.remove();
+            document.removeEventListener('keydown', handleEscape);
+        }
+    };
+    document.addEventListener('keydown', handleEscape);
+
+    // Focus OK button
+    okBtn.focus();
+}
+
+// Show a confirmation dialog
+function showConfirmDialog(title, message, onConfirm, options = {}) {
+    const {
+        confirmText = 'Confirm',
+        cancelText = 'Cancel',
+        confirmIcon = null,
+        type = 'warning' // 'warning', 'danger', 'info'
+    } = options;
+
+    // Remove existing modal if any
+    const existing = document.getElementById('confirm-dialog-modal');
+    if (existing) existing.remove();
+
+    const icons = {
+        warning: 'alert-triangle',
+        danger: 'trash-2',
+        info: 'help-circle'
+    };
+
+    const modal = document.createElement('div');
+    modal.id = 'confirm-dialog-modal';
+    modal.className = 'modal';
+    modal.innerHTML = `
+        <div class="modal-content confirm-dialog-content confirm-${type}">
+            <div class="modal-header">
+                <h3><i data-lucide="${icons[type] || icons.warning}"></i> ${title}</h3>
+            </div>
+            <div class="modal-body">
+                <p>${message}</p>
+            </div>
+            <div class="modal-footer">
+                <button class="tool-btn" id="confirm-cancel-btn">${cancelText}</button>
+                <button class="tool-btn confirm-action-btn" id="confirm-action-btn">
+                    ${confirmIcon ? `<i data-lucide="${confirmIcon}"></i> ` : ''}${confirmText}
+                </button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons({ nodes: [modal] });
+    }
+
+    const cancelBtn = modal.querySelector('#confirm-cancel-btn');
+    const confirmBtn = modal.querySelector('#confirm-action-btn');
+
+    cancelBtn.addEventListener('click', () => modal.remove());
+
+    confirmBtn.addEventListener('click', () => {
+        modal.remove();
+        if (onConfirm) onConfirm();
+    });
+
+    // Close on click outside
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
+    });
+
+    // Close on Escape
+    const handleEscape = (e) => {
+        if (e.key === 'Escape') {
+            modal.remove();
+            document.removeEventListener('keydown', handleEscape);
+        }
+    };
+    document.addEventListener('keydown', handleEscape);
+
+    // Focus cancel button (safer default)
+    cancelBtn.focus();
+}
+
+// Delete confirmation modal (specific for note panel delete)
+function showDeleteConfirmModal(panelId, annotationId) {
+    // Remove existing modal if any
+    const existingModal = document.getElementById('delete-confirm-modal');
+    if (existingModal) existingModal.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'delete-confirm-modal';
+    modal.className = 'modal';
+    modal.innerHTML = `
+        <div class="modal-content delete-confirm-modal-content">
+            <div class="modal-header">
+                <h3><i data-lucide="alert-triangle"></i> Delete Annotation</h3>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this annotation? This cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="tool-btn" id="delete-cancel-btn">Cancel</button>
+                <button class="tool-btn delete-confirm-btn" id="delete-confirm-btn"><i data-lucide="trash-2"></i> Delete</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Render Lucide icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons({ nodes: [modal] });
+    }
+
+    // Event handlers
+    const cancelBtn = modal.querySelector('#delete-cancel-btn');
+    const confirmBtn = modal.querySelector('#delete-confirm-btn');
+
+    cancelBtn.addEventListener('click', () => {
+        modal.remove();
+    });
+
+    confirmBtn.addEventListener('click', () => {
+        delete annotations[annotationId];
+        saveAnnotationsToStorage();
+        closeNotePanel(panelId);
+        refreshAnnotationsUI();
+        markAnnotatedParagraphs();
+        modal.remove();
+    });
+
+    // Close on click outside
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
+
+    // Close on Escape
+    const handleEscape = (e) => {
+        if (e.key === 'Escape') {
+            modal.remove();
+            document.removeEventListener('keydown', handleEscape);
+        }
+    };
+    document.addEventListener('keydown', handleEscape);
 }
 
 function saveNotePanel(panel) {
@@ -3672,15 +3884,20 @@ function saveNotePanel(panel) {
     refreshAnnotationsUI();
     markAnnotatedParagraphs();
 
-    // Visual feedback
+    // Visual feedback and switch to read-only mode
     const saveBtn = panel.querySelector('.note-panel-save');
-    const originalText = saveBtn.textContent;
+    const editBtn = panel.querySelector('.note-panel-edit');
     saveBtn.textContent = 'Saved!';
     saveBtn.disabled = true;
+
     setTimeout(() => {
-        saveBtn.textContent = originalText;
+        // Switch to read-only mode
+        textarea.setAttribute('readonly', '');
+        saveBtn.textContent = 'Save';
         saveBtn.disabled = false;
-    }, 1000);
+        saveBtn.classList.add('hidden');
+        editBtn.classList.remove('hidden');
+    }, 800);
 }
 
 function getOpenNotePanelsState() {
@@ -3819,12 +4036,16 @@ function refreshAnnotationsUI() {
                     <span class="annotation-para-num">¶${ann.paragraphIndex + 1}</span>
                     <span class="annotation-preview-text">${ann.paragraphPreview}...</span>
                     <span class="annotation-item-actions">
-                        <button class="annotation-action-btn edit-btn" title="Edit annotation">&#9998;</button>
-                        <button class="annotation-action-btn delete-btn" title="Delete annotation">&#128465;</button>
+                        <button class="annotation-action-btn edit-btn" title="Edit annotation"><i data-lucide="pencil"></i></button>
+                        <button class="annotation-action-btn delete-btn" title="Delete annotation"><i data-lucide="trash-2"></i></button>
                     </span>
                 </div>
                 <div class="annotation-item-note">${ann.note.substring(0, 100)}${ann.note.length > 100 ? '...' : ''}</div>
             `;
+            // Render Lucide icons in the new content
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons({ nodes: [item] });
+            }
 
             // Click on item jumps to annotation
             item.addEventListener('click', (e) => {
@@ -4017,7 +4238,7 @@ function markAnnotatedParagraphs() {
             // Add indicator icon
             const indicator = document.createElement('span');
             indicator.className = 'annotation-indicator';
-            indicator.innerHTML = '&#128221;';
+            indicator.innerHTML = '<i data-lucide="sticky-note"></i>';
             indicator.title = 'View/edit annotation';
             indicator.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -4026,6 +4247,10 @@ function markAnnotatedParagraphs() {
 
             // Insert at beginning of paragraph
             para.insertBefore(indicator, para.firstChild);
+            // Render Lucide icon
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons({ nodes: [indicator] });
+            }
         });
     });
 }
@@ -4229,41 +4454,175 @@ function downloadFile(content, filename, mimeType) {
 function importAnnotationsFromFile(file) {
     const reader = new FileReader();
     reader.onload = (e) => {
+        const content = e.target.result;
+        const isMarkdown = file.name.toLowerCase().endsWith('.md');
+
         try {
-            const data = JSON.parse(e.target.result);
-
-            // Import bookmarks
-            if (data.bookmarks && Array.isArray(data.bookmarks)) {
-                data.bookmarks.forEach(b => {
-                    // Check if bookmark with same ID exists
-                    if (!bookmarks.find(existing => existing.id === b.id)) {
-                        bookmarks.push(b);
-                    }
-                });
-                saveBookmarksToStorage();
-                refreshBookmarkUI();
+            if (isMarkdown) {
+                importFromMarkdown(content);
+            } else {
+                importFromJSON(content);
             }
-
-            // Import annotations
-            if (data.annotations && typeof data.annotations === 'object') {
-                Object.entries(data.annotations).forEach(([id, ann]) => {
-                    // Check if annotation with same ID exists
-                    if (!annotations[id]) {
-                        annotations[id] = ann;
-                    }
-                });
-                saveAnnotationsToStorage();
-                refreshAnnotationsUI();
-                markAnnotatedParagraphs();
-            }
-
             alert('Import successful!');
         } catch (error) {
             console.error('Import error:', error);
-            alert('Failed to import file. Please ensure it is a valid JSON export.');
+            alert(`Failed to import file. ${error.message || 'Please ensure it is a valid export file.'}`);
         }
     };
     reader.readAsText(file);
+}
+
+function importFromJSON(content) {
+    const data = JSON.parse(content);
+
+    // Import bookmarks
+    if (data.bookmarks && Array.isArray(data.bookmarks)) {
+        data.bookmarks.forEach(b => {
+            // Check if bookmark with same ID exists
+            if (!bookmarks.find(existing => existing.id === b.id)) {
+                bookmarks.push(b);
+            }
+        });
+        saveBookmarksToStorage();
+        refreshBookmarkUI();
+    }
+
+    // Import annotations
+    if (data.annotations && typeof data.annotations === 'object') {
+        Object.entries(data.annotations).forEach(([id, ann]) => {
+            // Check if annotation with same ID exists
+            if (!annotations[id]) {
+                annotations[id] = ann;
+            }
+        });
+        saveAnnotationsToStorage();
+        refreshAnnotationsUI();
+        markAnnotatedParagraphs();
+    }
+}
+
+function importFromMarkdown(content) {
+    const lines = content.split('\n');
+    let currentSection = null; // 'bookmarks' or 'annotations'
+    let currentVersion = null;
+    let currentChapter = null;
+    let currentParagraphIndex = null;
+    let currentParagraphPreview = null;
+    let currentNote = [];
+    let importedCount = 0;
+
+    // Helper to parse version label back to ID (e.g., "Seed 45443" -> "45443")
+    function parseVersionId(label) {
+        const match = label.match(/Seed\s*(\d+)/i);
+        return match ? match[1] : label;
+    }
+
+    // Helper to parse chapter label back to ID (e.g., "Ch 5" -> "chapter5")
+    function parseChapterId(label) {
+        // Handle "Ch 5" or "Chapter 5" format
+        const chMatch = label.match(/Ch(?:apter)?\s*(\d+)/i);
+        if (chMatch) {
+            return `chapter${chMatch[1]}`;
+        }
+        // Handle special chapters
+        if (label.toLowerCase().includes('part i') && !label.toLowerCase().includes('part ii')) return 'prologue';
+        if (label.toLowerCase().includes('part ii') && !label.toLowerCase().includes('part iii')) return 'part2';
+        if (label.toLowerCase().includes('part iii')) return 'part3';
+        if (label.toLowerCase().includes('prologue')) return 'prologue';
+        if (label.toLowerCase().includes('epilogue')) return 'chapter18';
+        if (label.toLowerCase().includes('notes')) return 'notes';
+        if (label.toLowerCase().includes('introduction')) return 'introduction';
+        return label.toLowerCase().replace(/\s+/g, '');
+    }
+
+    // Save current annotation if we have one
+    function saveCurrentAnnotation() {
+        if (currentVersion && currentChapter && currentParagraphIndex !== null && currentNote.length > 0) {
+            const noteText = currentNote.join('\n').trim();
+            if (noteText) {
+                const id = `annotation-import-${Date.now()}-${importedCount}`;
+                const now = new Date().toISOString();
+                annotations[id] = {
+                    id: id,
+                    created: now,
+                    modified: now,
+                    version: currentVersion,
+                    chapter: currentChapter,
+                    paragraphIndex: currentParagraphIndex,
+                    paragraphPreview: currentParagraphPreview || '',
+                    note: noteText
+                };
+                importedCount++;
+            }
+        }
+        currentNote = [];
+        currentParagraphIndex = null;
+        currentParagraphPreview = null;
+    }
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+
+        // Detect sections
+        if (line.startsWith('## Bookmarks')) {
+            saveCurrentAnnotation();
+            currentSection = 'bookmarks';
+            continue;
+        }
+        if (line.startsWith('## Passage Annotations')) {
+            saveCurrentAnnotation();
+            currentSection = 'annotations';
+            continue;
+        }
+
+        // Skip if not in annotations section (bookmarks import from markdown not supported - use JSON)
+        if (currentSection !== 'annotations') continue;
+
+        // Parse version/chapter header: ### Seed 45443 — Chapter 5
+        if (line.startsWith('### ')) {
+            saveCurrentAnnotation();
+            const headerMatch = line.match(/^###\s+(.+?)\s*[—–-]\s*(.+)$/);
+            if (headerMatch) {
+                currentVersion = parseVersionId(headerMatch[1].trim());
+                currentChapter = parseChapterId(headerMatch[2].trim());
+            }
+            continue;
+        }
+
+        // Parse paragraph line: **Paragraph 12:** "The door creaked..."
+        if (line.startsWith('**Paragraph ')) {
+            saveCurrentAnnotation();
+            const paraMatch = line.match(/^\*\*Paragraph\s+(\d+):\*\*\s*"?(.+?)"?\.{0,3}$/);
+            if (paraMatch) {
+                currentParagraphIndex = parseInt(paraMatch[1]) - 1; // Convert to 0-based
+                currentParagraphPreview = paraMatch[2].replace(/\.{3}$/, '').replace(/"$/, '');
+            }
+            continue;
+        }
+
+        // Skip horizontal rules
+        if (line.trim() === '---') {
+            continue;
+        }
+
+        // Accumulate note content
+        if (currentParagraphIndex !== null && line.trim()) {
+            currentNote.push(line);
+        }
+    }
+
+    // Save final annotation
+    saveCurrentAnnotation();
+
+    if (importedCount > 0) {
+        saveAnnotationsToStorage();
+        refreshAnnotationsUI();
+        markAnnotatedParagraphs();
+    }
+
+    if (importedCount === 0) {
+        throw new Error('No annotations found in the markdown file.');
+    }
 }
 
 function openFilesPanel() {
@@ -5342,6 +5701,11 @@ function handleEPUBUpload(event) {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize Lucide icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+
     initializeTheme();
     setupViewModeButtons();
     loadBookmarksFromStorage();
@@ -5527,7 +5891,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const exportMarkdownBtn = document.getElementById('export-markdown-btn');
     const exportAnnotationsBtn = document.getElementById('export-annotations-btn');
     const importAnnotationsInput = document.getElementById('import-annotations-input');
+    const closeAllNotesBtn = document.getElementById('close-all-notes-btn');
 
+    if (closeAllNotesBtn) {
+        closeAllNotesBtn.addEventListener('click', closeAllNotePanels);
+    }
     if (exportAnnotationsBtn) {
         exportAnnotationsBtn.addEventListener('click', openExportModal);
     }

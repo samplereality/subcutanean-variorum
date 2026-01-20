@@ -26,6 +26,9 @@
     <!-- Stylesheets -->
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="compare.css">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 </head>
 <body>
     <!-- Main Navigation Bar -->
@@ -37,31 +40,31 @@
 
         <div class="nav-links" id="nav-links">
             <button class="nav-item" id="nav-about" title="About this project">
-                <span class="nav-icon">?</span>
+                <i data-lucide="info" class="nav-icon"></i>
                 <span class="nav-label">About</span>
             </button>
             <button class="nav-item" id="nav-bookmarks" title="Saved views">
-                <span class="nav-icon">&#128278;</span>
+                <i data-lucide="bookmark" class="nav-icon"></i>
                 <span class="nav-label">Bookmarks</span>
             </button>
             <button class="nav-item" id="nav-annotations" title="Research notes">
-                <span class="nav-icon">&#128221;</span>
+                <i data-lucide="sticky-note" class="nav-icon"></i>
                 <span class="nav-label">Notes</span>
             </button>
             <button class="nav-item" id="nav-files" title="Upload files">
-                <span class="nav-icon">&#128194;</span>
+                <i data-lucide="folder-open" class="nav-icon"></i>
                 <span class="nav-label">Files</span>
             </button>
             <button class="nav-item" id="nav-source" title="Quant source">
-                <span class="nav-icon">&lt;&gt;</span>
+                <i data-lucide="code" class="nav-icon"></i>
                 <span class="nav-label">Source</span>
             </button>
             <button class="nav-item" id="nav-generate" title="Generate your own copy">
-                <span class="nav-icon">&#128214;</span>
+                <i data-lucide="sparkles" class="nav-icon"></i>
                 <span class="nav-label">Generate</span>
             </button>
             <button class="nav-item theme-toggle" id="theme-toggle" title="Toggle light/dark mode">
-                <span class="theme-icon" id="theme-icon">&#9788;</span>
+                <i data-lucide="sun" class="theme-icon" id="theme-icon"></i>
                 <span class="nav-label" id="theme-label">Light</span>
             </button>
         </div>
@@ -109,10 +112,11 @@
             <div id="annotations-empty" class="annotations-empty">No annotations yet.</div>
             <hr class="bookmark-divider">
             <div class="annotations-actions">
+                <button id="close-all-notes-btn" class="tool-btn" title="Close all open note panels">Close All Notes</button>
                 <button id="export-annotations-btn" class="tool-btn" title="Export all notes">Export Notes</button>
-                <label class="tool-btn" title="Import notes from JSON">
+                <label class="tool-btn" title="Import notes from JSON or Markdown">
                     Import
-                    <input type="file" id="import-annotations-input" accept=".json" style="display: none;">
+                    <input type="file" id="import-annotations-input" accept=".json,.md" style="display: none;">
                 </label>
             </div>
         </div>
@@ -218,7 +222,7 @@
             <div class="modal-header">
                 <h2>Word Differential Analysis</h2>
                 <p id="word-diff-description" class="modal-description"></p>
-                <button id="close-modal-btn" class="close-btn">&times;</button>
+                <button id="close-modal-btn" class="close-btn"><i data-lucide="x"></i></button>
             </div>
             <div class="modal-controls">
                 <label>Sort by:</label>
@@ -247,7 +251,7 @@
 
     <!-- Word Chapter Popup -->
     <div id="word-popup" class="word-popup">
-        <button id="word-popup-close" class="word-popup-close">&times;</button>
+        <button id="word-popup-close" class="word-popup-close"><i data-lucide="x"></i></button>
         <div class="word-popup-header">
             Chapters containing "<span id="popup-word"></span>":
         </div>
@@ -271,7 +275,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Manage Uploaded Versions</h2>
-                <button id="close-manage-modal-btn" class="close-btn">&times;</button>
+                <button id="close-manage-modal-btn" class="close-btn"><i data-lucide="x"></i></button>
             </div>
             <div class="modal-body">
                 <div id="uploads-list" class="uploads-list">
@@ -289,16 +293,16 @@
         <div class="modal-content privacy-notice-content">
             <div class="modal-header">
                 <h2>📁 About File Uploads</h2>
-                <button id="close-privacy-modal-btn" class="close-btn">&times;</button>
+                <button id="close-privacy-modal-btn" class="close-btn"><i data-lucide="x"></i></button>
             </div>
             <div class="modal-body">
                 <p><strong>Your files stay on your device.</strong></p>
                 <p>When you upload a file, it's stored only in your browser's local storage—not on any server. This means:</p>
-                <ul>
-                    <li>✓ Your files are completely private</li>
-                    <li>✓ No data is transmitted over the internet</li>
-                    <li>✓ Only you have access to your uploaded versions</li>
-                    <li>✓ Files persist across browser sessions on this device</li>
+                <ul class="check-list">
+                    <li><i data-lucide="check" class="check-icon"></i> Your files are completely private</li>
+                    <li><i data-lucide="check" class="check-icon"></i> No data is transmitted over the internet</li>
+                    <li><i data-lucide="check" class="check-icon"></i> Only you have access to your uploaded versions</li>
+                    <li><i data-lucide="check" class="check-icon"></i> Files persist across browser sessions on this device</li>
                 </ul>
                 <p class="privacy-note">You can delete uploaded versions anytime using the "Manage Uploads" button.</p>
                 <button id="privacy-understand-btn" class="tool-btn">Got it, proceed with upload</button>
@@ -310,17 +314,17 @@
     <div id="manage-info-modal" class="modal hidden">
         <div class="modal-content privacy-notice-content">
             <div class="modal-header">
-                <h2>📂 About Your Uploads</h2>
-                <button id="close-manage-info-modal-btn" class="close-btn">&times;</button>
+                <h2><i data-lucide="folder-open" class="modal-header-icon"></i> About Your Uploads</h2>
+                <button id="close-manage-info-modal-btn" class="close-btn"><i data-lucide="x"></i></button>
             </div>
             <div class="modal-body">
                 <p><strong>Your uploaded files are stored locally.</strong></p>
                 <p>All versions you've uploaded are stored in your browser's local storage, not on any server:</p>
-                <ul>
-                    <li>✓ Files remain private to this device and browser</li>
-                    <li>✓ No data is transmitted over the internet</li>
-                    <li>✓ You can delete any version at any time</li>
-                    <li>✓ Storage is limited by your browser (typically 5-10 MB)</li>
+                <ul class="check-list">
+                    <li><i data-lucide="check" class="check-icon"></i> Files remain private to this device and browser</li>
+                    <li><i data-lucide="check" class="check-icon"></i> No data is transmitted over the internet</li>
+                    <li><i data-lucide="check" class="check-icon"></i> You can delete any version at any time</li>
+                    <li><i data-lucide="check" class="check-icon"></i> Storage is limited by your browser (typically 5-10 MB)</li>
                 </ul>
                 <p class="privacy-note">Use this manager to view and delete uploaded versions from your browser's storage.</p>
                 <button id="manage-info-understand-btn" class="tool-btn">Got it, show my uploads</button>
@@ -334,7 +338,7 @@
             <div class="annotation-modal-header">
                 <span id="annotation-modal-title" class="annotation-title">Add Note</span>
                 <span id="annotation-location" class="annotation-location"></span>
-                <button id="close-annotation-modal-btn" class="close-btn">&times;</button>
+                <button id="close-annotation-modal-btn" class="close-btn"><i data-lucide="x"></i></button>
             </div>
             <div class="annotation-passage-preview">
                 "<span id="annotation-paragraph-preview"></span>"
@@ -353,7 +357,7 @@
         <div class="modal-content export-modal-content">
             <div class="modal-header">
                 <h2>Export Research Notes</h2>
-                <button id="close-export-modal-btn" class="close-btn">&times;</button>
+                <button id="close-export-modal-btn" class="close-btn"><i data-lucide="x"></i></button>
             </div>
             <div class="modal-body export-modal-body">
                 <p>Export all your bookmarks and annotations for backup or sharing.</p>
@@ -376,7 +380,7 @@
         <div class="modal-content about-modal-content">
             <div class="modal-header">
                 <h2>Subcutanean Variorum</h2>
-                <button id="close-about-modal-btn" class="close-btn">&times;</button>
+                <button id="close-about-modal-btn" class="close-btn"><i data-lucide="x"></i></button>
             </div>
             <div class="modal-body about-modal-body">
                 <h3>Overview</h3>
@@ -414,7 +418,7 @@
         <div class="modal-content generate-modal-content">
             <div class="modal-header">
                 <h2>Generate Your Own <em>Subcutanean</em></h2>
-                <button id="close-generate-modal-btn" class="close-btn">&times;</button>
+                <button id="close-generate-modal-btn" class="close-btn"><i data-lucide="x"></i></button>
             </div>
             <div class="modal-body generate-modal-body">
                 <p>In 2025, Aaron Reed released the source text and code of <em>Subcutanean</em> under a CC-BY 4.0 license. This Creative Commons license means anyone can copy, share, modify, or remix the novel as long as credit is given to Reed.</p>
@@ -467,7 +471,7 @@
             <div class="modal-header">
                 <h2>Jaccard Distance Analysis</h2>
                 <p class="modal-description" style="padding-right: 40px;">Jaccard distance measures vocabulary similarity between texts by comparing their unique word sets. Higher percentages indicate more similar vocabulary.</p>
-                <button id="close-levenshtein-modal-btn" class="close-btn">&times;</button>
+                <button id="close-levenshtein-modal-btn" class="close-btn"><i data-lucide="x"></i></button>
             </div>
             <div class="modal-body">
                 <div class="levenshtein-summary">
@@ -504,7 +508,7 @@
             <div class="modal-header">
                 <h2>Quant Macro Inspector</h2>
                 <p id="macro-inspector-context" class="modal-description"></p>
-                <button id="macro-inspector-close-btn" class="close-btn">&times;</button>
+                <button id="macro-inspector-close-btn" class="close-btn"><i data-lucide="x"></i></button>
             </div>
             <div class="modal-body macro-inspector-body" id="macro-inspector-body"></div>
             <div id="macro-empty-state" class="macro-empty-state hidden">
