@@ -28,6 +28,9 @@ let versionChapterTextCache = {};
 let versionNarrativeStatsCache = {};
 let coreVersionIds = [];
 let narrativeMetricBaselines = null;
+let variableInfo = null; // Variable descriptions and usage patterns
+let variableGroups = null; // Mutually exclusive variable groups for inference
+let variableMacros = null; // Macro definitions for inference
 let sourceSyntaxHighlightingEnabled = false;
 const SOURCE_VERSION_ID = 'quant_source';
 const SOURCE_VERSION_LABEL = 'Source Code';
@@ -353,6 +356,14 @@ function escapeHTML(str) {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
+}
+
+// Lighter escaping for source code display - only escape HTML-significant chars
+function escapeForDisplay(str) {
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
 }
 
 function normalizePlainText(str) {
@@ -1276,6 +1287,7 @@ function populateVersionSelectors() {
             buildChapterNavigation();
             displayComparison();
             updateToolbarVisibility();
+            updateVariableDiffIfVisible();
         });
         selectorA.dataset.hasListener = 'true';
     }
@@ -1286,8 +1298,376 @@ function populateVersionSelectors() {
             buildChapterNavigation();
             displayComparison();
             updateToolbarVisibility();
+            updateVariableDiffIfVisible();
         });
         selectorB.dataset.hasListener = 'true';
+    }
+}
+
+function updateVariableDiffIfVisible() {
+    const panel = document.getElementById('variable-diff-panel');
+    if (panel && !panel.classList.contains('hidden')) {
+        updateVariableDiff();
+    }
+}
+
+// Variable diff panel functions
+function getVersionVariables(versionId) {
+    if (!versionId) return [];
+
+    // First check allVersions (pre-loaded seeds)
+    if (allVersions && allVersions[versionId]?.variables) {
+        return allVersions[versionId].variables;
+    }
+
+    // Then check customVersions (uploaded EPUBs with inferred variables)
+    if (customVersions && customVersions[versionId]?.variables) {
+        return customVersions[versionId].variables;
+    }
+
+    return [];
+}
+
+function updateVariableDiff() {
+    const varsOnlyA = document.getElementById('vars-only-a');
+    const varsOnlyB = document.getElementById('vars-only-b');
+    const varsShared = document.getElementById('vars-shared');
+    const labelA = document.getElementById('var-diff-a-label');
+    const labelB = document.getElementById('var-diff-b-label');
+
+    if (!varsOnlyA || !varsOnlyB || !varsShared) return;
+
+    const varsA = new Set(getVersionVariables(versionA));
+    const varsB = new Set(getVersionVariables(versionB));
+
+    // Update labels
+    if (labelA) labelA.textContent = versionA || 'A';
+    if (labelB) labelB.textContent = versionB || 'B';
+
+    // Calculate differences
+    const onlyInA = [...varsA].filter(v => !varsB.has(v)).sort();
+    const onlyInB = [...varsB].filter(v => !varsA.has(v)).sort();
+    const shared = [...varsA].filter(v => varsB.has(v)).sort();
+
+    // Render variable tags with tooltips and click handlers
+    const renderVars = (vars) => {
+        if (vars.length === 0) return '<span class="var-list-empty">none</span>';
+        return vars.map(v => {
+            const info = variableInfo ? variableInfo[v] : null;
+            const description = info?.description || 'No description available';
+            const chapters = info?.chapters || [];
+            const inCurrentChapter = chapters.includes(currentChapter);
+            const chapterHint = inCurrentChapter ? ' (used in this chapter)' : '';
+            const clickable = inCurrentChapter ? 'var-tag-clickable' : '';
+            return `<span class="var-tag ${clickable}" data-var="${v}" data-tooltip="${escapeHtml(description)}${chapterHint}">${v}</span>`;
+        }).join('');
+    };
+
+    varsOnlyA.innerHTML = renderVars(onlyInA);
+    varsOnlyB.innerHTML = renderVars(onlyInB);
+    varsShared.innerHTML = renderVars(shared);
+
+    // Add click handlers for variable highlighting
+    document.querySelectorAll('.var-tag-clickable').forEach(tag => {
+        tag.addEventListener('click', () => {
+            const varName = tag.dataset.var;
+            highlightVariableText(varName);
+        });
+    });
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML.replace(/"/g, '&quot;');
+}
+
+// Track the currently highlighted variable for source viewing
+let currentHighlightedVar = null;
+
+function highlightVariableText(varName) {
+    // Clear any existing variable highlights and source buttons
+    document.querySelectorAll('.var-highlight').forEach(el => {
+        el.classList.remove('var-highlight');
+    });
+    document.querySelectorAll('.var-source-btn').forEach(el => {
+        el.remove();
+    });
+    closeVariableSourcePanel();
+
+    if (!variableInfo || !variableInfo[varName]) {
+        showNotification(`No pattern info available for variable "${varName}"`, 'info');
+        return;
+    }
+
+    const info = variableInfo[varName];
+    const patterns = info.patterns?.[currentChapter] || [];
+
+    if (patterns.length === 0) {
+        showNotification(`Variable "${varName}" has no text patterns in this chapter`, 'info');
+        return;
+    }
+
+    currentHighlightedVar = varName;
+
+    // Find paragraphs that contain any of the patterns
+    // Match all paragraph types across different view modes:
+    // - p elements in unified/side-by-side/diff views
+    // - .comparison-paragraph in comparison view
+    // - .source-paragraph in source view
+    const container = document.getElementById('comparison-display');
+    if (!container) {
+        showNotification('Could not find comparison display', 'error');
+        return;
+    }
+    const paragraphs = container.querySelectorAll('p, .comparison-paragraph, .source-paragraph');
+    let matchCount = 0;
+    let firstMatch = null;
+
+    paragraphs.forEach(para => {
+        const text = para.textContent || '';
+        const hasMatch = patterns.some(pattern => {
+            // Clean up pattern and check if paragraph contains it
+            const cleanPattern = pattern.replace(/\s+/g, ' ').trim();
+            const cleanText = text.replace(/\s+/g, ' ');
+            // Use substring matching (patterns may be truncated)
+            return cleanText.includes(cleanPattern.substring(0, 50));
+        });
+
+        if (hasMatch) {
+            para.classList.add('var-highlight');
+            matchCount++;
+            if (!firstMatch) firstMatch = para;
+
+            // Add a "View Source" button to the highlighted paragraph
+            addViewSourceButton(para, varName);
+        }
+    });
+
+    if (matchCount > 0) {
+        showNotification(`Highlighted ${matchCount} paragraph${matchCount > 1 ? 's' : ''} affected by "${varName}" - click the code icon to view source`, 'success');
+        if (firstMatch) {
+            firstMatch.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    } else {
+        showNotification(`Could not find text matching "${varName}" patterns in this chapter`, 'info');
+    }
+}
+
+function addViewSourceButton(paragraph, varName) {
+    // Make the paragraph position relative if not already
+    const currentPosition = window.getComputedStyle(paragraph).position;
+    if (currentPosition === 'static') {
+        paragraph.style.position = 'relative';
+    }
+
+    const btn = document.createElement('button');
+    btn.className = 'var-source-btn';
+    btn.innerHTML = '<i data-lucide="file-code"></i>';
+    btn.title = `View Quant source for @${varName}`;
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showVariableSourcePanel(varName, paragraph);
+    });
+    paragraph.appendChild(btn);
+
+    // Initialize the Lucide icon
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons({ nodes: [btn] });
+    }
+}
+
+function findVariableSourceSnippet(varName) {
+    // Get the source key for the current chapter
+    const sourceKey = SOURCE_KEY_BY_CHAPTER[currentChapter];
+    if (!sourceKey || !originSources || !originSources.chapters[sourceKey]) {
+        return null;
+    }
+
+    const sourceContent = originSources.chapters[sourceKey].content;
+    if (!sourceContent) return null;
+
+    // Find lines containing the variable conditional
+    const lines = sourceContent.split('\n');
+    const snippets = [];
+
+    // Pattern to match variable conditionals: [@varname> or [^@varname> or [*tag*@varname>
+    const varPattern = new RegExp(`\\[(?:\\*\\w+\\*)?[\\^]?@${varName}>`, 'i');
+
+    for (let i = 0; i < lines.length; i++) {
+        if (varPattern.test(lines[i])) {
+            // Get context: 1 line before and 2 lines after
+            const start = Math.max(0, i - 1);
+            const end = Math.min(lines.length, i + 3);
+            const snippet = lines.slice(start, end).join('\n');
+            snippets.push({
+                lineNumber: i + 1,
+                snippet: snippet
+            });
+        }
+    }
+
+    // Also check globals.txt for macro definitions that use this variable
+    if (originSources.chapters['globals']) {
+        const globalsContent = originSources.chapters['globals'].content;
+        const globalsLines = globalsContent.split('\n');
+
+        for (let i = 0; i < globalsLines.length; i++) {
+            const line = globalsLines[i];
+            // Check for MACRO definitions containing this variable
+            if (line.includes('[MACRO') && line.includes(`@${varName}`)) {
+                snippets.push({
+                    lineNumber: i + 1,
+                    snippet: line,
+                    isGlobal: true
+                });
+            }
+            // Check for DEFINE statements with this variable
+            if (line.includes('[DEFINE') && line.includes(`@${varName}`)) {
+                // Get preceding comment for context
+                let contextStart = i;
+                while (contextStart > 0 && globalsLines[contextStart - 1].startsWith('#')) {
+                    contextStart--;
+                }
+                const snippet = globalsLines.slice(contextStart, i + 1).join('\n');
+                snippets.push({
+                    lineNumber: contextStart + 1,
+                    snippet: snippet,
+                    isGlobal: true,
+                    isDefinition: true
+                });
+            }
+        }
+    }
+
+    return snippets.length > 0 ? snippets : null;
+}
+
+function showVariableSourcePanel(varName, anchorElement) {
+    closeVariableSourcePanel();
+
+    const snippets = findVariableSourceSnippet(varName);
+    if (!snippets || snippets.length === 0) {
+        showNotification(`No source found for @${varName} in this chapter`, 'info');
+        return;
+    }
+
+    const panel = document.createElement('div');
+    panel.className = 'var-source-panel';
+    panel.id = 'var-source-panel';
+
+    // Build the content
+    let html = `
+        <div class="var-source-header">
+            <span class="var-source-title">Source: <code>@${varName}</code></span>
+            <button class="var-source-close" title="Close">&times;</button>
+        </div>
+        <div class="var-source-body">
+    `;
+
+    // Group snippets by source file
+    const globalSnippets = snippets.filter(s => s.isGlobal);
+    const chapterSnippets = snippets.filter(s => !s.isGlobal);
+
+    if (globalSnippets.length > 0) {
+        const defSnippets = globalSnippets.filter(s => s.isDefinition);
+        const macroSnippets = globalSnippets.filter(s => !s.isDefinition);
+
+        if (defSnippets.length > 0) {
+            html += `<div class="var-source-section"><span class="var-source-label">Definition (globals.txt):</span>`;
+            defSnippets.forEach(s => {
+                // highlightQuantSyntax handles escaping internally
+                html += `<pre class="var-source-code">${highlightQuantSyntax(s.snippet)}</pre>`;
+            });
+            html += `</div>`;
+        }
+
+        if (macroSnippets.length > 0) {
+            html += `<div class="var-source-section"><span class="var-source-label">Macro usage (globals.txt):</span>`;
+            macroSnippets.forEach(s => {
+                html += `<pre class="var-source-code">${highlightQuantSyntax(s.snippet)}</pre>`;
+            });
+            html += `</div>`;
+        }
+    }
+
+    if (chapterSnippets.length > 0) {
+        const sourceKey = SOURCE_KEY_BY_CHAPTER[currentChapter];
+        html += `<div class="var-source-section"><span class="var-source-label">Chapter source (${sourceKey}.txt):</span>`;
+        chapterSnippets.forEach(s => {
+            html += `<pre class="var-source-code">${highlightQuantSyntax(s.snippet)}</pre>`;
+        });
+        html += `</div>`;
+    }
+
+    html += `</div>`;
+    panel.innerHTML = html;
+
+    // Position the panel near the anchor element
+    document.body.appendChild(panel);
+
+    const closeBtn = panel.querySelector('.var-source-close');
+    closeBtn.addEventListener('click', closeVariableSourcePanel);
+
+    // Position panel below the anchor
+    const rect = anchorElement.getBoundingClientRect();
+    const panelRect = panel.getBoundingClientRect();
+
+    let top = rect.bottom + window.scrollY + 10;
+    let left = rect.left + window.scrollX;
+
+    // Keep panel within viewport
+    if (left + panelRect.width > window.innerWidth - 20) {
+        left = window.innerWidth - panelRect.width - 20;
+    }
+    if (left < 20) left = 20;
+
+    panel.style.top = `${top}px`;
+    panel.style.left = `${left}px`;
+
+    // Close when clicking outside
+    setTimeout(() => {
+        document.addEventListener('click', handleSourcePanelOutsideClick);
+    }, 100);
+}
+
+function handleSourcePanelOutsideClick(e) {
+    const panel = document.getElementById('var-source-panel');
+    if (panel && !panel.contains(e.target) && !e.target.classList.contains('var-source-btn')) {
+        closeVariableSourcePanel();
+    }
+}
+
+function closeVariableSourcePanel() {
+    const panel = document.getElementById('var-source-panel');
+    if (panel) {
+        panel.remove();
+    }
+    document.removeEventListener('click', handleSourcePanelOutsideClick);
+}
+
+function toggleVariablePanel() {
+    const panel = document.getElementById('variable-diff-panel');
+    const btn = document.getElementById('show-vars-btn');
+
+    if (!panel) return;
+
+    const isHidden = panel.classList.contains('hidden');
+    panel.classList.toggle('hidden', !isHidden);
+
+    if (btn) {
+        btn.classList.toggle('active', isHidden);
+    }
+
+    if (isHidden) {
+        updateVariableDiff();
+    }
+}
+
+function initializeVariablePanel() {
+    const btn = document.getElementById('show-vars-btn');
+    if (btn) {
+        btn.addEventListener('click', toggleVariablePanel);
     }
 }
 
@@ -1351,6 +1731,7 @@ function buildChapterNavigation() {
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
             displayComparison();
+            updateVariableDiffIfVisible();
         });
 
         nav.appendChild(button);
@@ -5022,6 +5403,129 @@ async function loadOriginSources() {
     }
 }
 
+async function loadVariableInfo() {
+    try {
+        const response = await fetch('extracted_text/variable_info.json');
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        const data = await response.json();
+        // Handle new structure with variables, groups, and macros
+        if (data.variables) {
+            variableInfo = data.variables;
+            variableGroups = data.groups || [];
+            variableMacros = data.macros || {};
+        } else {
+            // Fallback for old format (direct variable dict)
+            variableInfo = data;
+            variableGroups = [];
+            variableMacros = {};
+        }
+        console.log(`Loaded info for ${Object.keys(variableInfo).length} variables, ${variableGroups.length} groups`);
+    } catch (error) {
+        console.error('Error loading variable info:', error);
+        variableInfo = null;
+        variableGroups = [];
+        variableMacros = {};
+    }
+}
+
+/**
+ * Infer which variables are active in an uploaded EPUB based on text patterns.
+ * This allows the Variables panel to work even with user-uploaded books.
+ *
+ * @param {Object} chapters - Object mapping chapter IDs to arrays of paragraphs
+ * @returns {Array} - List of inferred variable names
+ */
+function inferVariablesFromText(chapters) {
+    if (!variableInfo || !variableGroups) {
+        console.warn('Variable info not loaded, cannot infer variables');
+        return [];
+    }
+
+    const inferredVars = [];
+    const allText = {};
+
+    // Build searchable text for each chapter
+    for (const [chapterId, paragraphs] of Object.entries(chapters)) {
+        if (Array.isArray(paragraphs)) {
+            // Strip HTML tags for pattern matching
+            allText[chapterId] = paragraphs.map(p =>
+                p.replace(/<[^>]+>/g, '').toLowerCase()
+            ).join(' ');
+        }
+    }
+    const fullText = Object.values(allText).join(' ');
+
+    // Process each variable group (mutually exclusive alternatives)
+    for (const group of variableGroups) {
+        if (!group.variables || group.variables.length < 2) continue;
+
+        let bestMatch = null;
+        let bestScore = 0;
+
+        for (const varName of group.variables) {
+            const info = variableInfo[varName];
+            if (!info || !info.patterns) continue;
+
+            // Count pattern matches across all chapters
+            let score = 0;
+            for (const [chapterId, patterns] of Object.entries(info.patterns)) {
+                const chapterText = allText[chapterId] || fullText;
+                for (const pattern of patterns) {
+                    // Normalize pattern for matching
+                    const normalizedPattern = pattern
+                        .replace(/<[^>]+>/g, '')
+                        .toLowerCase()
+                        .trim();
+
+                    if (normalizedPattern.length >= 10 && chapterText.includes(normalizedPattern)) {
+                        score += normalizedPattern.length; // Longer matches = higher confidence
+                    }
+                }
+            }
+
+            if (score > bestScore) {
+                bestScore = score;
+                bestMatch = varName;
+            }
+        }
+
+        if (bestMatch) {
+            inferredVars.push(bestMatch);
+        }
+    }
+
+    // Check optional variables (those with ^@ prefix in DEFINE)
+    for (const [varName, info] of Object.entries(variableInfo)) {
+        if (!info.optional || !info.patterns) continue;
+
+        // Check if any patterns match
+        let found = false;
+        for (const [chapterId, patterns] of Object.entries(info.patterns)) {
+            const chapterText = allText[chapterId] || fullText;
+            for (const pattern of patterns) {
+                const normalizedPattern = pattern
+                    .replace(/<[^>]+>/g, '')
+                    .toLowerCase()
+                    .trim();
+
+                if (normalizedPattern.length >= 10 && chapterText.includes(normalizedPattern)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (found) break;
+        }
+
+        if (found) {
+            inferredVars.push(varName);
+        }
+    }
+
+    console.log(`Inferred ${inferredVars.length} variables from uploaded text:`, inferredVars);
+    return inferredVars;
+}
 
 function saveCustomVersions() {
     try {
@@ -5186,11 +5690,15 @@ async function processEPUBFile(file) {
             return;
         }
 
+        // Infer variables from the uploaded text
+        const inferredVariables = inferVariablesFromText(versionData);
+
         // Store in custom versions
         customVersions[versionId] = {
             name: `Seed ${versionId}`,
             data: versionData,
-            uploadDate: new Date().toISOString()
+            uploadDate: new Date().toISOString(),
+            variables: inferredVariables
         };
 
         // Merge into allVersions
@@ -5649,11 +6157,15 @@ async function processTextFile(file) {
             return;
         }
 
+        // Infer variables from the uploaded text
+        const inferredVariables = inferVariablesFromText(versionData);
+
         // Store in custom versions
         customVersions[versionId] = {
             name: `Seed ${versionId}`,
             data: versionData,
-            uploadDate: new Date().toISOString()
+            uploadDate: new Date().toISOString(),
+            variables: inferredVariables
         };
 
         // Merge into allVersions
@@ -5733,8 +6245,10 @@ document.addEventListener('DOMContentLoaded', () => {
     setupParagraphClickHandlers();
     loadAllVersions();
     loadOriginSources();
+    loadVariableInfo();
     initializeNavigation();
     initializeGenerateForm();
+    initializeVariablePanel();
 
     // Theme toggle event listener
     const themeToggle = document.getElementById('theme-toggle');

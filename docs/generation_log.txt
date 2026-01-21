@@ -1,0 +1,274 @@
+*** makeBook 60001 ****************************
+
+Reading manifest 'chapters/full-book-manifest.txt'
+Reading file 'chapters/end-altscene.txt'
+Reading file 'chapters/end-stats.txt'
+Reading file 'chapters/end-backers.txt'
+Reading file 'chapters/end-abouttheauthor.txt'
+
+vars: ['alcohol', 'avoidme', 'bubbles', 'cdrom', 'ch12light', 'ch12pantry', 'ch13open1', 'ch1stairs', 'ch8intro1', 'ch9wei', 'clubintro', 'colorseq3', 'dadphone', 'dislikesimile', 'dustyroom', 'empty', 'epi_group1b', 'epi_group2d', 'facingback', 'favdelany', 'ffchandelier', 'ffdropoff', 'fftube', 'fridgetunnel', 'gardens', 'gayniko', 'livejournal', 'neithersubjnorobj', 'nikoblackout', 'noalitpref', 'noch8extra', 'noslangpref', 'octagon', 'optimist', 'rooftop', 'ryanandniko', 'shamfriends', 'songlyric', 'spiralhall', 'tables', 'thebasement', 'wordy']
+
+
+*** makeBook 60002 ****************************
+
+Reading manifest 'chapters/full-book-manifest.txt'
+Reading file 'chapters/end-altscene.txt'
+Reading file 'chapters/end-stats.txt'
+Reading file 'chapters/end-backers.txt'
+Reading file 'chapters/end-abouttheauthor.txt'
+
+vars: ['', 'alliteration', 'avoiddialogue', 'bradphone', 'bubbles', 'canyons', 'ch12light', 'ch12pantry', 'ch13open2', 'ch1staircase', 'ch8intro2', 'clubintro', 'colorseq1', 'dustyroom', 'epi_group1b', 'epi_group2d', 'facingback', 'favcrowley', 'ffbookshelves', 'ffdropoff', 'ffset', 'fridgetunnel', 'furnished', 'gayniko', 'gorilla', 'justryan', 'likesimile', 'lingermen', 'livejournal', 'nikoblackout', 'objective', 'optimist', 'pentagon', 'slang', 'songlyric', 'spiralhall', 'stageladder', 'tables', 'tapetooshort', 'thecity', 'vortex', 'wordy']
+
+
+*** makeBook 60003 ****************************
+
+Reading manifest 'chapters/full-book-manifest.txt'
+Reading file 'chapters/end-altscene.txt'
+Reading file 'chapters/end-stats.txt'
+Reading file 'chapters/end-backers.txt'
+Reading file 'chapters/end-abouttheauthor.txt'
+
+vars: ['', 'acceptedlove', 'alcohol', 'alliteration', 'avoiddialogue', 'bigwords', 'ch12ducts', 'ch12light', 'ch13open2', 'ch1staircase', 'ch8intro1', 'ch9wei', 'colorseq3', 'dadphone', 'diary', 'dustyroom', 'empty', 'epi_group1b', 'epi_group2a', 'facingforward', 'favbarker', 'ffchandelier', 'ffthewalls', 'fftube', 'fridgetrapped', 'gardens', 'gayniko', 'gorilla', 'hexagon', 'justniko', 'likesimile', 'makeupintro', 'neithersubjnorobj', 'nikoblackout', 'nikofalls', 'noch8extra', 'nopolaritypref', 'noslangpref', 'noverbositypref', 'shadows', 'shamfriends', 'songlyric', 'tables', 'tapetooshort', 'thebasement', 'thoreaujoke']
+
+
+*** makeBook 60004 ****************************
+
+Reading manifest 'chapters/full-book-manifest.txt'
+Reading file 'chapters/end-altscene.txt'
+Reading file 'chapters/end-stats.txt'
+Reading file 'chapters/end-backers.txt'
+Reading file 'chapters/end-abouttheauthor.txt'
+
+vars: ['acceptedlove', 'alcohol', 'alliteration', 'avoidme', 'bigwords', 'bossf', 'bradphone', 'cdrom', 'ch12ducts', 'ch12light', 'ch13open1', 'ch1stairs', 'ch1stinger', 'ch8intro1', 'colorseq1', 'depressive', 'diary', 'empty', 'epi_group1a', 'epi_group2b', 'facingback', 'favbarker', 'ffbookshelves', 'ffdropoff', 'fftube', 'fridgetrapped', 'gardens', 'gayniko', 'hamsterwheel', 'hexagon', 'justryan', 'lingerers', 'makeupintro', 'movieline', 'nikoblackout', 'nikofalls', 'nosimilepref', 'noslangpref', 'rooftop', 'shadows', 'sofas', 'subjective', 'thecity', 'wordy']
+
+
+*** makeBook 60005 ****************************
+
+Reading manifest 'chapters/full-book-manifest.txt'
+Reading file 'chapters/end-altscene.txt'
+Reading file 'chapters/end-stats.txt'
+Reading file 'chapters/end-backers.txt'
+Reading file 'chapters/end-abouttheauthor.txt'
+
+vars: ['acceptedlove', 'bossf', 'bubbles', 'ch12pantry', 'ch13open1', 'ch1staircase', 'ch1stinger', 'ch8intro1', 'ch9wei', 'colorseq3', 'convopit', 'dadphone', 'epi_group1a', 'epi_group2d', 'facingforward', 'favbarker', 'ffbookshelves', 'ffdropoff', 'ffset', 'fridgetrapped', 'furnished', 'gayniko', 'gorilla', 'gunsignal', 'likesimile', 'livejournal', 'makeupintro', 'midterm', 'mockeries', 'neithersubjnorobj', 'noalliteration', 'noch8extra', 'noslangpref', 'optimist', 'pentagon', 'possibles', 'ryanandniko', 'songlyric', 'spiralhall', 'succinct', 'tables', 'tapetooshort', 'thebasement', 'vortex']
+
+
+*** makeBook 60006 ****************************
+
+Reading manifest 'chapters/full-book-manifest.txt'
+Reading file 'chapters/end-altscene.txt'
+Reading file 'chapters/end-stats.txt'
+Reading file 'chapters/end-backers.txt'
+Reading file 'chapters/end-abouttheauthor.txt'
+
+vars: ['alliteration', 'avoiddialogue', 'bossf', 'bradphone', 'cdrom', 'ch12pantry', 'ch13open1', 'ch1stairs', 'ch8intro2', 'clubintro', 'colorseq2', 'depressive', 'diary', 'empty', 'epi_group1a', 'epi_group2a', 'facingback', 'favbarker', 'ffchandelier', 'ffdropoff', 'ffset', 'firmniko', 'formal', 'fridgetunnel', 'hexagon', 'justniko', 'likenesses', 'movieline', 'neithersubjnorobj', 'nikoblackout', 'nikofalls', 'noch8extra', 'nosimilepref', 'rooftop', 'shadows', 'snakeoil', 'tables', 'thecity', 'thoreaujoke', 'wordy']
+
+
+*** makeBook 60007 ****************************
+
+Reading manifest 'chapters/full-book-manifest.txt'
+Reading file 'chapters/end-altscene.txt'
+Reading file 'chapters/end-stats.txt'
+Reading file 'chapters/end-backers.txt'
+Reading file 'chapters/end-abouttheauthor.txt'
+
+vars: ['', 'cdrom', 'ch12pantry', 'ch13open1', 'ch1staircase', 'ch8intro2', 'ch9wei', 'clubintro', 'colorseq2', 'dadphone', 'diary', 'dustyroom', 'empty', 'epi_group1c', 'epi_group2b', 'facingback', 'favdelany', 'ffbookshelves', 'ffset', 'ffthewalls', 'firmniko', 'formal', 'fridgetrapped', 'gunsignal', 'midterm', 'mockups', 'movieline', 'neithersubjnorobj', 'nikofalls', 'noalliteration', 'nopolaritypref', 'nosimilepref', 'pentagon', 'possibles', 'rooftop', 'ryanandniko', 'shadows', 'snakeoil', 'sofas', 'stageladder', 'thecity', 'wordy']
+
+
+*** makeBook 60008 ****************************
+
+Reading manifest 'chapters/full-book-manifest.txt'
+Reading file 'chapters/end-altscene.txt'
+Reading file 'chapters/end-stats.txt'
+Reading file 'chapters/end-backers.txt'
+Reading file 'chapters/end-abouttheauthor.txt'
+
+vars: ['alcohol', 'alliteration', 'avoiddialogue', 'avoidme', 'bigwords', 'bossf', 'canyons', 'cdrom', 'ch12pantry', 'ch13open1', 'ch1stairs', 'ch1stinger', 'ch8intro3', 'ch9wei', 'clubintro', 'colorseq2', 'dadphone', 'dustyroom', 'empty', 'epi_group1a', 'epi_group2a', 'facingback', 'favdelany', 'ffchandelier', 'ffthewalls', 'fftube', 'firmniko', 'fridgetrapped', 'gardens', 'gunsignal', 'hamsterwheel', 'justniko', 'livejournal', 'mimeos', 'movieline', 'neithersubjnorobj', 'nikofalls', 'nopolaritypref', 'nosimilepref', 'noslangpref', 'pentagon', 'rooftop', 'shadows', 'sofas', 'succinct', 'thebasement']
+
+
+*** makeBook 60009 ****************************
+
+Reading manifest 'chapters/full-book-manifest.txt'
+Reading file 'chapters/end-altscene.txt'
+Reading file 'chapters/end-stats.txt'
+Reading file 'chapters/end-backers.txt'
+Reading file 'chapters/end-abouttheauthor.txt'
+
+vars: ['alliteration', 'avoidme', 'bradphone', 'canyons', 'ch12pantry', 'ch13open2', 'ch1staircase', 'ch1stinger', 'ch8intro2', 'clubintro', 'colorseq1', 'diary', 'dislikesimile', 'dustyroom', 'empty', 'epi_group1d', 'epi_group2b', 'facingback', 'favdelany', 'ffchandelier', 'ffthewalls', 'fftube', 'formal', 'fridgetrapped', 'gayniko', 'gorilla', 'gunsignal', 'justniko', 'mimickers', 'neithersubjnorobj', 'nikoblackout', 'nikofalls', 'nopolaritypref', 'pentagon', 'possibles', 'rooftop', 'shadows', 'songlyric', 'stageladder', 'succinct', 'tables', 'thecity', 'vortex']
+
+
+*** makeBook 60010 ****************************
+
+Reading manifest 'chapters/full-book-manifest.txt'
+Reading file 'chapters/end-altscene.txt'
+Reading file 'chapters/end-stats.txt'
+Reading file 'chapters/end-backers.txt'
+Reading file 'chapters/end-abouttheauthor.txt'
+
+vars: ['alcohol', 'bigwords', 'caves', 'ch12ducts', 'ch13open1', 'ch1stairs', 'ch1stinger', 'ch8intro3', 'ch9wei', 'colorseq3', 'dadphone', 'dislikesimile', 'dustyroom', 'empty', 'epi_group1a', 'epi_group2a', 'facingforward', 'favcrowley', 'ffbookshelves', 'ffthewalls', 'fftubeweird', 'fridgetunnel', 'gorilla', 'justniko', 'livejournal', 'midterm', 'mockups', 'neithersubjnorobj', 'nikoblackout', 'nikofalls', 'noalitpref', 'noodlesintro', 'noslangpref', 'noverbositypref', 'octagon', 'optimist', 'originalniko', 'shadows', 'songlyric', 'stageladder', 'tables', 'tapetooshort', 'thebasement']
+
+
+*** makeBook 60011 ****************************
+
+Reading manifest 'chapters/full-book-manifest.txt'
+Reading file 'chapters/end-altscene.txt'
+Reading file 'chapters/end-stats.txt'
+Reading file 'chapters/end-backers.txt'
+Reading file 'chapters/end-abouttheauthor.txt'
+
+vars: ['', 'alcohol', 'avoiddialogue', 'bigwords', 'bossf', 'bradphone', 'canyons', 'caricatures', 'cdrom', 'ch12pantry', 'ch13open1', 'ch1staircase', 'ch1stinger', 'ch8intro3', 'ch9wei', 'colorseq2', 'dustyroom', 'empty', 'epi_group1b', 'epi_group2b', 'facingback', 'favcrowley', 'ffbookshelves', 'ffthewalls', 'fftube', 'firmniko', 'fridgetunnel', 'gardens', 'hamsterwheel', 'likesimile', 'livejournal', 'makeupintro', 'movieline', 'nikoblackout', 'noalliteration', 'nopolaritypref', 'noslangpref', 'noverbositypref', 'objective', 'octagon', 'rooftop', 'ryanandniko', 'shadows', 'spiralhall', 'tables', 'thebasement']
+
+
+*** makeBook 60012 ****************************
+
+Reading manifest 'chapters/full-book-manifest.txt'
+Reading file 'chapters/end-altscene.txt'
+Reading file 'chapters/end-stats.txt'
+Reading file 'chapters/end-backers.txt'
+Reading file 'chapters/end-abouttheauthor.txt'
+
+vars: ['', 'alcohol', 'avoiddialogue', 'bigwords', 'bossf', 'bubbles', 'caves', 'cdrom', 'ch12ducts', 'ch12light', 'ch13open1', 'ch1stairs', 'ch8intro3', 'clubintro', 'colorseq2', 'dadphone', 'diary', 'dustyroom', 'epi_group1b', 'epi_group2d', 'facingforward', 'favbarker', 'ffbookshelves', 'ffdropoff', 'fftubeweird', 'formal', 'fridgetrapped', 'furnished', 'husks', 'justryan', 'likesimile', 'movieline', 'nikoblackout', 'nikofalls', 'noalitpref', 'noch8extra', 'noverbositypref', 'objective', 'optimist', 'originalniko', 'pentagon', 'tables', 'tapetooshort', 'thebasement']
+
+
+*** makeBook 60013 ****************************
+
+Reading manifest 'chapters/full-book-manifest.txt'
+Reading file 'chapters/end-altscene.txt'
+Reading file 'chapters/end-stats.txt'
+Reading file 'chapters/end-backers.txt'
+Reading file 'chapters/end-abouttheauthor.txt'
+
+vars: ['', 'alliteration', 'bigwords', 'bubbles', 'cdrom', 'ch12ducts', 'ch12light', 'ch13open1', 'ch1staircase', 'ch8intro3', 'colorseq3', 'dadphone', 'depressive', 'dustyroom', 'epi_group1a', 'epi_group2d', 'facingback', 'favbarker', 'ffbookshelves', 'ffdropoff', 'fftube', 'firmniko', 'fridgetrapped', 'furnished', 'justryan', 'livejournal', 'midterm', 'nikoblackout', 'nikofalls', 'noch8extra', 'noodlesintro', 'nosimilepref', 'noverbositypref', 'objective', 'octagon', 'rooftop', 'shamfriends', 'slang', 'snakeoil', 'sofas', 'songlyric', 'tapetooshort', 'thecity']
+
+
+*** makeBook 60014 ****************************
+
+Reading manifest 'chapters/full-book-manifest.txt'
+Reading file 'chapters/end-altscene.txt'
+Reading file 'chapters/end-stats.txt'
+Reading file 'chapters/end-backers.txt'
+Reading file 'chapters/end-abouttheauthor.txt'
+
+vars: ['acceptedlove', 'avoidme', 'bradphone', 'bubbles', 'canyons', 'ch12light', 'ch12pantry', 'ch13open1', 'ch1stairs', 'ch1stinger', 'ch8intro3', 'ch9wei', 'colorseq2', 'diary', 'empty', 'epi_group1b', 'epi_group2c', 'facingforward', 'favcrowley', 'ffbookshelves', 'ffthewalls', 'fftube', 'firmniko', 'fridgetrapped', 'gardens', 'gorilla', 'likesimile', 'makeupintro', 'mimeos', 'movieline', 'nikofalls', 'noalliteration', 'noslangpref', 'objective', 'optimist', 'pentagon', 'ryanandniko', 'sofas', 'stageladder', 'succinct', 'tapetooshort', 'thecity']
+
+
+*** makeBook 60015 ****************************
+
+Reading manifest 'chapters/full-book-manifest.txt'
+Reading file 'chapters/end-altscene.txt'
+Reading file 'chapters/end-stats.txt'
+Reading file 'chapters/end-backers.txt'
+Reading file 'chapters/end-abouttheauthor.txt'
+
+vars: ['', 'avoiddialogue', 'bigwords', 'bossf', 'bradphone', 'canyons', 'ch12ducts', 'ch13open1', 'ch1stairs', 'ch1stinger', 'ch8intro1', 'ch9wei', 'clubintro', 'colorseq1', 'empty', 'epi_group1a', 'epi_group2c', 'facingforward', 'favdelany', 'ffbookshelves', 'ffdropoff', 'fftube', 'fridgetunnel', 'gayniko', 'gorilla', 'justniko', 'livejournal', 'midterm', 'mimeos', 'neithersubjnorobj', 'noalliteration', 'nosimilepref', 'noslangpref', 'noverbositypref', 'optimist', 'pentagon', 'possibles', 'shadows', 'sofas', 'songlyric', 'spiralhall', 'stageladder', 'thebasement', 'vortex']
+
+
+*** makeBook 60016 ****************************
+
+Reading manifest 'chapters/full-book-manifest.txt'
+Reading file 'chapters/end-altscene.txt'
+Reading file 'chapters/end-stats.txt'
+Reading file 'chapters/end-backers.txt'
+Reading file 'chapters/end-abouttheauthor.txt'
+
+vars: ['', 'alcohol', 'alliteration', 'avoiddialogue', 'avoidme', 'canyons', 'cdrom', 'ch12ducts', 'ch12light', 'ch13open2', 'ch1stairs', 'ch8intro2', 'clubintro', 'colorseq2', 'dadphone', 'depressive', 'diary', 'empty', 'epi_group1b', 'epi_group2a', 'facingforward', 'favbarker', 'ffbookshelves', 'ffthewalls', 'fftubeweird', 'fridgetunnel', 'hamsterwheel', 'hexagon', 'likesimile', 'lookieloos', 'midterm', 'movieline', 'neithersubjnorobj', 'nikoblackout', 'nikofalls', 'noverbositypref', 'originalniko', 'ryanandniko', 'shadows', 'slang', 'snakeoil', 'sofas', 'thebasement']
+
+
+*** makeBook 60017 ****************************
+
+Reading manifest 'chapters/full-book-manifest.txt'
+Reading file 'chapters/end-altscene.txt'
+Reading file 'chapters/end-stats.txt'
+Reading file 'chapters/end-backers.txt'
+Reading file 'chapters/end-abouttheauthor.txt'
+
+vars: ['', 'acceptedlove', 'alliteration', 'avoiddialogue', 'bigwords', 'bossf', 'bradphone', 'canyons', 'ch12ducts', 'ch12light', 'ch13open1', 'ch1stairs', 'ch8intro3', 'ch9wei', 'colorseq2', 'diary', 'empty', 'epi_group1c', 'epi_group2c', 'facingforward', 'favbarker', 'ffchandelier', 'ffdropoff', 'fftubeweird', 'firmniko', 'formal', 'fridgetrapped', 'gorilla', 'justryan', 'likesimile', 'makeupintro', 'midterm', 'mockups', 'movieline', 'nikoblackout', 'noch8extra', 'nopolaritypref', 'octagon', 'shadows', 'snakeoil', 'spiralhall', 'subjective', 'succinct', 'tables', 'tapetooshort', 'thebasement']
+
+
+*** makeBook 60018 ****************************
+
+Reading manifest 'chapters/full-book-manifest.txt'
+Reading file 'chapters/end-altscene.txt'
+Reading file 'chapters/end-stats.txt'
+Reading file 'chapters/end-backers.txt'
+Reading file 'chapters/end-abouttheauthor.txt'
+
+vars: ['acceptedlove', 'alcohol', 'alliteration', 'avoidme', 'bigwords', 'bradphone', 'bubbles', 'ch12pantry', 'ch13open1', 'ch1staircase', 'ch8intro2', 'ch9wei', 'colorseq1', 'convopit', 'dustyroom', 'empty', 'epi_group1b', 'epi_group2a', 'facingforward', 'favdelany', 'ffbookshelves', 'ffthewalls', 'fftube', 'firmniko', 'fridgetunnel', 'gorilla', 'justniko', 'livejournal', 'mockeries', 'noodlesintro', 'nosimilepref', 'noslangpref', 'octagon', 'optimist', 'possibles', 'songlyric', 'spiralhall', 'stageladder', 'subjective', 'tables', 'thebasement', 'vortex', 'wordy']
+
+
+*** makeBook 60019 ****************************
+
+Reading manifest 'chapters/full-book-manifest.txt'
+Reading file 'chapters/end-altscene.txt'
+Reading file 'chapters/end-stats.txt'
+Reading file 'chapters/end-backers.txt'
+Reading file 'chapters/end-abouttheauthor.txt'
+
+vars: ['', 'alcohol', 'alliteration', 'bigwords', 'bradphone', 'ch12light', 'ch12pantry', 'ch13open1', 'ch1stairs', 'ch8intro3', 'ch9wei', 'colorseq3', 'dislikesimile', 'dustyroom', 'epi_group1b', 'epi_group2c', 'facingforward', 'favdelany', 'ffbookshelves', 'ffthewalls', 'fftubeweird', 'fridgetrapped', 'furnished', 'gayniko', 'gorilla', 'hexagon', 'livejournal', 'movieline', 'neithersubjnorobj', 'nikoblackout', 'noch8extra', 'noodlesintro', 'nopolaritypref', 'noverbositypref', 'possibles', 'rooftop', 'ryanandniko', 'shadows', 'shapes', 'slang', 'spiralhall', 'tables', 'tapetooshort', 'thebasement', 'vortex']
+
+
+*** makeBook 60020 ****************************
+
+Reading manifest 'chapters/full-book-manifest.txt'
+Reading file 'chapters/end-altscene.txt'
+Reading file 'chapters/end-stats.txt'
+Reading file 'chapters/end-backers.txt'
+Reading file 'chapters/end-abouttheauthor.txt'
+
+vars: ['', 'alcohol', 'alliteration', 'avoiddialogue', 'avoidme', 'bigwords', 'bossf', 'bubbles', 'canyons', 'cdrom', 'ch12light', 'ch12pantry', 'ch13open1', 'ch1staircase', 'ch1stinger', 'ch8intro2', 'clubintro', 'colorseq3', 'dadphone', 'diary', 'dislikesimile', 'dustyroom', 'empty', 'epi_group1a', 'epi_group2a', 'facingforward', 'favcrowley', 'ffbookshelves', 'ffdropoff', 'ffset', 'formal', 'fridgetrapped', 'gardens', 'huskmen', 'justryan', 'movieline', 'neithersubjnorobj', 'nikofalls', 'nopolaritypref', 'noverbositypref', 'octagon', 'originalniko', 'rooftop', 'sofas', 'stageladder', 'tapetooshort', 'thebasement']
+
+
+*** makeBook 60021 ****************************
+
+Reading manifest 'chapters/full-book-manifest.txt'
+Reading file 'chapters/end-altscene.txt'
+Reading file 'chapters/end-stats.txt'
+Reading file 'chapters/end-backers.txt'
+Reading file 'chapters/end-abouttheauthor.txt'
+
+vars: ['acceptedlove', 'avoidme', 'bigwords', 'canyons', 'ch12ducts', 'ch13open1', 'ch1stairs', 'ch1stinger', 'ch8intro2', 'colorseq2', 'convopit', 'dadphone', 'dittomen', 'epi_group1a', 'epi_group2a', 'facingforward', 'favdelany', 'ffbookshelves', 'ffdropoff', 'fftubeweird', 'fridgetrapped', 'furnished', 'gorilla', 'likesimile', 'livejournal', 'noalliteration', 'noch8extra', 'noodlesintro', 'noslangpref', 'noverbositypref', 'objective', 'optimist', 'originalniko', 'pentagon', 'possibles', 'ryanandniko', 'shadows', 'snakeoil', 'sofas', 'songlyric', 'spiralhall', 'tapetooshort', 'thebasement']
+
+
+*** makeBook 60022 ****************************
+
+Reading manifest 'chapters/full-book-manifest.txt'
+Reading file 'chapters/end-altscene.txt'
+Reading file 'chapters/end-stats.txt'
+Reading file 'chapters/end-backers.txt'
+Reading file 'chapters/end-abouttheauthor.txt'
+
+vars: ['alcohol', 'alliteration', 'avoiddialogue', 'avoidme', 'bubbles', 'caves', 'cdrom', 'ch12pantry', 'ch13open2', 'ch1staircase', 'ch8intro1', 'clubintro', 'colorseq2', 'dadphone', 'diary', 'epi_group1a', 'epi_group2c', 'facingforward', 'favbarker', 'ffbookshelves', 'ffset', 'ffthewalls', 'fridgetunnel', 'furnished', 'gayniko', 'hamsterwheel', 'justryan', 'lookieloos', 'movieline', 'neithersubjnorobj', 'nikoblackout', 'nikofalls', 'nosimilepref', 'noslangpref', 'noverbositypref', 'octagon', 'optimist', 'possibles', 'tables', 'tapetooshort', 'thecity']
+
+
+*** makeBook 60023 ****************************
+
+Reading manifest 'chapters/full-book-manifest.txt'
+Reading file 'chapters/end-altscene.txt'
+Reading file 'chapters/end-stats.txt'
+Reading file 'chapters/end-backers.txt'
+Reading file 'chapters/end-abouttheauthor.txt'
+
+vars: ['acceptedlove', 'avoidme', 'bradphone', 'bubbles', 'canyons', 'caves', 'cdrom', 'ch12ducts', 'ch12light', 'ch13open2', 'ch1staircase', 'ch1stinger', 'ch8intro3', 'colorseq3', 'dislikesimile', 'dustyroom', 'empty', 'epi_group1b', 'epi_group2a', 'facingforward', 'favdelany', 'ffbookshelves', 'ffdropoff', 'fftube', 'fridgetrapped', 'huskmen', 'justniko', 'livejournal', 'midterm', 'nikoblackout', 'nikofalls', 'noalliteration', 'noch8extra', 'noodlesintro', 'noslangpref', 'noverbositypref', 'objective', 'optimist', 'originalniko', 'pentagon', 'songlyric', 'tables', 'thecity']
+
+
+*** makeBook 60024 ****************************
+
+Reading manifest 'chapters/full-book-manifest.txt'
+Reading file 'chapters/end-altscene.txt'
+Reading file 'chapters/end-stats.txt'
+Reading file 'chapters/end-backers.txt'
+Reading file 'chapters/end-abouttheauthor.txt'
+
+vars: ['', 'acceptedlove', 'avoiddialogue', 'bossf', 'bradphone', 'ch12ducts', 'ch12light', 'ch13open1', 'ch1stairs', 'ch1stinger', 'ch8intro3', 'ch9wei', 'clubintro', 'colorseq3', 'dislikesimile', 'dustyroom', 'epi_group1a', 'epi_group2a', 'facingforward', 'favbarker', 'ffbookshelves', 'ffset', 'ffthewalls', 'firmniko', 'formal', 'fridgetunnel', 'furnished', 'gorilla', 'livejournal', 'lookieloos', 'movieline', 'neithersubjnorobj', 'nikoblackout', 'nikofalls', 'noalliteration', 'octagon', 'optimist', 'possibles', 'rooftop', 'ryanandniko', 'shadows', 'snakeoil', 'sofas', 'stageladder', 'tapetooshort', 'thebasement', 'wordy']
+
+
+*** makeBook 60025 ****************************
+
+Reading manifest 'chapters/full-book-manifest.txt'
+Reading file 'chapters/end-altscene.txt'
+Reading file 'chapters/end-stats.txt'
+Reading file 'chapters/end-backers.txt'
+Reading file 'chapters/end-abouttheauthor.txt'
+
+vars: ['acceptedlove', 'avoidme', 'bigwords', 'bradphone', 'bubbles', 'cdrom', 'ch12ducts', 'ch12light', 'ch13open1', 'ch1staircase', 'ch1stinger', 'ch8intro2', 'clubintro', 'colorseq1', 'diary', 'epi_group1b', 'epi_group2b', 'facingback', 'favbarker', 'ffbookshelves', 'ffset', 'ffthewalls', 'fridgetrapped', 'furnished', 'gayniko', 'gunsignal', 'hamsterwheel', 'justryan', 'likesimile', 'movieline', 'nikoblackout', 'nikofalls', 'noalitpref', 'nopolaritypref', 'noverbositypref', 'pentagon', 'possibles', 'rooftop', 'semblances', 'slang', 'snakeoil', 'sofas', 'subjective', 'thecity']
+

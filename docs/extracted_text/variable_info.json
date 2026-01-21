@@ -1,0 +1,2034 @@
+{
+  "variables": {
+    "possibles": {
+      "description": "Major variants with cross-chapter implications. Do we include the possibles story, or not?",
+      "chapters": [
+        "prologue",
+        "chapter1",
+        "chapter2",
+        "chapter3",
+        "chapter16",
+        "chapter17",
+        "chapter18"
+      ],
+      "usage_count": 7,
+      "macros": [],
+      "group": null,
+      "optional": true,
+      "patterns": {
+        "chapter18": [
+          "it, to possible it"
+        ],
+        "chapter16": [
+          "The possible"
+        ],
+        "chapter2": [
+          "Another thing my overactive imagination had ruled out for me was horror movies.",
+          "or, dear god, a possible my brain had decided to believe in at that precise moment"
+        ],
+        "chapter3": [
+          ", for possibling it"
+        ],
+        "chapter17": [
+          ", the only one I didn't have to possible"
+        ],
+        "prologue": [
+          "Here's a story I don't think you ever heard.  I'd become an expert at seeing things that weren't the"
+        ],
+        "chapter1": [
+          "And at the same time, I could feel that old part of me fighting this, trying to possible, to keep se",
+          "Whether my eyes had started adjusting to the dim light, or the possible in my brain was shifting int"
+        ]
+      }
+    },
+    "dadphone": {
+      "description": "Is Ryan's \"can't control who you love trauma\" because of his dad's sudden death, or his toxic relationship with Bradley?",
+      "chapters": [
+        "chapter1",
+        "chapter2",
+        "chapter3",
+        "chapter4",
+        "chapter5",
+        "chapter9",
+        "chapter10",
+        "chapter16",
+        "chapter17",
+        "notes"
+      ],
+      "usage_count": 10,
+      "macros": [],
+      "group": [
+        "dadphone",
+        "bradphone"
+      ],
+      "optional": false,
+      "patterns": {
+        "chapter9": [
+          "Like dad, tucking me in. Gone between one blink and the next."
+        ],
+        "notes": [
+          "‣ Your Ryan spoke to his father on the pay phone."
+        ],
+        "chapter16": [
+          "afraid if I did he'd be gone",
+          "alone in a dark bedroom any more with no one who loved me to tuck me in, too afraid to fall asleep."
+        ],
+        "chapter2": [
+          "I remembered lying in bed as a kid, waiting to be tucked in, and the person I loved most in the worl"
+        ],
+        "chapter3": [
+          ". I’d never dated or even asked anyone out, and more and more it felt too late to start.",
+          "Niko said, very quiet: “You think there's something wrong with me?”\n\nI opened my eyes, looked at him"
+        ],
+        "chapter17": [
+          "dad would never be back to tuck me in, just because I'd never hear Niko's laugh again and he wouldn'"
+        ],
+        "chapter1": [
+          "I stared at the  lost in shadows at the end of the hall and"
+        ],
+        "chapter4": [
+          "I had a sudden vivid flashback to a photo I’d seen as a kid, still confused about my burgeoning sexu"
+        ],
+        "chapter10": [
+          "And all I can think of in this moment is Bradley, this cute sweet transfer student who a month befor",
+          "your father",
+          "Because my father was dead.\n\n“No,” I managed in a quiet, trembling voice.\n\n“Oh, he's right here, hon",
+          "“Well hey there, son.”\n\nThis is something you probably won't understand unless you've lost a parent.",
+          "“Good to hear your voice.” My dad. He sounded like he meant it. “How you holding up?”\n\n“Dad.” I wasn",
+          "you both said the next time you called, I was supposed to remind you that you have to go deeper.” He",
+          "“So what's the news, son?” my father said, a hint of a smile in his voice. “You in deep enough yet?”"
+        ],
+        "chapter5": [
+          "Dad was the one who got me into records, back when I was still a kid and he was the most amazing per"
+        ]
+      }
+    },
+    "bradphone": {
+      "description": "Is Ryan's \"can't control who you love trauma\" because of his dad's sudden death, or his toxic relationship with Bradley?",
+      "chapters": [
+        "chapter3",
+        "chapter4",
+        "chapter5",
+        "chapter10",
+        "chapter16",
+        "chapter17"
+      ],
+      "usage_count": 6,
+      "macros": [],
+      "group": [
+        "dadphone",
+        "bradphone"
+      ],
+      "optional": false,
+      "patterns": {
+        "chapter16": [
+          "I wasn't Bradley's and Niko wasn't mine and I wasn't his, no matter how much at times we'd wanted to"
+        ],
+        "chapter3": [
+          "my freshman year, and I'd had no intention of being"
+        ],
+        "chapter10": [
+          "I couldn't conceive of what my life would have been like, if we'd never inscribed those wounds on ea"
+        ]
+      }
+    },
+    "alcohol": {
+      "description": "Does this Ryan have a drinking problem?",
+      "chapters": [
+        "chapter1",
+        "chapter2",
+        "chapter3",
+        "chapter4",
+        "notes"
+      ],
+      "usage_count": 5,
+      "macros": [],
+      "group": null,
+      "optional": true,
+      "patterns": {
+        "notes": [
+          "‣ Your Ryan had a bit of a drinking problem."
+        ],
+        "chapter2": [
+          "But that was all academic while I was puking my guts out over a toilet bowl, and for much of the awf"
+        ],
+        "chapter3": [
+          ". Guess that was probably when I started drinking, though. I was a good kid before that.”\n\n“You've a",
+          ", focused on getting drunk with everyone else because it seemed like the thing to do",
+          "I felt a stab of guilt for getting so wasted, for not looking out for him; pushed down vague resentm"
+        ],
+        "chapter1": [
+          "I drank too much, as usual, and as usual it didn’t help.",
+          ", and not only because the shots were starting to hit me and walking a straight line on my own would",
+          "in our drink-addled haze",
+          "and, okay, because booze,",
+          "the room only spinning a little",
+          "(Okay: also the beer.) But someone",
+          "I felt proud for not slurring my speech; witty.",
+          "a wave of nausea washing over me",
+          "I smiled, embarrassed. “I think, uh. Don’t want to get too far from a bathroom.”\n\nHe eyed me apprais",
+          "Why do you always, always drink too much? Idiot. I tried to focus on",
+          "I tried not to think about my stomach.",
+          "It didn’t help that the hallway was spinning and I felt closer and closer to throwing up each second",
+          "Or maybe the wave wasn't relief. I swallowed hard to keep my stomach from heaving.",
+          "Everything was spinning. My stomach churned and my mouth filled with saliva, like the glands for adr",
+          ", the walls refusing to stay still",
+          "Seeing double. You're drunk. Except I'd never had it happen in three dimensions before, along the z-"
+        ],
+        "chapter4": [
+          "Or not vertigo, exactly. It's hard to describe."
+        ]
+      }
+    },
+    "fridgetrapped": {
+      "description": "Do they lose the way back because of losing the keys, or because the connection through the fridge snaps?",
+      "chapters": [
+        "chapter4",
+        "chapter5",
+        "chapter6",
+        "chapter7",
+        "chapter9",
+        "chapter13",
+        "chapter18"
+      ],
+      "usage_count": 7,
+      "macros": [],
+      "group": [
+        "fridgetrapped",
+        "fridgetunnel"
+      ],
+      "optional": false,
+      "patterns": {
+        "chapter9": [
+          "Different notes, different video"
+        ],
+        "chapter18": [
+          "We could never figure out why  didn’t use  keys to come through, since  should have had them both, o",
+          "Even if we’d had the key, the connection through the fridge was gone. Too shallow, too close to the "
+        ],
+        "chapter4": [
+          "tossed it on the counter for a minute",
+          "I checked my pockets. It wasn't on me. What had I done with it?\n\nA sinking feeling crept over me. It",
+          "It worked if I didn't think about it too hard.\n\nBut then where was the key?\n\nSimple. Still in the lo",
+          "them both. Both keys.",
+          "squandering whatever opportunity they'd represented"
+        ],
+        "chapter5": [
+          "We can find the other key and---",
+          "“The other two now have both keys, right?”\n\nNiko frowned. “What do you mean?”\n\n“I left one in the fr",
+          "He took a breath, let it out. “So yeah, you're right. They've got both keys. Unless they come back t",
+          "at least try to figure out what was going on, or at least how we could get back. Maybe the fridge wa",
+          "And now they've got them both, and we don't have any. We'd be factoring them into our plans if we ha",
+          "Which would allow us to leave something for each other at a rendezvous point.\n\n“The fridge is the na",
+          ", and something to say",
+          "When we got to the kitchen, we'd leave the note in front of the fridge (since we couldn't open it ou",
+          "I turned to walk back to the landing.\n\nBut as we walked away, I couldn't help remembering how those ",
+          "Nothing was waiting for us, which I found mildly deflating, and seemed to validate Niko's black mood",
+          "I wanted to be back Downstairs.",
+          "there, it was an excuse to spend time with Niko, we had an experiment to follow up on",
+          "We went down to follow up on our experiment when he came out of his funk, at the end of a nervous af"
+        ],
+        "chapter13": [],
+        "chapter7": [
+          "the same fucking note",
+          "The other me already got to the key on this side and took it through with him. There's no key left t"
+        ],
+        "chapter6": []
+      }
+    },
+    "fridgetunnel": {
+      "description": "Do they lose the way back because of losing the keys, or because the connection through the fridge snaps?",
+      "chapters": [
+        "chapter4",
+        "chapter5",
+        "chapter12",
+        "notes"
+      ],
+      "usage_count": 4,
+      "macros": [],
+      "group": [
+        "fridgetrapped",
+        "fridgetunnel"
+      ],
+      "optional": false,
+      "patterns": {
+        "notes": [
+          "‣ Your Ryan and Niko found the endless fridge tunnel."
+        ],
+        "chapter4": [
+          "And I must have gotten confused about the keys: maybe I hadn't turned the first one the right way wh"
+        ],
+        "chapter5": [
+          "Niko had a pad of yellow sticky notes and flipped the edges of it compulsively, nervous: “in case we",
+          "He started idly doodling flip-book animations of a gruesome hanging on the pad of sticky notes."
+        ],
+        "chapter12": [
+          "There's lots of connection points but the higher-up they are, the easier to get---misaligned. Two la",
+          "Forget lasers."
+        ]
+      }
+    },
+    "empty": {
+      "description": "Downstairs is mostly empty vs mostly full of anonymous abandoned furniture. I like that both of these are creepy in different ways.",
+      "chapters": [
+        "chapter2",
+        "chapter7",
+        "chapter8",
+        "chapter13",
+        "chapter18"
+      ],
+      "usage_count": 5,
+      "macros": [],
+      "group": [
+        "empty",
+        "furnished"
+      ],
+      "optional": false,
+      "patterns": {
+        "chapter8": [
+          "crawlways. Because they lead"
+        ],
+        "chapter18": [],
+        "chapter2": [
+          "Some of the rooms seemed like bedrooms: a few even had old bed frames and mattresses in them."
+        ],
+        "chapter13": [
+          "all empty except for a small drain in the center of each floor.",
+          "A maze of tunnels made from furniture, like a children's dream of a couch fort brought to life, that"
+        ],
+        "chapter7": [
+          "About half the doors led not to rooms, but to crawlways.\n\nThey were those half-sized doors you find ",
+          "he said to the crawlway",
+          "We figured out pretty quick it was a maze.\n\nYou could stoop-walk, but crawling on all fours was a lo",
+          "Once we realized how easy it would be to get lost, we retraced our steps and sat panting by the entr",
+          "half-door's knob",
+          "crawling in a promising direction",
+          "the crawlway",
+          "The twine scraping against the edge of the junction behind us sounded coarse and ugly, like a rusty ",
+          "The sound of the twine scraping the corner seemed way too loud, like someone was holding a mike agai",
+          "just around the corner",
+          "jabbed my fingers into the grooves in the fake wooden wall paneling and started babbling",
+          "around the corner",
+          "The fact that the lighting was so bright and consistent, so cheery, only tinged my fear a more metal",
+          "Around the corner we"
+        ]
+      }
+    },
+    "furnished": {
+      "description": "Downstairs is mostly empty vs mostly full of anonymous abandoned furniture. I like that both of these are creepy in different ways.",
+      "chapters": [
+        "chapter1",
+        "chapter2",
+        "chapter4",
+        "chapter5",
+        "chapter7",
+        "chapter10",
+        "chapter13"
+      ],
+      "usage_count": 7,
+      "macros": [],
+      "group": [
+        "empty",
+        "furnished"
+      ],
+      "optional": false,
+      "patterns": {
+        "chapter2": [
+          "We did end up dusting off a couple of the old couches down there, and moving down",
+          "half-furnished",
+          "an enormous old bureau---empty, like all the furniture---and",
+          "aging furniture aside,"
+        ],
+        "chapter1": [
+          "A smattering of old couches and end tables lined the walls, along with",
+          "cleaning up the",
+          "Most had a piece or two of abandoned furniture, all decades out of date, dusty, and anonymous."
+        ],
+        "chapter4": [
+          "^The room inside was crammed with furniture under sheets. On a normal day this might have scared the",
+          "^. Spotting something sofa-shaped, I lifted the edge of the sheet that covered it and half-crawled, ",
+          "^I thought I heard something move in the hallway outside. Scuffing the carpet, maybe.",
+          "^lift the sheet and walk back across that room. Now that my regular instincts were back, the thought"
+        ],
+        "chapter10": [
+          "were either empty or filled with rotting furniture floating on the surface, waterlogged, ruined"
+        ],
+        "chapter5": [
+          "^ with the sheet-covered furniture"
+        ],
+        "chapter13": [
+          "He spoke of a room whose floor was a chaos of school desks, plastic bucket seats and flip-down woode",
+          "you found rooms so well-furnished, he said, you could almost imagine they"
+        ],
+        "chapter7": [
+          ", trying not to be unnerved by the way our lights carved a thousand sweeping shadow-shapes out of , ",
+          ", each sway of my headlamp birthing a new imagined terror out of the confusion of shapes around me",
+          "The furniture right around us had been dragged out of shape, but the rest of the way back was unchan"
+        ]
+      }
+    },
+    "TheCity": {
+      "description": "Is Elder's story of an epic lower level a huge city of houses, or an endless basement floor?",
+      "chapters": [
+        "chapter11",
+        "chapter12",
+        "chapter13",
+        "chapter14",
+        "chapter15",
+        "notes"
+      ],
+      "usage_count": 6,
+      "macros": [],
+      "group": [
+        "TheCity",
+        "TheBasement"
+      ],
+      "optional": false,
+      "patterns": {
+        "notes": [
+          "a city of recursive houses"
+        ],
+        "chapter15": [
+          "The faint streetlights miles below, the pools of desk lights and floor lamps above, bookended but di"
+        ],
+        "chapter14": [
+          "the City. With all the houses, like I told you.",
+          "From down there you sometimes see clusters of lights, way up above. This must be one of them.",
+          "lights of the city seemed to drop, expand",
+          "lights of the city of houses"
+        ],
+        "chapter11": [
+          "“Can't walk the length of one of its walls without stopping to sleep. Takes five or six sleeps to wa",
+          "on the streets",
+          "in all that dark"
+        ],
+        "chapter13": [
+          "He spoke of rooms where the carpet was worn, could be ripped up to reveal floorboards underneath. He"
+        ],
+        "chapter12": [
+          "Sometimes those houses down there",
+          "out of those houses, those millions of houses"
+        ]
+      }
+    },
+    "TheBasement": {
+      "description": "Is Elder's story of an epic lower level a huge city of houses, or an endless basement floor?",
+      "chapters": [
+        "chapter11"
+      ],
+      "usage_count": 1,
+      "macros": [],
+      "group": [
+        "TheCity",
+        "TheBasement"
+      ],
+      "optional": false,
+      "patterns": {
+        "chapter11": [
+          "the right stair. Found"
+        ]
+      }
+    },
+    "ffdropoff": {
+      "description": "Details for the final fight scene",
+      "chapters": [
+        "chapter14",
+        "chapter15",
+        "chapter16",
+        "notes"
+      ],
+      "usage_count": 4,
+      "macros": [],
+      "group": [
+        "ffdropoff",
+        "ffthewalls"
+      ],
+      "optional": false,
+      "patterns": {
+        "notes": [
+          "suspended over an endless dropoff"
+        ],
+        "chapter16": [
+          ", but Niko had noticed something while scrambling around up top. One of the guy-wires sloping down i",
+          "The path curved gently left, then gently right.",
+          "It felt like we were back “inside” again. The sensation of walking through a pipe suspended over emp"
+        ],
+        "chapter15": [
+          "into darkness",
+          "empty space",
+          "lost in vanishing darkness"
+        ],
+        "chapter14": [
+          "The door opened onto nothing. Past the frame, the floor dropped away into blackness. The flashlight ",
+          "into blackness",
+          "It made slow, lazy curves as it went, like an immense statue of a snake slithering through grass. Yo",
+          "miles-high drop down",
+          "a giant snake that had somehow coated itself in superglue and slithered through",
+          "the top of the tube-path---the back of the snake---",
+          "the twinkling lights far below",
+          "“I think we're above ”",
+          "There was no wall around the hall we'd come through to get here. It stretched back into empty space ",
+          "forward like a sinuous path",
+          "the twinkling lights miles below",
+          "Far below the ; new lights winked on in the emptiness between them.",
+          ", miles below"
+        ]
+      }
+    },
+    "ffthewalls": {
+      "description": "Details for the final fight scene",
+      "chapters": [
+        "chapter14",
+        "chapter16"
+      ],
+      "usage_count": 2,
+      "macros": [],
+      "group": [
+        "ffdropoff",
+        "ffthewalls"
+      ],
+      "optional": false,
+      "patterns": {
+        "chapter14": [
+          "and cold damp air spilled out;",
+          "Perspectives change. Architecture gets stretched to breaking.",
+          "surrounded by endless walls of pink insulation foam,",
+          "“We can swing across from there to one of the hallways on the other side. No problemo.”",
+          "forest of insulation"
+        ]
+      }
+    },
+    "fftubeweird": {
+      "description": null,
+      "chapters": [
+        "chapter14",
+        "chapter15",
+        "chapter16"
+      ],
+      "usage_count": 3,
+      "macros": [],
+      "group": [
+        "fftubeweird",
+        "fftube",
+        "ffset"
+      ],
+      "optional": false,
+      "patterns": {
+        "chapter16": [
+          "Getting back on top of the cylinder had been a problem of broken physics. We couldn't just climb bac",
+          ", pushing off each one as his weight lifted it off the ground"
+        ],
+        "chapter15": [
+          "If it had been me, we'd all have died. I need time to consider a situation, to think things through.",
+          "tugging it across the hardwood above him, grumbling and shedding books like some beast made of libra",
+          "And I'd forgotten I wasn't at the end of my rope. Slack",
+          ". It gave me a head start, but also",
+          "It curved as the cylinder's gravity tugged it around, hyperbolic, and went wide, whipping underneath",
+          ", and for an instant it was as if the cylinder above was toying with him, uncertain whether to hold "
+        ],
+        "chapter14": [
+          "I looked for a way to brace myself, and that's when I discovered the furniture wasn't bolted to the ",
+          "and was too heavy for its weight to stop him. His momentum pulled it a quarter-revolution around to "
+        ]
+      }
+    },
+    "fftube": {
+      "description": null,
+      "chapters": [
+        "chapter14",
+        "chapter15",
+        "chapter16"
+      ],
+      "usage_count": 3,
+      "macros": [],
+      "group": [
+        "fftubeweird",
+        "fftube",
+        "ffset"
+      ],
+      "optional": false,
+      "patterns": {
+        "chapter15": [
+          "I'd never skydived or bungee jumped before; I had no experience with free fall and barely any even w",
+          "He'd stopped his fall by grabbing hold of my rope, but he wasn't tied to it, and was far enough abov"
+        ],
+        "chapter14": [
+          "Tie the rope around something.",
+          "I scrambled underneath it",
+          ". Before I could think, before I could stop myself, I threw myself off the edge of the cylinder afte"
+        ]
+      }
+    },
+    "ffset": {
+      "description": null,
+      "chapters": [
+        "chapter14",
+        "chapter15",
+        "chapter16",
+        "notes"
+      ],
+      "usage_count": 4,
+      "macros": [],
+      "group": [
+        "fftubeweird",
+        "fftube",
+        "ffset"
+      ],
+      "optional": false,
+      "patterns": {
+        "notes": [
+          "on a floating set"
+        ],
+        "chapter16": [
+          "junctions, no rooms",
+          "right route"
+        ],
+        "chapter15": [
+          "I dangled thirty or forty feet below the underside of the bedroom platform, swinging on my rope. A w",
+          "had stopped was that we balanced either other out. But with two bodies on one side of the rope, ther",
+          "Like lightning he shot up the rope, climbing hand over hand like a demon. With everything in motion ",
+          "But the anchor of furniture groaned above us, shifting uneasily, and as I looked back to Elder Niko ",
+          "In another swing Elder reached the loop and grabbed it. Then he hung",
+          "a rook's nest of plumbing,",
+          "jerked him away in a huge arc, flailing his limbs like a scarecrow. He swung in sickening curves ben",
+          "slid the knife under my belt, and started to climb back up. From the top of the platform I could cut",
+          "not really registering the words he'd said",
+          "Niko was clambering one handhold and foothold at a time to the edge of the floating set. He reached ",
+          "Muffled sounds of shifting furniture floated down as I swung. Otherwise the silence was oppressive,",
+          "Eventually I'd swung far enough to grab Niko's rope. At first I could simply climb down it, my own r",
+          "My rope swung away out of the range of my headlamp, swallowed up by darkness. His",
+          "somewhere above us; this rope wasn't rated to hold two people",
+          "peering over the edge of the platform,",
+          "He'd piled books scavenged from the bedroom set next to him on the edge. He had",
+          "After a particularly vicious clobbering I gained a body length and stopped climbing,",
+          "I hadn't gained enough distance, after all."
+        ],
+        "chapter14": [
+          "square platform suspended beneath us in mid-air",
+          "a square platform some way below and in front of us. But as I focused on it, I realized it wasn't a ",
+          "floor of the set",
+          "Tatty throw rugs, dollar-store trash cans, secondhand furniture, and a battered desk filled up the f",
+          "Not that it was apparent the floating platform was anything but a dead end. I protested weakly, but ",
+          "floating set",
+          "The platform swayed with my momentum: slight, but enough to suggest how thin the wires were that hel",
+          "hardwood platform",
+          "The shadows from the wires and cables that held the set suspended played across my face like strands",
+          "I cast around for something heavy, but the set's furnishings were as accurately cheap as its upstair",
+          "something sturdy",
+          "The big bed with its",
+          "looked the heaviest",
+          ", trying to ignore the way the platform rocked and swayed beneath me as I did",
+          "the furniture's bulk",
+          "He stretched instead for one of the taut cables holding it up but he was moving too fast",
+          "But the rope came up over the edge of the platform and angled across the floor. The force on the bed",
+          "Toward the drop-off and the . Toward a drop there'd be no possible way to survive.",
+          "I moved faster than thought. I'd never considered myself a person with quick reflexes, someone you c"
+        ]
+      }
+    },
+    "ffchandelier": {
+      "description": null,
+      "chapters": [
+        "chapter14",
+        "chapter15",
+        "chapter16"
+      ],
+      "usage_count": 3,
+      "macros": [],
+      "group": [
+        "ffchandelier",
+        "ffbookshelves"
+      ],
+      "optional": false,
+      "patterns": {
+        "chapter16": [
+          "From there it was simply a matter of detaching the chandelier net from its anchor point at the base ",
+          "under the invisible anchor point of the densest part of the web, the chandelier itself"
+        ],
+        "chapter15": [
+          "an overloaded and upside-down black bookshelf"
+        ],
+        "chapter14": [
+          "glittering in the gloom behind him. Ice?",
+          "a filigreed structure I couldn't at first identify. My impression of ice was wrong: it was laid out ",
+          "It hung with no obvious point of support above",
+          "chandelier-net, watching its cut-glass facets sparkle",
+          "crashed through the flimsy web",
+          "lines of chandelier",
+          "exploded rays of chandelier",
+          "chandelier net",
+          "mesh or net or whatever",
+          "With a tinkling smash, I crashed into the net of chandelier. It was like landing on an uncomfortably",
+          "of the net up here flattened as it dropped and converged to chandelier",
+          "climbing down a ladder",
+          "I noticed, disconcertingly, wasn't connected to anything at all. Nevertheless, it was rock-solid, an",
+          "chandelier net",
+          "chandelier-net",
+          "purchase on the jangling net",
+          "through a gap in the net, jerking them both",
+          "The web of chandelier-stuff bucked and heaved, tinkling like a dump truck full of glass. An eyebolt ",
+          "plunged his hand through also to the underside of the net, wrestling for the gun. It",
+          "Something zipped past my face in the same instant and I ducked, belatedly, eyes still glued on the f",
+          "the beads of glass",
+          "out of the net but all his weight was on it now and the wire frame dug into his skin",
+          "one of the glass baubles",
+          "jangling net",
+          "slipped through a gap in the net and tumbled",
+          "the edge of the net. He caught it and the whole thing twisted; but he'd snagged only a single strand",
+          "But his grab for the net had dislodged my Niko too, and he was head down and slipping, flailing, gra",
+          ", couldn't close his fingers around its thinness fast enough; it twanged as he plucked it with an im",
+          "and slid off the edge of the net. The tangled rope had gone taut and yanked him off, and"
+        ]
+      }
+    },
+    "ffbookshelves": {
+      "description": null,
+      "chapters": [
+        "chapter14",
+        "chapter15"
+      ],
+      "usage_count": 2,
+      "macros": [],
+      "group": [
+        "ffchandelier",
+        "ffbookshelves"
+      ],
+      "optional": false,
+      "patterns": {
+        "chapter15": [
+          ", face battered by the landslide of books only now starting to peter out"
+        ],
+        "chapter14": [
+          ", or to the integrity of a yellowing  paperback",
+          ", ripped-off pages fluttering in their wake",
+          "the books and",
+          "in a rain of paperbacks"
+        ]
+      }
+    },
+    "cdrom": {
+      "description": "Niko dreams & gorilla plot thread, or weird CD-ROM game plot thread?",
+      "chapters": [
+        "chapter4",
+        "chapter5",
+        "chapter9",
+        "chapter17",
+        "notes"
+      ],
+      "usage_count": 5,
+      "macros": [],
+      "group": [
+        "cdrom",
+        "gorilla"
+      ],
+      "optional": false,
+      "patterns": {
+        "notes": [
+          "‣ Your Ryan never solved the weird CD-ROM game. Maybe none of them did."
+        ],
+        "chapter17": [
+          "Like a puzzle in that damn adventure game, a puzzle you don't even know if there's an answer to unti"
+        ],
+        "chapter4": [
+          "I retreated instead into a game I'd bought a few months back but never made much progress with, a CD"
+        ],
+        "chapter5": [
+          "The weird CD-ROM game I'd been playing was gone from my desk and my hard drive: now internet searche"
+        ]
+      }
+    },
+    "gorilla": {
+      "description": "Niko dreams & gorilla plot thread, or weird CD-ROM game plot thread?",
+      "chapters": [
+        "chapter9",
+        "chapter15"
+      ],
+      "usage_count": 2,
+      "macros": [],
+      "group": [
+        "cdrom",
+        "gorilla"
+      ],
+      "optional": false,
+      "patterns": {
+        "chapter9": [
+          "I remembered something from a neurobiology class. “Did you know there are more neurons going from yo",
+          "Like the gorilla in the crowd."
+        ],
+        "chapter15": [
+          "Like noticing the gorilla in the crowd."
+        ]
+      }
+    },
+    "gayniko": {
+      "description": "Final Niko is in love with Ryan, is not, or ... ? Last to do is \"angryniko\"",
+      "chapters": [
+        "chapter16",
+        "chapter18",
+        "notes"
+      ],
+      "usage_count": 3,
+      "macros": [],
+      "group": [
+        "gayniko",
+        "firmniko",
+        "originalniko"
+      ],
+      "optional": false,
+      "patterns": {
+        "notes": [
+          "‣ Your Ryan lost his original Niko, but saved a different one."
+        ],
+        "chapter18": [
+          ", imperfect though you knew he’d be"
+        ],
+        "chapter16": [
+          "surprisingly tender,",
+          "I sometimes saw him looking at me, out of the corner of my eye, but I couldn’t look back.",
+          "The words seemed to shake him out of a daze, and he perked up, flashing a huge grin. “Hell yeah! Let",
+          ", seemed to notice his fingers were still touching my lips, pulled them back. Stared at them.\n\nAnd a",
+          "And the way he’d fought for me. The way he’d been looking at me.",
+          "Somehow we were closer than we’d been a moment before. The curves of his jaw, his cheek, were aches ",
+          "His lips were too close to mine. It would be so easy. It would last forever, like dying winter sunli",
+          "reaching out for me; but I must have looked shocked, because his expression changed to placating ala",
+          "I shook my head, angry, never more certain of anything.",
+          ", ignoring me",
+          "come through",
+          "And I couldn’t bear to see that need in his face, reflected back at last after all this time, and wo",
+          "His face hardened into a mask as he said this, grim and colorless. Then he looked at me, the corner ",
+          ", without spite this time",
+          "He wasn’t the Niko I wanted. None of them had been, even if this one thought maybe he could be, was "
+        ]
+      }
+    },
+    "firmniko": {
+      "description": "Final Niko is in love with Ryan, is not, or ... ? Last to do is \"angryniko\"",
+      "chapters": [
+        "chapter16"
+      ],
+      "usage_count": 1,
+      "macros": [],
+      "group": [
+        "gayniko",
+        "firmniko",
+        "originalniko"
+      ],
+      "optional": false,
+      "patterns": {}
+    },
+    "originalniko": {
+      "description": "Final Niko is in love with Ryan, is not, or ... ? Last to do is \"angryniko\"",
+      "chapters": [
+        "chapter4",
+        "chapter13",
+        "chapter15",
+        "chapter16",
+        "chapter17",
+        "chapter18",
+        "notes"
+      ],
+      "usage_count": 7,
+      "macros": [],
+      "group": [
+        "gayniko",
+        "firmniko",
+        "originalniko"
+      ],
+      "optional": false,
+      "patterns": {
+        "notes": [
+          "with Niko, not alone"
+        ],
+        "chapter18": [
+          "That pipe might just lead to the city sewer system, but",
+          "Assuming, that is, you survived too.\n\nI think you did. That could be me projecting, one last time. B",
+          "Your counterpart, the other Niko from the twin universe---he didn't make it. I always kill the Nikos",
+          ", lest you think I'm a total mooch.",
+          "and you found your way back to a world where people say “fourd” like God intended."
+        ],
+        "chapter16": [
+          "ended in a cramped",
+          ", making the chamber even more claustrophobic",
+          "“Huh.” I looked over; he was staring uneasily into the flooded opening. He caught me looking and for",
+          "'d seen it too and",
+          "“Thirty-five meter rope,” he said. “Looks like someone marked the way through.”\n\n“Our doubles?”\n\nHe ",
+          "“I don't want to go alone.”\n\n“It's the only way.” He gazed at me, fierce. “Orion, just trust me, oka",
+          "Almost on autopilot I guided Niko through what to expect, through breathing exercises, stroke techni",
+          "“Last one back to the right dimension buys the drinks,” I said,"
+        ],
+        "chapter17": [
+          "our glowsticks",
+          "predicted. He followed behind, pulling himself hand over hand along the rope",
+          "But faintly, through water rippling as if moving with strange, hot currents, there: another sliding ",
+          "The other sliding door was just ahead of us, but it seemed too as if we",
+          ", while behind me the other Ryan did the same. Our doors clicked shut.\n\nAnd as we turned around to s",
+          "they were coming they were going to get us",
+          "but it was hopeless. There were too many of them, drifting forward with hands outstretched, serene e",
+          "Beside me, Niko was preparing to push off against the glass and make a break for the other side, but",
+          "right through the mass of things closing in.",
+          "we were moving too fast for them, we were through, we were past them",
+          "We'd reached the glass door on the other side; below us, the drowned Orion sank into erasing darknes"
+        ],
+        "chapter15": [
+          "“I let you swim through first,” . “Can't remember. Why. Guess I thought I still owed you. A debt.” ."
+        ],
+        "chapter4": [
+          "with the hand holding the flashlight",
+          "I lost my grip on the flashlight, and it tumbled out of my hands, hit the hard shelf underneath me w",
+          "felt for the light, grabbed it and shook it",
+          ". Trying to keep my breathing calm, I unscrewed the end of the flashlight by feel, dumped out the ol"
+        ]
+      }
+    },
+    "wordy": {
+      "description": "Define book-wide independent variables affecting random text. Is this narrator wordy, succinct, or no preference?",
+      "chapters": [
+        "notes"
+      ],
+      "usage_count": 1,
+      "macros": [],
+      "group": [
+        "wordy",
+        "succinct",
+        "noverbositypref"
+      ],
+      "optional": false,
+      "patterns": {
+        "notes": [
+          "‣ Your narrator preferred wordier ways of saying things."
+        ]
+      }
+    },
+    "succinct": {
+      "description": "Define book-wide independent variables affecting random text. Is this narrator wordy, succinct, or no preference?",
+      "chapters": [
+        "notes"
+      ],
+      "usage_count": 1,
+      "macros": [],
+      "group": [
+        "wordy",
+        "succinct",
+        "noverbositypref"
+      ],
+      "optional": false,
+      "patterns": {}
+    },
+    "noverbositypref": {
+      "description": "Define book-wide independent variables affecting random text. Is this narrator wordy, succinct, or no preference?",
+      "chapters": [],
+      "usage_count": 0,
+      "macros": [],
+      "group": [
+        "wordy",
+        "succinct",
+        "noverbositypref"
+      ],
+      "optional": false,
+      "patterns": {}
+    },
+    "depressive": {
+      "description": "Does this narrator prefer sentences with a strong negative polarity?",
+      "chapters": [
+        "notes"
+      ],
+      "usage_count": 1,
+      "macros": [],
+      "group": [
+        "depressive",
+        "optimist",
+        "nopolaritypref"
+      ],
+      "optional": false,
+      "patterns": {
+        "notes": [
+          "‣ Your narrator was a bit more pessimistic than the norm."
+        ]
+      }
+    },
+    "optimist": {
+      "description": "Does this narrator prefer sentences with a strong negative polarity?",
+      "chapters": [
+        "notes"
+      ],
+      "usage_count": 1,
+      "macros": [],
+      "group": [
+        "depressive",
+        "optimist",
+        "nopolaritypref"
+      ],
+      "optional": false,
+      "patterns": {}
+    },
+    "nopolaritypref": {
+      "description": "Does this narrator prefer sentences with a strong negative polarity?",
+      "chapters": [],
+      "usage_count": 0,
+      "macros": [],
+      "group": [
+        "depressive",
+        "optimist",
+        "nopolaritypref"
+      ],
+      "optional": false,
+      "patterns": {}
+    },
+    "bigwords": {
+      "description": "Does this narrator have a tendency to use big words?",
+      "chapters": [],
+      "usage_count": 0,
+      "macros": [],
+      "group": null,
+      "optional": false,
+      "patterns": {}
+    },
+    "slang": {
+      "description": "Does this narrator prefer or avoid slang/swears?",
+      "chapters": [
+        "notes"
+      ],
+      "usage_count": 1,
+      "macros": [],
+      "group": [
+        "slang",
+        "formal",
+        "noslangpref"
+      ],
+      "optional": false,
+      "patterns": {
+        "notes": [
+          "‣ Your narrator preferred to use slang."
+        ]
+      }
+    },
+    "formal": {
+      "description": "Does this narrator prefer or avoid slang/swears?",
+      "chapters": [
+        "notes"
+      ],
+      "usage_count": 1,
+      "macros": [],
+      "group": [
+        "slang",
+        "formal",
+        "noslangpref"
+      ],
+      "optional": false,
+      "patterns": {}
+    },
+    "noslangpref": {
+      "description": "Does this narrator prefer or avoid slang/swears?",
+      "chapters": [],
+      "usage_count": 0,
+      "macros": [],
+      "group": [
+        "slang",
+        "formal",
+        "noslangpref"
+      ],
+      "optional": false,
+      "patterns": {}
+    },
+    "subjective": {
+      "description": "Does this narrator tend towards more subjective or objective statements or have no preference?",
+      "chapters": [],
+      "usage_count": 0,
+      "macros": [],
+      "group": [
+        "subjective",
+        "objective",
+        "neithersubjnorobj"
+      ],
+      "optional": false,
+      "patterns": {}
+    },
+    "objective": {
+      "description": "Does this narrator tend towards more subjective or objective statements or have no preference?",
+      "chapters": [],
+      "usage_count": 0,
+      "macros": [],
+      "group": [
+        "subjective",
+        "objective",
+        "neithersubjnorobj"
+      ],
+      "optional": false,
+      "patterns": {}
+    },
+    "neithersubjnorobj": {
+      "description": "Does this narrator tend towards more subjective or objective statements or have no preference?",
+      "chapters": [],
+      "usage_count": 0,
+      "macros": [],
+      "group": [
+        "subjective",
+        "objective",
+        "neithersubjnorobj"
+      ],
+      "optional": false,
+      "patterns": {}
+    },
+    "alliteration": {
+      "description": "Does this narrator prefer alliteration in sentences?",
+      "chapters": [],
+      "usage_count": 0,
+      "macros": [],
+      "group": [
+        "alliteration",
+        "noalliteration",
+        "noalitpref"
+      ],
+      "optional": false,
+      "patterns": {}
+    },
+    "noalliteration": {
+      "description": "Does this narrator prefer alliteration in sentences?",
+      "chapters": [],
+      "usage_count": 0,
+      "macros": [],
+      "group": [
+        "alliteration",
+        "noalliteration",
+        "noalitpref"
+      ],
+      "optional": false,
+      "patterns": {}
+    },
+    "noalitpref": {
+      "description": "Does this narrator prefer alliteration in sentences?",
+      "chapters": [],
+      "usage_count": 0,
+      "macros": [],
+      "group": [
+        "alliteration",
+        "noalliteration",
+        "noalitpref"
+      ],
+      "optional": false,
+      "patterns": {}
+    },
+    "avoidme": {
+      "description": "Does this narrator like to avoid making \"I\" statements about himself?",
+      "chapters": [],
+      "usage_count": 0,
+      "macros": [],
+      "group": null,
+      "optional": false,
+      "patterns": {}
+    },
+    "likesimile": {
+      "description": "Does this narrator prefer using simile/metaphor when possible?",
+      "chapters": [],
+      "usage_count": 0,
+      "macros": [],
+      "group": [
+        "likesimile",
+        "dislikesimile",
+        "nosimilepref"
+      ],
+      "optional": false,
+      "patterns": {}
+    },
+    "dislikesimile": {
+      "description": "Does this narrator prefer using simile/metaphor when possible?",
+      "chapters": [],
+      "usage_count": 0,
+      "macros": [],
+      "group": [
+        "likesimile",
+        "dislikesimile",
+        "nosimilepref"
+      ],
+      "optional": false,
+      "patterns": {}
+    },
+    "nosimilepref": {
+      "description": "Does this narrator prefer using simile/metaphor when possible?",
+      "chapters": [],
+      "usage_count": 0,
+      "macros": [],
+      "group": [
+        "likesimile",
+        "dislikesimile",
+        "nosimilepref"
+      ],
+      "optional": false,
+      "patterns": {}
+    },
+    "avoiddialogue": {
+      "description": "Does this narrator avoid quoted dialogue.",
+      "chapters": [],
+      "usage_count": 0,
+      "macros": [],
+      "group": null,
+      "optional": false,
+      "patterns": {}
+    },
+    "favdelany": {
+      "description": "Incidental cross-chapter stuff.",
+      "chapters": [
+        "chapter5",
+        "chapter11",
+        "chapter15",
+        "notes"
+      ],
+      "usage_count": 5,
+      "macros": [
+        "FavBook",
+        "AltBook",
+        "FavAuthor"
+      ],
+      "group": [
+        "favdelany",
+        "favbarker",
+        "favcrowley"
+      ],
+      "optional": false,
+      "patterns": {
+        "notes": [
+          "Dhalgren"
+        ],
+        "chapter15": [
+          "Dhalgren"
+        ],
+        "chapter11": [
+          "Dhalgren"
+        ],
+        "chapter5": [
+          "Samuel Delany",
+          "Dhalgren"
+        ]
+      }
+    },
+    "favbarker": {
+      "description": "Incidental cross-chapter stuff.",
+      "chapters": [
+        "chapter5",
+        "chapter11",
+        "chapter15",
+        "notes"
+      ],
+      "usage_count": 5,
+      "macros": [
+        "FavBook",
+        "AltBook",
+        "FavAuthor"
+      ],
+      "group": [
+        "favdelany",
+        "favbarker",
+        "favcrowley"
+      ],
+      "optional": false,
+      "patterns": {
+        "notes": [
+          "Imajica"
+        ],
+        "chapter15": [
+          "Imajica"
+        ],
+        "chapter11": [
+          "Imajica"
+        ],
+        "chapter5": [
+          "Clive Barker",
+          "Imajica"
+        ]
+      }
+    },
+    "favcrowley": {
+      "description": "Incidental cross-chapter stuff.",
+      "chapters": [
+        "chapter5",
+        "chapter11",
+        "chapter15",
+        "notes"
+      ],
+      "usage_count": 5,
+      "macros": [
+        "FavBook",
+        "AltBook",
+        "FavAuthor"
+      ],
+      "group": [
+        "favdelany",
+        "favbarker",
+        "favcrowley"
+      ],
+      "optional": false,
+      "patterns": {
+        "notes": [
+          "Little, Big"
+        ],
+        "chapter15": [
+          "Little, Big"
+        ],
+        "chapter11": [
+          "Little, Big"
+        ],
+        "chapter5": [
+          "John Crowley",
+          "Little, Big"
+        ]
+      }
+    },
+    "epi_group1a": {
+      "description": "Epigraphs",
+      "chapters": [
+        "prologue",
+        "part2",
+        "notes"
+      ],
+      "usage_count": 3,
+      "macros": [],
+      "group": [
+        "epi_group1a",
+        "epi_group1b",
+        "epi_group1c",
+        "epi_group1d",
+        "epi_group1e"
+      ],
+      "optional": false,
+      "patterns": {
+        "notes": [
+          "Gwendolyn MacEwen"
+        ],
+        "prologue": [],
+        "part2": []
+      }
+    },
+    "epi_group1b": {
+      "description": "Epigraphs",
+      "chapters": [
+        "prologue",
+        "part2",
+        "notes"
+      ],
+      "usage_count": 3,
+      "macros": [],
+      "group": [
+        "epi_group1a",
+        "epi_group1b",
+        "epi_group1c",
+        "epi_group1d",
+        "epi_group1e"
+      ],
+      "optional": false,
+      "patterns": {}
+    },
+    "epi_group1c": {
+      "description": "Epigraphs",
+      "chapters": [
+        "prologue",
+        "part2",
+        "notes"
+      ],
+      "usage_count": 3,
+      "macros": [],
+      "group": [
+        "epi_group1a",
+        "epi_group1b",
+        "epi_group1c",
+        "epi_group1d",
+        "epi_group1e"
+      ],
+      "optional": false,
+      "patterns": {}
+    },
+    "epi_group1d": {
+      "description": "Epigraphs",
+      "chapters": [
+        "prologue",
+        "part2",
+        "notes"
+      ],
+      "usage_count": 3,
+      "macros": [],
+      "group": [
+        "epi_group1a",
+        "epi_group1b",
+        "epi_group1c",
+        "epi_group1d",
+        "epi_group1e"
+      ],
+      "optional": false,
+      "patterns": {}
+    },
+    "epi_group1e": {
+      "description": "Epigraphs",
+      "chapters": [
+        "prologue",
+        "part2",
+        "notes"
+      ],
+      "usage_count": 3,
+      "macros": [],
+      "group": [
+        "epi_group1a",
+        "epi_group1b",
+        "epi_group1c",
+        "epi_group1d",
+        "epi_group1e"
+      ],
+      "optional": false,
+      "patterns": {}
+    },
+    "epi_group2a": {
+      "description": null,
+      "chapters": [
+        "part3",
+        "chapter18",
+        "notes"
+      ],
+      "usage_count": 3,
+      "macros": [],
+      "group": [
+        "epi_group2a",
+        "epi_group2b",
+        "epi_group2c",
+        "epi_group2d"
+      ],
+      "optional": false,
+      "patterns": {
+        "notes": [
+          "Abraham Cowley"
+        ],
+        "chapter18": [],
+        "part3": []
+      }
+    },
+    "epi_group2b": {
+      "description": null,
+      "chapters": [
+        "part3",
+        "chapter18",
+        "notes"
+      ],
+      "usage_count": 3,
+      "macros": [],
+      "group": [
+        "epi_group2a",
+        "epi_group2b",
+        "epi_group2c",
+        "epi_group2d"
+      ],
+      "optional": false,
+      "patterns": {}
+    },
+    "epi_group2c": {
+      "description": null,
+      "chapters": [
+        "part3",
+        "chapter18",
+        "notes"
+      ],
+      "usage_count": 3,
+      "macros": [],
+      "group": [
+        "epi_group2a",
+        "epi_group2b",
+        "epi_group2c",
+        "epi_group2d"
+      ],
+      "optional": false,
+      "patterns": {}
+    },
+    "epi_group2d": {
+      "description": null,
+      "chapters": [
+        "part3",
+        "chapter18",
+        "notes"
+      ],
+      "usage_count": 3,
+      "macros": [],
+      "group": [
+        "epi_group2a",
+        "epi_group2b",
+        "epi_group2c",
+        "epi_group2d"
+      ],
+      "optional": false,
+      "patterns": {}
+    },
+    "colorseq1": {
+      "description": "Glowstick colors. The symbolism of these color sequences is left as an exercise for the reader.",
+      "chapters": [
+        "chapter10",
+        "chapter11",
+        "chapter12",
+        "chapter17",
+        "notes"
+      ],
+      "usage_count": 13,
+      "macros": [
+        "color1",
+        "color1poetic",
+        "color1shades",
+        "color2",
+        "color2edge",
+        "color3",
+        "color4",
+        "color4adj"
+      ],
+      "group": [
+        "colorseq1",
+        "colorseq2",
+        "colorseq3"
+      ],
+      "optional": false,
+      "patterns": {
+        "notes": [
+          "orange",
+          "blue",
+          "yellow",
+          "red"
+        ],
+        "chapter17": [
+          "red",
+          "fiery"
+        ],
+        "chapter10": [
+          "Black and blue.",
+          "blue"
+        ],
+        "chapter11": [
+          "yellow",
+          "amber",
+          "sea-blue",
+          "orange"
+        ],
+        "chapter12": [
+          "orange"
+        ]
+      }
+    },
+    "colorseq2": {
+      "description": "Glowstick colors. The symbolism of these color sequences is left as an exercise for the reader.",
+      "chapters": [
+        "chapter10",
+        "chapter11",
+        "chapter12",
+        "chapter17",
+        "notes"
+      ],
+      "usage_count": 13,
+      "macros": [
+        "color1",
+        "color1poetic",
+        "color1shades",
+        "color2",
+        "color2edge",
+        "color3",
+        "color4",
+        "color4adj"
+      ],
+      "group": [
+        "colorseq1",
+        "colorseq2",
+        "colorseq3"
+      ],
+      "optional": false,
+      "patterns": {
+        "notes": [
+          "yellow",
+          "red",
+          "orange",
+          "blue"
+        ],
+        "chapter17": [
+          "blue",
+          "cerulean"
+        ],
+        "chapter10": [
+          "Black and blood.",
+          "red"
+        ],
+        "chapter11": [
+          "orange",
+          "ochre",
+          "blood-red",
+          "yellow"
+        ],
+        "chapter12": [
+          "yellow"
+        ]
+      }
+    },
+    "colorseq3": {
+      "description": "Glowstick colors. The symbolism of these color sequences is left as an exercise for the reader.",
+      "chapters": [
+        "chapter10",
+        "chapter11",
+        "chapter12",
+        "chapter17",
+        "notes"
+      ],
+      "usage_count": 13,
+      "macros": [
+        "color1",
+        "color1poetic",
+        "color1shades",
+        "color2",
+        "color2edge",
+        "color3",
+        "color4",
+        "color4adj"
+      ],
+      "group": [
+        "colorseq1",
+        "colorseq2",
+        "colorseq3"
+      ],
+      "optional": false,
+      "patterns": {
+        "notes": [
+          "yellow",
+          "red",
+          "silver",
+          "green"
+        ],
+        "chapter17": [
+          "green",
+          "emerald"
+        ],
+        "chapter10": [
+          "Black and blood.",
+          "red"
+        ],
+        "chapter11": [
+          "silver",
+          "pale gray",
+          "blood-red",
+          "yellow"
+        ],
+        "chapter12": [
+          "yellow"
+        ]
+      }
+    },
+    "singular01": {
+      "description": "Custom text for \"Singular Subcutanean\" crowdfunders. These control text that will never appear naturally; it will only be selected when that variable is manually turned on during generation of a specific backer's book. For privacy reasons, the contributor and the original creative prompt are not tracked here.",
+      "chapters": [
+        "notes"
+      ],
+      "usage_count": 1,
+      "macros": [],
+      "group": null,
+      "optional": false,
+      "patterns": {
+        "notes": []
+      }
+    },
+    "singular02": {
+      "description": null,
+      "chapters": [
+        "chapter17",
+        "notes"
+      ],
+      "usage_count": 2,
+      "macros": [],
+      "group": null,
+      "optional": false,
+      "patterns": {
+        "notes": [],
+        "chapter17": [
+          ", a catastrophe of self that nothing human could undo,"
+        ]
+      }
+    },
+    "singular03": {
+      "description": null,
+      "chapters": [
+        "chapter9",
+        "notes"
+      ],
+      "usage_count": 2,
+      "macros": [],
+      "group": null,
+      "optional": false,
+      "patterns": {
+        "chapter9": [
+          "I was thinking how unlikely it was that we were friends. Still, or ever. Maybe it was the lingering "
+        ],
+        "notes": []
+      }
+    },
+    "singular04": {
+      "description": null,
+      "chapters": [
+        "chapter5",
+        "notes"
+      ],
+      "usage_count": 2,
+      "macros": [],
+      "group": null,
+      "optional": false,
+      "patterns": {
+        "notes": [],
+        "chapter5": [
+          "; a smell like purple freesia, warm and clean but with dangerous undertones of promises unkept, sacr"
+        ]
+      }
+    },
+    "singular05": {
+      "description": null,
+      "chapters": [
+        "chapter4",
+        "chapter13",
+        "notes"
+      ],
+      "usage_count": 3,
+      "macros": [],
+      "group": null,
+      "optional": false,
+      "patterns": {
+        "notes": [],
+        "chapter4": [
+          "He started hanging out with different people: friends from a business development class named Martin"
+        ],
+        "chapter13": []
+      }
+    },
+    "singular06": {
+      "description": null,
+      "chapters": [
+        "chapter12",
+        "notes"
+      ],
+      "usage_count": 2,
+      "macros": [],
+      "group": null,
+      "optional": false,
+      "patterns": {
+        "notes": [],
+        "chapter12": [
+          "He unnerved me. At first I thought it was simply because of what had happened to him. But then I rea"
+        ]
+      }
+    },
+    "singular07": {
+      "description": null,
+      "chapters": [
+        "chapter5",
+        "notes"
+      ],
+      "usage_count": 2,
+      "macros": [],
+      "group": null,
+      "optional": false,
+      "patterns": {
+        "notes": [],
+        "chapter5": [
+          "cross-universe travel"
+        ]
+      }
+    },
+    "singular08": {
+      "description": null,
+      "chapters": [
+        "chapter2",
+        "notes"
+      ],
+      "usage_count": 2,
+      "macros": [],
+      "group": null,
+      "optional": false,
+      "patterns": {
+        "notes": [],
+        "chapter2": [
+          "We stayed up there till the stars came out: Sirius and Procyon, Castor and Pollux. My namesake still"
+        ]
+      }
+    },
+    "singular09": {
+      "description": null,
+      "chapters": [
+        "chapter7",
+        "notes"
+      ],
+      "usage_count": 2,
+      "macros": [],
+      "group": null,
+      "optional": false,
+      "patterns": {
+        "notes": [],
+        "chapter7": [
+          "a brass model of a harpoon attached to what appeared to be a real whale tooth---he'd gone through a "
+        ]
+      }
+    },
+    "singular10": {
+      "description": null,
+      "chapters": [
+        "notes"
+      ],
+      "usage_count": 1,
+      "macros": [],
+      "group": null,
+      "optional": false,
+      "patterns": {
+        "notes": []
+      }
+    },
+    "singular11": {
+      "description": null,
+      "chapters": [
+        "chapter5",
+        "notes"
+      ],
+      "usage_count": 2,
+      "macros": [],
+      "group": null,
+      "optional": false,
+      "patterns": {
+        "notes": [],
+        "chapter5": [
+          "Saint Paul was the capital of Minnesota now instead of Minneapolis, which didn't make a lot of sense"
+        ]
+      }
+    },
+    "singular12": {
+      "description": null,
+      "chapters": [
+        "chapter2"
+      ],
+      "usage_count": 1,
+      "macros": [],
+      "group": null,
+      "optional": false,
+      "patterns": {
+        "chapter2": [
+          "We watched the sunset and lingered in the crepuscular light after as it eased the particulars from t"
+        ]
+      }
+    }
+  },
+  "groups": [
+    {
+      "variables": [
+        "dadphone",
+        "bradphone"
+      ],
+      "description": "Is Ryan's \"can't control who you love trauma\" because of his dad's sudden death, or his toxic relationship with Bradley?",
+      "type": "exclusive"
+    },
+    {
+      "variables": [
+        "fridgetrapped",
+        "fridgetunnel"
+      ],
+      "description": "Do they lose the way back because of losing the keys, or because the connection through the fridge snaps?",
+      "type": "exclusive"
+    },
+    {
+      "variables": [
+        "empty",
+        "furnished"
+      ],
+      "description": "Downstairs is mostly empty vs mostly full of anonymous abandoned furniture. I like that both of these are creepy in different ways.",
+      "type": "exclusive"
+    },
+    {
+      "variables": [
+        "TheCity",
+        "TheBasement"
+      ],
+      "description": "Is Elder's story of an epic lower level a huge city of houses, or an endless basement floor?",
+      "type": "exclusive"
+    },
+    {
+      "variables": [
+        "ffdropoff",
+        "ffthewalls"
+      ],
+      "description": "Details for the final fight scene",
+      "type": "exclusive"
+    },
+    {
+      "variables": [
+        "fftubeweird",
+        "fftube",
+        "ffset"
+      ],
+      "description": null,
+      "type": "exclusive"
+    },
+    {
+      "variables": [
+        "ffchandelier",
+        "ffbookshelves"
+      ],
+      "description": null,
+      "type": "exclusive"
+    },
+    {
+      "variables": [
+        "cdrom",
+        "gorilla"
+      ],
+      "description": "Niko dreams & gorilla plot thread, or weird CD-ROM game plot thread?",
+      "type": "exclusive"
+    },
+    {
+      "variables": [
+        "gayniko",
+        "firmniko",
+        "originalniko"
+      ],
+      "description": "Final Niko is in love with Ryan, is not, or ... ? Last to do is \"angryniko\"",
+      "type": "exclusive"
+    },
+    {
+      "variables": [
+        "wordy",
+        "succinct",
+        "noverbositypref"
+      ],
+      "description": "Define book-wide independent variables affecting random text. Is this narrator wordy, succinct, or no preference?",
+      "type": "exclusive"
+    },
+    {
+      "variables": [
+        "depressive",
+        "optimist",
+        "nopolaritypref"
+      ],
+      "description": "Does this narrator prefer sentences with a strong negative polarity?",
+      "type": "exclusive"
+    },
+    {
+      "variables": [
+        "slang",
+        "formal",
+        "noslangpref"
+      ],
+      "description": "Does this narrator prefer or avoid slang/swears?",
+      "type": "exclusive"
+    },
+    {
+      "variables": [
+        "subjective",
+        "objective",
+        "neithersubjnorobj"
+      ],
+      "description": "Does this narrator tend towards more subjective or objective statements or have no preference?",
+      "type": "exclusive"
+    },
+    {
+      "variables": [
+        "alliteration",
+        "noalliteration",
+        "noalitpref"
+      ],
+      "description": "Does this narrator prefer alliteration in sentences?",
+      "type": "exclusive"
+    },
+    {
+      "variables": [
+        "likesimile",
+        "dislikesimile",
+        "nosimilepref"
+      ],
+      "description": "Does this narrator prefer using simile/metaphor when possible?",
+      "type": "exclusive"
+    },
+    {
+      "variables": [
+        "favdelany",
+        "favbarker",
+        "favcrowley"
+      ],
+      "description": "Incidental cross-chapter stuff.",
+      "type": "exclusive"
+    },
+    {
+      "variables": [
+        "epi_group1a",
+        "epi_group1b",
+        "epi_group1c",
+        "epi_group1d",
+        "epi_group1e"
+      ],
+      "description": "Epigraphs",
+      "type": "exclusive"
+    },
+    {
+      "variables": [
+        "epi_group2a",
+        "epi_group2b",
+        "epi_group2c",
+        "epi_group2d"
+      ],
+      "description": null,
+      "type": "exclusive"
+    },
+    {
+      "variables": [
+        "colorseq1",
+        "colorseq2",
+        "colorseq3"
+      ],
+      "description": "Glowstick colors. The symbolism of these color sequences is left as an exercise for the reader.",
+      "type": "exclusive"
+    }
+  ],
+  "macros": {
+    "FavBook": [
+      "favcrowley",
+      "favdelany",
+      "favbarker"
+    ],
+    "AltBook": [
+      "favcrowley",
+      "favdelany",
+      "favbarker"
+    ],
+    "FavAuthor": [
+      "favcrowley",
+      "favdelany",
+      "favbarker"
+    ],
+    "color1": [
+      "colorseq3",
+      "colorseq2",
+      "colorseq1"
+    ],
+    "color1poetic": [
+      "colorseq3",
+      "colorseq2",
+      "colorseq1"
+    ],
+    "color1shades": [
+      "colorseq3",
+      "colorseq2",
+      "colorseq1"
+    ],
+    "color2": [
+      "colorseq3",
+      "colorseq2",
+      "colorseq1"
+    ],
+    "color2edge": [
+      "colorseq3",
+      "colorseq2",
+      "colorseq1"
+    ],
+    "color3": [
+      "colorseq3",
+      "colorseq2",
+      "colorseq1"
+    ],
+    "color4": [
+      "colorseq3",
+      "colorseq2",
+      "colorseq1"
+    ],
+    "color4adj": [
+      "colorseq3",
+      "colorseq2",
+      "colorseq1"
+    ]
+  }
+}

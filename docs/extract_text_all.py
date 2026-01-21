@@ -103,41 +103,62 @@ def extract_chapter_from_epub(epub_path, chapter_file):
         return None
 
 
-def get_version_id_from_folder(folder_name):
-    """Extract version ID from folder name.
+def get_version_id_from_name(name):
+    """Extract version ID from folder or file name.
 
     Supports formats:
     - subcutanean-45443
     - 45443
-    - Any folder containing digits
+    - Any name containing digits
     """
     # Try subcutanean-XXXXX format
-    if folder_name.startswith('subcutanean-'):
-        return folder_name.split('-')[1]
+    if name.startswith('subcutanean-'):
+        return name.split('-')[1]
     # Try pure numeric format
-    if folder_name.isdigit():
-        return folder_name
+    if name.isdigit():
+        return name
     # Try to extract digits from the name
-    match = re.search(r'(\d{4,})', folder_name)
+    match = re.search(r'(\d{4,})', name)
     if match:
         return match.group(1)
     return None
 
 
-def is_valid_epub_folder(folder):
-    """Check if a folder contains Subcutanean EPUB files."""
-    if not folder.is_dir():
-        return False
-    # Check for subcutanean-XXXXX format or pure numeric format
-    folder_name = folder.name
-    if folder_name.startswith('subcutanean-'):
-        return True
-    if folder_name.isdigit():
-        return True
-    # Check if folder name contains a version number and has an EPUB
-    if re.search(r'\d{4,}', folder_name) and list(folder.glob('*.epub')):
-        return True
-    return False
+def find_epub_files(base_dir):
+    """Find all EPUB files, either directly in base_dir or in subfolders.
+
+    Returns list of tuples: (epub_path, version_id)
+    """
+    epub_files = []
+
+    # First, check for EPUBs directly in the base directory
+    direct_epubs = list(base_dir.glob('*.epub'))
+    for epub_path in direct_epubs:
+        version_id = get_version_id_from_name(epub_path.stem)
+        if version_id:
+            epub_files.append((epub_path, version_id))
+
+    # Then check subfolders (for backwards compatibility)
+    for folder in base_dir.iterdir():
+        if not folder.is_dir():
+            continue
+        folder_name = folder.name
+        # Check if it's a valid version folder
+        if not (folder_name.startswith('subcutanean-') or
+                folder_name.isdigit() or
+                re.search(r'\d{4,}', folder_name)):
+            continue
+
+        folder_epubs = list(folder.glob('*.epub'))
+        if folder_epubs:
+            epub_path = folder_epubs[0]
+            version_id = get_version_id_from_name(folder_name)
+            if not version_id:
+                version_id = get_version_id_from_name(epub_path.stem)
+            if version_id:
+                epub_files.append((epub_path, version_id))
+
+    return sorted(epub_files, key=lambda x: x[1])
 
 
 def extract_all_versions():
@@ -147,10 +168,10 @@ def extract_all_versions():
     output_dir = Path(__file__).parent / 'extracted_text'
     output_dir.mkdir(exist_ok=True)
 
-    # Find all EPUB folders (supports subcutanean-XXXXX and numeric-only formats)
-    epub_folders = sorted([d for d in base_dir.iterdir() if is_valid_epub_folder(d)])
+    # Find all EPUB files (supports direct files or subfolders)
+    epub_files = find_epub_files(base_dir)
 
-    print(f"Found {len(epub_folders)} EPUB folders")
+    print(f"Found {len(epub_files)} EPUB files")
 
     # Correct chapter mapping based on actual EPUB structure
     chapter_mapping = {
@@ -184,28 +205,7 @@ def extract_all_versions():
 
     all_versions = {}
 
-    for folder in epub_folders:
-        epub_files = list(folder.glob('*.epub'))
-        if not epub_files:
-            print(f"No EPUB found in {folder.name}")
-            continue
-
-        epub_path = epub_files[0]
-        version_id = get_version_id_from_folder(folder.name)
-
-        if not version_id:
-            # Try to get version ID from the EPUB filename itself
-            epub_name = epub_path.stem  # filename without extension
-            if epub_name.isdigit():
-                version_id = epub_name
-            else:
-                match = re.search(r'(\d{4,})', epub_name)
-                if match:
-                    version_id = match.group(1)
-                else:
-                    print(f"Could not determine version ID for {folder.name}")
-                    continue
-
+    for epub_path, version_id in epub_files:
         print(f"Processing version {version_id}...")
 
         version_data = {'version_id': version_id}

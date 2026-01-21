@@ -164,6 +164,25 @@
                         <!-- Options populated by JavaScript -->
                     </select>
                 </div>
+
+                <button id="show-vars-btn" class="tool-btn vars-toggle" title="Show variable differences between versions">
+                    <i data-lucide="variable"></i> Variables
+                </button>
+            </div>
+
+            <div id="variable-diff-panel" class="variable-diff-panel hidden">
+                <div class="var-diff-section">
+                    <span class="var-diff-label">Only in <span id="var-diff-a-label">A</span>:</span>
+                    <span id="vars-only-a" class="var-list var-list-a"></span>
+                </div>
+                <div class="var-diff-section">
+                    <span class="var-diff-label">Only in <span id="var-diff-b-label">B</span>:</span>
+                    <span id="vars-only-b" class="var-list var-list-b"></span>
+                </div>
+                <div class="var-diff-section var-diff-shared">
+                    <span class="var-diff-label">Shared:</span>
+                    <span id="vars-shared" class="var-list var-list-shared"></span>
+                </div>
             </div>
 
             <div class="view-mode-selector">

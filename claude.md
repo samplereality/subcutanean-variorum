@@ -45,14 +45,22 @@ docs/
 ├── index.html              # Main HTML structure with all modals
 ├── styles.css              # Base styling
 ├── compare.css             # Comparison UI and nav bar styles
-├── compare.js              # Main application JavaScript (~4400 lines)
-├── origin-sources/         # Quant source files for macro inspection
-│   ├── prologue.txt
-│   ├── chapter-01.txt
-│   └── ... (all chapters)
+├── compare.js              # Main application JavaScript (~6500 lines)
+├── origin_text/            # Quant source files
+│   ├── manifest.txt        # File listing in reading order
+│   ├── globals.txt         # Global variable and macro definitions
+│   ├── ch01.txt ... ch17.txt
+│   └── origin_sources.json # Pre-built JSON of all sources
 ├── extracted_text/         # JSON of extracted paragraphs per version
-└── variorum_data/
-    └── variorum.json       # Aligned variorum data
+│   ├── version_XXXXX.json  # Individual version files
+│   ├── all_versions.json   # Combined file with all versions
+│   ├── variable_info.json  # Variable metadata for inference
+│   └── levenshtein_distances.json
+├── build_variable_info.py  # Extract variable info from Quant sources
+├── extract_text_all.py     # Convert EPUBs to JSON
+├── calculate_levenshtein.py # Calculate similarity metrics
+├── build_origin_sources.py # Build Quant source JSON
+└── add_variables.py        # Add variables from generation log
 ```
 
 ### Key JavaScript Functions (compare.js)
@@ -348,7 +356,118 @@ Aaron Reed's Quant markup language allows:
 
 The Macro Inspector feature lets users view the original Quant source to understand how variations are generated.
 
+### Quant Syntax Quick Reference
+
+```
+[DEFINE @varname]              # Define a variable (always on)
+[DEFINE ^@varname]             # Define optional variable (may be off)
+[DEFINE @var1|@var2]           # Mutually exclusive alternatives
+[DEFINE 50>@var1|50>@var2]     # With probabilities
+
+[@varname>text...]             # Conditional text (show if @varname active)
+[^@varname>text...]            # Negated conditional (show if @varname NOT active)
+
+[MACRO MacroName][@var1>text1|@var2>text2]  # Macro definition
+{MacroName}                    # Macro usage in chapter text
+```
+
+### Chapter ID Mapping
+
+Source files (in `origin_text/`) map to browser chapter IDs:
+
+| Source File | Browser ID | Notes |
+|-------------|------------|-------|
+| part01.txt | prologue | Part One header + prologue |
+| ch01.txt | chapter1 | |
+| ch02.txt | chapter2 | |
+| ... | ... | |
+| ch09.txt | chapter9 | |
+| part02.txt | part2 | Part Two header |
+| ch10.txt | chapter10 | |
+| ... | ... | |
+| ch15.txt | chapter15 | |
+| part03.txt | part3 | Part Three header |
+| ch16.txt | chapter16 | |
+| ch17.txt | chapter17 | |
+| epilogue.txt | chapter18 | |
+| notes.txt | notes | Author's notes |
+
+This mapping is defined in `build_variable_info.py` as `CHAPTER_MAPPING`.
+
 ## Recent Changes (January 2026)
+
+### Variables Panel & Variable Inference
+
+A new "Variables" dropdown in the nav bar shows which Quant variables differ between compared versions:
+- **Only in A/B**: Variables unique to each version (clickable to highlight affected text)
+- **Shared**: Variables present in both versions
+- Click a variable tag to highlight paragraphs containing text affected by that variable
+- Highlighted paragraphs show a "View Source" button (Lucide `file-code` icon) to see underlying Quant markup
+
+**Variable Inference for Uploaded EPUBs:**
+When users upload an EPUB with a different seed, the system infers which variables are active:
+- For mutually exclusive groups (e.g., `dadphone|bradphone`): scores each variable by pattern matches, picks highest
+- For optional variables (e.g., `possibles`, `alcohol`): checks if any patterns match
+- Inferred variables are stored with the uploaded version in `customVersions`
+
+**Key Functions (compare.js):**
+- `getVersionVariables(versionId)` - Returns variables for a version (checks both `allVersions` and `customVersions`)
+- `updateVariableDiff()` - Populates the Variables panel
+- `highlightVariableText(varName)` - Highlights paragraphs affected by a variable
+- `inferVariablesFromText(chapters)` - Infers variables from uploaded EPUB text
+- `addViewSourceButton()` - Adds clickable source button to highlighted paragraphs
+- `showVariableSourcePanel(varName, paragraphEl)` - Shows Quant source for a variable
+
+**CSS Classes:**
+- `.variable-highlight` - Yellow highlight for affected paragraphs
+- `.var-source-btn` - Circular button positioned outside paragraph bounds (`top: -12px; right: -12px`)
+- `.var-source-panel` - Floating panel showing Quant source code
+
+### Variable Info JSON Structure
+
+The `docs/extracted_text/variable_info.json` file has a nested structure:
+
+```json
+{
+  "variables": {
+    "varname": {
+      "description": "From globals.txt comments",
+      "chapters": ["chapter1", "chapter5"],
+      "usage_count": 5,
+      "macros": ["MacroName"],
+      "group": ["varname", "altvarname"],  // null if independent
+      "optional": true,  // true if ^@varname in DEFINE
+      "patterns": {
+        "chapter1": ["text snippet for matching..."]
+      }
+    }
+  },
+  "groups": [
+    {
+      "variables": ["dadphone", "bradphone"],
+      "description": "Mutually exclusive description",
+      "type": "exclusive"
+    }
+  ],
+  "macros": {
+    "MacroName": ["var1", "var2"]
+  }
+}
+```
+
+### Processing Scripts Update
+
+| Script | Purpose | Command |
+|--------|---------|---------|
+| `build_variable_info.py` | Extract variable info from Quant sources | `python3 build_variable_info.py` |
+
+The `build_variable_info.py` script:
+- Parses `globals.txt` for variable definitions, descriptions, and macros
+- Tracks variable groups (mutually exclusive alternatives from `[DEFINE @a|@b]`)
+- Tracks optional variables (from `[DEFINE ^@varname]`)
+- Extracts text patterns from chapter conditionals (`[@varname>text...]`)
+- Extracts text patterns from macro definitions (`[MACRO Name][@var>text...]`)
+- Outputs to `docs/extracted_text/variable_info.json`
 
 ### Light/Dark Mode Toggle
 - Added theme toggle button to navigation bar
@@ -381,6 +500,45 @@ The Macro Inspector feature lets users view the original Quant source to underst
 
 ## Development Notes
 
+### Icon Usage: Lucide Icons (NOT Emoji)
+
+**IMPORTANT**: Always use Lucide icons, never emoji. The project uses the Lucide icon library.
+
+```html
+<!-- In HTML -->
+<i data-lucide="file-code"></i>
+<i data-lucide="search"></i>
+<i data-lucide="bookmark"></i>
+```
+
+```javascript
+// After adding icons dynamically, initialize them:
+if (typeof lucide !== 'undefined') {
+    lucide.createIcons({ nodes: [containerElement] });
+}
+```
+
+Common icons used:
+- `file-code` - View source
+- `search` - Search
+- `bookmark` - Bookmarks
+- `upload` - File upload
+- `sun` / `moon` - Theme toggle
+- `x` - Close/delete
+
+### Important Container IDs and Selectors
+
+The main comparison display container is `comparison-display` (NOT `comparison-container`):
+```javascript
+const container = document.getElementById('comparison-display');
+```
+
+Paragraph selectors vary by view mode:
+```javascript
+// Select paragraphs in comparison views
+const paragraphs = container.querySelectorAll('p, .comparison-paragraph, .source-paragraph');
+```
+
 ### Adding New Modals
 1. Add HTML structure with `class="modal hidden"`
 2. Add open/close functions in compare.js
@@ -405,6 +563,75 @@ function initializeMyForm() {
             .catch(error => { /* error */ });
     });
 }
+```
+
+### Quant Syntax Highlighting
+
+Use `highlightQuantSyntax(code)` for displaying Quant source code. It handles HTML escaping internally, so pass raw text (not pre-escaped):
+```javascript
+// Correct:
+html += `<pre class="var-source-code">${highlightQuantSyntax(rawSnippet)}</pre>`;
+
+// Wrong (causes double-escaping like &#039;):
+html += `<pre class="var-source-code">${highlightQuantSyntax(escapeHtml(rawSnippet))}</pre>`;
+```
+
+## Planned Features
+
+### Annotation & Scholarly Notes Feature (Not Yet Implemented)
+
+A research layer for the browser enabling:
+1. **Enhanced Bookmarks** - Add notes/commentary field to saved bookmarks
+2. **Passage-level Annotations** - Click paragraphs to add notes tied to specific text
+3. **Export** - Export annotations in both JSON and Markdown formats
+
+**Proposed Data Structures:**
+
+```javascript
+// Enhanced bookmark (extends existing bookmark)
+{
+    id: "bookmark-1705001234567",
+    name: "Important variant in Ch 5",
+    versionA: "45443",
+    versionB: "45467",
+    chapter: "chapter-05",
+    mode: "sidebyside",
+    scrollPosition: 1245.5,
+    notes: "This passage shows significant divergence..."  // NEW
+}
+
+// New localStorage key: 'subcutanean_annotations'
+{
+    "annotation-1705001234567": {
+        id: "annotation-1705001234567",
+        created: "2026-01-18T12:00:00Z",
+        modified: "2026-01-18T14:30:00Z",
+        versionA: "45443",
+        versionB: "45467",
+        chapter: "chapter-05",
+        paragraphIndex: 12,
+        paragraphPreview: "The door creaked...",
+        note: "Compare with seed 45450..."
+    }
+}
+```
+
+**Proposed Export Format (Markdown):**
+```markdown
+# Subcutanean Variorum - Research Notes
+Exported: January 18, 2026
+
+## Bookmarks
+### Important variant in Ch 5
+- Versions: Seed 45443 vs Seed 45467
+- Chapter: Chapter 5
+- Notes: This passage shows significant divergence...
+
+## Passage Annotations
+### Chapter 5, Paragraph 12
+- Versions: Seed 45443 vs Seed 45467
+- Text: "The door creaked..."
+- Notes: Compare with seed 45450...
 ```
 
 ## Credits
