@@ -165,6 +165,20 @@
                     </select>
                 </div>
 
+                <div class="selector-group version-c-group hidden" id="version-c-group">
+                    <label for="version-c-select">And</label>
+                    <select id="version-c-select" class="version-select">
+                        <!-- Options populated by JavaScript -->
+                    </select>
+                    <button id="remove-version-c-btn" class="remove-version-btn" title="Remove third version">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+
+                <button id="add-version-c-btn" class="tool-btn add-version-btn" title="Add a third version to compare">
+                    <i data-lucide="plus"></i>
+                </button>
+
                 <button id="show-vars-btn" class="tool-btn vars-toggle" title="Show variable differences between versions">
                     <i data-lucide="variable"></i> Variables
                 </button>
@@ -179,8 +193,12 @@
                     <span class="var-diff-label">Only in <span id="var-diff-b-label">B</span>:</span>
                     <span id="vars-only-b" class="var-list var-list-b"></span>
                 </div>
+                <div class="var-diff-section var-diff-c hidden" id="var-diff-c-section">
+                    <span class="var-diff-label">Only in <span id="var-diff-c-label">C</span>:</span>
+                    <span id="vars-only-c" class="var-list var-list-c"></span>
+                </div>
                 <div class="var-diff-section var-diff-shared">
-                    <span class="var-diff-label">Shared:</span>
+                    <span class="var-diff-label"><span id="var-shared-label">Shared</span>:</span>
                     <span id="vars-shared" class="var-list var-list-shared"></span>
                 </div>
             </div>
@@ -252,7 +270,7 @@
                 <p class="word-diff-instruction">Click any word to see it in context</p>
             </div>
             <div class="modal-body">
-                <div class="diff-results">
+                <div class="diff-results" id="diff-results">
                     <div class="unique-words-panel">
                         <h3>Unique to Seed <span id="seed-a-label"></span></h3>
                         <p class="word-count">(<span id="unique-a-count"></span> unique words)</p>
@@ -262,6 +280,11 @@
                         <h3>Unique to Seed <span id="seed-b-label"></span></h3>
                         <p class="word-count">(<span id="unique-b-count"></span> unique words)</p>
                         <div id="unique-words-b" class="word-list"></div>
+                    </div>
+                    <div class="unique-words-panel unique-words-panel-c hidden" id="unique-words-panel-c">
+                        <h3>Unique to Seed <span id="seed-c-label"></span></h3>
+                        <p class="word-count">(<span id="unique-c-count"></span> unique words)</p>
+                        <div id="unique-words-c" class="word-list"></div>
                     </div>
                 </div>
             </div>
@@ -494,7 +517,7 @@
             </div>
             <div class="modal-body">
                 <div class="heatmap-versions">
-                    <span>Comparing: <strong id="heatmap-version-a"></strong> vs <strong id="heatmap-version-b"></strong></span>
+                    <span>Comparing: <strong id="heatmap-version-a"></strong> vs <strong id="heatmap-version-b"></strong><span id="heatmap-version-c-separator" style="display: none;"> vs </span><strong id="heatmap-version-c" style="display: none;"></strong></span>
                 </div>
                 <div id="heatmap-container" class="heatmap-container">
                     <!-- Heatmap bars will be generated here -->

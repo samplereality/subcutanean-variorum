@@ -6,6 +6,8 @@ let currentChapter = 'prologue';
 let currentMode = 'sidebyside';
 let versionA = null;
 let versionB = null;
+let versionC = null; // Optional third version for three-way comparison
+let unifiedViewVersion = 'A'; // Which version to display in unified view (A, B, or C)
 let customVersions = {}; // Store uploaded versions
 let mostRecentUploadId = null; // Track most recently uploaded version for Jaccard analysis
 let bookmarks = [];
@@ -1201,14 +1203,17 @@ async function loadAllVersions() {
 function populateVersionSelectors() {
     const selectorA = document.getElementById('version-a-select');
     const selectorB = document.getElementById('version-b-select');
+    const selectorC = document.getElementById('version-c-select');
     if (!selectorA || !selectorB) return;
 
     const previousValueA = selectorA.value;
     const previousValueB = selectorB.value;
+    const previousValueC = selectorC ? selectorC.value : null;
 
     // Clear existing options
     selectorA.innerHTML = '';
     selectorB.innerHTML = '';
+    if (selectorC) selectorC.innerHTML = '';
 
     const addSourceOption = (select) => {
         const option = document.createElement('option');
@@ -1229,10 +1234,18 @@ function populateVersionSelectors() {
         optionB.value = vid;
         optionB.textContent = `Seed ${vid}`;
         selectorB.appendChild(optionB);
+
+        if (selectorC) {
+            const optionC = document.createElement('option');
+            optionC.value = vid;
+            optionC.textContent = `Seed ${vid}`;
+            selectorC.appendChild(optionC);
+        }
     });
 
     addSourceOption(selectorA);
     addSourceOption(selectorB);
+    if (selectorC) addSourceOption(selectorC);
 
     // Add separator if there are custom versions
     const customIds = Object.keys(customVersions);
@@ -1247,6 +1260,13 @@ function populateVersionSelectors() {
         separatorB.textContent = '──────────';
         selectorB.appendChild(separatorB);
 
+        if (selectorC) {
+            const separatorC = document.createElement('option');
+            separatorC.disabled = true;
+            separatorC.textContent = '──────────';
+            selectorC.appendChild(separatorC);
+        }
+
         // Add custom versions
         customIds.sort().forEach(vid => {
             const optionA = document.createElement('option');
@@ -1258,11 +1278,19 @@ function populateVersionSelectors() {
             optionB.value = vid;
             optionB.textContent = `📎 ${customVersions[vid].name || vid}`;
             selectorB.appendChild(optionB);
+
+            if (selectorC) {
+                const optionC = document.createElement('option');
+                optionC.value = vid;
+                optionC.textContent = `📎 ${customVersions[vid].name || vid}`;
+                selectorC.appendChild(optionC);
+            }
         });
     }
 
     const desiredA = versionA || previousValueA;
     const desiredB = versionB || previousValueB;
+    const desiredC = versionC || previousValueC;
 
     if (desiredA) {
         selectorA.value = desiredA;
@@ -1278,6 +1306,11 @@ function populateVersionSelectors() {
 
     if (!selectorB.value && selectorB.options.length > 0) {
         selectorB.value = selectorB.options[0].value;
+    }
+
+    // Set selector C value if it exists and versionC is set
+    if (selectorC && desiredC) {
+        selectorC.value = desiredC;
     }
 
     // Add change handlers (only once)
@@ -1302,12 +1335,77 @@ function populateVersionSelectors() {
         });
         selectorB.dataset.hasListener = 'true';
     }
+
+    if (selectorC && !selectorC.dataset.hasListener) {
+        selectorC.addEventListener('change', (e) => {
+            versionC = e.target.value;
+            buildChapterNavigation();
+            displayComparison();
+            updateToolbarVisibility();
+            updateVariableDiffIfVisible();
+        });
+        selectorC.dataset.hasListener = 'true';
+    }
 }
 
 function updateVariableDiffIfVisible() {
     const panel = document.getElementById('variable-diff-panel');
     if (panel && !panel.classList.contains('hidden')) {
         updateVariableDiff();
+    }
+}
+
+// Toggle third version mode
+function toggleThirdVersion(enable) {
+    const group = document.getElementById('version-c-group');
+    const addBtn = document.getElementById('add-version-c-btn');
+    const selectorC = document.getElementById('version-c-select');
+    const varDiffCSection = document.getElementById('var-diff-c-section');
+
+    if (enable) {
+        // Show version C selector
+        if (group) group.classList.remove('hidden');
+        if (addBtn) addBtn.classList.add('hidden');
+
+        // Auto-select a version different from A and B
+        if (!versionC && versionIds.length > 2) {
+            versionC = versionIds.find(id => id !== versionA && id !== versionB) || versionIds[2];
+            if (selectorC) selectorC.value = versionC;
+        }
+
+        // Show version C in variables panel
+        if (varDiffCSection) varDiffCSection.classList.remove('hidden');
+
+        // Initialize Lucide icons for the remove button
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    } else {
+        // Hide version C selector
+        if (group) group.classList.add('hidden');
+        if (addBtn) addBtn.classList.remove('hidden');
+        versionC = null;
+
+        // Hide version C in variables panel
+        if (varDiffCSection) varDiffCSection.classList.add('hidden');
+    }
+
+    // Re-render comparison with new version state
+    buildChapterNavigation();
+    displayComparison();
+    updateVariableDiffIfVisible();
+}
+
+function initializeThirdVersionControls() {
+    const addBtn = document.getElementById('add-version-c-btn');
+    const removeBtn = document.getElementById('remove-version-c-btn');
+
+    if (addBtn) {
+        addBtn.addEventListener('click', () => toggleThirdVersion(true));
+    }
+
+    if (removeBtn) {
+        removeBtn.addEventListener('click', () => toggleThirdVersion(false));
     }
 }
 
@@ -1331,23 +1429,42 @@ function getVersionVariables(versionId) {
 function updateVariableDiff() {
     const varsOnlyA = document.getElementById('vars-only-a');
     const varsOnlyB = document.getElementById('vars-only-b');
+    const varsOnlyC = document.getElementById('vars-only-c');
     const varsShared = document.getElementById('vars-shared');
     const labelA = document.getElementById('var-diff-a-label');
     const labelB = document.getElementById('var-diff-b-label');
+    const labelC = document.getElementById('var-diff-c-label');
+    const sharedLabel = document.getElementById('var-shared-label');
 
     if (!varsOnlyA || !varsOnlyB || !varsShared) return;
 
     const varsA = new Set(getVersionVariables(versionA));
     const varsB = new Set(getVersionVariables(versionB));
+    const varsC = versionC ? new Set(getVersionVariables(versionC)) : null;
 
     // Update labels
     if (labelA) labelA.textContent = versionA || 'A';
     if (labelB) labelB.textContent = versionB || 'B';
+    if (labelC) labelC.textContent = versionC || 'C';
 
     // Calculate differences
-    const onlyInA = [...varsA].filter(v => !varsB.has(v)).sort();
-    const onlyInB = [...varsB].filter(v => !varsA.has(v)).sort();
-    const shared = [...varsA].filter(v => varsB.has(v)).sort();
+    let onlyInA, onlyInB, onlyInC, shared;
+
+    if (versionC && varsC) {
+        // Three-way comparison
+        onlyInA = [...varsA].filter(v => !varsB.has(v) && !varsC.has(v)).sort();
+        onlyInB = [...varsB].filter(v => !varsA.has(v) && !varsC.has(v)).sort();
+        onlyInC = [...varsC].filter(v => !varsA.has(v) && !varsB.has(v)).sort();
+        shared = [...varsA].filter(v => varsB.has(v) && varsC.has(v)).sort();
+        if (sharedLabel) sharedLabel.textContent = 'In all three';
+    } else {
+        // Two-way comparison
+        onlyInA = [...varsA].filter(v => !varsB.has(v)).sort();
+        onlyInB = [...varsB].filter(v => !varsA.has(v)).sort();
+        onlyInC = [];
+        shared = [...varsA].filter(v => varsB.has(v)).sort();
+        if (sharedLabel) sharedLabel.textContent = 'Shared';
+    }
 
     // Render variable tags with tooltips and click handlers
     const renderVars = (vars) => {
@@ -1365,6 +1482,7 @@ function updateVariableDiff() {
 
     varsOnlyA.innerHTML = renderVars(onlyInA);
     varsOnlyB.innerHTML = renderVars(onlyInB);
+    if (varsOnlyC) varsOnlyC.innerHTML = renderVars(onlyInC);
     varsShared.innerHTML = renderVars(shared);
 
     // Add click handlers for variable highlighting
@@ -1783,20 +1901,21 @@ function displayComparison() {
     const searchTerm = currentSearchTerm;
     clearSearchHighlights(false);
 
-    // Get chapter text from both versions
+    // Get chapter text from both versions (and optionally third)
     const chapterDataA = getChapterContent(versionA, currentChapter);
     const chapterDataB = getChapterContent(versionB, currentChapter);
+    const chapterDataC = versionC ? getChapterContent(versionC, currentChapter) : null;
     const textA = chapterDataA.paragraphs;
     const textB = chapterDataB.paragraphs;
 
     if (currentMode === 'unified') {
-        displayUnified(display, chapterDataA, versionA);
+        displayUnified(display, chapterDataA, chapterDataB, chapterDataC);
     } else if (currentMode === 'sidebyside') {
-        displaySideBySide(display, chapterDataA, chapterDataB);
+        displaySideBySide(display, chapterDataA, chapterDataB, chapterDataC);
     } else if (currentMode === 'diff') {
-        displayDiff(display, chapterDataA, chapterDataB);
+        displayDiff(display, chapterDataA, chapterDataB, chapterDataC);
     } else if (currentMode === 'comparison') {
-        displayParagraphComparison(display, chapterDataA, chapterDataB);
+        displayParagraphComparison(display, chapterDataA, chapterDataB, chapterDataC);
     }
 
     // Re-apply search highlights if there was an active search
@@ -1846,28 +1965,64 @@ function renderParagraphs(container, paragraphs, isSource, versionId) {
     });
 }
 
-function displayUnified(container, chapterData, version) {
-    const { paragraphs, isSource } = chapterData;
+function displayUnified(container, dataA, dataB, dataC = null) {
     container.innerHTML = '';
     container.className = '';
 
     const div = document.createElement('div');
     div.className = 'unified-view';
 
+    // Determine which data to display based on unifiedViewVersion
+    let activeData, activeVersion;
+    if (dataC) {
+        // Three versions - show tabs
+        const tabsContainer = document.createElement('div');
+        tabsContainer.className = 'unified-tabs';
+
+        const versions = [
+            { key: 'A', version: versionA, data: dataA },
+            { key: 'B', version: versionB, data: dataB },
+            { key: 'C', version: versionC, data: dataC }
+        ];
+
+        versions.forEach(({ key, version }) => {
+            const tab = document.createElement('button');
+            tab.className = `unified-tab ${unifiedViewVersion === key ? 'active' : ''}`;
+            tab.textContent = formatVersionLabel(version);
+            tab.addEventListener('click', () => {
+                unifiedViewVersion = key;
+                displayComparison();
+            });
+            tabsContainer.appendChild(tab);
+        });
+
+        div.appendChild(tabsContainer);
+
+        const selected = versions.find(v => v.key === unifiedViewVersion);
+        activeData = selected.data;
+        activeVersion = selected.version;
+    } else {
+        // Two versions - use version A by default (original behavior)
+        activeData = dataA;
+        activeVersion = versionA;
+    }
+
+    const { paragraphs, isSource } = activeData;
+
     const heading = document.createElement('h2');
-    heading.textContent = formatVersionLabel(version);
+    heading.textContent = formatVersionLabel(activeVersion);
     div.appendChild(heading);
 
-    renderParagraphs(div, paragraphs, isSource, version);
+    renderParagraphs(div, paragraphs, isSource, activeVersion);
 
     container.appendChild(div);
 }
 
-function displaySideBySide(container, dataA, dataB) {
+function displaySideBySide(container, dataA, dataB, dataC = null) {
     const { paragraphs: paragraphsA, isSource: isSourceA } = dataA;
     const { paragraphs: paragraphsB, isSource: isSourceB } = dataB;
     container.innerHTML = '';
-    container.className = 'side-by-side';
+    container.className = dataC ? 'side-by-side three-column' : 'side-by-side';
 
     // Version A panel
     const panelA = document.createElement('div');
@@ -1892,6 +2047,21 @@ function displaySideBySide(container, dataA, dataB) {
     container.appendChild(panelA);
     container.appendChild(panelB);
 
+    // Version C panel (optional)
+    if (dataC) {
+        const { paragraphs: paragraphsC, isSource: isSourceC } = dataC;
+        const panelC = document.createElement('div');
+        panelC.className = 'version-panel';
+
+        const headingC = document.createElement('h2');
+        headingC.textContent = formatVersionLabel(versionC);
+        panelC.appendChild(headingC);
+
+        renderParagraphs(panelC, paragraphsC, isSourceC, versionC);
+
+        container.appendChild(panelC);
+    }
+
     initializeSourceSync({
         panelA,
         panelB,
@@ -1900,9 +2070,10 @@ function displaySideBySide(container, dataA, dataB) {
     });
 }
 
-function displayDiff(container, dataA, dataB) {
+function displayDiff(container, dataA, dataB, dataC = null) {
     const paragraphsA = dataA.paragraphs;
     const paragraphsB = dataB.paragraphs;
+    const paragraphsC = dataC ? dataC.paragraphs : null;
     container.innerHTML = '';
     container.className = '';
 
@@ -1910,10 +2081,25 @@ function displayDiff(container, dataA, dataB) {
     div.className = 'diff-view';
 
     const heading = document.createElement('h2');
-    heading.textContent = `Tracking Changes: ${formatVersionLabel(versionA)} → ${formatVersionLabel(versionB)}`;
+    if (dataC) {
+        heading.textContent = `Tracking Changes: ${formatVersionLabel(versionA)} as base`;
+    } else {
+        heading.textContent = `Tracking Changes: ${formatVersionLabel(versionA)} → ${formatVersionLabel(versionB)}`;
+    }
     div.appendChild(heading);
 
-    // Use alignment algorithm to match paragraphs intelligently
+    if (dataC) {
+        // Three-version track changes: A as base
+        displayDiffThreeWay(div, paragraphsA, paragraphsB, paragraphsC);
+    } else {
+        // Two-version track changes (original behavior)
+        displayDiffTwoWay(div, paragraphsA, paragraphsB);
+    }
+
+    container.appendChild(div);
+}
+
+function displayDiffTwoWay(div, paragraphsA, paragraphsB) {
     const alignments = alignParagraphs(paragraphsA, paragraphsB);
 
     alignments.forEach((alignment, index) => {
@@ -1962,8 +2148,101 @@ function displayDiff(container, dataA, dataB) {
 
         div.appendChild(p);
     });
+}
 
-    container.appendChild(div);
+function displayDiffThreeWay(div, paragraphsA, paragraphsB, paragraphsC) {
+    // Use three-way alignment with A as anchor
+    const alignments = alignThreeParagraphs(paragraphsA, paragraphsB, paragraphsC);
+
+    // Add legend for three-way diff
+    const legend = document.createElement('div');
+    legend.className = 'diff-legend';
+    legend.innerHTML = `
+        <span class="legend-item"><span class="legend-swatch diff-added-b"></span> Only in ${formatVersionLabel(versionB)}</span>
+        <span class="legend-item"><span class="legend-swatch diff-added-c"></span> Only in ${formatVersionLabel(versionC)}</span>
+        <span class="legend-item"><span class="legend-swatch diff-removed"></span> Removed from ${formatVersionLabel(versionA)}</span>
+    `;
+    div.appendChild(legend);
+
+    alignments.forEach((alignment, index) => {
+        const { textA, textB, textC, type } = alignment;
+
+        const p = document.createElement('p');
+        p.dataset.paragraphIndex = index;
+
+        if (type === 'abc-identical') {
+            // All three match - show normal paragraph
+            p.innerHTML = textA;
+        } else if (type === 'unique-a') {
+            // Only in A (removed from both B and C)
+            p.innerHTML = `<span class="diff-removed">${textA}</span>`;
+        } else if (type === 'unique-b') {
+            // Only in B (added in B only)
+            p.innerHTML = `<span class="diff-added-b">${textB}</span>`;
+        } else if (type === 'unique-c') {
+            // Only in C (added in C only)
+            p.innerHTML = `<span class="diff-added-c">${textC}</span>`;
+        } else if (type === 'ab-match') {
+            // A and B match, C differs or missing
+            if (textC) {
+                // C has different text
+                p.innerHTML = textA + ` <span class="diff-added-c">[C: ${textC}]</span>`;
+            } else {
+                // C doesn't have this paragraph
+                p.innerHTML = textA;
+            }
+        } else if (type === 'ac-match') {
+            // A and C match, B differs or missing
+            if (textB) {
+                // B has different text
+                p.innerHTML = textA + ` <span class="diff-added-b">[B: ${textB}]</span>`;
+            } else {
+                // B doesn't have this paragraph
+                p.innerHTML = textA;
+            }
+        } else if (type === 'bc-match') {
+            // B and C match, A differs or missing - A is base so show B/C as additions
+            if (textA) {
+                // Show A as removed, B/C as what remains
+                const cleanA = textA.replace(/<\/?(?:em|strong)>/g, '');
+                const cleanBC = textB.replace(/<\/?(?:em|strong)>/g, '');
+                const diff = Diff.diffWords(cleanA, cleanBC);
+                diff.forEach(part => {
+                    const span = document.createElement('span');
+                    if (part.added) {
+                        span.className = 'diff-added';
+                        span.innerHTML = part.value;
+                    } else if (part.removed) {
+                        span.className = 'diff-removed';
+                        span.innerHTML = part.value;
+                    } else {
+                        span.innerHTML = part.value;
+                    }
+                    p.appendChild(span);
+                });
+            } else {
+                // A doesn't exist, B=C added
+                p.innerHTML = `<span class="diff-added">${textB}</span>`;
+            }
+        } else if (type === 'all-different') {
+            // All three differ - show A as base with B and C variants
+            p.innerHTML = textA;
+            if (textB) {
+                const bSpan = document.createElement('span');
+                bSpan.className = 'diff-variant-b';
+                bSpan.innerHTML = ` [B: ${textB}]`;
+                p.appendChild(bSpan);
+            }
+            if (textC) {
+                const cSpan = document.createElement('span');
+                cSpan.className = 'diff-variant-c';
+                cSpan.innerHTML = ` [C: ${textC}]`;
+                p.appendChild(cSpan);
+            }
+        }
+
+        div.appendChild(p);
+    });
 }
 
 // Collation View (intelligent paragraph alignment)
@@ -2166,9 +2445,145 @@ function alignParagraphs(paragraphsA, paragraphsB) {
     return alignments;
 }
 
-function displayParagraphComparison(container, dataA, dataB) {
+// Align three sets of paragraphs using pairwise alignment approach
+function alignThreeParagraphs(paragraphsA, paragraphsB, paragraphsC) {
+    // Step 1: Get pairwise alignments using existing algorithm
+    const alignAB = alignParagraphs(paragraphsA, paragraphsB);
+    const alignAC = alignParagraphs(paragraphsA, paragraphsC);
+
+    // Step 2: Build A-index maps from pairwise alignments
+    const mapAB = new Map(); // indexA -> alignment object from AB
+    const mapAC = new Map(); // indexA -> alignment object from AC
+    const orphansB = []; // B paragraphs not matched to A
+    const orphansC = []; // C paragraphs not matched to A
+
+    alignAB.forEach(align => {
+        if (align.indexA !== null) {
+            mapAB.set(align.indexA, align);
+        } else if (align.indexB !== null) {
+            orphansB.push(align);
+        }
+    });
+
+    alignAC.forEach(align => {
+        if (align.indexA !== null) {
+            mapAC.set(align.indexA, align);
+        } else if (align.indexB !== null) {
+            // In alignAC, indexB is actually indexC
+            orphansC.push({
+                indexC: align.indexB,
+                textC: align.textB
+            });
+        }
+    });
+
+    // Step 3: Merge alignments using A as anchor
+    const threeWay = [];
+
+    for (let i = 0; i < paragraphsA.length; i++) {
+        const ab = mapAB.get(i);
+        const ac = mapAC.get(i);
+
+        const textA = paragraphsA[i];
+        const textB = ab?.textB ?? null;
+        const textC = ac?.textB ?? null; // In alignAC result, textB is actually textC
+        const indexB = ab?.indexB ?? null;
+        const indexC = ac?.indexB ?? null; // In alignAC result, indexB is actually indexC
+
+        threeWay.push({
+            indexA: i,
+            indexB: indexB,
+            indexC: indexC,
+            textA: textA,
+            textB: textB,
+            textC: textC,
+            similarityAB: ab?.similarity ?? 0,
+            similarityAC: ac?.similarity ?? 0,
+            type: classifyThreeWay(textA, textB, textC)
+        });
+    }
+
+    // Step 4: Append orphans (unique to B or C, not matched to A)
+    orphansB.forEach(orphan => {
+        threeWay.push({
+            indexA: null,
+            indexB: orphan.indexB,
+            indexC: null,
+            textA: null,
+            textB: orphan.textB,
+            textC: null,
+            similarityAB: 0,
+            similarityAC: 0,
+            type: 'unique-b'
+        });
+    });
+
+    orphansC.forEach(orphan => {
+        threeWay.push({
+            indexA: null,
+            indexB: null,
+            indexC: orphan.indexC,
+            textA: null,
+            textB: null,
+            textC: orphan.textC,
+            similarityAB: 0,
+            similarityAC: 0,
+            type: 'unique-c'
+        });
+    });
+
+    return threeWay;
+}
+
+// Classify alignment type for three-way comparison
+function classifyThreeWay(textA, textB, textC) {
+    const normA = textA ? normalizeText(textA) : null;
+    const normB = textB ? normalizeText(textB) : null;
+    const normC = textC ? normalizeText(textC) : null;
+
+    // All three present and match
+    if (normA && normB && normC && normA === normB && normA === normC) {
+        return 'abc-identical';
+    }
+
+    // A and B match, C differs or missing
+    if (normA && normB && normA === normB && normA !== normC) {
+        return 'ab-match';
+    }
+
+    // A and C match, B differs or missing
+    if (normA && normC && normA === normC && normA !== normB) {
+        return 'ac-match';
+    }
+
+    // B and C match, A differs
+    if (normB && normC && normB === normC && normA !== normB) {
+        return 'bc-match';
+    }
+
+    // Only in A (B and C both null/empty)
+    if (normA && !normB && !normC) {
+        return 'unique-a';
+    }
+
+    // Only in B (handled above in orphans, but just in case)
+    if (!normA && normB && !normC) {
+        return 'unique-b';
+    }
+
+    // Only in C (handled above in orphans, but just in case)
+    if (!normA && !normB && normC) {
+        return 'unique-c';
+    }
+
+    // All three different (or various partial combinations)
+    return 'all-different';
+}
+
+function displayParagraphComparison(container, dataA, dataB, dataC = null) {
     const paragraphsA = dataA.paragraphs;
     const paragraphsB = dataB.paragraphs;
+    const paragraphsC = dataC ? dataC.paragraphs : null;
     container.innerHTML = '';
     container.className = '';
 
@@ -2176,9 +2591,25 @@ function displayParagraphComparison(container, dataA, dataB) {
     div.className = 'comparison-view';
 
     const heading = document.createElement('h2');
-    heading.textContent = `Collation: ${formatVersionLabel(versionA)} vs ${formatVersionLabel(versionB)}`;
+    if (dataC) {
+        heading.textContent = `Collation: ${formatVersionLabel(versionA)} vs ${formatVersionLabel(versionB)} vs ${formatVersionLabel(versionC)}`;
+    } else {
+        heading.textContent = `Collation: ${formatVersionLabel(versionA)} vs ${formatVersionLabel(versionB)}`;
+    }
     div.appendChild(heading);
 
+    if (dataC) {
+        // Three-version collation
+        displayParagraphComparisonThreeWay(div, paragraphsA, paragraphsB, paragraphsC);
+    } else {
+        // Two-version collation
+        displayParagraphComparisonTwoWay(div, paragraphsA, paragraphsB);
+    }
+
+    container.appendChild(div);
+}
+
+function displayParagraphComparisonTwoWay(div, paragraphsA, paragraphsB) {
     // Add legend
     const legend = document.createElement('div');
     legend.className = 'comparison-legend';
@@ -2266,7 +2697,101 @@ function displayParagraphComparison(container, dataA, dataB) {
     });
 
     div.appendChild(grid);
-    container.appendChild(div);
+}
+
+function displayParagraphComparisonThreeWay(div, paragraphsA, paragraphsB, paragraphsC) {
+    // Add legend for three-way comparison
+    const legend = document.createElement('div');
+    legend.className = 'comparison-legend three-way';
+    legend.innerHTML = `
+        <div class="legend-item">
+            <div class="legend-color abc-identical"></div>
+            <span>All identical</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color ab-match"></div>
+            <span>A = B</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color ac-match"></div>
+            <span>A = C</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color bc-match"></div>
+            <span>B = C</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color unique-a"></div>
+            <span>Only A</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color unique-b"></div>
+            <span>Only B</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color unique-c"></div>
+            <span>Only C</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color all-different"></div>
+            <span>All differ</span>
+        </div>
+    `;
+    div.appendChild(legend);
+
+    // Use three-way alignment
+    const alignments = alignThreeParagraphs(paragraphsA, paragraphsB, paragraphsC);
+
+    // Create grid for paragraphs (3 columns)
+    const grid = document.createElement('div');
+    grid.className = 'comparison-grid three-column';
+
+    alignments.forEach((alignment, rowIndex) => {
+        const { indexA, indexB, indexC, textA, textB, textC, type } = alignment;
+
+        // Determine placeholder states
+        const aIsPlaceholder = !textA;
+        const bIsPlaceholder = !textB;
+        const cIsPlaceholder = !textC;
+
+        // Create paragraph A
+        const divA = createCollationCell(textA, indexA, versionA, type, aIsPlaceholder, rowIndex);
+
+        // Create paragraph B
+        const divB = createCollationCell(textB, indexB, versionB, type, bIsPlaceholder, rowIndex);
+
+        // Create paragraph C
+        const divC = createCollationCell(textC, indexC, versionC, type, cIsPlaceholder, rowIndex);
+
+        grid.appendChild(divA);
+        grid.appendChild(divB);
+        grid.appendChild(divC);
+    });
+
+    div.appendChild(grid);
+}
+
+function createCollationCell(text, index, version, type, isPlaceholder, rowIndex) {
+    const cell = document.createElement('div');
+    cell.dataset.paragraphIndex = rowIndex;
+
+    if (isPlaceholder) {
+        cell.className = 'comparison-paragraph placeholder';
+        cell.textContent = '—';
+    } else {
+        cell.className = `comparison-paragraph ${type}`;
+
+        const numberDiv = document.createElement('div');
+        numberDiv.className = 'comparison-paragraph-number';
+        numberDiv.textContent = `${formatVersionLabel(version)} [${index + 1}]`;
+        cell.appendChild(numberDiv);
+
+        const contentDiv = document.createElement('div');
+        contentDiv.innerHTML = text;
+        cell.appendChild(contentDiv);
+    }
+
+    return cell;
 }
 
 function teardownSourceSync() {
@@ -2791,7 +3316,7 @@ function updateSearchUI() {
 
 // Word differential functionality
 let currentSortMode = 'alpha'; // 'alpha' or 'freq'
-let currentWordData = { uniqueToA: [], uniqueToB: [], freqA: new Map(), freqB: new Map() };
+let currentWordData = { uniqueToA: [], uniqueToB: [], uniqueToC: [], freqA: new Map(), freqB: new Map(), freqC: new Map() };
 
 function extractWords(text) {
     // Remove HTML tags, lowercase, extract words (alphanumeric + apostrophes)
@@ -2888,34 +3413,66 @@ function calculateWordDifferential() {
     const modal = document.getElementById('word-diff-modal');
     const seedALabel = document.getElementById('seed-a-label');
     const seedBLabel = document.getElementById('seed-b-label');
+    const seedCLabel = document.getElementById('seed-c-label');
+    const panelC = document.getElementById('unique-words-panel-c');
+    const diffResults = document.getElementById('diff-results');
 
-    // Get text for both seeds
+    // Get text for all seeds
     const textA = getAllTextForSeed(versionA);
     const textB = getAllTextForSeed(versionB);
+    const textC = versionC ? getAllTextForSeed(versionC) : '';
 
     // Extract word frequencies
     const freqA = extractWords(textA);
     const freqB = extractWords(textB);
+    const freqC = versionC ? extractWords(textC) : new Map();
 
     // Calculate unique words
-    const uniqueToA = [...freqA.keys()].filter(word => !freqB.has(word));
-    const uniqueToB = [...freqB.keys()].filter(word => !freqA.has(word));
+    let uniqueToA, uniqueToB, uniqueToC;
+
+    if (versionC) {
+        // Three-way: unique means not in either of the other two
+        uniqueToA = [...freqA.keys()].filter(word => !freqB.has(word) && !freqC.has(word));
+        uniqueToB = [...freqB.keys()].filter(word => !freqA.has(word) && !freqC.has(word));
+        uniqueToC = [...freqC.keys()].filter(word => !freqA.has(word) && !freqB.has(word));
+    } else {
+        // Two-way comparison (original)
+        uniqueToA = [...freqA.keys()].filter(word => !freqB.has(word));
+        uniqueToB = [...freqB.keys()].filter(word => !freqA.has(word));
+        uniqueToC = [];
+    }
 
     // Store data globally for sorting
     currentWordData = {
         uniqueToA: uniqueToA,
         uniqueToB: uniqueToB,
+        uniqueToC: uniqueToC,
         freqA: freqA,
-        freqB: freqB
+        freqB: freqB,
+        freqC: freqC
     };
 
     // Update modal labels
     seedALabel.textContent = formatVersionLabel(versionA);
     seedBLabel.textContent = formatVersionLabel(versionB);
 
+    // Show/hide third column
+    if (versionC) {
+        seedCLabel.textContent = formatVersionLabel(versionC);
+        panelC.classList.remove('hidden');
+        diffResults.classList.add('three-column');
+    } else {
+        panelC.classList.add('hidden');
+        diffResults.classList.remove('three-column');
+    }
+
     // Update description with seed numbers
     const description = document.getElementById('word-diff-description');
-    description.textContent = `Words in ${formatVersionLabel(versionA)} that are not in ${formatVersionLabel(versionB)}, and vice-versa. Select any word to see which chapters it appears in. Select the chapters to see the word in context.`;
+    if (versionC) {
+        description.textContent = `Words unique to each version (not found in either of the other two). Select any word to see which chapters it appears in.`;
+    } else {
+        description.textContent = `Words in ${formatVersionLabel(versionA)} that are not in ${formatVersionLabel(versionB)}, and vice-versa. Select any word to see which chapters it appears in. Select the chapters to see the word in context.`;
+    }
 
     // Display words with current sort mode
     displayWordLists();
@@ -2927,15 +3484,18 @@ function calculateWordDifferential() {
 function displayWordLists() {
     const uniqueACount = document.getElementById('unique-a-count');
     const uniqueBCount = document.getElementById('unique-b-count');
+    const uniqueCCount = document.getElementById('unique-c-count');
     const uniqueWordsA = document.getElementById('unique-words-a');
     const uniqueWordsB = document.getElementById('unique-words-b');
+    const uniqueWordsC = document.getElementById('unique-words-c');
 
-    let sortedA, sortedB;
+    let sortedA, sortedB, sortedC;
 
     if (currentSortMode === 'alpha') {
         // Sort alphabetically
         sortedA = [...currentWordData.uniqueToA].sort();
         sortedB = [...currentWordData.uniqueToB].sort();
+        sortedC = [...currentWordData.uniqueToC].sort();
     } else {
         // Sort by frequency (descending)
         sortedA = [...currentWordData.uniqueToA].sort((a, b) =>
@@ -2944,11 +3504,15 @@ function displayWordLists() {
         sortedB = [...currentWordData.uniqueToB].sort((a, b) =>
             currentWordData.freqB.get(b) - currentWordData.freqB.get(a)
         );
+        sortedC = [...currentWordData.uniqueToC].sort((a, b) =>
+            currentWordData.freqC.get(b) - currentWordData.freqC.get(a)
+        );
     }
 
     // Update counts
     uniqueACount.textContent = sortedA.length;
     uniqueBCount.textContent = sortedB.length;
+    if (uniqueCCount) uniqueCCount.textContent = sortedC.length;
 
     // Display unique words with frequencies if in frequency mode
     uniqueWordsA.innerHTML = '';
@@ -2976,6 +3540,22 @@ function displayWordLists() {
         span.addEventListener('click', (e) => showWordPopup(e, word, versionB));
         uniqueWordsB.appendChild(span);
     });
+
+    // Display version C words if available
+    if (uniqueWordsC && versionC) {
+        uniqueWordsC.innerHTML = '';
+        sortedC.forEach(word => {
+            const freq = currentWordData.freqC.get(word);
+            const freqText = (currentSortMode === 'freq' && freq > 1) ? ` (${freq})` : '';
+            const span = document.createElement('span');
+            span.className = 'word-item';
+            span.textContent = word + freqText;
+            span.dataset.word = word;
+            span.dataset.seed = versionC;
+            span.addEventListener('click', (e) => showWordPopup(e, word, versionC));
+            uniqueWordsC.appendChild(span);
+        });
+    }
 }
 
 function setSortMode(mode) {
@@ -3728,7 +4308,10 @@ function saveCurrentBookmark() {
 
     const openPanels = getOpenNotePanelsState();
     const panelInfo = openPanels.length > 0 ? ` + ${openPanels.length} note${openPanels.length > 1 ? 's' : ''}` : '';
-    const defaultName = `${formatVersionLabel(versionA)} vs ${formatVersionLabel(versionB)} – ${formatChapterLabel(currentChapter)} (${formatModeLabel(currentMode)})${panelInfo}`;
+    const versionLabel = versionC
+        ? `${formatVersionLabel(versionA)} vs ${formatVersionLabel(versionB)} vs ${formatVersionLabel(versionC)}`
+        : `${formatVersionLabel(versionA)} vs ${formatVersionLabel(versionB)}`;
+    const defaultName = `${versionLabel} – ${formatChapterLabel(currentChapter)} (${formatModeLabel(currentMode)})${panelInfo}`;
     const label = prompt('Name this bookmark:', defaultName);
     if (label === null) return;
     const trimmed = label.trim();
@@ -3743,6 +4326,7 @@ function saveCurrentBookmark() {
         name: trimmed,
         versionA: versionA,
         versionB: versionB,
+        versionC: versionC || null, // Optional third version
         chapter: currentChapter,
         mode: currentMode,
         scrollPosition: window.scrollY,
@@ -3764,6 +4348,8 @@ function applyBookmark(bookmark) {
     if (!bookmark) return;
     const versionAAvailable = isVersionSelectable(bookmark.versionA);
     const versionBAvailable = isVersionSelectable(bookmark.versionB);
+    const versionCAvailable = bookmark.versionC ? isVersionSelectable(bookmark.versionC) : true;
+
     if (!versionAAvailable || !versionBAvailable) {
         if (isSourceVersion(bookmark.versionA) || isSourceVersion(bookmark.versionB)) {
             showNotification('Source code data is still loading. Please try again in a moment.', 'info');
@@ -3778,14 +4364,30 @@ function applyBookmark(bookmark) {
         return;
     }
 
+    // Warn if third version is no longer available but continue with two-version mode
+    if (bookmark.versionC && !versionCAvailable) {
+        showNotification('Third version in this bookmark is no longer available. Restoring two-version comparison.', 'warning');
+    }
+
     const selectA = document.getElementById('version-a-select');
     const selectB = document.getElementById('version-b-select');
+    const selectC = document.getElementById('version-c-select');
 
     versionA = bookmark.versionA;
     versionB = bookmark.versionB;
 
     if (selectA) selectA.value = versionA;
     if (selectB) selectB.value = versionB;
+
+    // Restore third version if available
+    if (bookmark.versionC && versionCAvailable) {
+        versionC = bookmark.versionC;
+        if (selectC) selectC.value = versionC;
+        toggleThirdVersion(true);
+    } else {
+        versionC = null;
+        toggleThirdVersion(false);
+    }
 
     currentChapter = bookmark.chapter;
     pendingBookmarkScroll = typeof bookmark.scrollPosition === 'number' ? bookmark.scrollPosition : 0;
@@ -6270,6 +6872,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeNavigation();
     initializeGenerateForm();
     initializeVariablePanel();
+    initializeThirdVersionControls();
 
     // Theme toggle event listener
     const themeToggle = document.getElementById('theme-toggle');
@@ -6763,44 +7366,78 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function calculateChapterVariation(chapterId) {
-        // Get paragraphs for both versions
+        // Get paragraphs for all versions
         const dataA = allVersions[versionA];
         const dataB = allVersions[versionB];
+        const dataC = versionC ? allVersions[versionC] : null;
 
-        if (!dataA || !dataB) return { variation: 0, identical: 0, different: 0, total: 0 };
+        if (!dataA || !dataB) return { variation: 0, identical: 0, different: 0, total: 0, twoMatch: 0, allDiffer: 0 };
 
         const parasA = dataA[chapterId] || [];
         const parasB = dataB[chapterId] || [];
+        const parasC = dataC ? (dataC[chapterId] || []) : null;
 
         // Normalize paragraphs for comparison (strip HTML, lowercase, trim)
         const normalize = (p) => p.replace(/<[^>]+>/g, '').toLowerCase().trim();
 
         const normalizedA = parasA.map(normalize);
         const normalizedB = parasB.map(normalize);
+        const normalizedC = parasC ? parasC.map(normalize) : null;
 
-        // Count matches and differences
-        const maxLen = Math.max(normalizedA.length, normalizedB.length);
-        if (maxLen === 0) return { variation: 0, identical: 0, different: 0, total: 0 };
+        if (versionC && normalizedC) {
+            // Three-way comparison
+            const maxLen = Math.max(normalizedA.length, normalizedB.length, normalizedC.length);
+            if (maxLen === 0) return { variation: 0, identical: 0, different: 0, total: 0, twoMatch: 0, allDiffer: 0 };
 
-        let identical = 0;
-        let different = 0;
+            let allMatch = 0;
+            let twoMatch = 0;
+            let allDiffer = 0;
 
-        // Simple paragraph-by-paragraph comparison
-        for (let i = 0; i < maxLen; i++) {
-            const a = normalizedA[i] || '';
-            const b = normalizedB[i] || '';
+            for (let i = 0; i < maxLen; i++) {
+                const a = normalizedA[i] || '';
+                const b = normalizedB[i] || '';
+                const c = normalizedC[i] || '';
 
-            if (a === b && a !== '') {
-                identical++;
-            } else if (a !== '' || b !== '') {
-                different++;
+                if (a === '' && b === '' && c === '') continue;
+
+                if (a === b && b === c && a !== '') {
+                    allMatch++;
+                } else if ((a === b && a !== '') || (a === c && a !== '') || (b === c && b !== '')) {
+                    twoMatch++;
+                } else {
+                    allDiffer++;
+                }
             }
+
+            const total = allMatch + twoMatch + allDiffer;
+            // Weighted variation: allDiffer counts fully, twoMatch counts as half
+            const variation = total > 0 ? ((allDiffer + twoMatch * 0.5) / total) * 100 : 0;
+
+            return { variation, identical: allMatch, different: allDiffer, total, twoMatch, allDiffer };
+        } else {
+            // Two-version comparison (original logic)
+            const maxLen = Math.max(normalizedA.length, normalizedB.length);
+            if (maxLen === 0) return { variation: 0, identical: 0, different: 0, total: 0, twoMatch: 0, allDiffer: 0 };
+
+            let identical = 0;
+            let different = 0;
+
+            for (let i = 0; i < maxLen; i++) {
+                const a = normalizedA[i] || '';
+                const b = normalizedB[i] || '';
+
+                if (a === b && a !== '') {
+                    identical++;
+                } else if (a !== '' || b !== '') {
+                    different++;
+                }
+            }
+
+            const total = identical + different;
+            const variation = total > 0 ? (different / total) * 100 : 0;
+
+            return { variation, identical, different, total, twoMatch: 0, allDiffer: different };
         }
-
-        const total = identical + different;
-        const variation = total > 0 ? (different / total) * 100 : 0;
-
-        return { variation, identical, different, total };
     }
 
     function getHeatmapColor(variation) {
@@ -6824,6 +7461,20 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update version labels
         document.getElementById('heatmap-version-a').textContent = formatVersionLabel(versionA);
         document.getElementById('heatmap-version-b').textContent = formatVersionLabel(versionB);
+
+        // Show/hide third version label
+        const versionCEl = document.getElementById('heatmap-version-c');
+        const versionCSeparator = document.getElementById('heatmap-version-c-separator');
+        if (versionC) {
+            if (versionCEl) {
+                versionCEl.textContent = formatVersionLabel(versionC);
+                versionCEl.style.display = 'inline';
+            }
+            if (versionCSeparator) versionCSeparator.style.display = 'inline';
+        } else {
+            if (versionCEl) versionCEl.style.display = 'none';
+            if (versionCSeparator) versionCSeparator.style.display = 'none';
+        }
 
         const container = document.getElementById('heatmap-container');
         const summaryEl = document.getElementById('heatmap-summary');
@@ -6857,6 +7508,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let html = '';
         let totalIdentical = 0;
         let totalDifferent = 0;
+        let totalTwoMatch = 0;
         let mostVariedChapter = { id: '', label: '', variation: 0 };
         let leastVariedChapter = { id: '', label: '', variation: 100 };
 
@@ -6864,6 +7516,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const stats = calculateChapterVariation(ch.id);
             totalIdentical += stats.identical;
             totalDifferent += stats.different;
+            totalTwoMatch += stats.twoMatch || 0;
 
             if (stats.total > 0) {
                 if (stats.variation > mostVariedChapter.variation) {
@@ -6891,15 +7544,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
         container.innerHTML = html;
 
-        // Summary
-        const totalParagraphs = totalIdentical + totalDifferent;
-        const overallVariation = totalParagraphs > 0 ? ((totalDifferent / totalParagraphs) * 100).toFixed(1) : 0;
+        // Summary - different wording for two-way vs three-way comparison
+        if (versionC) {
+            const totalParagraphs = totalIdentical + totalTwoMatch + totalDifferent;
+            const overallVariation = totalParagraphs > 0 ? (((totalDifferent + totalTwoMatch * 0.5) / totalParagraphs) * 100).toFixed(1) : 0;
 
-        summaryEl.innerHTML = `
-            <p><strong>${totalIdentical}</strong> paragraphs identical, <strong>${totalDifferent}</strong> paragraphs differ (${overallVariation}% overall variation)</p>
-            <p>Most varied: <strong>${mostVariedChapter.label}</strong> (${mostVariedChapter.variation.toFixed(0)}%) ·
-               Least varied: <strong>${leastVariedChapter.label}</strong> (${leastVariedChapter.variation.toFixed(0)}%)</p>
-        `;
+            summaryEl.innerHTML = `
+                <p><strong>${totalIdentical}</strong> paragraphs match in all three versions, <strong>${totalTwoMatch}</strong> match in two, <strong>${totalDifferent}</strong> all differ (${overallVariation}% weighted variation)</p>
+                <p>Most varied: <strong>${mostVariedChapter.label}</strong> (${mostVariedChapter.variation.toFixed(0)}%) ·
+                   Least varied: <strong>${leastVariedChapter.label}</strong> (${leastVariedChapter.variation.toFixed(0)}%)</p>
+            `;
+        } else {
+            const totalParagraphs = totalIdentical + totalDifferent;
+            const overallVariation = totalParagraphs > 0 ? ((totalDifferent / totalParagraphs) * 100).toFixed(1) : 0;
+
+            summaryEl.innerHTML = `
+                <p><strong>${totalIdentical}</strong> paragraphs identical, <strong>${totalDifferent}</strong> paragraphs differ (${overallVariation}% overall variation)</p>
+                <p>Most varied: <strong>${mostVariedChapter.label}</strong> (${mostVariedChapter.variation.toFixed(0)}%) ·
+                   Least varied: <strong>${leastVariedChapter.label}</strong> (${leastVariedChapter.variation.toFixed(0)}%)</p>
+            `;
+        }
     }
 
     // Make closeHeatmapModal available globally for onclick handlers
