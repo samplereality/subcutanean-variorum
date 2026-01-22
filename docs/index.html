@@ -212,7 +212,7 @@
                     <button id="clear-search-btn" class="tool-btn" title="Clear search results">Clear</button>
                 </div>
                 <button id="word-diff-btn" class="tool-btn" title="Compare unique vocabulary between two versions">Word Differential</button>
-                <button id="levenshtein-btn" class="tool-btn" title="Analyze vocabulary similarity using Jaccard distance">Jaccard Distance</button>
+                <button id="heatmap-btn" class="tool-btn" title="View chapter-by-chapter variation density">Chapter Heatmap</button>
             </div>
 
         </div>
@@ -484,40 +484,27 @@
         </div>
     </div>
 
-    <!-- Jaccard Distance Modal -->
-    <div id="levenshtein-modal" class="modal hidden">
+    <!-- Chapter Heatmap Modal -->
+    <div id="heatmap-modal" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Jaccard Distance Analysis</h2>
-                <p class="modal-description" style="padding-right: 40px;">Jaccard distance measures vocabulary similarity between texts by comparing their unique word sets. Higher percentages indicate more similar vocabulary.</p>
-                <button id="close-levenshtein-modal-btn" class="close-btn"><i data-lucide="x"></i></button>
+                <h2>Chapter Variation Heatmap</h2>
+                <p class="modal-description" style="padding-right: 40px;">Shows where textual differences are concentrated across chapters. Darker colors indicate more variation between the two selected versions.</p>
+                <button id="close-heatmap-modal-btn" class="close-btn"><i data-lucide="x"></i></button>
             </div>
             <div class="modal-body">
-                <div class="levenshtein-summary">
-                    <div class="distance-card">
-                        <h3>Currently Selected Versions</h3>
-                        <p class="distance-pair">
-                            <strong>Seeds <span id="most-similar-seeds"></span></strong>
-                        </p>
-                        <p class="distance-value"><span id="most-similar-distance"></span></p>
-                        <button id="load-most-similar-btn" class="tool-btn">Load These Versions</button>
-                    </div>
-                    <div class="distance-card">
-                        <h3>Most Recently Uploaded File</h3>
-                        <p class="distance-pair">
-                            <strong><span id="most-different-seeds"></span></strong>
-                        </p>
-                        <p class="distance-value"><span id="most-different-distance"></span></p>
-                        <div style="display: flex; gap: 10px; justify-content: center;">
-                            <button id="load-closest-btn" class="tool-btn">Load Closest Match</button>
-                            <button id="load-farthest-btn" class="tool-btn">Load Farthest Match</button>
-                        </div>
-                    </div>
+                <div class="heatmap-versions">
+                    <span>Comparing: <strong id="heatmap-version-a"></strong> vs <strong id="heatmap-version-b"></strong></span>
                 </div>
-                <div class="matrix-section">
-                    <button id="show-matrix-btn" class="tool-btn">Show All Uploaded Files</button>
-                    <div id="distance-matrix" class="distance-matrix hidden"></div>
+                <div id="heatmap-container" class="heatmap-container">
+                    <!-- Heatmap bars will be generated here -->
                 </div>
+                <div class="heatmap-legend">
+                    <span class="legend-label">Identical</span>
+                    <div class="legend-gradient"></div>
+                    <span class="legend-label">High variation</span>
+                </div>
+                <div id="heatmap-summary" class="heatmap-summary"></div>
             </div>
         </div>
     </div>

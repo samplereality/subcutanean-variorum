@@ -1529,6 +1529,133 @@ header {
     cursor: default;
 }
 
+/* Chapter Heatmap Modal */
+
+.heatmap-versions {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.heatmap-versions strong {
+    color: var(--accent-color);
+}
+
+.heatmap-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.heatmap-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.heatmap-label {
+    width: 100px;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.8);
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.heatmap-bar-container {
+    flex: 1;
+    height: 28px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.heatmap-bar-container:hover {
+    transform: scaleY(1.1);
+}
+
+.heatmap-bar {
+    height: 100%;
+    transition: width 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 8px;
+}
+
+.heatmap-bar-value {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.95);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.heatmap-legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.legend-gradient {
+    width: 150px;
+    height: 12px;
+    border-radius: 3px;
+    background: linear-gradient(to right,
+        rgba(76, 175, 80, 0.6),
+        rgba(255, 193, 7, 0.6),
+        rgba(255, 136, 0, 0.8),
+        rgba(244, 67, 54, 0.8)
+    );
+}
+
+.heatmap-summary {
+    text-align: center;
+    padding: 1rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.heatmap-summary strong {
+    color: var(--accent-color);
+}
+
+/* Light theme adjustments for heatmap */
+[data-theme="light"] .heatmap-versions {
+    color: rgba(0, 0, 0, 0.8);
+}
+
+[data-theme="light"] .heatmap-label {
+    color: rgba(0, 0, 0, 0.7);
+}
+
+[data-theme="light"] .heatmap-bar-container {
+    background-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .heatmap-bar-value {
+    color: rgba(255, 255, 255, 1);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8), 0 0 6px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="light"] .heatmap-legend {
+    color: rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="light"] .heatmap-summary {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: rgba(0, 0, 0, 0.8);
+}
+
 /* Comparison display */
 
 main {

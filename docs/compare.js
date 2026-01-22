@@ -1213,7 +1213,7 @@ function populateVersionSelectors() {
     const addSourceOption = (select) => {
         const option = document.createElement('option');
         option.value = SOURCE_VERSION_ID;
-        option.textContent = originSourcesLoaded ? '📜 Source Code' : '📜 Source Code (loading...)';
+        option.textContent = originSourcesLoaded ? '⟨⟩ Source Code' : '⟨⟩ Source Code (loading...)';
         option.disabled = !originSourcesLoaded;
         select.appendChild(option);
     };
@@ -1701,6 +1701,7 @@ function buildChapterNavigation() {
     chapters.forEach(chapterId => {
         const button = document.createElement('button');
         button.className = 'nav-btn';
+        button.setAttribute('data-chapter', chapterId);
         if (chapterId === currentChapter) {
             button.classList.add('active');
         }
@@ -1710,11 +1711,11 @@ function buildChapterNavigation() {
         if (chapterId === 'introduction') {
             buttonText = 'Intro';
         } else if (chapterId === 'prologue') {
-            buttonText = 'Part I';
+            buttonText = 'Part 1';
         } else if (chapterId === 'part2') {
-            buttonText = 'Part II';
+            buttonText = 'Part 2';
         } else if (chapterId === 'part3') {
-            buttonText = 'Part III';
+            buttonText = 'Part 3';
         } else if (chapterId === 'chapter18') {
             buttonText = 'Epilogue';
         } else if (chapterId === 'notes') {
@@ -1994,9 +1995,9 @@ function normalizeText(text) {
 
 function formatChapterLabel(chapterId) {
     if (!chapterId) return 'Chapter';
-    if (chapterId === 'prologue') return 'Part I';
-    if (chapterId === 'part2') return 'Part II';
-    if (chapterId === 'part3') return 'Part III';
+    if (chapterId === 'prologue') return 'Part 1';
+    if (chapterId === 'part2') return 'Part 2';
+    if (chapterId === 'part3') return 'Part 3';
     if (chapterId === 'chapter18') return 'Epilogue';
     if (chapterId === 'notes') return 'Notes';
     if (chapterId.startsWith('chapter')) {
@@ -3010,9 +3011,9 @@ function findChaptersWithWord(word, seedId) {
 
 function formatChapterName(chapterId) {
     if (chapterId === 'introduction') return 'Introduction';
-    if (chapterId === 'prologue') return 'Prologue';
-    if (chapterId === 'part2') return 'Part II';
-    if (chapterId === 'part3') return 'Part III';
+    if (chapterId === 'prologue') return 'Part 1';
+    if (chapterId === 'part2') return 'Part 2';
+    if (chapterId === 'part3') return 'Part 3';
     if (chapterId === 'chapter18') return 'Epilogue';
     if (chapterId === 'notes') return 'Notes';
     if (chapterId.startsWith('chapter')) {
@@ -3102,6 +3103,26 @@ function closeWordPopup() {
 function closeModal() {
     const modal = document.getElementById('word-diff-modal');
     modal.classList.add('hidden');
+}
+
+function navigateToChapter(chapterId) {
+    // Update current chapter
+    currentChapter = chapterId;
+
+    // Update active chapter button
+    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+    const chapterButtons = document.querySelectorAll('.nav-btn');
+    chapterButtons.forEach(btn => {
+        // Match button by data attribute or text content
+        const btnChapter = btn.getAttribute('data-chapter');
+        if (btnChapter === chapterId) {
+            btn.classList.add('active');
+        }
+    });
+
+    // Display the chapter
+    displayComparison();
+    updateVariableDiffIfVisible();
 }
 
 // EPUB Generation functionality
@@ -6728,21 +6749,203 @@ document.addEventListener('DOMContentLoaded', () => {
         loadVersionPair(version1, version2);
     };
 
-    // Event listeners
+    // Chapter Heatmap functionality
+    function openHeatmapModal() {
+        closeAllModals();
+        const modal = document.getElementById('heatmap-modal');
+        modal.classList.remove('hidden');
+        displayChapterHeatmap();
+    }
+
+    function closeHeatmapModal() {
+        const modal = document.getElementById('heatmap-modal');
+        modal.classList.add('hidden');
+    }
+
+    function calculateChapterVariation(chapterId) {
+        // Get paragraphs for both versions
+        const dataA = allVersions[versionA];
+        const dataB = allVersions[versionB];
+
+        if (!dataA || !dataB) return { variation: 0, identical: 0, different: 0, total: 0 };
+
+        const parasA = dataA[chapterId] || [];
+        const parasB = dataB[chapterId] || [];
+
+        // Normalize paragraphs for comparison (strip HTML, lowercase, trim)
+        const normalize = (p) => p.replace(/<[^>]+>/g, '').toLowerCase().trim();
+
+        const normalizedA = parasA.map(normalize);
+        const normalizedB = parasB.map(normalize);
+
+        // Count matches and differences
+        const maxLen = Math.max(normalizedA.length, normalizedB.length);
+        if (maxLen === 0) return { variation: 0, identical: 0, different: 0, total: 0 };
+
+        let identical = 0;
+        let different = 0;
+
+        // Simple paragraph-by-paragraph comparison
+        for (let i = 0; i < maxLen; i++) {
+            const a = normalizedA[i] || '';
+            const b = normalizedB[i] || '';
+
+            if (a === b && a !== '') {
+                identical++;
+            } else if (a !== '' || b !== '') {
+                different++;
+            }
+        }
+
+        const total = identical + different;
+        const variation = total > 0 ? (different / total) * 100 : 0;
+
+        return { variation, identical, different, total };
+    }
+
+    function getHeatmapColor(variation) {
+        // variation is 0-100
+        if (variation < 5) {
+            return 'rgba(76, 175, 80, 0.6)'; // Green - nearly identical
+        } else if (variation < 20) {
+            return 'rgba(139, 195, 74, 0.6)'; // Light green
+        } else if (variation < 40) {
+            return 'rgba(255, 193, 7, 0.7)'; // Yellow
+        } else if (variation < 60) {
+            return 'rgba(255, 152, 0, 0.8)'; // Orange
+        } else if (variation < 80) {
+            return 'rgba(255, 87, 34, 0.8)'; // Deep orange
+        } else {
+            return 'rgba(244, 67, 54, 0.85)'; // Red - high variation
+        }
+    }
+
+    function displayChapterHeatmap() {
+        // Update version labels
+        document.getElementById('heatmap-version-a').textContent = formatVersionLabel(versionA);
+        document.getElementById('heatmap-version-b').textContent = formatVersionLabel(versionB);
+
+        const container = document.getElementById('heatmap-container');
+        const summaryEl = document.getElementById('heatmap-summary');
+
+        // Chapter order for display
+        const chapters = [
+            { id: 'prologue', label: 'Part 1' },
+            { id: 'chapter1', label: 'Chapter 1' },
+            { id: 'chapter2', label: 'Chapter 2' },
+            { id: 'chapter3', label: 'Chapter 3' },
+            { id: 'chapter4', label: 'Chapter 4' },
+            { id: 'chapter5', label: 'Chapter 5' },
+            { id: 'chapter6', label: 'Chapter 6' },
+            { id: 'chapter7', label: 'Chapter 7' },
+            { id: 'chapter8', label: 'Chapter 8' },
+            { id: 'chapter9', label: 'Chapter 9' },
+            { id: 'part2', label: 'Part 2' },
+            { id: 'chapter10', label: 'Chapter 10' },
+            { id: 'chapter11', label: 'Chapter 11' },
+            { id: 'chapter12', label: 'Chapter 12' },
+            { id: 'chapter13', label: 'Chapter 13' },
+            { id: 'chapter14', label: 'Chapter 14' },
+            { id: 'chapter15', label: 'Chapter 15' },
+            { id: 'part3', label: 'Part 3' },
+            { id: 'chapter16', label: 'Chapter 16' },
+            { id: 'chapter17', label: 'Chapter 17' },
+            { id: 'chapter18', label: 'Chapter 18' },
+            { id: 'notes', label: 'Notes' }
+        ];
+
+        let html = '';
+        let totalIdentical = 0;
+        let totalDifferent = 0;
+        let mostVariedChapter = { id: '', label: '', variation: 0 };
+        let leastVariedChapter = { id: '', label: '', variation: 100 };
+
+        chapters.forEach(ch => {
+            const stats = calculateChapterVariation(ch.id);
+            totalIdentical += stats.identical;
+            totalDifferent += stats.different;
+
+            if (stats.total > 0) {
+                if (stats.variation > mostVariedChapter.variation) {
+                    mostVariedChapter = { ...ch, variation: stats.variation };
+                }
+                if (stats.variation < leastVariedChapter.variation) {
+                    leastVariedChapter = { ...ch, variation: stats.variation };
+                }
+            }
+
+            const color = getHeatmapColor(stats.variation);
+            const barWidth = Math.max(5, stats.variation); // Minimum 5% width for visibility
+
+            html += `
+                <div class="heatmap-row" data-chapter="${ch.id}">
+                    <span class="heatmap-label">${ch.label}</span>
+                    <div class="heatmap-bar-container" onclick="navigateToChapter('${ch.id}'); closeHeatmapModal();" title="Click to view ${ch.label}">
+                        <div class="heatmap-bar" style="width: ${barWidth}%; background-color: ${color};">
+                            ${stats.variation >= 10 ? `<span class="heatmap-bar-value">${stats.variation.toFixed(0)}%</span>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        container.innerHTML = html;
+
+        // Summary
+        const totalParagraphs = totalIdentical + totalDifferent;
+        const overallVariation = totalParagraphs > 0 ? ((totalDifferent / totalParagraphs) * 100).toFixed(1) : 0;
+
+        summaryEl.innerHTML = `
+            <p><strong>${totalIdentical}</strong> paragraphs identical, <strong>${totalDifferent}</strong> paragraphs differ (${overallVariation}% overall variation)</p>
+            <p>Most varied: <strong>${mostVariedChapter.label}</strong> (${mostVariedChapter.variation.toFixed(0)}%) ·
+               Least varied: <strong>${leastVariedChapter.label}</strong> (${leastVariedChapter.variation.toFixed(0)}%)</p>
+        `;
+    }
+
+    // Make closeHeatmapModal available globally for onclick handlers
+    window.closeHeatmapModal = closeHeatmapModal;
+
+    // Event listeners for heatmap
+    const heatmapBtn = document.getElementById('heatmap-btn');
+    const closeHeatmapBtn = document.getElementById('close-heatmap-modal-btn');
+    const heatmapModal = document.getElementById('heatmap-modal');
+
+    if (heatmapBtn) {
+        heatmapBtn.addEventListener('click', openHeatmapModal);
+    }
+    if (closeHeatmapBtn) {
+        closeHeatmapBtn.addEventListener('click', closeHeatmapModal);
+    }
+    if (heatmapModal) {
+        heatmapModal.addEventListener('click', (e) => {
+            if (e.target === heatmapModal) {
+                closeHeatmapModal();
+            }
+        });
+    }
+
+    // Keep Jaccard event listeners for backwards compatibility (if elements exist)
     const jaccardBtn = document.getElementById('levenshtein-btn');
     const closeJaccardBtn = document.getElementById('close-levenshtein-modal-btn');
     const jaccardModal = document.getElementById('levenshtein-modal');
     const showMatrixBtn = document.getElementById('show-matrix-btn');
 
-    jaccardBtn.addEventListener('click', openJaccardModal);
-    closeJaccardBtn.addEventListener('click', closeJaccardModal);
-    showMatrixBtn.addEventListener('click', toggleUploadedFilesMatrix);
-
-    jaccardModal.addEventListener('click', (e) => {
-        if (e.target === jaccardModal) {
-            closeJaccardModal();
-        }
-    });
+    if (jaccardBtn) {
+        jaccardBtn.addEventListener('click', openJaccardModal);
+    }
+    if (closeJaccardBtn) {
+        closeJaccardBtn.addEventListener('click', closeJaccardModal);
+    }
+    if (showMatrixBtn) {
+        showMatrixBtn.addEventListener('click', toggleUploadedFilesMatrix);
+    }
+    if (jaccardModal) {
+        jaccardModal.addEventListener('click', (e) => {
+            if (e.target === jaccardModal) {
+                closeJaccardModal();
+            }
+        });
+    }
 });
 function normalizeOptionId(name) {
     return (name || '').replace(/^@/, '').trim().toLowerCase();
