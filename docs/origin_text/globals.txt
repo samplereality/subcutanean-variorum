@@ -36,7 +36,6 @@
 
 
 
-
 # ************************************************************
 # Define book-wide independent variables affecting random text.
 # ************************************************************
@@ -74,7 +73,6 @@
 # Incidental cross-chapter stuff.
 # ************************************************************
 
-
 [DEFINE 50>@favdelany|35>@favbarker|15>@favcrowley]
 [MACRO FavBook][@favdelany>{i/Dhalgren}|@favbarker>{i/Imajica}|@favcrowley>{i/Little, Big}]
 [MACRO AltBook][@favdelany>{i/They Fly at Çiron}|@favbarker>{i/Sacrament}|@favcrowley>{i/The Deep}]
@@ -103,6 +101,7 @@
 [MACRO color4adj][@colorseq1>fiery|@colorseq2>cerulean|@colorseq3>emerald]
 
 
+
 # ************************************************************
 # Custom text for "Singular Subcutanean" crowdfunders.
 # ************************************************************
@@ -121,12 +120,3 @@
 [DEFINE 0>@singular10]
 [DEFINE 0>@singular11]
 [DEFINE 0>@singular12]
-
-
-
-
-
-
-
-
-

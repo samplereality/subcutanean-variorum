@@ -180,11 +180,26 @@
                 </button>
 
                 <button id="show-vars-btn" class="tool-btn vars-toggle" title="Show variable differences between versions">
-                    <i data-lucide="variable"></i> Variables
+                    <i data-lucide="variable"></i> Global Variables
+                </button>
+                <button id="show-chapter-vars-btn" class="tool-btn chapter-vars-toggle" title="Show variables defined in current chapter">
+                    <i data-lucide="file-text"></i> Chapter Variables
                 </button>
             </div>
 
+            <div id="chapter-vars-panel" class="chapter-vars-panel hidden">
+                <div class="var-panel-description">
+                    Variables defined within the current chapter's source file. These are local to this chapter and affect text variations only within this section.
+                </div>
+                <div id="chapter-vars-content" class="chapter-vars-content">
+                    <span class="var-list-empty">No chapter-local variables in this chapter</span>
+                </div>
+            </div>
+
             <div id="variable-diff-panel" class="variable-diff-panel hidden">
+                <div class="var-panel-description">
+                    These variables are declared in <a href="#" id="show-globals-link" class="globals-link">globals.txt</a> and are determined upon seed generation. They affect both minor and major narrative decisions.
+                </div>
                 <div class="var-diff-section">
                     <span class="var-diff-label">Only in <span id="var-diff-a-label">A</span>:</span>
                     <span id="vars-only-a" class="var-list var-list-a"></span>
@@ -210,7 +225,6 @@
                     <button id="mode-sidebyside" class="mode-btn active" title="View two versions in parallel columns" data-short="Side/Side">Side-by-side</button>
                     <button id="mode-diff" class="mode-btn" title="Highlight additions and deletions between versions" data-short="Diff">Track Changes</button>
                     <button id="mode-comparison" class="mode-btn" title="Compare variations across multiple witnesses" data-short="Collation">Collation</button>
-                    <button id="macro-inspector-btn" class="mode-btn hidden" title="Inspect Quant macros and variables" data-short="Macros">Macro Inspector</button>
                     <button id="syntax-toggle-btn" class="mode-btn hidden" title="Toggle Quant syntax highlighting" data-short="Syntax">Enable Syntax Highlighting</button>
                 </div>
             </div>
@@ -532,16 +546,15 @@
         </div>
     </div>
 
-    <div id="macro-inspector-modal" class="modal hidden">
-        <div class="modal-content macro-inspector-content">
+    <div id="globals-modal" class="modal hidden">
+        <div class="modal-content globals-modal-content">
             <div class="modal-header">
-                <h2>Quant Macro Inspector</h2>
-                <p id="macro-inspector-context" class="modal-description"></p>
-                <button id="macro-inspector-close-btn" class="close-btn"><i data-lucide="x"></i></button>
+                <h2>globals.txt</h2>
+                <p class="modal-description">Global variable and macro definitions for <em>Subcutanean</em></p>
+                <button id="globals-close-btn" class="close-btn"><i data-lucide="x"></i></button>
             </div>
-            <div class="modal-body macro-inspector-body" id="macro-inspector-body"></div>
-            <div id="macro-empty-state" class="macro-empty-state hidden">
-                Load a seed alongside the Quant Source to inspect global macros.
+            <div class="modal-body globals-modal-body" id="globals-modal-body">
+                <pre id="globals-content" class="globals-source-code"></pre>
             </div>
         </div>
     </div>

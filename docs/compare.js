@@ -22,17 +22,12 @@ let originSourcePanelOpen = false;
 let currentSourceKey = null;
 let sourcePanelPosition = { x: null, y: null };
 let sourceSyncState = null;
-let globalMacroConfig = null;
-let macroActivationCache = {};
-let notesOptionLookup = null;
-let macroSignalConfig = null;
 let versionChapterTextCache = {};
-let versionNarrativeStatsCache = {};
-let coreVersionIds = [];
-let narrativeMetricBaselines = null;
 let variableInfo = null; // Variable descriptions and usage patterns
 let variableGroups = null; // Mutually exclusive variable groups for inference
 let variableMacros = null; // Macro definitions for inference
+let chapterVariables = null; // Chapter-local variable definitions
+let scholarlyDescriptions = null; // Scholarly annotations (override variableInfo descriptions)
 let sourceSyntaxHighlightingEnabled = false;
 const SOURCE_VERSION_ID = 'quant_source';
 const SOURCE_VERSION_LABEL = 'Source Code';
@@ -644,18 +639,12 @@ function getChapterContent(versionId, chapterId) {
 
 function updateToolbarVisibility() {
     const sourceSelected = isSourceCodeVisible();
-    const macroAvailable = sourceSelected && !!globalMacroConfig;
     const diffBtn = document.getElementById('mode-diff');
     const comparisonBtn = document.getElementById('mode-comparison');
-    const macroBtn = document.getElementById('macro-inspector-btn');
     const syntaxBtn = document.getElementById('syntax-toggle-btn');
 
     if (diffBtn) diffBtn.classList.toggle('hidden', sourceSelected);
     if (comparisonBtn) comparisonBtn.classList.toggle('hidden', sourceSelected);
-    if (macroBtn) {
-        macroBtn.classList.toggle('hidden', !macroAvailable);
-        macroBtn.disabled = !macroAvailable;
-    }
     if (syntaxBtn) {
         syntaxBtn.classList.toggle('hidden', !sourceSelected);
         syntaxBtn.disabled = !sourceSelected;
@@ -684,70 +673,6 @@ function getChaptersForVersion(versionId) {
     const versionData = allVersions[versionId];
     if (!versionData) return [];
     return Object.keys(versionData).filter(key => key !== 'version_id');
-}
-
-function getVersionForMacroAnalysis() {
-    const sourceOnA = isSourceVersion(versionA);
-    const sourceOnB = isSourceVersion(versionB);
-    if (sourceOnA && !sourceOnB) return versionB;
-    if (sourceOnB && !sourceOnA) return versionA;
-    return null;
-}
-
-function getMacroActivationData(versionId) {
-    if (!versionId) return null;
-    if (macroActivationCache[versionId]) {
-        return macroActivationCache[versionId];
-    }
-    if (!allVersions || !allVersions[versionId]) {
-        macroActivationCache[versionId] = null;
-        return null;
-    }
-
-    const versionData = allVersions[versionId];
-    const notes = Array.isArray(versionData.notes) ? versionData.notes : [];
-    const normalizedNotes = notes
-        .map(note => normalizePlainText(note))
-        .filter(Boolean);
-
-    const activation = {
-        versionId,
-        notesAvailable: normalizedNotes.length > 0,
-        options: {}
-    };
-
-    if (!notesOptionLookup) {
-        macroActivationCache[versionId] = activation;
-        return activation;
-    }
-
-    const noteSet = new Set(normalizedNotes);
-    Object.entries(notesOptionLookup.byOption).forEach(([optionId, cues]) => {
-        const matchedCue = cues.find(cue => noteSet.has(cue.normalized));
-        if (matchedCue) {
-            activation.options[optionId] = {
-                status: 'active',
-                note: matchedCue.text
-            };
-        }
-    });
-
-    const signalMatches = detectMacroSignalsForVersion(versionId);
-    Object.entries(signalMatches).forEach(([optionId, matchInfo]) => {
-        if (!activation.options[optionId]) {
-            activation.options[optionId] = matchInfo;
-        }
-    });
-
-    const heuristicMatches = detectNarrativeStyleHeuristics(versionId, activation.options);
-    Object.entries(heuristicMatches).forEach(([optionId, matchInfo]) => {
-        if (!activation.options[optionId]) {
-            activation.options[optionId] = matchInfo;
-        }
-    });
-
-    macroActivationCache[versionId] = activation;
-    return activation;
 }
 
 function getVersionChapterIds(versionId) {
@@ -784,378 +709,11 @@ function getVersionChapterText(versionId, chapterId, normalized = false) {
     return text;
 }
 
-function detectMacroSignalsForVersion(versionId) {
-    const matches = {};
-    if (!macroSignalConfig || !allVersions || !allVersions[versionId]) return matches;
-    Object.entries(macroSignalConfig).forEach(([optionKey, rules]) => {
-        const optionId = normalizeOptionId(optionKey);
-        if (!Array.isArray(rules) || rules.length === 0) return;
-        const matched = rules.some(rule => {
-            const matchText = (rule && rule.match) ? rule.match : '';
-            if (!matchText) return false;
-            if (rule.type && rule.type !== 'text') return false;
-            const useNormalized = rule.normalized !== false;
-            const chapters = Array.isArray(rule.chapters) && rule.chapters.length > 0
-                ? rule.chapters
-                : getVersionChapterIds(versionId);
-            const preparedNeedle = useNormalized
-                ? normalizePlainText(matchText)
-                : (rule.caseSensitive ? matchText : matchText.toLowerCase());
-            if (!preparedNeedle) return false;
-            return chapters.some(chapterId => {
-                const chapterText = getVersionChapterText(versionId, chapterId, useNormalized);
-                if (!chapterText) return false;
-                const haystack = useNormalized
-                    ? chapterText
-                    : (rule.caseSensitive ? chapterText : chapterText.toLowerCase());
-                if (!haystack) return false;
-                if (haystack.includes(preparedNeedle)) {
-                    matches[optionId] = {
-                        status: 'active',
-                        note: rule.note || `Detected via signal in ${formatChapterName(chapterId)}`
-                    };
-                    return true;
-                }
-                return false;
-            });
-        });
-        if (matched) {
-            return;
-        }
-    });
-    return matches;
-}
-
 function invalidateVersionCaches(versionId) {
     if (!versionId) return;
-    if (macroActivationCache[versionId]) {
-        delete macroActivationCache[versionId];
-    }
     if (versionChapterTextCache[versionId]) {
         delete versionChapterTextCache[versionId];
     }
-    if (versionNarrativeStatsCache[versionId]) {
-        delete versionNarrativeStatsCache[versionId];
-    }
-}
-
-function detectNarrativeStyleHeuristics(versionId, existingOptions = {}) {
-    const stats = getNarrativeStats(versionId);
-    if (!stats) return {};
-    const matches = {};
-    const hasOption = (optionId) => !!(existingOptions && existingOptions[optionId]);
-
-    const setMatch = (optionId, note) => {
-        matches[optionId] = {
-            status: 'active',
-            note
-        };
-    };
-
-    const alliterationRate = stats.significantWordCount > 0 ? stats.alliterationCount / stats.significantWordCount : 0;
-    if (!hasOption('alliteration') && !hasOption('noalliteration')) {
-        if (narrativeMetricBaselines && narrativeMetricBaselines.alliteration.std > 0) {
-            const z = (alliterationRate - narrativeMetricBaselines.alliteration.mean) / narrativeMetricBaselines.alliteration.std;
-            if (z >= 1.25) {
-                setMatch('alliteration', 'Frequent alliteration detected in narration');
-            } else if (z <= -1.25) {
-                setMatch('noalliteration', 'Alliteration is rarely used in narration');
-            }
-        }
-    }
-
-    const slangRate = stats.totalWords > 0 ? (stats.slangCount / stats.totalWords) * 1000 : 0;
-    if (!hasOption('slang') && !hasOption('formal')) {
-        if (slangRate >= 10) {
-            setMatch('slang', 'High density of informal/slang vocabulary detected');
-        } else if (slangRate <= 1.5) {
-            setMatch('formal', 'Very little slang detected across narration');
-        }
-    }
-
-    if (!hasOption('bigwords')) {
-        const avgSignificantWordLength = stats.significantWordCount > 0 ? stats.significantWordLength / stats.significantWordCount : 0;
-        if (avgSignificantWordLength >= 5.3) {
-            setMatch('bigwords', 'Narrator favors longer word choices throughout the text');
-        }
-    }
-
-    if (!hasOption('avoidme')) {
-        const meWordRate = stats.totalWords > 0 ? (stats.meWordCount / stats.totalWords) * 1000 : 0;
-        if (meWordRate <= 6) {
-            setMatch('avoidme', 'First-person pronouns appear relatively rarely');
-        }
-    }
-
-    if (!hasOption('likesimile') && !hasOption('dislikesimile')) {
-        const simileRate = stats.totalWords > 0 ? (stats.simileCount / stats.totalWords) * 1000 : 0;
-        if (narrativeMetricBaselines && narrativeMetricBaselines.simile.std > 0) {
-            const z = (simileRate - narrativeMetricBaselines.simile.mean) / narrativeMetricBaselines.simile.std;
-            if (z >= 1.25) {
-                setMatch('likesimile', 'Similes and analogies appear frequently in narration');
-            } else if (z <= -1.25) {
-                setMatch('dislikesimile', 'Similes are rarely employed in narration');
-            }
-        }
-    }
-
-    if (!hasOption('avoiddialogue')) {
-        const dialogueRatio = stats.totalParagraphs > 0 ? stats.dialogueParagraphs / stats.totalParagraphs : 0;
-        if (dialogueRatio <= 0.08) {
-            setMatch('avoiddialogue', 'Quoted dialogue is rarely present in this version');
-        }
-    }
-
-    return matches;
-}
-
-function getNarrativeStats(versionId) {
-    if (!versionId || !allVersions || !allVersions[versionId]) return null;
-    if (versionNarrativeStatsCache[versionId]) {
-        return versionNarrativeStatsCache[versionId];
-    }
-    const stats = {
-        totalParagraphs: 0,
-        totalWords: 0,
-        significantWordCount: 0,
-        significantWordLength: 0,
-        alliterationCount: 0,
-        slangCount: 0,
-        meWordCount: 0,
-        simileCount: 0,
-        dialogueParagraphs: 0
-    };
-    const chapterIds = getVersionChapterIds(versionId).filter(ch => !NON_NARRATIVE_SECTIONS.has(ch));
-    chapterIds.forEach(chapterId => {
-        const paragraphs = getChapterParagraphs(versionId, chapterId) || [];
-        paragraphs.forEach(html => {
-            const plain = htmlToPlainText(html);
-            if (!plain || plain.includes('{')) {
-                return;
-            }
-            stats.totalParagraphs += 1;
-            if (/“.*”/.test(plain)) {
-                stats.dialogueParagraphs += 1;
-            }
-            const words = plain.match(/[\w']+/g) || [];
-            if (!words.length) return;
-            stats.totalWords += words.length;
-            const significantWords = words.filter(word => word.length >= 4);
-            stats.significantWordCount += significantWords.length;
-            stats.significantWordLength += significantWords.reduce((sum, word) => sum + word.length, 0);
-            stats.alliterationCount += countAlliteration(significantWords);
-            stats.slangCount += countRegexMatches(SLANG_REGEX, plain);
-            stats.meWordCount += countRegexMatches(ME_WORD_REGEX, plain);
-            stats.simileCount += countRegexMatches(SIMILE_REGEX, plain);
-        });
-    });
-    versionNarrativeStatsCache[versionId] = stats;
-    return stats;
-}
-
-function countAlliteration(words) {
-    if (!Array.isArray(words) || words.length === 0) return 0;
-    let count = 0;
-    let lastLetter = '';
-    words.forEach(word => {
-        const letter = word.charAt(0).toLowerCase();
-        if (!letter) return;
-        if (letter === lastLetter) {
-            count += 1;
-        }
-        lastLetter = letter;
-    });
-    return count;
-}
-
-function countRegexMatches(regex, text) {
-    if (!text) return 0;
-    const re = new RegExp(regex.source, regex.flags);
-    const matches = text.match(re);
-    return matches ? matches.length : 0;
-}
-
-function computeNarrativeMetricBaselines() {
-    if (!coreVersionIds.length) {
-        narrativeMetricBaselines = null;
-        return;
-    }
-    const simileRates = [];
-    const alliterationRates = [];
-    coreVersionIds.forEach(versionId => {
-        const stats = getNarrativeStats(versionId);
-        if (!stats || !stats.totalWords || !stats.significantWordCount) return;
-        simileRates.push((stats.simileCount / stats.totalWords) * 1000);
-        alliterationRates.push(stats.alliterationCount / stats.significantWordCount);
-    });
-    narrativeMetricBaselines = {
-        simile: calculateMeanStd(simileRates),
-        alliteration: calculateMeanStd(alliterationRates)
-    };
-}
-
-function calculateMeanStd(values) {
-    if (!values || values.length === 0) {
-        return { mean: 0, std: 0 };
-    }
-    const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
-    const variance = values.reduce((acc, value) => acc + Math.pow(value - mean, 2), 0) / values.length;
-    return {
-        mean,
-        std: Math.sqrt(variance)
-    };
-}
-
-const DEFAULT_OPTION_IDS = new Set([
-    'noverbositypref',
-    'nopolaritypref',
-    'noslangpref',
-    'neithersubjnorobj',
-    'noalitpref',
-    'nosimilepref'
-]);
-
-function createMacroOptionBadge(option, activation, assumedDefault = false) {
-    const badge = document.createElement('div');
-    badge.className = 'macro-option';
-    const label = document.createElement('span');
-    label.className = 'macro-option-label';
-    label.textContent = option.display || formatOptionName(option.id);
-    badge.appendChild(label);
-
-    const statusEl = document.createElement('span');
-    statusEl.className = 'macro-option-status';
-    const optionState = activation && activation.options && activation.options[option.id];
-    if (optionState && optionState.status === 'active') {
-        badge.classList.add('macro-option-active');
-        statusEl.textContent = 'Detected';
-    } else {
-        if (assumedDefault) {
-            badge.classList.add('macro-option-assumed');
-            statusEl.textContent = 'Assumed';
-        } else {
-            statusEl.textContent = activation && activation.notesAvailable ? 'Not detected' : 'Unknown';
-        }
-    }
-    badge.appendChild(statusEl);
-
-    if (optionState && optionState.note) {
-        const noteEl = document.createElement('div');
-        noteEl.className = 'macro-option-note';
-        noteEl.textContent = optionState.note;
-        badge.appendChild(noteEl);
-    } else if (assumedDefault) {
-        const noteEl = document.createElement('div');
-        noteEl.className = 'macro-option-note';
-        noteEl.textContent = 'Not listed; assuming default setting';
-        badge.appendChild(noteEl);
-    }
-
-    return badge;
-}
-
-function createMacroCard(entry, activation) {
-    const card = document.createElement('div');
-    card.className = 'macro-card';
-    const header = document.createElement('div');
-    header.className = 'macro-card-header';
-
-    const title = document.createElement('h4');
-    title.textContent = entry.title || entry.description || entry.options.map(opt => opt.display).join(', ');
-    header.appendChild(title);
-
-    if (entry.description && entry.description !== entry.title) {
-        const desc = document.createElement('p');
-        desc.className = 'macro-card-description';
-        desc.textContent = entry.description;
-        header.appendChild(desc);
-    }
-    card.appendChild(header);
-
-    const optionsWrap = document.createElement('div');
-    optionsWrap.className = 'macro-options';
-    const activeOptions = new Set();
-    entry.options.forEach(option => {
-        if (activation && activation.options && activation.options[option.id]) {
-            activeOptions.add(option.id);
-        }
-    });
-    const defaultOption = activeOptions.size === 0 ? getDefaultOption(entry.options) : null;
-    entry.options.forEach(option => {
-        const assumedDefault = defaultOption && defaultOption.id === option.id;
-        optionsWrap.appendChild(createMacroOptionBadge(option, activation, assumedDefault));
-    });
-    card.appendChild(optionsWrap);
-
-    return card;
-}
-
-function getDefaultOption(options) {
-    if (!Array.isArray(options)) return null;
-    return options.find(opt => DEFAULT_OPTION_IDS.has(opt.id));
-}
-
-function populateMacroInspector() {
-    const contextEl = document.getElementById('macro-inspector-context');
-    const container = document.getElementById('macro-inspector-body');
-    const emptyState = document.getElementById('macro-empty-state');
-    if (!container || !contextEl || !emptyState) return;
-
-    container.innerHTML = '';
-
-    const analysisVersion = getVersionForMacroAnalysis();
-    const activation = analysisVersion ? getMacroActivationData(analysisVersion) : null;
-
-    if (contextEl) {
-        const versionLabel = analysisVersion ? formatVersionLabel(analysisVersion) : 'No version selected';
-        contextEl.textContent = `Source chapter: ${formatChapterName(currentChapter)} · Compared with: ${versionLabel}`;
-    }
-
-    if (!globalMacroConfig || !analysisVersion || !activation) {
-        emptyState.textContent = 'Load a seed alongside the Quant Source to inspect global macros.';
-        emptyState.classList.remove('hidden');
-        return;
-    }
-
-    if (activation.notesAvailable) {
-        emptyState.classList.add('hidden');
-    } else {
-        emptyState.textContent = 'This version does not include the stats page, so detection may be incomplete.';
-        emptyState.classList.remove('hidden');
-    }
-
-    globalMacroConfig.groups.forEach(group => {
-        if (!group.entries || group.entries.length === 0) {
-            return;
-        }
-        const groupEl = document.createElement('div');
-        groupEl.className = 'macro-group';
-        const heading = document.createElement('h3');
-        heading.textContent = group.title || 'Global macros';
-        groupEl.appendChild(heading);
-
-        group.entries.forEach(entry => {
-            if (entry.options.length === 0) return;
-            groupEl.appendChild(createMacroCard(entry, activation));
-        });
-
-        container.appendChild(groupEl);
-    });
-}
-
-function openMacroInspector() {
-    if (!globalMacroConfig || !isSourceCodeVisible()) return;
-    const modal = document.getElementById('macro-inspector-modal');
-    if (!modal) return;
-    closeAllModals();
-    populateMacroInspector();
-    modal.classList.remove('hidden');
-}
-
-function closeMacroInspector() {
-    const modal = document.getElementById('macro-inspector-modal');
-    if (!modal) return;
-    modal.classList.add('hidden');
 }
 
 function isVersionSelectable(versionId) {
@@ -1171,8 +729,6 @@ async function loadAllVersions() {
         const response = await fetch('extracted_text/all_versions.json');
         allVersions = await response.json();
         versionIds = Object.keys(allVersions).sort();
-        coreVersionIds = [...versionIds];
-        computeNarrativeMetricBaselines();
 
         // Load custom versions from localStorage
         loadCustomVersions();
@@ -1321,6 +877,7 @@ function populateVersionSelectors() {
             displayComparison();
             updateToolbarVisibility();
             updateVariableDiffIfVisible();
+            updateChapterVariablesPanelIfVisible();
         });
         selectorA.dataset.hasListener = 'true';
     }
@@ -1332,6 +889,7 @@ function populateVersionSelectors() {
             displayComparison();
             updateToolbarVisibility();
             updateVariableDiffIfVisible();
+            updateChapterVariablesPanelIfVisible();
         });
         selectorB.dataset.hasListener = 'true';
     }
@@ -1343,6 +901,7 @@ function populateVersionSelectors() {
             displayComparison();
             updateToolbarVisibility();
             updateVariableDiffIfVisible();
+            updateChapterVariablesPanelIfVisible();
         });
         selectorC.dataset.hasListener = 'true';
     }
@@ -1394,6 +953,7 @@ function toggleThirdVersion(enable) {
     buildChapterNavigation();
     displayComparison();
     updateVariableDiffIfVisible();
+    updateChapterVariablesPanelIfVisible();
 }
 
 function initializeThirdVersionControls() {
@@ -1438,9 +998,13 @@ function updateVariableDiff() {
 
     if (!varsOnlyA || !varsOnlyB || !varsShared) return;
 
-    const varsA = new Set(getVersionVariables(versionA));
-    const varsB = new Set(getVersionVariables(versionB));
-    const varsC = versionC ? new Set(getVersionVariables(versionC)) : null;
+    // Helper to filter to only global variables (defined in globals.txt)
+    const isGlobalVar = (v) => variableInfo && variableInfo[v];
+
+    // Get version variables, filtered to only include global variables
+    const varsA = new Set(getVersionVariables(versionA).filter(isGlobalVar));
+    const varsB = new Set(getVersionVariables(versionB).filter(isGlobalVar));
+    const varsC = versionC ? new Set(getVersionVariables(versionC).filter(isGlobalVar)) : null;
 
     // Update labels
     if (labelA) labelA.textContent = versionA || 'A';
@@ -1471,7 +1035,10 @@ function updateVariableDiff() {
         if (vars.length === 0) return '<span class="var-list-empty">none</span>';
         return vars.map(v => {
             const info = variableInfo ? variableInfo[v] : null;
-            const description = info?.description || 'No description available';
+            // Scholarly descriptions take precedence over source descriptions
+            const scholarlyDesc = scholarlyDescriptions ? scholarlyDescriptions[v] : null;
+            const sourceDesc = info?.description;
+            const description = scholarlyDesc || sourceDesc || 'No description available';
             const chapters = info?.chapters || [];
             const inCurrentChapter = chapters.includes(currentChapter);
             const chapterHint = inCurrentChapter ? ' (used in this chapter)' : '';
@@ -1767,6 +1334,9 @@ function closeVariableSourcePanel() {
 function toggleVariablePanel() {
     const panel = document.getElementById('variable-diff-panel');
     const btn = document.getElementById('show-vars-btn');
+    // Close chapter vars panel when opening global vars
+    const chapterPanel = document.getElementById('chapter-vars-panel');
+    const chapterBtn = document.getElementById('show-chapter-vars-btn');
 
     if (!panel) return;
 
@@ -1775,6 +1345,12 @@ function toggleVariablePanel() {
 
     if (btn) {
         btn.classList.toggle('active', isHidden);
+    }
+
+    // Close the other panel if we're opening this one
+    if (isHidden && chapterPanel && !chapterPanel.classList.contains('hidden')) {
+        chapterPanel.classList.add('hidden');
+        if (chapterBtn) chapterBtn.classList.remove('active');
     }
 
     if (isHidden) {
@@ -1786,6 +1362,325 @@ function initializeVariablePanel() {
     const btn = document.getElementById('show-vars-btn');
     if (btn) {
         btn.addEventListener('click', toggleVariablePanel);
+    }
+}
+
+// Chapter Variables Panel
+function toggleChapterVariablesPanel() {
+    const panel = document.getElementById('chapter-vars-panel');
+    const btn = document.getElementById('show-chapter-vars-btn');
+    // Close global vars panel when opening chapter vars
+    const globalPanel = document.getElementById('variable-diff-panel');
+    const globalBtn = document.getElementById('show-vars-btn');
+
+    if (!panel) return;
+
+    const isHidden = panel.classList.contains('hidden');
+    panel.classList.toggle('hidden', !isHidden);
+
+    if (btn) {
+        btn.classList.toggle('active', isHidden);
+    }
+
+    // Close the other panel if we're opening this one
+    if (isHidden && globalPanel && !globalPanel.classList.contains('hidden')) {
+        globalPanel.classList.add('hidden');
+        if (globalBtn) globalBtn.classList.remove('active');
+    }
+
+    if (isHidden) {
+        updateChapterVariablesPanel();
+    }
+}
+
+function extractChapterVariablePatterns(varName) {
+    // Get the source for the current chapter
+    const sourceKey = SOURCE_KEY_BY_CHAPTER[currentChapter];
+    if (!sourceKey || !originSources || !originSources.chapters[sourceKey]) {
+        return { activePatterns: [], inactivePatterns: [] };
+    }
+
+    const sourceContent = originSources.chapters[sourceKey].content;
+    if (!sourceContent) return { activePatterns: [], inactivePatterns: [] };
+
+    const activePatterns = [];
+    const inactivePatterns = [];
+
+    // Match conditional blocks: [@varname>active text|inactive text] or [@varname>active text]
+    // Also handles: [^@varname>text...], [*tag*@varname>text...]
+    const varPattern = new RegExp(
+        `\\[(?:\\*\\w+\\*)?@${varName}>([^\\[\\]]+?)(?:\\|([^\\[\\]]+?))?\\]`,
+        'g'
+    );
+
+    let match;
+    while ((match = varPattern.exec(sourceContent)) !== null) {
+        const activeText = match[1] ? match[1].trim() : '';
+        const inactiveText = match[2] ? match[2].trim() : '';
+
+        // Clean up Quant markup
+        const cleanText = (text) => {
+            return text
+                .replace(/\{i\/([^}]+)\}/g, '$1')  // {i/text} -> text
+                .replace(/\{[^}]+\}/g, '')          // Remove other macros
+                .replace(/\s+/g, ' ')
+                .trim();
+        };
+
+        const cleanActive = cleanText(activeText);
+        const cleanInactive = cleanText(inactiveText);
+
+        if (cleanActive.length >= 8) {
+            activePatterns.push(cleanActive.substring(0, 80));
+        }
+        if (cleanInactive.length >= 8) {
+            inactivePatterns.push(cleanInactive.substring(0, 80));
+        }
+    }
+
+    return { activePatterns, inactivePatterns };
+}
+
+function detectChapterVariableInText(varName, chapterText) {
+    const { activePatterns, inactivePatterns } = extractChapterVariablePatterns(varName);
+
+    if (activePatterns.length === 0 && inactivePatterns.length === 0) {
+        return 'unknown';
+    }
+
+    const textNormalized = chapterText.replace(/\s+/g, ' ');
+
+    // Check for active patterns
+    const hasActivePattern = activePatterns.some(pattern => {
+        const patternNormalized = pattern.replace(/\s+/g, ' ');
+        return textNormalized.includes(patternNormalized);
+    });
+
+    // Check for inactive patterns
+    const hasInactivePattern = inactivePatterns.some(pattern => {
+        const patternNormalized = pattern.replace(/\s+/g, ' ');
+        return textNormalized.includes(patternNormalized);
+    });
+
+    if (hasActivePattern && !hasInactivePattern) return 'active';
+    if (hasInactivePattern && !hasActivePattern) return 'inactive';
+    if (hasActivePattern && hasInactivePattern) return 'both'; // Shouldn't happen normally
+    return 'unknown';
+}
+
+function updateChapterVariablesPanel() {
+    const content = document.getElementById('chapter-vars-content');
+    if (!content) return;
+
+    if (!chapterVariables || !currentChapter || !chapterVariables[currentChapter]) {
+        content.innerHTML = '<span class="var-list-empty">No chapter-local variables defined in this chapter</span>';
+        return;
+    }
+
+    const vars = chapterVariables[currentChapter];
+
+    // Get chapter text for each version
+    const chapterDataA = getChapterContent(versionA, currentChapter);
+    const chapterDataB = getChapterContent(versionB, currentChapter);
+    const chapterDataC = versionC ? getChapterContent(versionC, currentChapter) : null;
+
+    const textA = (chapterDataA.paragraphs || []).join(' ');
+    const textB = (chapterDataB.paragraphs || []).join(' ');
+    const textC = chapterDataC ? (chapterDataC.paragraphs || []).join(' ') : '';
+
+    // Collect all chapter variable names and detect which are active in each version
+    const allVarNames = [];
+    vars.forEach(def => {
+        def.variables.forEach(v => allVarNames.push(v));
+    });
+
+    const varsInA = new Set();
+    const varsInB = new Set();
+    const varsInC = new Set();
+
+    allVarNames.forEach(varName => {
+        const statusA = detectChapterVariableInText(varName, textA);
+        const statusB = detectChapterVariableInText(varName, textB);
+
+        if (statusA === 'active') varsInA.add(varName);
+        if (statusB === 'active') varsInB.add(varName);
+
+        if (versionC && textC) {
+            const statusC = detectChapterVariableInText(varName, textC);
+            if (statusC === 'active') varsInC.add(varName);
+        }
+    });
+
+    // Calculate differences
+    let onlyInA, onlyInB, onlyInC, shared;
+
+    if (versionC) {
+        onlyInA = [...varsInA].filter(v => !varsInB.has(v) && !varsInC.has(v)).sort();
+        onlyInB = [...varsInB].filter(v => !varsInA.has(v) && !varsInC.has(v)).sort();
+        onlyInC = [...varsInC].filter(v => !varsInA.has(v) && !varsInB.has(v)).sort();
+        shared = [...varsInA].filter(v => varsInB.has(v) && varsInC.has(v)).sort();
+    } else {
+        onlyInA = [...varsInA].filter(v => !varsInB.has(v)).sort();
+        onlyInB = [...varsInB].filter(v => !varsInA.has(v)).sort();
+        onlyInC = [];
+        shared = [...varsInA].filter(v => varsInB.has(v)).sort();
+    }
+
+    // Find variables that couldn't be detected in either version
+    const detected = new Set([...varsInA, ...varsInB, ...varsInC]);
+    const undetected = allVarNames.filter(v => !detected.has(v)).sort();
+
+    // Render function
+    const renderVars = (varNames, clickable = true) => {
+        if (varNames.length === 0) return '<span class="var-list-empty">none</span>';
+        return varNames.map(v => {
+            // Find the definition for this variable to get description
+            let description = '';
+            for (const def of vars) {
+                if (def.variables.includes(v)) {
+                    description = def.description || '';
+                    break;
+                }
+            }
+            const clickClass = clickable ? 'clickable' : '';
+            const tooltip = description ? `title="${escapeHtml(description)}"` : `title="Click to highlight"`;
+            return `<span class="chapter-var-tag ${clickClass}" data-varname="${v}" ${tooltip}>@${v}</span>`;
+        }).join('');
+    };
+
+    // Column-based layout to align with comparison view
+    let html = `<div class="chapter-vars-columns ${versionC ? 'three-col' : 'two-col'}">`;
+
+    // Column A
+    html += `
+        <div class="chapter-vars-column var-list-a">
+            <div class="chapter-vars-column-header">${versionA || 'A'}</div>
+            <div class="chapter-vars-column-content">${renderVars(onlyInA)}</div>
+        </div>
+    `;
+
+    // Column B
+    html += `
+        <div class="chapter-vars-column var-list-b">
+            <div class="chapter-vars-column-header">${versionB || 'B'}</div>
+            <div class="chapter-vars-column-content">${renderVars(onlyInB)}</div>
+        </div>
+    `;
+
+    // Column C (if three-version mode)
+    if (versionC) {
+        html += `
+            <div class="chapter-vars-column var-list-c">
+                <div class="chapter-vars-column-header">${versionC}</div>
+                <div class="chapter-vars-column-content">${renderVars(onlyInC)}</div>
+            </div>
+        `;
+    }
+
+    html += `</div>`; // Close columns container
+
+    // Shared row (spans full width)
+    html += `
+        <div class="chapter-var-section chapter-vars-shared">
+            <span class="chapter-var-section-label">${versionC ? 'In all:' : 'Shared:'}</span>
+            <span class="chapter-var-section-content var-list-shared">${renderVars(shared)}</span>
+        </div>
+    `;
+
+    if (undetected.length > 0) {
+        html += `
+            <div class="chapter-var-section undetected">
+                <span class="chapter-var-section-label">Undetected:</span>
+                <span class="chapter-var-section-content var-list-undetected">${renderVars(undetected, false)}</span>
+            </div>
+        `;
+    }
+
+    content.innerHTML = html;
+
+    // Add click handlers to variable tags
+    content.querySelectorAll('.chapter-var-tag.clickable').forEach(tag => {
+        tag.addEventListener('click', () => {
+            const varName = tag.dataset.varname;
+            highlightChapterVariableText(varName);
+        });
+    });
+}
+
+function initializeChapterVariablesPanel() {
+    const btn = document.getElementById('show-chapter-vars-btn');
+    if (btn) {
+        btn.addEventListener('click', toggleChapterVariablesPanel);
+    }
+}
+
+function highlightChapterVariableText(varName) {
+    // Clear any existing variable highlights and source buttons
+    document.querySelectorAll('.var-highlight').forEach(el => {
+        el.classList.remove('var-highlight');
+    });
+    document.querySelectorAll('.var-source-btn').forEach(el => {
+        el.remove();
+    });
+    closeVariableSourcePanel();
+
+    // Use the shared pattern extraction function
+    const { activePatterns, inactivePatterns } = extractChapterVariablePatterns(varName);
+
+    // Combine all patterns (both active and inactive text will help us find the right paragraphs)
+    const patterns = [...activePatterns, ...inactivePatterns];
+
+    if (patterns.length === 0) {
+        showNotification(`Variable "@${varName}" has no text patterns in this chapter`, 'info');
+        return;
+    }
+
+    currentHighlightedVar = varName;
+
+    // Find paragraphs that contain any of the patterns
+    const container = document.getElementById('comparison-display');
+    if (!container) {
+        showNotification('Could not find comparison display', 'error');
+        return;
+    }
+    const paragraphs = container.querySelectorAll('p, .comparison-paragraph, .source-paragraph');
+    let matchCount = 0;
+    let firstMatch = null;
+
+    paragraphs.forEach(para => {
+        const text = para.textContent || '';
+        const hasMatch = patterns.some(pattern => {
+            const cleanPattern = pattern.replace(/\s+/g, ' ').trim();
+            const cleanText = text.replace(/\s+/g, ' ');
+            // Use substring matching (patterns may be truncated)
+            return cleanText.includes(cleanPattern.substring(0, 50));
+        });
+
+        if (hasMatch) {
+            para.classList.add('var-highlight');
+            matchCount++;
+            if (!firstMatch) firstMatch = para;
+
+            // Add a "View Source" button to the highlighted paragraph
+            addViewSourceButton(para, varName);
+        }
+    });
+
+    if (matchCount > 0) {
+        showNotification(`Highlighted ${matchCount} paragraph${matchCount > 1 ? 's' : ''} affected by "@${varName}" - click the code icon to view source`, 'success');
+        // Scroll to first match
+        if (firstMatch) {
+            firstMatch.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    } else {
+        showNotification(`No paragraphs found matching patterns for "@${varName}"`, 'info');
+    }
+}
+
+function updateChapterVariablesPanelIfVisible() {
+    const panel = document.getElementById('chapter-vars-panel');
+    if (panel && !panel.classList.contains('hidden')) {
+        updateChapterVariablesPanel();
     }
 }
 
@@ -1851,6 +1746,7 @@ function buildChapterNavigation() {
             button.classList.add('active');
             displayComparison();
             updateVariableDiffIfVisible();
+            updateChapterVariablesPanelIfVisible();
         });
 
         nav.appendChild(button);
@@ -4128,11 +4024,11 @@ function closeAllModals() {
     const modalIds = [
         'about-modal',
         'generate-modal',
+        'globals-modal',
         'levenshtein-modal',
         'manage-uploads-modal',
         'manage-info-modal',
         'privacy-notice-modal',
-        'macro-inspector-modal',
         'annotation-modal',
         'export-modal'
     ];
@@ -4170,6 +4066,63 @@ function openGenerateModal() {
 function closeGenerateModal() {
     const modal = document.getElementById('generate-modal');
     modal.classList.add('hidden');
+}
+
+// Globals Modal functionality
+
+function openGlobalsModal() {
+    closeAllModals();
+    const modal = document.getElementById('globals-modal');
+    const contentEl = document.getElementById('globals-content');
+
+    // Load globals content from origin sources
+    if (originSourcesLoaded && originSources && originSources.chapters && originSources.chapters.globals) {
+        const globalsContent = originSources.chapters.globals.content || '';
+        contentEl.innerHTML = highlightQuantSyntax(globalsContent);
+    } else {
+        contentEl.innerHTML = '<span style="color: #888;">Loading globals.txt...</span>';
+        // Try to load origin sources if not loaded
+        loadOriginSources().then(() => {
+            if (originSources && originSources.chapters && originSources.chapters.globals) {
+                contentEl.innerHTML = highlightQuantSyntax(originSources.chapters.globals.content || '');
+            } else {
+                contentEl.innerHTML = '<span style="color: #f66;">Could not load globals.txt</span>';
+            }
+        });
+    }
+
+    modal.classList.remove('hidden');
+}
+
+function closeGlobalsModal() {
+    const modal = document.getElementById('globals-modal');
+    modal.classList.add('hidden');
+}
+
+function initializeGlobalsModal() {
+    const closeBtn = document.getElementById('globals-close-btn');
+    const modal = document.getElementById('globals-modal');
+    const link = document.getElementById('show-globals-link');
+
+    if (link) {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            openGlobalsModal();
+        });
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeGlobalsModal);
+    }
+
+    // Close on click outside modal content
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeGlobalsModal();
+            }
+        });
+    }
 }
 
 function initializeGenerateForm() {
@@ -5996,22 +5949,14 @@ function loadCustomVersions() {
 
 async function loadOriginSources() {
     try {
-        const [originResponse, signalResponse] = await Promise.all([
-            fetch('origin_text/origin_sources.json'),
-            fetch('origin_text/macro_signals.json').catch(() => null)
-        ]);
+        const originResponse = await fetch('origin_text/origin_sources.json');
         if (!originResponse.ok) {
             throw new Error(`HTTP ${originResponse.status}`);
         }
         originSources = await originResponse.json();
-        macroSignalConfig = signalResponse && signalResponse.ok ? await signalResponse.json() : null;
         originSourcesLoaded = true;
         sourceParagraphCache = {};
-        globalMacroConfig = parseGlobalMacroConfig(originSources);
-        notesOptionLookup = buildNotesOptionLookup(originSources, globalMacroConfig);
-        macroActivationCache = {};
         versionChapterTextCache = {};
-        versionNarrativeStatsCache = {};
         currentSourceKey = getSourceKeyForChapter(currentChapter);
         if (originSourcePanelOpen) {
             syncSourceToCurrentChapter();
@@ -6033,23 +5978,40 @@ async function loadVariableInfo() {
             throw new Error(`HTTP ${response.status}`);
         }
         const data = await response.json();
-        // Handle new structure with variables, groups, and macros
+        // Handle new structure with variables, groups, macros, and chapter_variables
         if (data.variables) {
             variableInfo = data.variables;
             variableGroups = data.groups || [];
             variableMacros = data.macros || {};
+            chapterVariables = data.chapter_variables || {};
         } else {
             // Fallback for old format (direct variable dict)
             variableInfo = data;
             variableGroups = [];
             variableMacros = {};
+            chapterVariables = {};
         }
-        console.log(`Loaded info for ${Object.keys(variableInfo).length} variables, ${variableGroups.length} groups`);
+        const chapterVarCount = Object.values(chapterVariables).reduce((sum, defs) => sum + defs.length, 0);
+        console.log(`Loaded info for ${Object.keys(variableInfo).length} variables, ${variableGroups.length} groups, ${chapterVarCount} chapter-local vars`);
     } catch (error) {
         console.error('Error loading variable info:', error);
         variableInfo = null;
         variableGroups = [];
         variableMacros = {};
+        chapterVariables = {};
+    }
+
+    // Load scholarly descriptions (separate from source materials)
+    try {
+        const response = await fetch('scholarly_descriptions.json');
+        if (response.ok) {
+            const data = await response.json();
+            scholarlyDescriptions = data.variables || {};
+            console.log(`Loaded ${Object.keys(scholarlyDescriptions).length} scholarly descriptions`);
+        }
+    } catch (error) {
+        // Scholarly descriptions are optional - don't log error
+        scholarlyDescriptions = {};
     }
 }
 
@@ -6871,7 +6833,9 @@ document.addEventListener('DOMContentLoaded', () => {
     loadVariableInfo();
     initializeNavigation();
     initializeGenerateForm();
+    initializeGlobalsModal();
     initializeVariablePanel();
+    initializeChapterVariablesPanel();
     initializeThirdVersionControls();
 
     // Theme toggle event listener
@@ -7076,27 +7040,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.target.files && e.target.files[0]) {
                 importAnnotationsFromFile(e.target.files[0]);
                 e.target.value = ''; // Reset to allow reimport of same file
-            }
-        });
-    }
-
-    // Macro Inspector events
-    const macroBtn = document.getElementById('macro-inspector-btn');
-    const macroModal = document.getElementById('macro-inspector-modal');
-    const macroCloseBtn = document.getElementById('macro-inspector-close-btn');
-    if (macroBtn) {
-        macroBtn.addEventListener('click', () => {
-            if (!globalMacroConfig || !isSourceCodeVisible()) return;
-            openMacroInspector();
-        });
-    }
-    if (macroCloseBtn) {
-        macroCloseBtn.addEventListener('click', closeMacroInspector);
-    }
-    if (macroModal) {
-        macroModal.addEventListener('click', (e) => {
-            if (e.target === macroModal) {
-                closeMacroInspector();
             }
         });
     }
@@ -7377,37 +7320,26 @@ document.addEventListener('DOMContentLoaded', () => {
         const parasB = dataB[chapterId] || [];
         const parasC = dataC ? (dataC[chapterId] || []) : null;
 
-        // Normalize paragraphs for comparison (strip HTML, lowercase, trim)
-        const normalize = (p) => p.replace(/<[^>]+>/g, '').toLowerCase().trim();
-
-        const normalizedA = parasA.map(normalize);
-        const normalizedB = parasB.map(normalize);
-        const normalizedC = parasC ? parasC.map(normalize) : null;
-
-        if (versionC && normalizedC) {
-            // Three-way comparison
-            const maxLen = Math.max(normalizedA.length, normalizedB.length, normalizedC.length);
-            if (maxLen === 0) return { variation: 0, identical: 0, different: 0, total: 0, twoMatch: 0, allDiffer: 0 };
+        if (versionC && parasC) {
+            // Three-way comparison using proper alignment
+            const alignments = alignThreeParagraphs(parasA, parasB, parasC);
+            if (alignments.length === 0) return { variation: 0, identical: 0, different: 0, total: 0, twoMatch: 0, allDiffer: 0 };
 
             let allMatch = 0;
             let twoMatch = 0;
             let allDiffer = 0;
 
-            for (let i = 0; i < maxLen; i++) {
-                const a = normalizedA[i] || '';
-                const b = normalizedB[i] || '';
-                const c = normalizedC[i] || '';
-
-                if (a === '' && b === '' && c === '') continue;
-
-                if (a === b && b === c && a !== '') {
+            alignments.forEach(alignment => {
+                const type = alignment.type;
+                if (type === 'abc-identical') {
                     allMatch++;
-                } else if ((a === b && a !== '') || (a === c && a !== '') || (b === c && b !== '')) {
+                } else if (type === 'ab-match' || type === 'ac-match' || type === 'bc-match') {
                     twoMatch++;
                 } else {
+                    // unique-a, unique-b, unique-c, all-different
                     allDiffer++;
                 }
-            }
+            });
 
             const total = allMatch + twoMatch + allDiffer;
             // Weighted variation: allDiffer counts fully, twoMatch counts as half
@@ -7415,23 +7347,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
             return { variation, identical: allMatch, different: allDiffer, total, twoMatch, allDiffer };
         } else {
-            // Two-version comparison (original logic)
-            const maxLen = Math.max(normalizedA.length, normalizedB.length);
-            if (maxLen === 0) return { variation: 0, identical: 0, different: 0, total: 0, twoMatch: 0, allDiffer: 0 };
+            // Two-version comparison using proper alignment
+            const alignments = alignParagraphs(parasA, parasB);
+            if (alignments.length === 0) return { variation: 0, identical: 0, different: 0, total: 0, twoMatch: 0, allDiffer: 0 };
 
             let identical = 0;
             let different = 0;
 
-            for (let i = 0; i < maxLen; i++) {
-                const a = normalizedA[i] || '';
-                const b = normalizedB[i] || '';
-
-                if (a === b && a !== '') {
+            alignments.forEach(alignment => {
+                if (alignment.type === 'identical') {
                     identical++;
-                } else if (a !== '' || b !== '') {
+                } else {
+                    // modified, unique-a, unique-b all count as different
                     different++;
                 }
-            }
+            });
 
             const total = identical + different;
             const variation = total > 0 ? (different / total) * 100 : 0;
@@ -7529,11 +7459,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const color = getHeatmapColor(stats.variation);
             const barWidth = Math.max(5, stats.variation); // Minimum 5% width for visibility
+            const tooltipText = `${stats.different} of ${stats.total} paragraphs differ (${stats.variation.toFixed(0)}%). Click to view ${ch.label}`;
 
             html += `
                 <div class="heatmap-row" data-chapter="${ch.id}">
                     <span class="heatmap-label">${ch.label}</span>
-                    <div class="heatmap-bar-container" onclick="navigateToChapter('${ch.id}'); closeHeatmapModal();" title="Click to view ${ch.label}">
+                    <div class="heatmap-bar-container" onclick="navigateToChapter('${ch.id}'); closeHeatmapModal();" title="${tooltipText}">
                         <div class="heatmap-bar" style="width: ${barWidth}%; background-color: ${color};">
                             ${stats.variation >= 10 ? `<span class="heatmap-bar-value">${stats.variation.toFixed(0)}%</span>` : ''}
                         </div>
@@ -7550,18 +7481,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const overallVariation = totalParagraphs > 0 ? (((totalDifferent + totalTwoMatch * 0.5) / totalParagraphs) * 100).toFixed(1) : 0;
 
             summaryEl.innerHTML = `
-                <p><strong>${totalIdentical}</strong> paragraphs match in all three versions, <strong>${totalTwoMatch}</strong> match in two, <strong>${totalDifferent}</strong> all differ (${overallVariation}% weighted variation)</p>
-                <p>Most varied: <strong>${mostVariedChapter.label}</strong> (${mostVariedChapter.variation.toFixed(0)}%) ·
-                   Least varied: <strong>${leastVariedChapter.label}</strong> (${leastVariedChapter.variation.toFixed(0)}%)</p>
+                <p><strong>${totalIdentical}</strong> paragraphs match in all three versions, <strong>${totalTwoMatch}</strong> match in two, <strong>${totalDifferent}</strong> all differ (${overallVariation}% variation)</p>
+                <p>Most variation: <strong>${mostVariedChapter.label}</strong> (${mostVariedChapter.variation.toFixed(0)}%) ·
+                   Least variation: <strong>${leastVariedChapter.label}</strong> (${leastVariedChapter.variation.toFixed(0)}%)</p>
             `;
         } else {
             const totalParagraphs = totalIdentical + totalDifferent;
             const overallVariation = totalParagraphs > 0 ? ((totalDifferent / totalParagraphs) * 100).toFixed(1) : 0;
 
             summaryEl.innerHTML = `
-                <p><strong>${totalIdentical}</strong> paragraphs identical, <strong>${totalDifferent}</strong> paragraphs differ (${overallVariation}% overall variation)</p>
-                <p>Most varied: <strong>${mostVariedChapter.label}</strong> (${mostVariedChapter.variation.toFixed(0)}%) ·
-                   Least varied: <strong>${leastVariedChapter.label}</strong> (${leastVariedChapter.variation.toFixed(0)}%)</p>
+                <p><strong>${totalIdentical}</strong> paragraphs identical, <strong>${totalDifferent}</strong> differ (${overallVariation}% variation)</p>
+                <p>Most variation: <strong>${mostVariedChapter.label}</strong> (${mostVariedChapter.variation.toFixed(0)}%) ·
+                   Least variation: <strong>${leastVariedChapter.label}</strong> (${leastVariedChapter.variation.toFixed(0)}%)</p>
             `;
         }
     }
@@ -7611,185 +7542,3 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
-function normalizeOptionId(name) {
-    return (name || '').replace(/^@/, '').trim().toLowerCase();
-}
-
-function formatOptionName(id) {
-    if (!id) return '';
-    const cleaned = id.replace(/^@/, '').replace(/_/g, ' ').trim();
-    return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
-}
-
-function parseGlobalMacroConfig(originData) {
-    if (!originData || !originData.chapters || !originData.chapters.globals) return null;
-    const globalsContent = originData.chapters.globals.content || '';
-    const lines = globalsContent.split(/\r?\n/);
-    const groups = [];
-    const optionIndex = {};
-    let currentGroup = { title: 'Global Macros', entries: [] };
-    groups.push(currentGroup);
-    let pendingDescription = [];
-    let awaitingGroupTitle = false;
-    let previousLineWasTitle = false;
-
-    lines.forEach(line => {
-        const trimmed = line.trim();
-        if (!trimmed) {
-            return;
-        }
-        if (trimmed.startsWith('#')) {
-            const text = trimmed.replace(/^#\s*/, '').trim();
-            if (/^\*+/.test(text)) {
-                if (previousLineWasTitle) {
-                    previousLineWasTitle = false;
-                } else {
-                    awaitingGroupTitle = true;
-                }
-                return;
-            }
-            if (awaitingGroupTitle) {
-                const title = text || 'Global Macros';
-                currentGroup = { title, entries: [] };
-                groups.push(currentGroup);
-                pendingDescription = [];
-                awaitingGroupTitle = false;
-                previousLineWasTitle = true;
-                return;
-            }
-            previousLineWasTitle = false;
-            pendingDescription.push(text);
-            return;
-        }
-        const defineMatch = trimmed.match(/^\[DEFINE\s+([^\]]+)\]/i);
-        if (defineMatch) {
-            const body = defineMatch[1].trim();
-            const optionTokens = body.split('|').map(token => token.trim()).filter(Boolean);
-            const options = [];
-            optionTokens.forEach(token => {
-                const withoutChance = token.replace(/^\d{1,3}>/, '').trim();
-                const cleaned = withoutChance.replace(/^\^/, '').trim();
-                if (!cleaned.startsWith('@')) return;
-                const id = normalizeOptionId(cleaned);
-                options.push({
-                    id,
-                    display: formatOptionName(id),
-                    raw: cleaned
-                });
-            });
-            const filteredOptions = options.filter(opt => !isSingularOption(opt.id));
-            if (filteredOptions.length === 0) {
-                pendingDescription = [];
-                return;
-            }
-            const entry = {
-                id: filteredOptions.map(opt => opt.id).join('-') || `define-${currentGroup.entries.length}`,
-                title: pendingDescription[0] || filteredOptions.map(opt => formatOptionName(opt.id)).join(' vs '),
-                description: pendingDescription.join(' ').trim(),
-                options: filteredOptions
-            };
-            currentGroup.entries.push(entry);
-            entry.options.forEach(opt => {
-                optionIndex[opt.id] = entry;
-            });
-            pendingDescription = [];
-            previousLineWasTitle = false;
-        }
-    });
-
-    return { groups, optionIndex };
-}
-
-function isSingularOption(optionId) {
-    return typeof optionId === 'string' && optionId.startsWith('singular');
-}
-
-function buildNotesOptionLookup(originData, config) {
-    if (!originData || !originData.chapters || !originData.chapters.notes || !config) return null;
-    const notesContent = originData.chapters.notes.content || '';
-    const regex = /\[([\s\S]*?)\]/g;
-    const cues = {};
-    let match;
-
-    while ((match = regex.exec(notesContent)) !== null) {
-        const block = (match[1] || '').trim();
-        if (!block) continue;
-        if (/^(MACRO|STICKY_MACRO)\s/i.test(block)) {
-            continue;
-        }
-        const segments = splitQuantOptions(block);
-        if (!segments.length) continue;
-        let entryContext = null;
-        const assigned = [];
-
-        segments.forEach(segment => {
-            const trimmed = segment.trim();
-            if (!trimmed) return;
-            let optionId = null;
-            let text = trimmed;
-            const optMatch = trimmed.match(/^@([A-Za-z_][A-Za-z0-9_-]*)>([\s\S]*)$/);
-            if (optMatch) {
-                optionId = normalizeOptionId(optMatch[1]);
-                text = optMatch[2];
-                entryContext = config.optionIndex[optionId] || entryContext;
-            } else if (entryContext && entryContext.options.length === 2) {
-                const remaining = entryContext.options
-                    .map(opt => opt.id)
-                    .filter(id => !assigned.includes(id));
-                if (remaining.length === 1) {
-                    optionId = remaining[0];
-                }
-            }
-            if (!optionId) return;
-            assigned.push(optionId);
-            const plain = quantOptionToPlain(text);
-            const normalized = normalizePlainText(plain);
-            if (!plain || !normalized) return;
-            if (!cues[optionId]) cues[optionId] = [];
-            cues[optionId].push({ text: plain, normalized });
-        });
-    }
-
-    return { byOption: cues };
-}
-
-function splitQuantOptions(text) {
-    if (!text) return [];
-    const parts = [];
-    let current = '';
-    let braceDepth = 0;
-    for (let i = 0; i < text.length; i++) {
-        const char = text[i];
-        if (char === '{') {
-            braceDepth += 1;
-            current += char;
-            continue;
-        }
-        if (char === '}') {
-            braceDepth = Math.max(0, braceDepth - 1);
-            current += char;
-            continue;
-        }
-        if (char === '|' && braceDepth === 0) {
-            parts.push(current);
-            current = '';
-            continue;
-        }
-        current += char;
-    }
-    if (current) parts.push(current);
-    return parts;
-}
-
-function quantOptionToPlain(text) {
-    if (!text) return '';
-    let output = text.replace(/~/g, '');
-    output = output.replace(/\{([^{}]+)\}/g, (_, inner) => {
-        const slashIndex = inner.indexOf('/');
-        if (slashIndex !== -1) {
-            return inner.slice(slashIndex + 1);
-        }
-        return inner;
-    });
-    return output.replace(/\s+/g, ' ').trim();
-}

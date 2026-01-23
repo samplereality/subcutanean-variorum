@@ -1481,23 +1481,23 @@
       "patterns": {
         "notes": [
           "orange",
-          "blue",
-          "yellow",
-          "red"
-        ],
-        "chapter17": [
           "red",
-          "fiery"
-        ],
-        "chapter10": [
-          "Black and blue.",
+          "yellow",
           "blue"
         ],
+        "chapter17": [
+          "fiery",
+          "red"
+        ],
+        "chapter10": [
+          "blue",
+          "Black and blue."
+        ],
         "chapter11": [
-          "yellow",
-          "amber",
+          "orange",
           "sea-blue",
-          "orange"
+          "amber",
+          "yellow"
         ],
         "chapter12": [
           "orange"
@@ -1533,23 +1533,23 @@
       "patterns": {
         "notes": [
           "yellow",
-          "red",
-          "orange",
-          "blue"
-        ],
-        "chapter17": [
           "blue",
-          "cerulean"
-        ],
-        "chapter10": [
-          "Black and blood.",
+          "orange",
           "red"
         ],
+        "chapter17": [
+          "cerulean",
+          "blue"
+        ],
+        "chapter10": [
+          "red",
+          "Black and blood."
+        ],
         "chapter11": [
-          "orange",
-          "ochre",
+          "yellow",
           "blood-red",
-          "yellow"
+          "ochre",
+          "orange"
         ],
         "chapter12": [
           "yellow"
@@ -1585,23 +1585,23 @@
       "patterns": {
         "notes": [
           "yellow",
-          "red",
-          "silver",
-          "green"
-        ],
-        "chapter17": [
           "green",
-          "emerald"
-        ],
-        "chapter10": [
-          "Black and blood.",
+          "silver",
           "red"
         ],
+        "chapter17": [
+          "emerald",
+          "green"
+        ],
+        "chapter10": [
+          "red",
+          "Black and blood."
+        ],
         "chapter11": [
-          "silver",
-          "pale gray",
+          "yellow",
           "blood-red",
-          "yellow"
+          "pale gray",
+          "silver"
         ],
         "chapter12": [
           "yellow"
@@ -1976,59 +1976,425 @@
   ],
   "macros": {
     "FavBook": [
-      "favcrowley",
       "favdelany",
-      "favbarker"
+      "favbarker",
+      "favcrowley"
     ],
     "AltBook": [
-      "favcrowley",
       "favdelany",
-      "favbarker"
+      "favbarker",
+      "favcrowley"
     ],
     "FavAuthor": [
-      "favcrowley",
       "favdelany",
-      "favbarker"
+      "favbarker",
+      "favcrowley"
     ],
     "color1": [
-      "colorseq3",
+      "colorseq1",
       "colorseq2",
-      "colorseq1"
+      "colorseq3"
     ],
     "color1poetic": [
-      "colorseq3",
+      "colorseq1",
       "colorseq2",
-      "colorseq1"
+      "colorseq3"
     ],
     "color1shades": [
-      "colorseq3",
+      "colorseq1",
       "colorseq2",
-      "colorseq1"
+      "colorseq3"
     ],
     "color2": [
-      "colorseq3",
+      "colorseq1",
       "colorseq2",
-      "colorseq1"
+      "colorseq3"
     ],
     "color2edge": [
-      "colorseq3",
+      "colorseq1",
       "colorseq2",
-      "colorseq1"
+      "colorseq3"
     ],
     "color3": [
-      "colorseq3",
+      "colorseq1",
       "colorseq2",
-      "colorseq1"
+      "colorseq3"
     ],
     "color4": [
-      "colorseq3",
+      "colorseq1",
       "colorseq2",
-      "colorseq1"
+      "colorseq3"
     ],
     "color4adj": [
-      "colorseq3",
+      "colorseq1",
       "colorseq2",
-      "colorseq1"
+      "colorseq3"
+    ]
+  },
+  "chapter_variables": {
+    "chapter8": [
+      {
+        "variables": [
+          "spiralhall",
+          "nikofalls"
+        ],
+        "description": "Pick one of two significant moments: either a spiral hallway that one of them doesn't see, or Niko almost falling and Ryan having to talk him to safety.",
+        "is_group": true,
+        "is_optional": false,
+        "has_probabilities": true,
+        "raw": "50>@spiralhall|50>@nikofalls"
+      },
+      {
+        "variables": [
+          "noch8extra",
+          "hamsterwheel",
+          "stageladder"
+        ],
+        "description": "Optionally include an extra sequence exploring a weird example of architecture.",
+        "is_group": true,
+        "is_optional": false,
+        "has_probabilities": true,
+        "raw": "34>@noch8extra|33>@hamsterwheel|33>@stageladder"
+      },
+      {
+        "variables": [
+          "ch8intro1",
+          "ch8intro2",
+          "ch8intro3"
+        ],
+        "description": null,
+        "is_group": true,
+        "is_optional": false,
+        "has_probabilities": false,
+        "raw": "@ch8intro1|@ch8intro2|@ch8intro3"
+      },
+      {
+        "variables": [
+          "canyons"
+        ],
+        "description": null,
+        "is_group": false,
+        "is_optional": true,
+        "has_probabilities": false,
+        "raw": "^@canyons"
+      },
+      {
+        "variables": [
+          "acceptedLove"
+        ],
+        "description": null,
+        "is_group": false,
+        "is_optional": true,
+        "has_probabilities": false,
+        "raw": "^@acceptedLove"
+      },
+      {
+        "variables": [
+          "tapeTooShort"
+        ],
+        "description": null,
+        "is_group": false,
+        "is_optional": true,
+        "has_probabilities": false,
+        "raw": "^@tapeTooShort"
+      }
+    ],
+    "chapter9": [
+      {
+        "variables": [
+          "thoreaujoke"
+        ],
+        "description": null,
+        "is_group": false,
+        "is_optional": false,
+        "has_probabilities": true,
+        "raw": "25>@thoreaujoke"
+      },
+      {
+        "variables": [
+          "midterm"
+        ],
+        "description": null,
+        "is_group": false,
+        "is_optional": false,
+        "has_probabilities": false,
+        "raw": "@midterm"
+      },
+      {
+        "variables": [
+          "bossf"
+        ],
+        "description": null,
+        "is_group": false,
+        "is_optional": false,
+        "has_probabilities": false,
+        "raw": "@bossf"
+      },
+      {
+        "variables": [
+          "ch9weI"
+        ],
+        "description": null,
+        "is_group": false,
+        "is_optional": true,
+        "has_probabilities": false,
+        "raw": "^@ch9weI"
+      }
+    ],
+    "chapter2": [
+      {
+        "variables": [
+          "rooftop"
+        ],
+        "description": null,
+        "is_group": false,
+        "is_optional": false,
+        "has_probabilities": false,
+        "raw": "@rooftop"
+      },
+      {
+        "variables": [
+          "octagon",
+          "hexagon",
+          "pentagon"
+        ],
+        "description": null,
+        "is_group": true,
+        "is_optional": false,
+        "has_probabilities": false,
+        "raw": "@octagon|@hexagon|@pentagon"
+      }
+    ],
+    "chapter3": [
+      {
+        "variables": [
+          "nikoblackout"
+        ],
+        "description": null,
+        "is_group": false,
+        "is_optional": false,
+        "has_probabilities": false,
+        "raw": "@nikoblackout"
+      }
+    ],
+    "prologue": [
+      {
+        "variables": [
+          "ch1stairs",
+          "ch1staircase"
+        ],
+        "description": null,
+        "is_group": true,
+        "is_optional": false,
+        "has_probabilities": false,
+        "raw": "@ch1stairs|@ch1staircase"
+      }
+    ],
+    "chapter1": [
+      {
+        "variables": [
+          "clubintro",
+          "makeupintro",
+          "noodlesintro"
+        ],
+        "description": null,
+        "is_group": true,
+        "is_optional": false,
+        "has_probabilities": false,
+        "raw": "@clubintro|@makeupintro|@noodlesintro"
+      },
+      {
+        "variables": [
+          "dustyroom"
+        ],
+        "description": null,
+        "is_group": false,
+        "is_optional": false,
+        "has_probabilities": false,
+        "raw": "@dustyroom"
+      },
+      {
+        "variables": [
+          "diary",
+          "livejournal"
+        ],
+        "description": null,
+        "is_group": true,
+        "is_optional": false,
+        "has_probabilities": false,
+        "raw": "@diary|@livejournal"
+      },
+      {
+        "variables": [
+          "convopit"
+        ],
+        "description": null,
+        "is_group": false,
+        "is_optional": false,
+        "has_probabilities": true,
+        "raw": "20>@convopit"
+      },
+      {
+        "variables": [
+          "justRyan",
+          "justNiko",
+          "ryanAndNiko"
+        ],
+        "description": "Some independent variables for the details of this scare scene. Who's the figure: Ryan? Niko? The two of them holding hands?",
+        "is_group": true,
+        "is_optional": false,
+        "has_probabilities": false,
+        "raw": "@justRyan|@justNiko|@ryanAndNiko"
+      },
+      {
+        "variables": [
+          "facingforward",
+          "facingback"
+        ],
+        "description": "Is its back to us, or not?",
+        "is_group": true,
+        "is_optional": false,
+        "has_probabilities": true,
+        "raw": "75>@facingforward|25>@facingback"
+      },
+      {
+        "variables": [
+          "ch1stinger"
+        ],
+        "description": null,
+        "is_group": false,
+        "is_optional": true,
+        "has_probabilities": false,
+        "raw": "^@ch1stinger"
+      }
+    ],
+    "chapter4": [
+      {
+        "variables": [
+          "movieline",
+          "songlyric"
+        ],
+        "description": null,
+        "is_group": true,
+        "is_optional": false,
+        "has_probabilities": false,
+        "raw": "@movieline|@songlyric"
+      }
+    ],
+    "chapter10": [
+      {
+        "variables": [
+          "gunsignal"
+        ],
+        "description": null,
+        "is_group": false,
+        "is_optional": false,
+        "has_probabilities": true,
+        "raw": "33>@gunsignal"
+      }
+    ],
+    "chapter13": [
+      {
+        "variables": [
+          "ch13open1",
+          "ch13open2"
+        ],
+        "description": null,
+        "is_group": true,
+        "is_optional": false,
+        "has_probabilities": false,
+        "raw": "@ch13open1|@ch13open2"
+      },
+      {
+        "variables": [
+          "lookieloos",
+          "huskmen",
+          "husks",
+          "ringers",
+          "dittomen",
+          "mimeos",
+          "mimickers",
+          "shamfriends",
+          "mockups",
+          "mockeries",
+          "caricatures",
+          "alterboys",
+          "semblances",
+          "creepermen",
+          "inchmen",
+          "shapes",
+          "lingerers",
+          "lingermen",
+          "likenesses"
+        ],
+        "description": null,
+        "is_group": true,
+        "is_optional": false,
+        "has_probabilities": true,
+        "raw": "15>@lookieloos|8>@huskmen|3>@husks|7>@ringers|7>@dittomen|6>@mimeos|6>@mimickers|6>@shamfriends|5>@mockups|5>@mockeries|5>@caricatures|4>@alterboys|6>@semblances|6>@creepermen|3>@inchmen|4>@shapes|2>@lingerers|1>@lingermen|1>@likenesses"
+      }
+    ],
+    "chapter7": [
+      {
+        "variables": [
+          "tables",
+          "sofas"
+        ],
+        "description": "If Downstairs is @empty, the setting is a maze of crawlways. If @furnished, it's a maze of furniture, with two possibilities for variety.",
+        "is_group": true,
+        "is_optional": false,
+        "has_probabilities": false,
+        "raw": "@tables|@sofas"
+      }
+    ],
+    "chapter6": [
+      {
+        "variables": [
+          "vortex",
+          "gardens",
+          "snakeoil",
+          "caves"
+        ],
+        "description": "There are a bunch of different hinted explanations for Downstairs that can show up. All of them are bullshit. But they create different metaphors and clues Orion uses to try to make sense of what's happening to him.",
+        "is_group": true,
+        "is_optional": false,
+        "has_probabilities": false,
+        "raw": "@vortex|@gardens|@snakeoil|@caves"
+      },
+      {
+        "variables": [
+          "bubbles",
+          "shadows"
+        ],
+        "description": null,
+        "is_group": true,
+        "is_optional": false,
+        "has_probabilities": false,
+        "raw": "@bubbles|@shadows"
+      }
+    ],
+    "chapter12": [
+      {
+        "variables": [
+          "ch12light"
+        ],
+        "description": null,
+        "is_group": false,
+        "is_optional": false,
+        "has_probabilities": false,
+        "raw": "@ch12light"
+      },
+      {
+        "variables": [
+          "ch12ducts",
+          "ch12pantry"
+        ],
+        "description": null,
+        "is_group": true,
+        "is_optional": false,
+        "has_probabilities": false,
+        "raw": "@ch12ducts|@ch12pantry"
+      }
     ]
   }
 }

@@ -245,6 +245,78 @@ def extract_chapter_patterns(variables, macros, macro_patterns):
     return variables
 
 
+def extract_chapter_variables(global_variables):
+    """Extract variables defined within chapter files (not in globals.txt).
+
+    Returns a dict: chapter_id -> list of variable definitions
+    """
+    chapter_variables = {}
+
+    for source_file in ORIGIN_DIR.glob('*.txt'):
+        if source_file.name in ('globals.txt', 'manifest.txt'):
+            continue
+
+        stem = source_file.stem
+        chapter_id = CHAPTER_MAPPING.get(stem, stem)
+        content = source_file.read_text(encoding='utf-8')
+
+        chapter_vars = []
+        current_comment = []
+
+        for line in content.split('\n'):
+            line = line.rstrip()
+
+            # Collect comment lines
+            if line.startswith('#'):
+                comment_text = line[1:].strip()
+                if comment_text and not comment_text.startswith('***'):
+                    current_comment.append(comment_text)
+                continue
+
+            # Look for DEFINE statements
+            define_match = re.search(r'\[DEFINE\s+([^\]]+)\]', line)
+            if define_match:
+                define_content = define_match.group(1)
+                var_names = re.findall(r'@(\w+)', define_content)
+
+                # Skip if all variables are global (already in globals.txt)
+                local_vars = [v for v in var_names if v not in global_variables]
+                if not local_vars:
+                    current_comment = []
+                    continue
+
+                description = ' '.join(current_comment) if current_comment else None
+
+                # Check if it's a group (mutually exclusive)
+                is_group = len(local_vars) > 1
+
+                # Check for optional (^) prefix
+                is_optional = any(f'^@{v}' in define_content for v in local_vars)
+
+                # Extract probabilities if present
+                has_probabilities = bool(re.search(r'\d+>', define_content))
+
+                chapter_vars.append({
+                    'variables': local_vars,
+                    'description': description,
+                    'is_group': is_group,
+                    'is_optional': is_optional,
+                    'has_probabilities': has_probabilities,
+                    'raw': define_content.strip()
+                })
+
+                current_comment = []
+                continue
+
+            if line.strip():
+                current_comment = []
+
+        if chapter_vars:
+            chapter_variables[chapter_id] = chapter_vars
+
+    return chapter_variables
+
+
 def main():
     print("Parsing globals.txt for variables and macros...")
     variables, macros, macro_patterns, variable_groups = parse_globals()
@@ -264,11 +336,17 @@ def main():
     print(f"  {with_chapters} variables are used in chapters")
     print(f"  {with_patterns} variables have text patterns for highlighting")
 
+    print("\nExtracting chapter-local variable definitions...")
+    chapter_variables = extract_chapter_variables(variables)
+    total_chapter_vars = sum(len(defs) for defs in chapter_variables.values())
+    print(f"  Found {total_chapter_vars} chapter-local variable definitions in {len(chapter_variables)} chapters")
+
     # Build final output with variables and groups for inference
     output_data = {
         'variables': variables,
         'groups': variable_groups,
         'macros': macros,
+        'chapter_variables': chapter_variables,
     }
 
     OUTPUT_PATH.parent.mkdir(exist_ok=True)
