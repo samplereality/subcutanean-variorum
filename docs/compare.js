@@ -1637,34 +1637,121 @@ function highlightChapterVariableText(varName) {
 
     currentHighlightedVar = varName;
 
-    // Find paragraphs that contain any of the patterns
+    // Helper to check if text matches any pattern
+    const matchesPattern = (text) => {
+        const cleanText = (text || '').replace(/\s+/g, ' ');
+        return patterns.some(pattern => {
+            const cleanPattern = pattern.replace(/\s+/g, ' ').trim();
+            return cleanText.includes(cleanPattern.substring(0, 50));
+        });
+    };
+
+    // Get original paragraph data for each version
+    const chapterDataA = getChapterContent(versionA, currentChapter);
+    const chapterDataB = getChapterContent(versionB, currentChapter);
+    const chapterDataC = versionC ? getChapterContent(versionC, currentChapter) : null;
+
+    const paragraphsA = chapterDataA.paragraphs || [];
+    const paragraphsB = chapterDataB.paragraphs || [];
+    const paragraphsC = chapterDataC ? (chapterDataC.paragraphs || []) : [];
+
+    // Find matching paragraph indices in original data
+    const matchingIndicesA = new Set();
+    const matchingIndicesB = new Set();
+    const matchingIndicesC = new Set();
+
+    paragraphsA.forEach((text, idx) => {
+        if (matchesPattern(text)) matchingIndicesA.add(idx);
+    });
+    paragraphsB.forEach((text, idx) => {
+        if (matchesPattern(text)) matchingIndicesB.add(idx);
+    });
+    paragraphsC.forEach((text, idx) => {
+        if (matchesPattern(text)) matchingIndicesC.add(idx);
+    });
+
     const container = document.getElementById('comparison-display');
     if (!container) {
         showNotification('Could not find comparison display', 'error');
         return;
     }
-    const paragraphs = container.querySelectorAll('p, .comparison-paragraph, .source-paragraph');
+
     let matchCount = 0;
     let firstMatch = null;
 
-    paragraphs.forEach(para => {
-        const text = para.textContent || '';
-        const hasMatch = patterns.some(pattern => {
-            const cleanPattern = pattern.replace(/\s+/g, ' ').trim();
-            const cleanText = text.replace(/\s+/g, ' ');
-            // Use substring matching (patterns may be truncated)
-            return cleanText.includes(cleanPattern.substring(0, 50));
+    if (currentMode === 'sidebyside' || currentMode === 'unified') {
+        // In side-by-side and unified, paragraphs have data-version-id and data-paragraph-index
+        const domParagraphs = container.querySelectorAll('p[data-paragraph-index], .source-paragraph[data-paragraph-index]');
+        domParagraphs.forEach(para => {
+            const idx = parseInt(para.dataset.paragraphIndex, 10);
+            const version = para.dataset.versionId;
+
+            let matches = false;
+            if (version === versionA && matchingIndicesA.has(idx)) matches = true;
+            if (version === versionB && matchingIndicesB.has(idx)) matches = true;
+            if (version === versionC && matchingIndicesC.has(idx)) matches = true;
+
+            if (matches) {
+                para.classList.add('var-highlight');
+                matchCount++;
+                if (!firstMatch) firstMatch = para;
+                addViewSourceButton(para, varName);
+            }
         });
+    } else if (currentMode === 'diff') {
+        // In diff view, paragraph index is the alignment index
+        // We need to map alignment indices to original paragraph indices
+        const alignments = versionC
+            ? alignThreeParagraphs(paragraphsA, paragraphsB, paragraphsC)
+            : alignParagraphs(paragraphsA, paragraphsB);
 
-        if (hasMatch) {
-            para.classList.add('var-highlight');
-            matchCount++;
-            if (!firstMatch) firstMatch = para;
+        const domParagraphs = container.querySelectorAll('.diff-view p[data-paragraph-index]');
+        domParagraphs.forEach(para => {
+            const alignIdx = parseInt(para.dataset.paragraphIndex, 10);
+            const alignment = alignments[alignIdx];
+            if (!alignment) return;
 
-            // Add a "View Source" button to the highlighted paragraph
-            addViewSourceButton(para, varName);
-        }
-    });
+            let matches = false;
+            // Check if any of the aligned original paragraphs match
+            if (alignment.indexA !== null && matchingIndicesA.has(alignment.indexA)) matches = true;
+            if (alignment.indexB !== null && matchingIndicesB.has(alignment.indexB)) matches = true;
+            if (alignment.indexC !== undefined && alignment.indexC !== null && matchingIndicesC.has(alignment.indexC)) matches = true;
+
+            if (matches) {
+                para.classList.add('var-highlight');
+                matchCount++;
+                if (!firstMatch) firstMatch = para;
+                addViewSourceButton(para, varName);
+            }
+        });
+    } else if (currentMode === 'comparison') {
+        // In collation view, each alignment row has 2 or 3 .comparison-paragraph elements
+        const alignments = versionC
+            ? alignThreeParagraphs(paragraphsA, paragraphsB, paragraphsC)
+            : alignParagraphs(paragraphsA, paragraphsB);
+
+        const domParagraphs = container.querySelectorAll('.comparison-paragraph[data-paragraph-index]');
+        const numVersions = versionC ? 3 : 2;
+
+        domParagraphs.forEach((para, domIdx) => {
+            const rowIndex = parseInt(para.dataset.paragraphIndex, 10);
+            const versionInRow = domIdx % numVersions; // 0 = A, 1 = B, 2 = C
+            const alignment = alignments[rowIndex];
+            if (!alignment) return;
+
+            let matches = false;
+            if (versionInRow === 0 && alignment.indexA !== null && matchingIndicesA.has(alignment.indexA)) matches = true;
+            if (versionInRow === 1 && alignment.indexB !== null && matchingIndicesB.has(alignment.indexB)) matches = true;
+            if (versionInRow === 2 && alignment.indexC !== undefined && alignment.indexC !== null && matchingIndicesC.has(alignment.indexC)) matches = true;
+
+            if (matches) {
+                para.classList.add('var-highlight');
+                matchCount++;
+                if (!firstMatch) firstMatch = para;
+                addViewSourceButton(para, varName);
+            }
+        });
+    }
 
     if (matchCount > 0) {
         showNotification(`Highlighted ${matchCount} paragraph${matchCount > 1 ? 's' : ''} affected by "@${varName}" - click the code icon to view source`, 'success');
