@@ -1543,55 +1543,54 @@ function updateChapterVariablesPanel() {
                 }
             }
             const clickClass = clickable ? 'clickable' : '';
-            const tooltip = description ? `title="${escapeHtml(description)}"` : `title="Click to highlight"`;
-            return `<span class="chapter-var-tag ${clickClass}" data-varname="${v}" ${tooltip}>@${v}</span>`;
+            const tooltipText = description || (clickable ? 'Click to highlight' : '');
+            return `<span class="chapter-var-tag ${clickClass}" data-varname="${v}" data-tooltip="${escapeHtml(tooltipText)}">@${v}</span>`;
         }).join('');
     };
 
-    // Column-based layout to align with comparison view
-    let html = `<div class="chapter-vars-columns ${versionC ? 'three-col' : 'two-col'}">`;
+    // Simple inline layout matching Global Variables panel style
+    let html = '';
 
-    // Column A
+    // Only in A
     html += `
-        <div class="chapter-vars-column var-list-a">
-            <div class="chapter-vars-column-header">${versionA || 'A'}</div>
-            <div class="chapter-vars-column-content">${renderVars(onlyInA)}</div>
+        <div class="chapter-var-diff-section">
+            <span class="chapter-var-diff-label">Only in ${versionA || 'A'}:</span>
+            <span class="chapter-var-list var-list-a">${renderVars(onlyInA)}</span>
         </div>
     `;
 
-    // Column B
+    // Only in B
     html += `
-        <div class="chapter-vars-column var-list-b">
-            <div class="chapter-vars-column-header">${versionB || 'B'}</div>
-            <div class="chapter-vars-column-content">${renderVars(onlyInB)}</div>
+        <div class="chapter-var-diff-section">
+            <span class="chapter-var-diff-label">Only in ${versionB || 'B'}:</span>
+            <span class="chapter-var-list var-list-b">${renderVars(onlyInB)}</span>
         </div>
     `;
 
-    // Column C (if three-version mode)
+    // Only in C (if three-version mode)
     if (versionC) {
         html += `
-            <div class="chapter-vars-column var-list-c">
-                <div class="chapter-vars-column-header">${versionC}</div>
-                <div class="chapter-vars-column-content">${renderVars(onlyInC)}</div>
+            <div class="chapter-var-diff-section">
+                <span class="chapter-var-diff-label">Only in ${versionC}:</span>
+                <span class="chapter-var-list var-list-c">${renderVars(onlyInC)}</span>
             </div>
         `;
     }
 
-    html += `</div>`; // Close columns container
-
-    // Shared row (spans full width)
+    // Shared
     html += `
-        <div class="chapter-var-section chapter-vars-shared">
-            <span class="chapter-var-section-label">${versionC ? 'In all:' : 'Shared:'}</span>
-            <span class="chapter-var-section-content var-list-shared">${renderVars(shared)}</span>
+        <div class="chapter-var-diff-section shared">
+            <span class="chapter-var-diff-label">${versionC ? 'In all:' : 'Shared'}:</span>
+            <span class="chapter-var-list var-list-shared">${renderVars(shared)}</span>
         </div>
     `;
 
+    // Undetected (if any)
     if (undetected.length > 0) {
         html += `
-            <div class="chapter-var-section undetected">
-                <span class="chapter-var-section-label">Undetected:</span>
-                <span class="chapter-var-section-content var-list-undetected">${renderVars(undetected, false)}</span>
+            <div class="chapter-var-diff-section undetected">
+                <span class="chapter-var-diff-label">Undetected:</span>
+                <span class="chapter-var-list var-list-undetected">${renderVars(undetected, false)}</span>
             </div>
         `;
     }
