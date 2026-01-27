@@ -40,6 +40,14 @@ let mobileNavOpen = false;
 // Theme state
 let currentTheme = 'dark';
 
+// Gonzo Mode state
+let gonzoCurrentChapter = 'prologue';
+let gonzoCurrentParagraphIndex = 0;
+const GONZO_PARAGRAPHS_PER_VIEW = 3;
+let gonzoScrollSyncEnabled = true;
+let gonzoHasBeenOpened = false;  // Track if Gonzo has been opened before
+let savedScrollPosition = 0;     // Save main view scroll position when entering Gonzo
+
 // Theme functions
 function initializeTheme() {
     // Check localStorage for saved preference
@@ -4116,7 +4124,9 @@ function closeAllModals() {
         'manage-info-modal',
         'privacy-notice-modal',
         'annotation-modal',
-        'export-modal'
+        'export-modal',
+        'heatmap-modal'
+        // Note: gonzo-modal is excluded so it persists when other modals open
     ];
     modalIds.forEach(id => {
         const modal = document.getElementById(id);
@@ -7586,6 +7596,369 @@ document.addEventListener('DOMContentLoaded', () => {
     // Make closeHeatmapModal available globally for onclick handlers
     window.closeHeatmapModal = closeHeatmapModal;
 
+    // ============================================
+    // Gonzo Mode - 5x5 Grid View of All 25 Versions
+    // ============================================
+
+    function openGonzoModal() {
+        closeAllModals();
+        closeAllNavDropdowns();
+
+        const modal = document.getElementById('gonzo-modal');
+        if (!modal) return;
+
+        // Save main view scroll position to restore when closing
+        savedScrollPosition = window.scrollY;
+
+        // Only initialize chapter/paragraph on first open
+        // On subsequent opens, preserve where user left off
+        if (!gonzoHasBeenOpened) {
+            gonzoCurrentChapter = currentChapter;
+            gonzoCurrentParagraphIndex = 0;
+            gonzoHasBeenOpened = true;
+        }
+
+        // Populate chapter selector
+        populateGonzoChapterSelector();
+
+        // Render the grid
+        renderGonzoGrid();
+
+        // Show modal
+        modal.classList.remove('hidden');
+
+        // Add keyboard listener
+        document.addEventListener('keydown', handleGonzoKeydown);
+
+        // Initialize Lucide icons in the modal
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+
+        // Update theme icon to reflect current theme
+        updateGonzoThemeIcon();
+    }
+
+    function closeGonzoModal() {
+        const modal = document.getElementById('gonzo-modal');
+        if (modal) {
+            modal.classList.add('hidden');
+        }
+        document.removeEventListener('keydown', handleGonzoKeydown);
+
+        // Restore main view scroll position
+        window.scrollTo(0, savedScrollPosition);
+    }
+
+    function updateGonzoThemeIcon() {
+        const themeBtn = document.getElementById('gonzo-theme-btn');
+        if (!themeBtn) return;
+
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+        // In dark mode, show sun icon (to switch to light)
+        // In light mode, show moon icon (to switch to dark)
+        const iconName = currentTheme === 'light' ? 'moon' : 'sun';
+
+        themeBtn.innerHTML = `<i data-lucide="${iconName}"></i>`;
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons({ nodes: [themeBtn] });
+        }
+    }
+
+    function openGonzoAboutModal() {
+        const modal = document.getElementById('gonzo-about-modal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+    }
+
+    function closeGonzoAboutModal() {
+        const modal = document.getElementById('gonzo-about-modal');
+        if (modal) {
+            modal.classList.add('hidden');
+        }
+    }
+
+    function handleGonzoKeydown(e) {
+        // ESC to close - first close About modal if open, then Gonzo mode
+        if (e.key === 'Escape') {
+            const aboutModal = document.getElementById('gonzo-about-modal');
+            if (aboutModal && !aboutModal.classList.contains('hidden')) {
+                closeGonzoAboutModal();
+            } else {
+                closeGonzoModal();
+            }
+            return;
+        }
+
+        // Arrow keys for navigation
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            gonzoNavigatePrev();
+        } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+            e.preventDefault();
+            gonzoNavigateNext();
+        }
+
+        // Page Up/Down for larger jumps
+        if (e.key === 'PageUp') {
+            e.preventDefault();
+            gonzoNavigatePrev(GONZO_PARAGRAPHS_PER_VIEW * 3);
+        } else if (e.key === 'PageDown') {
+            e.preventDefault();
+            gonzoNavigateNext(GONZO_PARAGRAPHS_PER_VIEW * 3);
+        }
+
+        // Home/End for chapter start/end
+        if (e.key === 'Home') {
+            e.preventDefault();
+            gonzoCurrentParagraphIndex = 0;
+            renderGonzoGrid();
+        } else if (e.key === 'End') {
+            e.preventDefault();
+            const maxParas = getGonzoMaxParagraphCount();
+            gonzoCurrentParagraphIndex = Math.max(0, maxParas - GONZO_PARAGRAPHS_PER_VIEW);
+            renderGonzoGrid();
+        }
+    }
+
+    function populateGonzoChapterSelector() {
+        const select = document.getElementById('gonzo-chapter-select');
+        if (!select) return;
+
+        select.innerHTML = '';
+
+        const chapters = [
+            { id: 'prologue', label: 'Prologue' },
+            { id: 'chapter1', label: 'Chapter 1' },
+            { id: 'chapter2', label: 'Chapter 2' },
+            { id: 'chapter3', label: 'Chapter 3' },
+            { id: 'chapter4', label: 'Chapter 4' },
+            { id: 'chapter5', label: 'Chapter 5' },
+            { id: 'chapter6', label: 'Chapter 6' },
+            { id: 'chapter7', label: 'Chapter 7' },
+            { id: 'chapter8', label: 'Chapter 8' },
+            { id: 'chapter9', label: 'Chapter 9' },
+            { id: 'chapter10', label: 'Chapter 10' },
+            { id: 'chapter11', label: 'Chapter 11' },
+            { id: 'chapter12', label: 'Chapter 12' },
+            { id: 'chapter13', label: 'Chapter 13' },
+            { id: 'chapter14', label: 'Chapter 14' },
+            { id: 'chapter15', label: 'Chapter 15' },
+            { id: 'chapter16', label: 'Chapter 16' },
+            { id: 'chapter17', label: 'Chapter 17' },
+            { id: 'chapter18', label: 'Chapter 18' }
+        ];
+
+        chapters.forEach(ch => {
+            const option = document.createElement('option');
+            option.value = ch.id;
+            option.textContent = ch.label;
+            if (ch.id === gonzoCurrentChapter) {
+                option.selected = true;
+            }
+            select.appendChild(option);
+        });
+    }
+
+    function getGonzoMaxParagraphCount() {
+        // Find the maximum paragraph count across all built-in versions for current chapter
+        let maxCount = 0;
+        versionIds.forEach(versionId => {
+            // Only use built-in versions (not custom uploads)
+            if (allVersions[versionId] && !customVersions[versionId]) {
+                const paragraphs = allVersions[versionId][gonzoCurrentChapter];
+                if (paragraphs && paragraphs.length > maxCount) {
+                    maxCount = paragraphs.length;
+                }
+            }
+        });
+        return maxCount;
+    }
+
+    function getBuiltInVersionIds() {
+        // Return only the 25 built-in version IDs (not custom uploads)
+        return versionIds.filter(vid => !customVersions[vid]).slice(0, 25);
+    }
+
+    function renderGonzoGrid() {
+        const grid = document.getElementById('gonzo-grid');
+        if (!grid || !allVersions) return;
+
+        grid.innerHTML = '';
+
+        const builtInVersions = getBuiltInVersionIds();
+        const maxParagraphs = getGonzoMaxParagraphCount();
+        const startIdx = gonzoCurrentParagraphIndex;
+        const endIdx = Math.min(startIdx + GONZO_PARAGRAPHS_PER_VIEW, maxParagraphs);
+
+        // Update header info
+        updateGonzoHeaderInfo(startIdx, endIdx, maxParagraphs);
+
+        // Render 25 cells (5x5 grid)
+        builtInVersions.forEach((versionId, index) => {
+            const cell = document.createElement('div');
+            cell.className = 'gonzo-cell';
+            cell.dataset.versionId = versionId;
+            cell.dataset.cellIndex = index;
+
+            // Header with seed number
+            const header = document.createElement('div');
+            header.className = 'gonzo-cell-header';
+            header.textContent = `Seed ${versionId}`;
+
+            // Content area
+            const content = document.createElement('div');
+            content.className = 'gonzo-cell-content synced-scroll';
+            content.dataset.cellIndex = index;
+
+            const versionData = allVersions[versionId];
+            const paragraphs = versionData ? versionData[gonzoCurrentChapter] : null;
+            const cellParagraphs = paragraphs ? paragraphs.slice(startIdx, endIdx) : [];
+
+            if (cellParagraphs.length === 0) {
+                // Empty/missing paragraphs
+                cell.classList.add('empty');
+                content.innerHTML = '<span>No content</span>';
+            } else {
+                // Render paragraphs
+                cellParagraphs.forEach((para, pIdx) => {
+                    const p = document.createElement('p');
+                    p.innerHTML = para;
+                    p.dataset.paragraphIndex = startIdx + pIdx;
+                    content.appendChild(p);
+                });
+            }
+
+            // Add scroll sync listener
+            content.addEventListener('scroll', (e) => {
+                if (gonzoScrollSyncEnabled) {
+                    syncGonzoScroll(e.target);
+                }
+            });
+
+            cell.appendChild(header);
+            cell.appendChild(content);
+            grid.appendChild(cell);
+        });
+
+        // Fill remaining cells if less than 25 versions
+        const remainingCells = 25 - builtInVersions.length;
+        for (let i = 0; i < remainingCells; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'gonzo-cell empty';
+            cell.innerHTML = '<div class="gonzo-cell-header">—</div><div class="gonzo-cell-content"><span>No version</span></div>';
+            grid.appendChild(cell);
+        }
+
+        // Update navigation button states
+        updateGonzoNavButtons(maxParagraphs);
+    }
+
+    function updateGonzoHeaderInfo(startIdx, endIdx, maxParagraphs) {
+        const chapterLabel = document.getElementById('gonzo-chapter-label');
+        const paraRange = document.getElementById('gonzo-para-range');
+        const currentPos = document.getElementById('gonzo-current-position');
+        const totalParas = document.getElementById('gonzo-total-paragraphs');
+
+        // Format chapter name
+        const chapterNames = {
+            'prologue': 'Prologue',
+            'chapter1': 'Chapter 1', 'chapter2': 'Chapter 2', 'chapter3': 'Chapter 3',
+            'chapter4': 'Chapter 4', 'chapter5': 'Chapter 5', 'chapter6': 'Chapter 6',
+            'chapter7': 'Chapter 7', 'chapter8': 'Chapter 8', 'chapter9': 'Chapter 9',
+            'chapter10': 'Chapter 10', 'chapter11': 'Chapter 11', 'chapter12': 'Chapter 12',
+            'chapter13': 'Chapter 13', 'chapter14': 'Chapter 14', 'chapter15': 'Chapter 15',
+            'chapter16': 'Chapter 16', 'chapter17': 'Chapter 17', 'chapter18': 'Chapter 18'
+        };
+
+        if (chapterLabel) {
+            chapterLabel.textContent = chapterNames[gonzoCurrentChapter] || gonzoCurrentChapter;
+        }
+
+        if (paraRange) {
+            if (maxParagraphs === 0) {
+                paraRange.textContent = 'No paragraphs';
+            } else {
+                paraRange.textContent = `Paragraphs ${startIdx + 1}–${endIdx}`;
+            }
+        }
+
+        if (currentPos) {
+            currentPos.textContent = maxParagraphs === 0 ? '0' : `Paragraphs ${startIdx + 1}–${endIdx}`;
+        }
+
+        if (totalParas) {
+            totalParas.textContent = maxParagraphs;
+        }
+    }
+
+    function updateGonzoNavButtons(maxParagraphs) {
+        const prevBtn = document.getElementById('gonzo-prev-btn');
+        const nextBtn = document.getElementById('gonzo-next-btn');
+
+        if (prevBtn) {
+            prevBtn.disabled = gonzoCurrentParagraphIndex <= 0;
+        }
+
+        if (nextBtn) {
+            nextBtn.disabled = gonzoCurrentParagraphIndex + GONZO_PARAGRAPHS_PER_VIEW >= maxParagraphs;
+        }
+    }
+
+    function gonzoNavigatePrev(amount = GONZO_PARAGRAPHS_PER_VIEW) {
+        gonzoCurrentParagraphIndex = Math.max(0, gonzoCurrentParagraphIndex - amount);
+        renderGonzoGrid();
+    }
+
+    function gonzoNavigateNext(amount = GONZO_PARAGRAPHS_PER_VIEW) {
+        const maxParagraphs = getGonzoMaxParagraphCount();
+        gonzoCurrentParagraphIndex = Math.min(
+            maxParagraphs - GONZO_PARAGRAPHS_PER_VIEW,
+            gonzoCurrentParagraphIndex + amount
+        );
+        gonzoCurrentParagraphIndex = Math.max(0, gonzoCurrentParagraphIndex);
+        renderGonzoGrid();
+    }
+
+    function gonzoChangeChapter(chapterId) {
+        gonzoCurrentChapter = chapterId;
+        gonzoCurrentParagraphIndex = 0;
+        renderGonzoGrid();
+    }
+
+    // Synchronized scrolling across all 25 cells
+    function syncGonzoScroll(sourceElement) {
+        // Use requestAnimationFrame for immediate, smooth sync
+        requestAnimationFrame(() => {
+            const scrollRatio = sourceElement.scrollTop /
+                (sourceElement.scrollHeight - sourceElement.clientHeight || 1);
+
+            // Temporarily disable sync to prevent loops
+            gonzoScrollSyncEnabled = false;
+
+            const allCells = document.querySelectorAll('.gonzo-cell-content');
+            allCells.forEach(cell => {
+                if (cell !== sourceElement) {
+                    const targetScroll = scrollRatio *
+                        (cell.scrollHeight - cell.clientHeight);
+                    cell.scrollTop = targetScroll;
+                }
+            });
+
+            // Re-enable sync on next frame
+            requestAnimationFrame(() => {
+                gonzoScrollSyncEnabled = true;
+            });
+        });
+    }
+
+    // Make closeGonzoModal available globally
+    window.closeGonzoModal = closeGonzoModal;
+
     // Event listeners for heatmap
     const heatmapBtn = document.getElementById('heatmap-btn');
     const closeHeatmapBtn = document.getElementById('close-heatmap-modal-btn');
@@ -7603,6 +7976,67 @@ document.addEventListener('DOMContentLoaded', () => {
                 closeHeatmapModal();
             }
         });
+    }
+
+    // Event listeners for Gonzo Mode
+    const gonzoBtn = document.getElementById('gonzo-btn');
+    const gonzoCloseBtn = document.getElementById('gonzo-close-btn');
+    const gonzoAboutBtn = document.getElementById('gonzo-about-btn');
+    const gonzoThemeBtn = document.getElementById('gonzo-theme-btn');
+    const gonzoModal = document.getElementById('gonzo-modal');
+    const gonzoChapterSelect = document.getElementById('gonzo-chapter-select');
+    const gonzoPrevBtn = document.getElementById('gonzo-prev-btn');
+    const gonzoNextBtn = document.getElementById('gonzo-next-btn');
+
+    if (gonzoBtn) {
+        gonzoBtn.addEventListener('click', openGonzoModal);
+    }
+    if (gonzoCloseBtn) {
+        gonzoCloseBtn.addEventListener('click', closeGonzoModal);
+    }
+    if (gonzoAboutBtn) {
+        gonzoAboutBtn.addEventListener('click', openGonzoAboutModal);
+    }
+
+    // Gonzo About modal listeners
+    const gonzoAboutModal = document.getElementById('gonzo-about-modal');
+    const gonzoAboutCloseBtn = document.getElementById('gonzo-about-close-btn');
+
+    if (gonzoAboutCloseBtn) {
+        gonzoAboutCloseBtn.addEventListener('click', closeGonzoAboutModal);
+    }
+    if (gonzoAboutModal) {
+        gonzoAboutModal.addEventListener('click', (e) => {
+            if (e.target === gonzoAboutModal) {
+                closeGonzoAboutModal();
+            }
+        });
+    }
+
+    if (gonzoThemeBtn) {
+        gonzoThemeBtn.addEventListener('click', () => {
+            toggleTheme();
+            updateGonzoThemeIcon();
+        });
+    }
+    if (gonzoModal) {
+        gonzoModal.addEventListener('click', (e) => {
+            // Close only if clicking the overlay itself, not the container
+            if (e.target === gonzoModal) {
+                closeGonzoModal();
+            }
+        });
+    }
+    if (gonzoChapterSelect) {
+        gonzoChapterSelect.addEventListener('change', (e) => {
+            gonzoChangeChapter(e.target.value);
+        });
+    }
+    if (gonzoPrevBtn) {
+        gonzoPrevBtn.addEventListener('click', () => gonzoNavigatePrev());
+    }
+    if (gonzoNextBtn) {
+        gonzoNextBtn.addEventListener('click', () => gonzoNavigateNext());
     }
 
     // Keep Jaccard event listeners for backwards compatibility (if elements exist)
