@@ -32,6 +32,13 @@ let sourceSyntaxHighlightingEnabled = false;
 const SOURCE_VERSION_ID = 'quant_source';
 const SOURCE_VERSION_LABEL = 'Source Code';
 let sourceParagraphCache = {};
+let globalMacrosCache = null; // Cache for macros defined in globals.txt
+
+// Source Code Mode state
+let sourceCodeModeEnabled = false;
+let toggledSourceParagraphs = new Set(); // Track which paragraphs are showing source (key: "versionId-chapterId-paragraphIndex")
+let originalParagraphContent = new Map(); // Store original HTML content for restoration
+let lastDisplayedChapter = null; // Track chapter changes to clear toggle state
 
 // Navigation state
 let activeNavDropdown = null;
@@ -389,14 +396,58 @@ function convertSourceContentToParagraphs(content) {
     const normalizedBlocks = [];
     const rawBlocks = [];
 
+    // Also track content-only paragraphs (excluding macro definitions) for better alignment
+    const contentOnlyHighlighted = [];
+    const contentOnlyRaw = [];
+
+    // And macro definitions for lookup
+    const macroDefinitions = new Map(); // macroName -> { raw, highlighted }
+
+    // Helper to check if a block is a formatting-only code (not actual content)
+    function isFormattingOnlyBlock(text) {
+        const trimmed = text.trim();
+        // Match blocks that are only formatting codes like {chapter/15}, {section_break}, {pp}, {part/...}, {vspace/N}
+        // These are not actual rendered paragraphs
+        const formattingOnlyPattern = /^\{(chapter|section_break|part|vspace|pp|verse|verse_inline)(\/[^}]*)?\}$/;
+        return formattingOnlyPattern.test(trimmed);
+    }
+
+    // Helper to check if a block is a continuation alternative (starts with |)
+    // These are alternative branches in conditional blocks like [@var1>text|@var2>alt text]
+    // When split by double-newlines, |@var2>... becomes a separate block but it's actually
+    // an alternative that only appears for specific seeds, not a separate content paragraph
+    function isContinuationAlternative(text) {
+        const trimmed = text.trim();
+        return trimmed.startsWith('|');
+    }
+
     blocks.forEach(block => {
         const withoutLeadingNewlines = block.replace(/^\n+/, '').replace(/\n+$/, '');
         if (!withoutLeadingNewlines.trim()) return;
+
         const html = escapeHTML(withoutLeadingNewlines).replace(/\n/g, '<br>');
+        const highlighted = `<div class="source-snippet">${highlightQuantSyntax(withoutLeadingNewlines)}</div>`;
+
         htmlBlocks.push(`<div class="source-snippet">${html}</div>`);
-        highlightedBlocks.push(`<div class="source-snippet">${highlightQuantSyntax(withoutLeadingNewlines)}</div>`);
+        highlightedBlocks.push(highlighted);
         normalizedBlocks.push(normalizePlainText(withoutLeadingNewlines));
         rawBlocks.push(withoutLeadingNewlines);
+
+        // Check if this is a macro definition
+        const macroMatch = withoutLeadingNewlines.match(/^\[MACRO\s+([^\]]+)\]/);
+        if (macroMatch) {
+            const macroName = macroMatch[1].trim();
+            macroDefinitions.set(macroName, {
+                raw: withoutLeadingNewlines,
+                highlighted: highlighted
+            });
+        } else if (!withoutLeadingNewlines.startsWith('#') &&
+                   !isFormattingOnlyBlock(withoutLeadingNewlines) &&
+                   !isContinuationAlternative(withoutLeadingNewlines)) {
+            // Content paragraph (not a comment, macro definition, formatting-only code, or continuation alternative)
+            contentOnlyHighlighted.push(highlighted);
+            contentOnlyRaw.push(withoutLeadingNewlines);
+        }
     });
     const rawText = normalized;
 
@@ -405,7 +456,11 @@ function convertSourceContentToParagraphs(content) {
         htmlHighlighted: highlightedBlocks,
         normalized: normalizedBlocks,
         raw: rawBlocks,
-        rawText
+        rawText,
+        // New fields for source code mode
+        contentOnlyHighlighted,
+        contentOnlyRaw,
+        macroDefinitions
     };
 }
 
@@ -1393,6 +1448,407 @@ function toggleChapterVariablesPanel() {
     }
 }
 
+// ===== Source Code Mode Functions =====
+
+function toggleSourceCodeMode() {
+    sourceCodeModeEnabled = !sourceCodeModeEnabled;
+
+    const btn = document.getElementById('source-code-mode-btn');
+    if (btn) {
+        btn.classList.toggle('active', sourceCodeModeEnabled);
+    }
+
+    if (!sourceCodeModeEnabled) {
+        // When disabling, restore all toggled paragraphs and clear state
+        restoreAllToggledParagraphs();
+        toggledSourceParagraphs.clear();
+        originalParagraphContent.clear();
+    }
+
+    // Re-render to add/remove icons
+    displayComparison();
+}
+
+function restoreAllToggledParagraphs() {
+    // Restore original content to all paragraphs that are showing source
+    originalParagraphContent.forEach((content, key) => {
+        const [versionId, chapter, index] = key.split('-');
+        const para = findParagraphElement(versionId, parseInt(index, 10));
+        if (para) {
+            para.innerHTML = content;
+            para.classList.remove('paragraph-showing-source');
+            // Re-add the source toggle button
+            addSourceToggleIcon(para);
+        }
+    });
+}
+
+function findParagraphElement(versionId, paragraphIndex) {
+    const container = document.getElementById('comparison-display');
+    if (!container) return null;
+
+    // Try to find by data attributes
+    return container.querySelector(`[data-version-id="${versionId}"][data-paragraph-index="${paragraphIndex}"]`);
+}
+
+function addSourceToggleIcons(container) {
+    if (!sourceCodeModeEnabled) return;
+    if (!container) return;
+
+    // Pre-compute which paragraphs have source available (one alignment per version, not per paragraph)
+    const sourceAvailability = computeSourceAvailability();
+
+    // Select all paragraph elements that have paragraph index data
+    const paragraphs = container.querySelectorAll('p[data-paragraph-index], .comparison-paragraph[data-paragraph-index]');
+    paragraphs.forEach(para => {
+        // Skip source paragraphs (when version is Source Code)
+        if (para.classList.contains('source-paragraph')) return;
+        // Skip if already showing source
+        if (para.classList.contains('paragraph-showing-source')) return;
+        // Skip placeholder cells in collation view
+        if (para.classList.contains('placeholder')) return;
+
+        // For diff view paragraphs without versionId, use versionA as default
+        if (!para.dataset.versionId && currentMode === 'diff') {
+            para.dataset.versionId = versionA;
+        }
+
+        addSourceToggleIcon(para, sourceAvailability);
+    });
+}
+
+// Pre-compute which paragraphs have source available using position-based mapping
+function computeSourceAvailability() {
+    const availability = new Map();
+
+    // Get source data with content-only paragraphs
+    const sourceData = getSourceChapterData(currentChapter);
+    if (!sourceData || !sourceData.contentOnlyHighlighted.length) return availability;
+
+    const numSourceParagraphs = sourceData.contentOnlyHighlighted.length;
+
+    // For diff view, compute based on alignment indices mapping to original paragraph index
+    if (currentMode === 'diff') {
+        const chapterDataA = getChapterContent(versionA, currentChapter);
+        const paragraphsA = chapterDataA ? chapterDataA.paragraphs : [];
+        const chapterDataB = getChapterContent(versionB, currentChapter);
+        const paragraphsB = chapterDataB ? chapterDataB.paragraphs : [];
+
+        let diffAlignments;
+        if (versionC) {
+            const chapterDataC = getChapterContent(versionC, currentChapter);
+            const paragraphsC = chapterDataC ? chapterDataC.paragraphs : [];
+            diffAlignments = alignThreeParagraphs(paragraphsA, paragraphsB, paragraphsC);
+        } else {
+            diffAlignments = alignParagraphs(paragraphsA, paragraphsB);
+        }
+
+        // Mark which diff alignment indices have source (based on position)
+        diffAlignments.forEach((alignment, idx) => {
+            if (alignment.indexA !== null && alignment.indexA < numSourceParagraphs) {
+                availability.set(`${versionA}-${idx}`, true);
+            }
+        });
+    } else if (currentMode === 'comparison') {
+        // For collation view, check original indices against source count
+        const versions = versionC ? [versionA, versionB, versionC] : [versionA, versionB];
+
+        for (const ver of versions) {
+            if (isSourceVersion(ver)) continue;
+            const chapterData = getChapterContent(ver, currentChapter);
+            if (!chapterData || !chapterData.paragraphs) continue;
+
+            // Mark paragraphs that have a corresponding source (by position)
+            for (let i = 0; i < chapterData.paragraphs.length && i < numSourceParagraphs; i++) {
+                availability.set(`${ver}-orig-${i}`, true);
+            }
+        }
+    } else {
+        // For unified and side-by-side, use position-based check
+        const versions = versionC ? [versionA, versionB, versionC] : [versionA, versionB];
+
+        for (const ver of versions) {
+            if (isSourceVersion(ver)) continue;
+            const chapterData = getChapterContent(ver, currentChapter);
+            if (!chapterData || !chapterData.paragraphs) continue;
+
+            // Mark paragraphs that have a corresponding source (by position)
+            for (let i = 0; i < chapterData.paragraphs.length && i < numSourceParagraphs; i++) {
+                availability.set(`${ver}-${i}`, true);
+            }
+        }
+    }
+
+    return availability;
+}
+
+function addSourceToggleIcon(paragraph, sourceAvailability = null) {
+    // Skip if already has icon
+    if (paragraph.querySelector('.source-toggle-btn')) return;
+    // Skip source paragraphs
+    if (paragraph.classList.contains('source-paragraph')) return;
+
+    const versionId = paragraph.dataset.versionId;
+    const paragraphIndex = parseInt(paragraph.dataset.paragraphIndex, 10);
+    const originalIndex = paragraph.dataset.originalIndex || null;
+
+    // Check if source is available using pre-computed map (if provided)
+    // If sourceAvailability is null, skip the check (caller knows source is available)
+    if (sourceAvailability) {
+        let hasSource = false;
+        if (currentMode === 'comparison' && originalIndex !== null && originalIndex !== '') {
+            hasSource = sourceAvailability.has(`${versionId}-orig-${originalIndex}`);
+        } else {
+            hasSource = sourceAvailability.has(`${versionId}-${paragraphIndex}`);
+        }
+        if (!hasSource) return;
+    }
+
+    // Make paragraph position relative if needed
+    const currentPosition = window.getComputedStyle(paragraph).position;
+    if (currentPosition === 'static') {
+        paragraph.style.position = 'relative';
+    }
+
+    const btn = document.createElement('button');
+    btn.className = 'source-toggle-btn';
+    btn.innerHTML = '<i data-lucide="code"></i>';
+    btn.title = 'Toggle source code view';
+
+    // Check if this paragraph is currently showing source
+    const key = `${versionId}-${currentChapter}-${paragraphIndex}`;
+    if (toggledSourceParagraphs.has(key)) {
+        btn.classList.add('active');
+    }
+
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleParagraphSource(paragraph);
+    });
+
+    paragraph.appendChild(btn);
+
+    // Initialize Lucide icon
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons({ nodes: [btn] });
+    }
+}
+
+function toggleParagraphSource(paragraph) {
+    const versionId = paragraph.dataset.versionId;
+    const paragraphIndex = parseInt(paragraph.dataset.paragraphIndex, 10);
+    const key = `${versionId}-${currentChapter}-${paragraphIndex}`;
+
+    if (toggledSourceParagraphs.has(key)) {
+        // Restore rendered text
+        restoreRenderedParagraph(paragraph, key);
+        toggledSourceParagraphs.delete(key);
+        // Get the NEW button (added by restoreRenderedParagraph) and ensure it's not active
+        const btn = paragraph.querySelector('.source-toggle-btn');
+        if (btn) btn.classList.remove('active');
+    } else {
+        // Show source code
+        showParagraphSource(paragraph, versionId, paragraphIndex, key);
+        toggledSourceParagraphs.add(key);
+        const btn = paragraph.querySelector('.source-toggle-btn');
+        if (btn) btn.classList.add('active');
+    }
+}
+
+function showParagraphSource(paragraph, versionId, paragraphIndex, key) {
+    // Remove the source toggle button before saving (so it's not included in saved content)
+    const existingBtn = paragraph.querySelector('.source-toggle-btn');
+    if (existingBtn) existingBtn.remove();
+
+    // Store original content for restoration (without the button)
+    originalParagraphContent.set(key, paragraph.innerHTML);
+
+    // Get the original index for collation view (if available)
+    const originalIndex = paragraph.dataset.originalIndex || null;
+
+    // Get the corresponding source paragraph
+    const sourceHtml = getSourceForRenderedParagraph(versionId, paragraphIndex, originalIndex);
+
+    if (!sourceHtml) {
+        showNotification('Source not available for this paragraph', 'info');
+        return;
+    }
+
+    // Replace paragraph content with source
+    paragraph.innerHTML = sourceHtml;
+    paragraph.classList.add('paragraph-showing-source');
+
+    // Re-add the toggle button (now active)
+    addSourceToggleIcon(paragraph);
+    const btn = paragraph.querySelector('.source-toggle-btn');
+    if (btn) btn.classList.add('active');
+}
+
+function restoreRenderedParagraph(paragraph, key) {
+    const originalContent = originalParagraphContent.get(key);
+    if (originalContent) {
+        paragraph.innerHTML = originalContent;
+        paragraph.classList.remove('paragraph-showing-source');
+        originalParagraphContent.delete(key);
+
+        // Re-add the source toggle button (since innerHTML wiped it)
+        if (sourceCodeModeEnabled) {
+            addSourceToggleIcon(paragraph);
+        }
+    }
+}
+
+function getSourceForRenderedParagraph(versionId, paragraphIndex, originalIndex = null) {
+    // Get source data using content-only paragraphs for better alignment
+    const sourceData = getSourceChapterData(currentChapter);
+    if (!sourceData) return null;
+
+    const { contentOnlyHighlighted, contentOnlyRaw, macroDefinitions } = sourceData;
+    if (!contentOnlyHighlighted.length) return null;
+
+    // Determine the actual paragraph index to use
+    let targetIndex = paragraphIndex;
+
+    // For collation view, use the originalIndex if provided
+    if (currentMode === 'comparison' && originalIndex !== null && originalIndex !== '') {
+        targetIndex = parseInt(originalIndex, 10);
+    }
+
+    // For diff view, paragraphIndex is the alignment index - need to get original index
+    if (currentMode === 'diff') {
+        const chapterDataA = getChapterContent(versionA, currentChapter);
+        const paragraphsA = chapterDataA ? chapterDataA.paragraphs : [];
+        const chapterDataB = getChapterContent(versionB, currentChapter);
+        const paragraphsB = chapterDataB ? chapterDataB.paragraphs : [];
+
+        let alignments;
+        if (versionC) {
+            const chapterDataC = getChapterContent(versionC, currentChapter);
+            const paragraphsC = chapterDataC ? chapterDataC.paragraphs : [];
+            alignments = alignThreeParagraphs(paragraphsA, paragraphsB, paragraphsC);
+        } else {
+            alignments = alignParagraphs(paragraphsA, paragraphsB);
+        }
+
+        const diffAlignment = alignments[paragraphIndex];
+        if (!diffAlignment || diffAlignment.indexA === null) return null;
+        targetIndex = diffAlignment.indexA;
+    }
+
+    // Use position-based mapping: rendered paragraph N → source content paragraph N
+    // This works because content paragraphs maintain their order (macro defs are separate)
+    if (targetIndex < 0 || targetIndex >= contentOnlyHighlighted.length) {
+        return null;
+    }
+
+    let result = contentOnlyHighlighted[targetIndex];
+    const rawSource = contentOnlyRaw[targetIndex];
+
+    // Find macro references in this source paragraph and append their definitions
+    // Check both chapter-local macros and global macros
+    const globalMacros = getGlobalMacros();
+
+    if (rawSource) {
+        const macroRefs = findMacroReferences(rawSource);
+        const includedMacros = new Set();
+
+        // Helper to lookup a macro from chapter or global definitions
+        function lookupMacro(name) {
+            if (macroDefinitions.has(name)) {
+                return macroDefinitions.get(name);
+            }
+            if (globalMacros.has(name)) {
+                return globalMacros.get(name);
+            }
+            return null;
+        }
+
+        for (const macroName of macroRefs) {
+            const macroDef = lookupMacro(macroName);
+            if (macroDef && !includedMacros.has(macroName)) {
+                includedMacros.add(macroName);
+                result += `<div class="source-snippet macro-definition">${highlightQuantSyntax(macroDef.raw)}</div>`;
+
+                // Also check for nested macro references in this macro's definition
+                const nestedRefs = findMacroReferences(macroDef.raw);
+                for (const nestedMacro of nestedRefs) {
+                    const nestedDef = lookupMacro(nestedMacro);
+                    if (nestedDef && !includedMacros.has(nestedMacro)) {
+                        includedMacros.add(nestedMacro);
+                        result += `<div class="source-snippet macro-definition">${highlightQuantSyntax(nestedDef.raw)}</div>`;
+                    }
+                }
+            }
+        }
+    }
+
+    return result;
+}
+
+// Get full source data including content-only paragraphs and macro definitions
+function getSourceChapterData(chapterId) {
+    const key = getSourceKeyForChapter(chapterId);
+    if (!key || !originSourcesLoaded || !originSources || !originSources.chapters[key]) {
+        return null;
+    }
+
+    if (!sourceParagraphCache[key]) {
+        sourceParagraphCache[key] = convertSourceContentToParagraphs(originSources.chapters[key].content || '');
+    }
+
+    return sourceParagraphCache[key];
+}
+
+// Get global macros from globals.txt (cached)
+function getGlobalMacros() {
+    if (globalMacrosCache !== null) {
+        return globalMacrosCache;
+    }
+
+    globalMacrosCache = new Map();
+
+    if (!originSourcesLoaded || !originSources || !originSources.chapters['globals']) {
+        return globalMacrosCache;
+    }
+
+    const globalsContent = originSources.chapters['globals'].content || '';
+    const normalized = globalsContent.replace(/\r\n/g, '\n');
+    const blocks = normalized.split(/\n{2,}/);
+
+    blocks.forEach(block => {
+        const trimmed = block.replace(/^\n+/, '').replace(/\n+$/, '');
+        if (!trimmed) return;
+
+        // Check if this is a MACRO or STICKY_MACRO definition
+        const macroMatch = trimmed.match(/^\[(STICKY_)?MACRO\s+([^\]]+)\]/);
+        if (macroMatch) {
+            const macroName = macroMatch[2].trim();
+            const highlighted = `<div class="source-snippet">${highlightQuantSyntax(trimmed)}</div>`;
+            globalMacrosCache.set(macroName, {
+                raw: trimmed,
+                highlighted: highlighted
+            });
+        }
+    });
+
+    return globalMacrosCache;
+}
+
+// Find macro references like {MacroName} in source text
+function findMacroReferences(text) {
+    const macros = [];
+    const regex = /\{([^}\/]+)\}/g;
+    let match;
+    while ((match = regex.exec(text)) !== null) {
+        const macroName = match[1].trim();
+        // Skip inline formatting like {i/text}
+        if (!macroName.includes('/') && macroName !== 'pp' && macroName !== 'chapter') {
+            macros.push(macroName);
+        }
+    }
+    return macros;
+}
+
 function extractChapterVariablePatterns(varName) {
     // Get the source for the current chapter
     const sourceKey = SOURCE_KEY_BY_CHAPTER[currentChapter];
@@ -1610,6 +2066,13 @@ function initializeChapterVariablesPanel() {
     const btn = document.getElementById('show-chapter-vars-btn');
     if (btn) {
         btn.addEventListener('click', toggleChapterVariablesPanel);
+    }
+}
+
+function initializeSourceCodeMode() {
+    const btn = document.getElementById('source-code-mode-btn');
+    if (btn) {
+        btn.addEventListener('click', toggleSourceCodeMode);
     }
 }
 
@@ -1878,6 +2341,13 @@ function displayComparison() {
     teardownSourceSync();
     updateToolbarVisibility();
 
+    // Clear Source Code Mode toggled paragraphs when chapter changes
+    if (lastDisplayedChapter !== currentChapter) {
+        toggledSourceParagraphs.clear();
+        originalParagraphContent.clear();
+        lastDisplayedChapter = currentChapter;
+    }
+
     // Clear any search highlights when changing view (but preserve search state)
     const hadActiveSearch = currentSearchTerm !== '';
     const searchTerm = currentSearchTerm;
@@ -1899,6 +2369,9 @@ function displayComparison() {
     } else if (currentMode === 'comparison') {
         displayParagraphComparison(display, chapterDataA, chapterDataB, chapterDataC);
     }
+
+    // Add source code toggle icons if Source Code Mode is enabled
+    addSourceToggleIcons(display);
 
     // Re-apply search highlights if there was an active search
     if (hadActiveSearch && searchTerm) {
@@ -2628,6 +3101,8 @@ function displayParagraphComparisonTwoWay(div, paragraphsA, paragraphsB) {
         // Create paragraph A (or placeholder)
         const divA = document.createElement('div');
         divA.dataset.paragraphIndex = rowIndex;
+        divA.dataset.versionId = versionA;
+        divA.dataset.originalIndex = indexA !== null ? indexA : '';
         if (textA) {
             divA.className = `comparison-paragraph ${type === 'unique-b' ? 'placeholder' : type}`;
 
@@ -2654,6 +3129,8 @@ function displayParagraphComparisonTwoWay(div, paragraphsA, paragraphsB) {
         // Create paragraph B (or placeholder)
         const divB = document.createElement('div');
         divB.dataset.paragraphIndex = rowIndex;
+        divB.dataset.versionId = versionB;
+        divB.dataset.originalIndex = indexB !== null ? indexB : '';
         if (textB) {
             divB.className = `comparison-paragraph ${type === 'unique-a' ? 'placeholder' : type}`;
 
@@ -2756,6 +3233,8 @@ function displayParagraphComparisonThreeWay(div, paragraphsA, paragraphsB, parag
 function createCollationCell(text, index, version, type, isPlaceholder, rowIndex) {
     const cell = document.createElement('div');
     cell.dataset.paragraphIndex = rowIndex;
+    cell.dataset.versionId = version;
+    cell.dataset.originalIndex = index !== null ? index : '';
 
     if (isPlaceholder) {
         cell.className = 'comparison-paragraph placeholder';
@@ -6042,6 +6521,7 @@ async function loadOriginSources() {
         originSources = await originResponse.json();
         originSourcesLoaded = true;
         sourceParagraphCache = {};
+        globalMacrosCache = null;
         versionChapterTextCache = {};
         currentSourceKey = getSourceKeyForChapter(currentChapter);
         if (originSourcePanelOpen) {
@@ -6922,6 +7402,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeGlobalsModal();
     initializeVariablePanel();
     initializeChapterVariablesPanel();
+    initializeSourceCodeMode();
     initializeThirdVersionControls();
 
     // Theme toggle event listener

@@ -423,9 +423,94 @@ header {
 }
 
 .vars-toggle.active,
-.chapter-vars-toggle.active {
+.chapter-vars-toggle.active,
+.source-code-toggle.active {
     background-color: var(--accent-color);
     color: #000;
+}
+
+/* Source Code Mode - paragraph toggle icons */
+.source-toggle-btn {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background-color: var(--accent-color);
+    color: #fff;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s, transform 0.2s, background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.source-toggle-btn:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.source-toggle-btn.active {
+    background-color: #4caf50;
+    opacity: 1;
+}
+
+.source-toggle-btn [data-lucide],
+.source-toggle-btn svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    stroke-width: 2;
+}
+
+/* Paragraph showing inline source */
+.paragraph-showing-source {
+    background: rgba(18, 28, 44, 0.85);
+    border: 1px solid rgba(255, 136, 0, 0.3);
+    border-radius: 6px;
+    padding: 0.65rem 0.8rem;
+    font-family: "Source Code Pro", "Courier New", monospace;
+    font-size: 0.85rem;
+    line-height: 1.5;
+}
+
+[data-theme="light"] .paragraph-showing-source {
+    background: rgba(240, 235, 230, 0.95);
+    border: 1px solid rgba(217, 104, 0, 0.4);
+    color: #2c2c2c;
+}
+
+/* Macro definitions shown with source */
+.source-snippet.macro-definition {
+    margin-top: 0.75rem;
+    border-left: 3px solid rgba(129, 199, 132, 0.6);
+    background: rgba(129, 199, 132, 0.08);
+}
+
+.source-snippet.macro-definition::before {
+    content: "Macro:";
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: rgba(129, 199, 132, 0.9);
+    margin-bottom: 0.3rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+[data-theme="light"] .source-snippet.macro-definition {
+    background: rgba(76, 175, 80, 0.08);
+    border-left-color: rgba(76, 175, 80, 0.5);
+}
+
+[data-theme="light"] .source-snippet.macro-definition::before {
+    color: rgba(56, 142, 60, 0.9);
 }
 
 /* Variable diff panel */
