@@ -47,6 +47,12 @@ const GONZO_PARAGRAPHS_PER_VIEW = 3;
 let gonzoScrollSyncEnabled = true;
 let gonzoHasBeenOpened = false;  // Track if Gonzo has been opened before
 let savedScrollPosition = 0;     // Save main view scroll position when entering Gonzo
+const GONZO_CHAPTERS = [
+    'prologue', 'chapter1', 'chapter2', 'chapter3', 'chapter4',
+    'chapter5', 'chapter6', 'chapter7', 'chapter8', 'chapter9',
+    'chapter10', 'chapter11', 'chapter12', 'chapter13', 'chapter14',
+    'chapter15', 'chapter16', 'chapter17', 'chapter18'
+];
 
 // Theme functions
 function initializeTheme() {
@@ -7805,10 +7811,14 @@ document.addEventListener('DOMContentLoaded', () => {
             cell.dataset.versionId = versionId;
             cell.dataset.cellIndex = index;
 
-            // Header with seed number
+            // Header with seed number (clickable to open in unified view)
             const header = document.createElement('div');
-            header.className = 'gonzo-cell-header';
+            header.className = 'gonzo-cell-header gonzo-cell-header-clickable';
             header.textContent = `Seed ${versionId}`;
+            header.title = `Open Seed ${versionId} in unified view`;
+            header.addEventListener('click', () => {
+                gonzoOpenInUnifiedView(versionId);
+            });
 
             // Content area
             const content = document.createElement('div');
@@ -7899,23 +7909,54 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateGonzoNavButtons(maxParagraphs) {
         const prevBtn = document.getElementById('gonzo-prev-btn');
         const nextBtn = document.getElementById('gonzo-next-btn');
+        const currentIdx = GONZO_CHAPTERS.indexOf(gonzoCurrentChapter);
 
         if (prevBtn) {
-            prevBtn.disabled = gonzoCurrentParagraphIndex <= 0;
+            // Only disable at very start of first chapter
+            prevBtn.disabled = gonzoCurrentParagraphIndex <= 0 && currentIdx <= 0;
         }
 
         if (nextBtn) {
-            nextBtn.disabled = gonzoCurrentParagraphIndex + GONZO_PARAGRAPHS_PER_VIEW >= maxParagraphs;
+            // Only disable at very end of last chapter
+            const atEndOfChapter = gonzoCurrentParagraphIndex + GONZO_PARAGRAPHS_PER_VIEW >= maxParagraphs;
+            nextBtn.disabled = atEndOfChapter && currentIdx >= GONZO_CHAPTERS.length - 1;
         }
     }
 
     function gonzoNavigatePrev(amount = GONZO_PARAGRAPHS_PER_VIEW) {
+        if (gonzoCurrentParagraphIndex <= 0) {
+            // Go back to previous chapter's end
+            const currentIdx = GONZO_CHAPTERS.indexOf(gonzoCurrentChapter);
+            if (currentIdx > 0) {
+                gonzoCurrentChapter = GONZO_CHAPTERS[currentIdx - 1];
+                populateGonzoChapterSelector();
+                const maxParas = getGonzoMaxParagraphCount();
+                gonzoCurrentParagraphIndex = Math.max(0, maxParas - GONZO_PARAGRAPHS_PER_VIEW);
+                renderGonzoGrid();
+            }
+            return;
+        }
+
         gonzoCurrentParagraphIndex = Math.max(0, gonzoCurrentParagraphIndex - amount);
         renderGonzoGrid();
     }
 
     function gonzoNavigateNext(amount = GONZO_PARAGRAPHS_PER_VIEW) {
         const maxParagraphs = getGonzoMaxParagraphCount();
+        const atEnd = gonzoCurrentParagraphIndex + GONZO_PARAGRAPHS_PER_VIEW >= maxParagraphs;
+
+        if (atEnd) {
+            // Advance to next chapter
+            const currentIdx = GONZO_CHAPTERS.indexOf(gonzoCurrentChapter);
+            if (currentIdx < GONZO_CHAPTERS.length - 1) {
+                gonzoCurrentChapter = GONZO_CHAPTERS[currentIdx + 1];
+                gonzoCurrentParagraphIndex = 0;
+                populateGonzoChapterSelector();
+                renderGonzoGrid();
+            }
+            return;
+        }
+
         gonzoCurrentParagraphIndex = Math.min(
             maxParagraphs - GONZO_PARAGRAPHS_PER_VIEW,
             gonzoCurrentParagraphIndex + amount
@@ -7928,6 +7969,39 @@ document.addEventListener('DOMContentLoaded', () => {
         gonzoCurrentChapter = chapterId;
         gonzoCurrentParagraphIndex = 0;
         renderGonzoGrid();
+    }
+
+    function gonzoOpenInUnifiedView(versionId) {
+        // Set version A to the clicked seed
+        versionA = versionId;
+        const selectA = document.getElementById('version-a-select');
+        if (selectA) selectA.value = versionId;
+
+        // Set chapter to current Gonzo chapter
+        currentChapter = gonzoCurrentChapter;
+
+        // Update active chapter button
+        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            if (btn.dataset.chapter === currentChapter) {
+                btn.classList.add('active');
+            }
+        });
+
+        // Close Gonzo mode
+        closeGonzoModal();
+
+        // Switch to unified view and display
+        setViewMode('unified');
+
+        // Scroll to approximate paragraph position
+        setTimeout(() => {
+            const paragraphs = document.querySelectorAll('#comparison-display p');
+            const targetIndex = Math.min(gonzoCurrentParagraphIndex, paragraphs.length - 1);
+            if (paragraphs[targetIndex]) {
+                paragraphs[targetIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 100);
     }
 
     // Synchronized scrolling across all 25 cells
