@@ -248,6 +248,7 @@
                 </div>
                 <button id="word-diff-btn" class="tool-btn" title="Compare unique vocabulary between two versions">Word Differential</button>
                 <button id="heatmap-btn" class="tool-btn" title="View chapter-by-chapter variation density">Chapter Heatmap</button>
+                <button id="gonzo-btn" class="tool-btn" title="View same paragraphs across all 25 versions in a 5x5 grid">Gonzo Mode</button>
             </div>
 
         </div>
@@ -545,6 +546,97 @@
                     <span class="legend-label">High variation</span>
                 </div>
                 <div id="heatmap-summary" class="heatmap-summary"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gonzo Mode Modal - 5x5 Grid View of All 25 Versions -->
+    <div id="gonzo-modal" class="modal hidden gonzo-fullscreen">
+        <div class="gonzo-container">
+            <!-- Header with nav controls -->
+            <div class="gonzo-header">
+                <div class="gonzo-header-left">
+                    <h2>Gonzo Mode</h2>
+                    <div class="gonzo-location">
+                        <span id="gonzo-chapter-label">Prologue</span>
+                        <span class="gonzo-separator">|</span>
+                        <span id="gonzo-para-range">Paragraphs 1-3</span>
+                    </div>
+                </div>
+                <div class="gonzo-header-right">
+                    <button id="gonzo-about-btn" class="gonzo-header-btn" title="About">
+                        <i data-lucide="info"></i> About
+                    </button>
+                    <button id="gonzo-theme-btn" class="gonzo-header-btn" title="Toggle light/dark mode">
+                        <i data-lucide="sun"></i>
+                    </button>
+                    <button id="gonzo-close-btn" class="gonzo-header-btn gonzo-close" title="Close Gonzo Mode (ESC)">
+                        <i data-lucide="x"></i> Close
+                    </button>
+                </div>
+            </div>
+
+            <!-- 5x5 Grid Container -->
+            <div id="gonzo-grid" class="gonzo-grid">
+                <!-- 25 cells will be generated dynamically by JavaScript -->
+            </div>
+
+            <!-- Navigation Controls -->
+            <div class="gonzo-controls">
+                <button id="gonzo-prev-btn" class="gonzo-nav-btn" title="Previous paragraphs (Left Arrow)">
+                    <i data-lucide="chevron-left"></i> Prev
+                </button>
+
+                <div class="gonzo-chapter-selector">
+                    <label for="gonzo-chapter-select">Chapter:</label>
+                    <select id="gonzo-chapter-select">
+                        <!-- Options populated by JavaScript -->
+                    </select>
+                </div>
+
+                <div class="gonzo-position-info">
+                    <span id="gonzo-current-position">1-3</span> of <span id="gonzo-total-paragraphs">0</span>
+                </div>
+
+                <button id="gonzo-next-btn" class="gonzo-nav-btn" title="Next paragraphs (Right Arrow)">
+                    Next <i data-lucide="chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gonzo Mode About Modal -->
+    <div id="gonzo-about-modal" class="modal hidden gonzo-about-overlay">
+        <div class="modal-content about-modal-content">
+            <div class="modal-header">
+                <h2>About Gonzo Mode</h2>
+                <button id="gonzo-about-close-btn" class="close-btn">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-body about-modal-body">
+                <h3>Overview</h3>
+                <p><strong>Gonzo Mode</strong> displays the same paragraph(s) from all 25 built-in versions of <em>Subcutanean</em> simultaneously in a 5×5 grid.</p>
+
+                <p>Each cell shows 3 paragraphs from a different seed, letting you see at a glance how the text varies across all versions.</p>
+
+                <h4>Navigation</h4>
+                <ul>
+                    <li><strong>Prev / Next</strong> — Move through paragraphs (3 at a time)</li>
+                    <li><strong>Chapter dropdown</strong> — Jump to a different chapter</li>
+                    <li><strong>Scroll any cell</strong> — All cells scroll together</li>
+                </ul>
+
+                <h4>Keyboard Shortcuts</h4>
+                <ul>
+                    <li><strong>← → ↑ ↓</strong> — Previous/next paragraphs</li>
+                    <li><strong>Page Up/Down</strong> — Jump 9 paragraphs</li>
+                    <li><strong>Home / End</strong> — Go to chapter start/end</li>
+                    <li><strong>ESC</strong> — Close Gonzo Mode</li>
+                </ul>
+
+                <h4>Empty Cells</h4>
+                <p>If a version has fewer paragraphs than others, its cell will appear grayed out with "No content" displayed.</p>
             </div>
         </div>
     </div>
