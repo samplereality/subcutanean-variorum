@@ -39,6 +39,7 @@ let sourceCodeModeEnabled = false;
 let toggledSourceParagraphs = new Set(); // Track which paragraphs are showing source (key: "versionId-chapterId-paragraphIndex")
 let originalParagraphContent = new Map(); // Store original HTML content for restoration
 let lastDisplayedChapter = null; // Track chapter changes to clear toggle state
+let sourceMappingCache = new Map(); // Cache: "versionId-chapterId" -> Map<paragraphIndex, sourceBlockIndex>
 
 // Navigation state
 let activeNavDropdown = null;
@@ -476,6 +477,180 @@ function convertSourceContentToParagraphs(content) {
         contentOnlyRaw,
         macroDefinitions
     };
+}
+
+// ============================================
+// Source Code Mode: Text Similarity Matching
+// ============================================
+
+// Strip Quant markup from source text to get comparable plain text
+function stripQuantMarkup(text) {
+    if (!text) return '';
+    return text
+        // Remove DEFINE and MACRO declarations
+        .replace(/\[DEFINE\s+[^\]]*\]/g, '')
+        .replace(/\[MACRO\s+[^\]]*\]/g, '')
+        .replace(/\[STICKY_MACRO\s+[^\]]*\]/g, '')
+        // Remove starred labels like *Ch8SpiralHall*
+        .replace(/\*[A-Za-z0-9_]+\*/g, '')
+        // Remove conditional openers: [@var>, [^@var>, |@var>
+        .replace(/\[?\^?@[A-Za-z_][A-Za-z0-9_-]*>/g, '')
+        .replace(/\|@[A-Za-z_][A-Za-z0-9_-]*>/g, '')
+        // Remove probability prefixes like [50>, |50>, [66>
+        .replace(/[\[|]\d+>/g, '')
+        // Remove remaining brackets
+        .replace(/[\[\]]/g, '')
+        // Convert {i/text} and {b/text} to just text
+        .replace(/\{[ib]\//g, '').replace(/\}/g, '')
+        // Remove other formatting codes like {chapter/N}, {section_break}, {pp}, {vspace/N}
+        .replace(/\{(chapter|section_break|part|vspace|pp|verse|verse_inline)(\/[^}]*)?\}/g, '')
+        // Remove macro references {MacroName} but keep surrounding text
+        .replace(/\{[^}]+\}/g, '')
+        // Remove @ variable references in running text
+        .replace(/@[A-Za-z_][A-Za-z0-9_-]*/g, '')
+        // Remove pipe alternatives
+        .replace(/\|/g, ' ')
+        // Collapse whitespace
+        .replace(/\s+/g, ' ')
+        .trim()
+        .toLowerCase();
+}
+
+// Build an index of source blocks for efficient text matching
+function buildSourceMatchIndex(sourceData) {
+    const index = [];
+    const { raw: rawBlocks } = sourceData;
+
+    for (let i = 0; i < rawBlocks.length; i++) {
+        const block = rawBlocks[i];
+        const trimmed = block.trim();
+
+        // Skip comments
+        if (trimmed.startsWith('#')) continue;
+
+        // Skip standalone DEFINE blocks
+        if (/^\[DEFINE\s/.test(trimmed)) continue;
+
+        // Skip standalone MACRO/STICKY_MACRO definitions (just the definition, no surrounding text)
+        if (/^\[(STICKY_)?MACRO\s/.test(trimmed)) continue;
+
+        // Skip formatting-only blocks
+        const formattingOnlyPattern = /^\{(chapter|section_break|part|vspace|pp|verse|verse_inline)(\/[^}]*)?\}$/;
+        if (formattingOnlyPattern.test(trimmed)) continue;
+
+        // Strip markup and extract words (3+ chars for meaningful matching)
+        const plainText = stripQuantMarkup(block);
+        const words = new Set(plainText.split(/\s+/).filter(w => w.length >= 3));
+
+        // Skip blocks with too few matchable words
+        if (words.size < 2) continue;
+
+        index.push({
+            blockIndex: i,
+            words: words,
+            plainText: plainText
+        });
+    }
+
+    return index;
+}
+
+// Find the best matching source block for a rendered paragraph
+function findBestSourceMatch(renderedText, matchIndex, startHint) {
+    if (!renderedText || !matchIndex.length) return -1;
+
+    // Strip HTML and normalize rendered text
+    const plainRendered = renderedText
+        .replace(/<[^>]+>/g, ' ')  // strip HTML tags
+        .replace(/&[a-z]+;/gi, ' ')  // strip HTML entities
+        .replace(/\s+/g, ' ')
+        .trim()
+        .toLowerCase();
+
+    const renderedWords = new Set(plainRendered.split(/\s+/).filter(w => w.length >= 3));
+    if (renderedWords.size < 1) return -1;
+
+    let bestScore = 0;
+    let bestBlockIndex = -1;
+
+    for (const entry of matchIndex) {
+        // Compute overlap coefficient: |intersection| / min(|A|, |B|)
+        let intersectionCount = 0;
+        for (const word of renderedWords) {
+            if (entry.words.has(word)) intersectionCount++;
+        }
+
+        const minSize = Math.min(renderedWords.size, entry.words.size);
+        if (minSize === 0) continue;
+
+        const score = intersectionCount / minSize;
+
+        // Use score, with sequential proximity as tiebreaker
+        if (score > bestScore + 0.01) {
+            bestScore = score;
+            bestBlockIndex = entry.blockIndex;
+        } else if (Math.abs(score - bestScore) <= 0.01 && score > 0.3) {
+            // Tiebreaker: prefer blocks closer to the expected position (startHint)
+            if (startHint !== undefined) {
+                const currentDist = Math.abs(entry.blockIndex - startHint);
+                const bestDist = Math.abs(bestBlockIndex - startHint);
+                if (currentDist < bestDist) {
+                    bestScore = score;
+                    bestBlockIndex = entry.blockIndex;
+                }
+            }
+        }
+    }
+
+    // Require a minimum match score
+    return bestScore >= 0.25 ? bestBlockIndex : -1;
+}
+
+// Pre-compute the full source mapping for a chapter
+function buildChapterSourceMapping(versionId, chapterId) {
+    const cacheKey = `${versionId}-${chapterId}`;
+    if (sourceMappingCache.has(cacheKey)) {
+        return sourceMappingCache.get(cacheKey);
+    }
+
+    const mapping = new Map();
+
+    // Get rendered paragraphs for this version/chapter
+    const chapterData = getChapterContent(versionId, chapterId);
+    if (!chapterData || !chapterData.paragraphs || !chapterData.paragraphs.length) {
+        sourceMappingCache.set(cacheKey, mapping);
+        return mapping;
+    }
+
+    // Get source data
+    const sourceData = getSourceChapterData(chapterId);
+    if (!sourceData || !sourceData.raw || !sourceData.raw.length) {
+        sourceMappingCache.set(cacheKey, mapping);
+        return mapping;
+    }
+
+    // Build the match index
+    const matchIndex = buildSourceMatchIndex(sourceData);
+
+    // For each rendered paragraph, find the best matching source block
+    const renderedParagraphs = chapterData.paragraphs;
+    let lastMatchedBlock = 0; // Track position for sequential proximity hints
+
+    for (let i = 0; i < renderedParagraphs.length; i++) {
+        const bestMatch = findBestSourceMatch(renderedParagraphs[i], matchIndex, lastMatchedBlock);
+        if (bestMatch >= 0) {
+            mapping.set(i, bestMatch);
+            lastMatchedBlock = bestMatch;
+        }
+    }
+
+    sourceMappingCache.set(cacheKey, mapping);
+    return mapping;
+}
+
+// Clear source mapping cache (call when chapter or versions change)
+function clearSourceMappingCache() {
+    sourceMappingCache.clear();
 }
 
 function highlightQuantSyntax(text) {
@@ -942,6 +1117,7 @@ function populateVersionSelectors() {
     if (!selectorA.dataset.hasListener) {
         selectorA.addEventListener('change', (e) => {
             versionA = e.target.value;
+            clearSourceMappingCache();
             buildChapterNavigation();
             displayComparison();
             updateToolbarVisibility();
@@ -954,6 +1130,7 @@ function populateVersionSelectors() {
     if (!selectorB.dataset.hasListener) {
         selectorB.addEventListener('change', (e) => {
             versionB = e.target.value;
+            clearSourceMappingCache();
             buildChapterNavigation();
             displayComparison();
             updateToolbarVisibility();
@@ -1477,6 +1654,7 @@ function toggleSourceCodeMode() {
         restoreAllToggledParagraphs();
         toggledSourceParagraphs.clear();
         originalParagraphContent.clear();
+        clearSourceMappingCache();
     }
 
     // Re-render to add/remove icons
@@ -1535,14 +1713,12 @@ function addSourceToggleIcons(container) {
 function computeSourceAvailability() {
     const availability = new Map();
 
-    // Get source data with content-only paragraphs
+    // Check if source data exists for this chapter
     const sourceData = getSourceChapterData(currentChapter);
-    if (!sourceData || !sourceData.contentOnlyHighlighted.length) return availability;
+    if (!sourceData || !sourceData.raw.length) return availability;
 
-    const numSourceParagraphs = sourceData.contentOnlyHighlighted.length;
-
-    // For diff view, compute based on alignment indices mapping to original paragraph index
     if (currentMode === 'diff') {
+        // For diff view, check version A's mapping against alignment indices
         const chapterDataA = getChapterContent(versionA, currentChapter);
         const paragraphsA = chapterDataA ? chapterDataA.paragraphs : [];
         const chapterDataB = getChapterContent(versionB, currentChapter);
@@ -1557,38 +1733,34 @@ function computeSourceAvailability() {
             diffAlignments = alignParagraphs(paragraphsA, paragraphsB);
         }
 
-        // Mark which diff alignment indices have source (based on position)
+        // Build mapping for version A
+        const mapping = buildChapterSourceMapping(versionA, currentChapter);
+
         diffAlignments.forEach((alignment, idx) => {
-            if (alignment.indexA !== null && alignment.indexA < numSourceParagraphs) {
+            if (alignment.indexA !== null && mapping.has(alignment.indexA)) {
                 availability.set(`${versionA}-${idx}`, true);
             }
         });
     } else if (currentMode === 'comparison') {
-        // For collation view, check original indices against source count
+        // For collation view, check each version's mapping
         const versions = versionC ? [versionA, versionB, versionC] : [versionA, versionB];
 
         for (const ver of versions) {
             if (isSourceVersion(ver)) continue;
-            const chapterData = getChapterContent(ver, currentChapter);
-            if (!chapterData || !chapterData.paragraphs) continue;
-
-            // Mark paragraphs that have a corresponding source (by position)
-            for (let i = 0; i < chapterData.paragraphs.length && i < numSourceParagraphs; i++) {
-                availability.set(`${ver}-orig-${i}`, true);
+            const mapping = buildChapterSourceMapping(ver, currentChapter);
+            for (const [paraIdx] of mapping) {
+                availability.set(`${ver}-orig-${paraIdx}`, true);
             }
         }
     } else {
-        // For unified and side-by-side, use position-based check
+        // For unified and side-by-side, use the pre-computed mapping
         const versions = versionC ? [versionA, versionB, versionC] : [versionA, versionB];
 
         for (const ver of versions) {
             if (isSourceVersion(ver)) continue;
-            const chapterData = getChapterContent(ver, currentChapter);
-            if (!chapterData || !chapterData.paragraphs) continue;
-
-            // Mark paragraphs that have a corresponding source (by position)
-            for (let i = 0; i < chapterData.paragraphs.length && i < numSourceParagraphs; i++) {
-                availability.set(`${ver}-${i}`, true);
+            const mapping = buildChapterSourceMapping(ver, currentChapter);
+            for (const [paraIdx] of mapping) {
+                availability.set(`${ver}-${paraIdx}`, true);
             }
         }
     }
@@ -1713,22 +1885,21 @@ function restoreRenderedParagraph(paragraph, key) {
 }
 
 function getSourceForRenderedParagraph(versionId, paragraphIndex, originalIndex = null) {
-    // Get source data using content-only paragraphs for better alignment
     const sourceData = getSourceChapterData(currentChapter);
     if (!sourceData) return null;
 
-    const { contentOnlyHighlighted, contentOnlyRaw, macroDefinitions } = sourceData;
-    if (!contentOnlyHighlighted.length) return null;
+    const { htmlHighlighted, raw: rawBlocks, macroDefinitions } = sourceData;
+    if (!rawBlocks.length) return null;
 
-    // Determine the actual paragraph index to use
-    let targetIndex = paragraphIndex;
+    // Determine the rendered paragraph index to look up in the mapping
+    let renderedIndex = paragraphIndex;
 
     // For collation view, use the originalIndex if provided
     if (currentMode === 'comparison' && originalIndex !== null && originalIndex !== '') {
-        targetIndex = parseInt(originalIndex, 10);
+        renderedIndex = parseInt(originalIndex, 10);
     }
 
-    // For diff view, paragraphIndex is the alignment index - need to get original index
+    // For diff view, paragraphIndex is the alignment index - need original index
     if (currentMode === 'diff') {
         const chapterDataA = getChapterContent(versionA, currentChapter);
         const paragraphsA = chapterDataA ? chapterDataA.paragraphs : [];
@@ -1746,27 +1917,27 @@ function getSourceForRenderedParagraph(versionId, paragraphIndex, originalIndex 
 
         const diffAlignment = alignments[paragraphIndex];
         if (!diffAlignment || diffAlignment.indexA === null) return null;
-        targetIndex = diffAlignment.indexA;
+        renderedIndex = diffAlignment.indexA;
     }
 
-    // Use position-based mapping: rendered paragraph N → source content paragraph N
-    // This works because content paragraphs maintain their order (macro defs are separate)
-    if (targetIndex < 0 || targetIndex >= contentOnlyHighlighted.length) {
+    // Use text similarity matching to find the right source block
+    const mapping = buildChapterSourceMapping(versionId, currentChapter);
+    const sourceBlockIndex = mapping.get(renderedIndex);
+
+    if (sourceBlockIndex === undefined || sourceBlockIndex < 0 || sourceBlockIndex >= rawBlocks.length) {
         return null;
     }
 
-    let result = contentOnlyHighlighted[targetIndex];
-    const rawSource = contentOnlyRaw[targetIndex];
+    let result = htmlHighlighted[sourceBlockIndex];
+    const rawSource = rawBlocks[sourceBlockIndex];
 
     // Find macro references in this source paragraph and append their definitions
-    // Check both chapter-local macros and global macros
     const globalMacros = getGlobalMacros();
 
     if (rawSource) {
         const macroRefs = findMacroReferences(rawSource);
         const includedMacros = new Set();
 
-        // Helper to lookup a macro from chapter or global definitions
         function lookupMacro(name) {
             if (macroDefinitions.has(name)) {
                 return macroDefinitions.get(name);
@@ -1783,7 +1954,6 @@ function getSourceForRenderedParagraph(versionId, paragraphIndex, originalIndex 
                 includedMacros.add(macroName);
                 result += `<div class="source-snippet macro-definition">${highlightQuantSyntax(macroDef.raw)}</div>`;
 
-                // Also check for nested macro references in this macro's definition
                 const nestedRefs = findMacroReferences(macroDef.raw);
                 for (const nestedMacro of nestedRefs) {
                     const nestedDef = lookupMacro(nestedMacro);
@@ -2355,10 +2525,11 @@ function displayComparison() {
     teardownSourceSync();
     updateToolbarVisibility();
 
-    // Clear Source Code Mode toggled paragraphs when chapter changes
+    // Clear Source Code Mode toggled paragraphs and mapping cache when chapter changes
     if (lastDisplayedChapter !== currentChapter) {
         toggledSourceParagraphs.clear();
         originalParagraphContent.clear();
+        clearSourceMappingCache();
         lastDisplayedChapter = currentChapter;
     }
 
@@ -5815,8 +5986,8 @@ function setupParagraphClickHandlers() {
     const container = document.getElementById('comparison-display');
     if (!container) return;
 
-    container.addEventListener('click', (e) => {
-        // Don't open if clicking on the annotation indicator
+    container.addEventListener('dblclick', (e) => {
+        // Don't open if double-clicking on the annotation indicator
         if (e.target.classList.contains('annotation-indicator')) return;
 
         // Find the clicked paragraph - check for various paragraph types
