@@ -36,6 +36,28 @@ A web-based variorum browser for exploring textual variations across 25 versions
    - Submits to Google Apps Script which logs to Google Sheets
    - User receives PDF and EPUB (optionally TXT/HTML) via email
 
+6. **Gonzo Mode**
+   - 5x5 grid view showing all 25 versions simultaneously for a single chapter
+   - Each cell displays one version's text for the current paragraph range
+   - Arrow key navigation (left/right) through paragraph windows, auto-advancing across chapters
+   - Custom nav bar with About, Theme toggle, and Close buttons (z-index: 6000, above main nav)
+   - Dedicated Gonzo About modal (z-index: 7000) explaining the feature
+   - Click seed number in cell header to jump to unified view at that location
+   - Scroll position preserved when reopening Gonzo Mode
+   - Empty cells for versions with fewer paragraphs than others
+
+7. **Source Code Mode** (enhanced)
+   - Click code icon on any paragraph to view underlying Quant source
+   - Text similarity matching replaces position-based paragraph-to-source mapping
+   - Handles multi-paragraph conditionals, variable-driven content, and macro expansions
+   - Pre-computed mapping cached per chapter/version for performance
+   - Macro reference and definition lookup for cross-file source viewing
+
+8. **Passage-level Annotations**
+   - Double-click any paragraph to add research notes tied to specific text
+   - Annotations stored in localStorage with version, chapter, and paragraph context
+   - Uses double-click (not single-click) to prevent accidental creation when clicking source buttons
+
 ## Technical Implementation
 
 ### Architecture
@@ -45,7 +67,7 @@ docs/
 ├── index.html              # Main HTML structure with all modals
 ├── styles.css              # Base styling
 ├── compare.css             # Comparison UI and nav bar styles
-├── compare.js              # Main application JavaScript (~6500 lines)
+├── compare.js              # Main application JavaScript (~8500 lines)
 ├── origin_text/            # Quant source files
 │   ├── manifest.txt        # File listing in reading order
 │   ├── globals.txt         # Global variable and macro definitions
@@ -99,6 +121,27 @@ docs/
 - `saveBookmark()` / `loadBookmark()` / `deleteBookmark()`
 - `loadBookmarksFromStorage()` / `saveBookmarksToStorage()`
 
+**Source Code Mode (text similarity matching):**
+- `stripQuantMarkup(text)` - Strips Quant syntax to get comparable plain text
+- `buildSourceMatchIndex(sourceData)` - Pre-computes normalized word sets for all source blocks
+- `findBestSourceMatch(renderedText, matchIndex, startHint)` - Word overlap scoring with sequential proximity tiebreaker
+- `buildChapterSourceMapping(versionId, chapterId)` - Full chapter mapping with caching
+- `clearSourceMappingCache()` - Cache invalidation on chapter/version/mode changes
+- `getSourceForRenderedParagraph()` - Uses fuzzy matching instead of position-based lookup
+- `computeSourceAvailability()` - Uses pre-computed mapping for availability checks
+
+**Gonzo Mode:**
+- `openGonzoMode()` / `closeGonzoMode()` - Fullscreen 5x5 grid lifecycle
+- `renderGonzoGrid()` - Renders all 25 version cells for current paragraph window
+- `gonzoNavigateNext()` / `gonzoNavigatePrev()` - Arrow key navigation with chapter auto-advance
+- `updateGonzoNavButtons()` - Disables nav at absolute start/end only
+- `gonzoOpenInUnifiedView()` - Click seed to jump to unified view at that location
+- `openGonzoAboutModal()` / `closeGonzoAboutModal()` - Dedicated Gonzo About modal
+- `updateGonzoThemeIcon()` - Syncs theme toggle icon in Gonzo header
+
+**Annotations:**
+- `setupParagraphClickHandlers()` - Double-click handler for creating annotations on paragraphs
+
 ### HTML Structure (index.html)
 
 ```html
@@ -130,6 +173,15 @@ docs/
 <div id="levenshtein-modal" class="modal hidden">...</div>
 <div id="macro-inspector-modal" class="modal hidden">...</div>
 <div id="manage-uploads-modal" class="modal hidden">...</div>
+
+<!-- Gonzo Mode -->
+<div id="gonzo-fullscreen" class="gonzo-fullscreen hidden">
+    <div class="gonzo-header">...</div>    <!-- Custom nav bar (z-index: 6000) -->
+    <div class="gonzo-grid">...</div>      <!-- 5x5 CSS grid -->
+</div>
+<div id="gonzo-about-modal" class="modal hidden gonzo-about-overlay">
+    <!-- z-index: 7000, uses standard modal classes -->
+</div>
 ```
 
 ### CSS Organization (compare.css)
@@ -139,6 +191,8 @@ docs/
 - **Modals**: `.modal`, `.modal-content`, `.modal-header`, `.modal-body`
 - **Generate Form**: `.generate-modal-content`, `#subcutanean-form`
 - **View Modes**: `.unified-view`, `.side-by-side-view`, `.track-changes-view`, `.collation-view`
+- **Gonzo Mode**: `.gonzo-fullscreen` (z-index: 6000), `.gonzo-header`, `.gonzo-header-btn`, `.gonzo-grid`, `.gonzo-cell`, `.gonzo-cell-header-clickable`, `.gonzo-about-overlay` (z-index: 7000)
+- **Source Code Mode**: `.source-toggle-btn`, `.source-code-panel`, `.source-highlight`
 - **Responsive**: Media queries at 900px, 768px, 640px breakpoints
 
 ### Generate Copy Form
@@ -498,6 +552,62 @@ The `build_variable_info.py` script:
 - Bold/strong tag preservation in text extraction
 - Both Python script and JavaScript parser updated
 
+### Gonzo Mode (5x5 Grid View)
+
+A fullscreen 5x5 grid showing all 25 versions simultaneously for comparative reading.
+
+**Features:**
+- Each cell shows one version's text for the current paragraph window
+- Arrow key navigation (left/right) moves through paragraph windows
+- Auto-advances to next/previous chapter at boundaries
+- Custom header bar with About, Theme toggle, and Close buttons
+- Click seed number in cell header to open that version in unified view at the current location
+- Scroll position preserved when reopening Gonzo Mode
+- Empty cells shown for versions with fewer paragraphs
+
+**Z-index layering:**
+- Main nav bar: 5000
+- Gonzo fullscreen: 6000 (covers main nav)
+- Gonzo About modal: 7000 (above Gonzo mode)
+
+**Light mode compatibility:**
+- Gonzo header buttons use forced light text (`color: #e8e8e8`) since the header background stays dark in both themes
+
+**Key constant:**
+- `GONZO_CHAPTERS` — ordered array of all chapter IDs for cross-chapter navigation
+
+**State variables:**
+- `gonzoHasBeenOpened` — tracks if Gonzo has been opened before (for scroll position preservation)
+- `savedScrollPosition` — stores scroll position when entering Gonzo Mode
+
+### Source Code Mode: Text Similarity Matching
+
+Replaced position-based paragraph-to-source mapping with text similarity matching to fix misalignment caused by Quant's multi-paragraph conditionals.
+
+**Problem:** The original position-based mapping (paragraph N → source block N) broke because:
+1. Multi-paragraph conditionals (e.g., `[@spiralhall>...70 lines...]`) split into ~35 source blocks but render as ~20 paragraphs (or 0 if inactive)
+2. Alternative branches with multi-paragraph content create variable paragraph counts
+3. Chapter 8 has 215 source blocks but seed 60001 renders only 132 paragraphs
+
+**Solution:** Word overlap coefficient scoring:
+1. `stripQuantMarkup()` removes Quant syntax from source text for comparison
+2. `buildSourceMatchIndex()` pre-computes normalized word sets for all source blocks
+3. `findBestSourceMatch()` scores each source block by `|intersection| / min(|rendered|, |source|)` with sequential proximity as tiebreaker
+4. `buildChapterSourceMapping()` pre-computes full chapter mapping, cached per `versionId-chapterId`
+
+**Cache invalidation:** `clearSourceMappingCache()` called when:
+- Chapter changes (in `displayComparison()`)
+- Version selector changes
+- Source code mode is toggled
+
+**Indexing change:** Uses `highlightedBlocks[]` (all blocks) instead of `contentOnlyHighlighted[]` since fuzzy matching naturally avoids comment/formatting blocks.
+
+**Uploaded versions:** Source Code Mode works with uploaded versions — the matching is based on text content, so it handles any version regardless of how it was loaded.
+
+### Double-click for Annotations
+
+Changed annotation creation from single-click to double-click (`dblclick` event) in `setupParagraphClickHandlers()`. This prevents accidental annotation modal opens when clicking near the source toggle button or other interactive elements. Applied globally across all view modes for consistent behavior.
+
 ## Development Notes
 
 ### Icon Usage: Lucide Icons (NOT Emoji)
@@ -525,6 +635,9 @@ Common icons used:
 - `upload` - File upload
 - `sun` / `moon` - Theme toggle
 - `x` - Close/delete
+- `grid-3x3` - Gonzo Mode
+- `info` - About (in Gonzo header)
+- `chevron-left` / `chevron-right` - Navigation arrows
 
 ### Important Container IDs and Selectors
 
@@ -565,6 +678,22 @@ function initializeMyForm() {
 }
 ```
 
+### Z-index Layering
+
+The app uses a structured z-index hierarchy. Respect this when adding new overlays:
+
+| Element | Z-index | Notes |
+|---------|---------|-------|
+| Main nav bar | 5000 | Fixed top position |
+| Nav dropdowns | 5001 | Just above nav bar |
+| Gonzo Mode fullscreen | 6000 | Covers entire page including nav |
+| Gonzo About modal | 7000 | Above Gonzo mode |
+| Standard modals | 2000 | Below nav bar (covered by Gonzo) |
+
+### Event Handling: Annotations
+
+Annotations use `dblclick` (double-click), not `click`, to prevent accidental creation when interacting with other clickable elements (source toggle buttons, variable highlights, etc.). This is set in `setupParagraphClickHandlers()`.
+
 ### Quant Syntax Highlighting
 
 Use `highlightQuantSyntax(code)` for displaying Quant source code. It handles HTML escaping internally, so pass raw text (not pre-escaped):
@@ -578,12 +707,12 @@ html += `<pre class="var-source-code">${highlightQuantSyntax(escapeHtml(rawSnipp
 
 ## Planned Features
 
-### Annotation & Scholarly Notes Feature (Not Yet Implemented)
+### Annotation & Scholarly Notes Feature (Partially Implemented)
 
 A research layer for the browser enabling:
-1. **Enhanced Bookmarks** - Add notes/commentary field to saved bookmarks
-2. **Passage-level Annotations** - Click paragraphs to add notes tied to specific text
-3. **Export** - Export annotations in both JSON and Markdown formats
+1. **Enhanced Bookmarks** - Add notes/commentary field to saved bookmarks (not yet implemented)
+2. **Passage-level Annotations** - Double-click paragraphs to add notes tied to specific text (implemented)
+3. **Export** - Export annotations in both JSON and Markdown formats (not yet implemented)
 
 **Proposed Data Structures:**
 
