@@ -53,8 +53,16 @@ A web-based variorum browser for exploring textual variations across 25 versions
    - Pre-computed mapping cached per chapter/version for performance
    - Macro reference and definition lookup for cross-file source viewing
 
-8. **Passage-level Annotations**
+8. **Passage-level Annotations** (enhanced)
    - Double-click any paragraph to add research notes tied to specific text
+   - Floating draggable note panels with orange glow styling (position: absolute, scroll with page)
+   - Leader lines (via leader-line-new) connect note panels to their annotated paragraphs
+   - Toggle to show/hide leader lines (icon in Notes dropdown header)
+   - Notes positioned to avoid obscuring the paragraph (right side preferred, left fallback, above/below for full-width views)
+   - Notes fade out when scrolling behind sticky seed headers
+   - Auto-close on first save; read-only mode for existing annotations
+   - Notes close automatically on chapter change
+   - Clicking a note in the Notes pane jumps to the paragraph and opens the note panel beside it
    - Annotations stored in localStorage with version, chapter, and paragraph context
    - Uses double-click (not single-click) to prevent accidental creation when clicking source buttons
 
@@ -118,7 +126,9 @@ docs/
 - `convertTxtToEpub(versionId)` - Generate EPUB from TXT
 
 **Bookmarks:**
-- `saveBookmark()` / `loadBookmark()` / `deleteBookmark()`
+- `saveCurrentBookmark()` - Opens bookmark name modal (replaces browser prompt)
+- `confirmBookmarkSave()` / `closeBookmarkNameModal()` - Modal save/cancel handlers
+- `applyBookmark()` / `deleteSelectedBookmark()`
 - `loadBookmarksFromStorage()` / `saveBookmarksToStorage()`
 
 **Source Code Mode (text similarity matching):**
@@ -141,6 +151,19 @@ docs/
 
 **Annotations:**
 - `setupParagraphClickHandlers()` - Double-click handler for creating annotations on paragraphs
+- `openAnnotationModal()` - Creates floating note panel with paragraph-relative positioning
+- `closeNotePanel()` / `closeAllNotePanels()` - Panel lifecycle management
+- `saveNotePanel()` - Saves annotation; auto-closes on first save
+- `jumpToAnnotation()` - Navigates to annotation's chapter/paragraph and opens panel beside it
+- `bringNotePanelToFront()` - Z-index management for overlapping panels
+
+**Leader Lines (annotation connectors):**
+- `createNoteLine(panelId)` - Creates LeaderLine between note panel and annotated paragraph
+- `removeNoteLine(panelId)` / `removeAllNoteLines()` - Line cleanup
+- `updateAllNoteLines()` - Repositions all lines (called on scroll)
+- `recreateAllNoteLines()` - Rebuilds all lines (called on theme change, chapter render)
+- `findAnnotatedParagraph()` - Finds DOM paragraph by index and version
+- `updateNotePanelVisibility()` - Fades panels behind sticky headers
 
 ### HTML Structure (index.html)
 
@@ -608,6 +631,36 @@ Replaced position-based paragraph-to-source mapping with text similarity matchin
 
 Changed annotation creation from single-click to double-click (`dblclick` event) in `setupParagraphClickHandlers()`. This prevents accidental annotation modal opens when clicking near the source toggle button or other interactive elements. Applied globally across all view modes for consistent behavior.
 
+### Annotation Enhancements: Leader Lines, Floating Panels, Scroll Behavior
+
+**Leader Lines (connector lines):**
+- Uses `leader-line-new@1.1.9` CDN library to draw SVG connector lines between note panels and annotated paragraphs
+- Lines are semi-transparent orange, fluid path, small disc plugs, theme-aware colors
+- Toggle button in Notes dropdown header (icon-only, Lucide `link` icon)
+- Lines update position on scroll (rAF-throttled) and during panel drag
+- Lines recreated on theme change and chapter re-render (`setTimeout` 50ms for DOM settling)
+- Global state: `noteLines` (map of panelId → LeaderLine), `noteLinesVisible` (toggle)
+
+**Floating Note Panels:**
+- `position: absolute` — panels scroll with page alongside their paragraphs
+- Drag handler accounts for scroll offset (`window.scrollX`/`scrollY` added to `clientX`/`clientY`)
+- Positioned to avoid obscuring the annotated paragraph: right side first, left side fallback, above/below for full-width views (Track Changes, Unified)
+- Auto-close on first save (400ms delay with "Saved!" feedback); existing notes show read-only mode
+- Panels close on chapter change (`closeAllNotePanels()` in `displayComparison()`)
+- Clicking a note in the Notes pane: closes existing panel, scrolls to paragraph, reopens panel beside it using synthetic event for positioning
+- Styled with warm background (`#1c1f2e`), orange glow box-shadow, distinct from cold blue version panels
+
+**Scroll-Aware Hiding:**
+- `updateNotePanelVisibility()` checks if note panels have scrolled behind sticky seed headers
+- Adds `.behind-header` CSS class (opacity: 0, pointer-events: none, 0.2s transition)
+- Leader lines hidden/shown via `line.hide('none')` / `line.show('none')` (instant, no animation)
+
+**Bookmark Save Modal:**
+- Replaced `prompt()` with styled `#bookmark-name-modal` matching other modals
+- Text input pre-filled with default name, auto-selected on open
+- Enter to save, Escape to cancel, click-outside-to-close
+- `saveCurrentBookmark()` opens modal; `confirmBookmarkSave()` creates the bookmark
+
 ## Development Notes
 
 ### Icon Usage: Lucide Icons (NOT Emoji)
@@ -638,6 +691,8 @@ Common icons used:
 - `grid-3x3` - Gonzo Mode
 - `info` - About (in Gonzo header)
 - `chevron-left` / `chevron-right` - Navigation arrows
+- `link` - Leader lines toggle (Notes dropdown header)
+- `pencil` / `trash-2` / `save` - Annotation panel actions
 
 ### Important Container IDs and Selectors
 
@@ -684,11 +739,13 @@ The app uses a structured z-index hierarchy. Respect this when adding new overla
 
 | Element | Z-index | Notes |
 |---------|---------|-------|
+| Standard modals | 2000 | Below nav bar (covered by Gonzo) |
 | Main nav bar | 5000 | Fixed top position |
 | Nav dropdowns | 5001 | Just above nav bar |
+| Leader lines (SVG) | 5999 | Annotation connectors, below note panels |
+| Note panels | 6001+ | Floating, incrementing z-index per panel |
 | Gonzo Mode fullscreen | 6000 | Covers entire page including nav |
 | Gonzo About modal | 7000 | Above Gonzo mode |
-| Standard modals | 2000 | Below nav bar (covered by Gonzo) |
 
 ### Event Handling: Annotations
 
@@ -707,11 +764,11 @@ html += `<pre class="var-source-code">${highlightQuantSyntax(escapeHtml(rawSnipp
 
 ## Planned Features
 
-### Annotation & Scholarly Notes Feature (Partially Implemented)
+### Annotation & Scholarly Notes Feature (Mostly Implemented)
 
 A research layer for the browser enabling:
-1. **Enhanced Bookmarks** - Add notes/commentary field to saved bookmarks (not yet implemented)
-2. **Passage-level Annotations** - Double-click paragraphs to add notes tied to specific text (implemented)
+1. **Enhanced Bookmarks** - Add notes/commentary field to saved bookmarks (implemented — notes textarea in Bookmarks dropdown, styled save modal)
+2. **Passage-level Annotations** - Double-click paragraphs to add notes tied to specific text (implemented — floating panels, leader lines, scroll behavior)
 3. **Export** - Export annotations in both JSON and Markdown formats (not yet implemented)
 
 **Proposed Data Structures:**
