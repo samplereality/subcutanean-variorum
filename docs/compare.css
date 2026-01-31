@@ -404,6 +404,16 @@ header {
     height: 16px;
 }
 
+/* Bottom chapter navigation (end of chapter content) */
+.bottom-chapter-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 0.5rem 1rem;
+    grid-column: 1 / -1;
+}
+
 /* Panel toggle buttons (View / Analyze) on essential strip */
 .panel-toggle-btn {
     background-color: rgba(255,255,255,0.1);
@@ -699,17 +709,20 @@ header {
     font-family: monospace;
 }
 
-.var-list-a .var-tag {
+.var-list-a .var-tag,
+.var-list-a .chapter-var-tag {
     background-color: rgba(255, 100, 100, 0.3);
     color: #ffaaaa;
 }
 
-.var-list-b .var-tag {
+.var-list-b .var-tag,
+.var-list-b .chapter-var-tag {
     background-color: rgba(100, 255, 100, 0.3);
     color: #aaffaa;
 }
 
-.var-list-c .var-tag {
+.var-list-c .var-tag,
+.var-list-c .chapter-var-tag {
     background-color: rgba(156, 39, 176, 0.3);
     color: #ce93d8;
 }
@@ -718,9 +731,15 @@ header {
     display: none;
 }
 
-.var-list-shared .var-tag {
+.var-list-shared .var-tag,
+.var-list-shared .chapter-var-tag {
     background-color: rgba(150, 150, 150, 0.3);
     color: #cccccc;
+}
+
+.var-list-undetected .chapter-var-tag {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.5);
 }
 
 .var-diff-shared {
@@ -2014,7 +2033,7 @@ main {
 
 #comparison-display {
     max-width: 1600px;
-    margin: 2rem auto;
+    margin: 2rem auto 0;
     padding: 0 1rem;
 }
 

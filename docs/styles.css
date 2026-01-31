@@ -99,7 +99,7 @@ header {
 main {
     max-width: var(--max-width);
     margin: 0 auto;
-    padding: 1rem 1rem;
+    padding: 0rem 1rem 0 1rem;
 }
 
 #info-panel {
@@ -316,7 +316,7 @@ span.variant:hover {
 
 footer {
     text-align: center;
-    padding: 2rem 1rem;
+    padding: 0.75rem 1rem;
     color: #a0a0a0;
     font-size: 0.9rem;
     border-top: 1px solid rgba(255, 255, 255, 0.1);

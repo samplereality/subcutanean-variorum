@@ -2065,6 +2065,11 @@ function updateChapterNavArrows() {
     const currentIndex = availableChapters.indexOf(currentChapter);
     prevBtn.disabled = currentIndex <= 0;
     nextBtn.disabled = currentIndex >= availableChapters.length - 1;
+
+    const bottomPrev = document.querySelector('.bottom-chapter-prev');
+    const bottomNext = document.querySelector('.bottom-chapter-next');
+    if (bottomPrev) bottomPrev.disabled = currentIndex <= 0;
+    if (bottomNext) bottomNext.disabled = currentIndex >= availableChapters.length - 1;
 }
 
 function navigateChapter(direction) {
@@ -2077,6 +2082,9 @@ function navigateChapter(direction) {
     const select = document.getElementById('chapter-select');
     if (select) select.value = currentChapter;
 
+    const bottomSelect = document.querySelector('.bottom-chapter-select');
+    if (bottomSelect) bottomSelect.value = currentChapter;
+
     updateChapterNavArrows();
     displayComparison();
     updateVariableDiffIfVisible();
@@ -2085,7 +2093,68 @@ function navigateChapter(direction) {
 function updateChapterSelect() {
     const select = document.getElementById('chapter-select');
     if (select) select.value = currentChapter;
+    const bottomSelect = document.querySelector('.bottom-chapter-select');
+    if (bottomSelect) bottomSelect.value = currentChapter;
     updateChapterNavArrows();
+}
+
+function appendBottomChapterNav(container) {
+    const nav = document.createElement('div');
+    nav.className = 'bottom-chapter-nav';
+
+    // Prev button
+    const prevBtn = document.createElement('button');
+    prevBtn.className = 'chapter-arrow-btn bottom-chapter-prev';
+    prevBtn.title = 'Previous chapter';
+    prevBtn.innerHTML = '<i data-lucide="chevron-left"></i>';
+    prevBtn.addEventListener('click', () => {
+        navigateChapter(-1);
+        window.scrollTo({ top: 0, behavior: 'auto' });
+    });
+
+    // Chapter select
+    const select = document.createElement('select');
+    select.className = 'chapter-select bottom-chapter-select';
+    availableChapters.forEach(chapterId => {
+        const option = document.createElement('option');
+        option.value = chapterId;
+        option.textContent = getChapterDisplayName(chapterId);
+        if (chapterId === currentChapter) option.selected = true;
+        select.appendChild(option);
+    });
+    select.addEventListener('change', () => {
+        currentChapter = select.value;
+        const topSelect = document.getElementById('chapter-select');
+        if (topSelect) topSelect.value = currentChapter;
+        updateChapterNavArrows();
+        displayComparison();
+        updateVariableDiffIfVisible();
+        window.scrollTo({ top: 0, behavior: 'auto' });
+    });
+
+    // Next button
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'chapter-arrow-btn bottom-chapter-next';
+    nextBtn.title = 'Next chapter';
+    nextBtn.innerHTML = '<i data-lucide="chevron-right"></i>';
+    nextBtn.addEventListener('click', () => {
+        navigateChapter(1);
+        window.scrollTo({ top: 0, behavior: 'auto' });
+    });
+
+    // Set disabled state
+    const currentIndex = availableChapters.indexOf(currentChapter);
+    prevBtn.disabled = currentIndex <= 0;
+    nextBtn.disabled = currentIndex >= availableChapters.length - 1;
+
+    nav.appendChild(prevBtn);
+    nav.appendChild(select);
+    nav.appendChild(nextBtn);
+    container.appendChild(nav);
+
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons({ nodes: [nav] });
+    }
 }
 
 // ==========================================
@@ -2287,6 +2356,9 @@ function displayComparison() {
 
     // Mark paragraphs that have annotations
     markAnnotatedParagraphs();
+
+    // Append bottom chapter navigation
+    appendBottomChapterNav(display);
 }
 
 function renderParagraphs(container, paragraphs, isSource, versionId) {
