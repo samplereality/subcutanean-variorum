@@ -26,7 +26,6 @@ let versionChapterTextCache = {};
 let variableInfo = null; // Variable descriptions and usage patterns
 let variableGroups = null; // Mutually exclusive variable groups for inference
 let variableMacros = null; // Macro definitions for inference
-let chapterVariables = null; // Chapter-local variable definitions
 let scholarlyDescriptions = null; // Scholarly annotations (override variableInfo descriptions)
 let sourceSyntaxHighlightingEnabled = false;
 const SOURCE_VERSION_ID = 'quant_source';
@@ -896,7 +895,10 @@ function updateToolbarVisibility() {
             sourceSyntaxHighlightingEnabled = false;
         }
         syntaxBtn.classList.toggle('syntax-active', sourceSyntaxHighlightingEnabled);
-        syntaxBtn.textContent = sourceSyntaxHighlightingEnabled ? 'Disable Syntax Highlighting' : 'Enable Syntax Highlighting';
+        const syntaxLabel = syntaxBtn.querySelector('.btn-label');
+        if (syntaxLabel) {
+            syntaxLabel.textContent = sourceSyntaxHighlightingEnabled ? 'Syntax Off' : 'Syntax Highlighting';
+        }
     }
 }
 
@@ -1122,7 +1124,7 @@ function populateVersionSelectors() {
             displayComparison();
             updateToolbarVisibility();
             updateVariableDiffIfVisible();
-            updateChapterVariablesPanelIfVisible();
+
         });
         selectorA.dataset.hasListener = 'true';
     }
@@ -1135,7 +1137,7 @@ function populateVersionSelectors() {
             displayComparison();
             updateToolbarVisibility();
             updateVariableDiffIfVisible();
-            updateChapterVariablesPanelIfVisible();
+
         });
         selectorB.dataset.hasListener = 'true';
     }
@@ -1147,7 +1149,7 @@ function populateVersionSelectors() {
             displayComparison();
             updateToolbarVisibility();
             updateVariableDiffIfVisible();
-            updateChapterVariablesPanelIfVisible();
+
         });
         selectorC.dataset.hasListener = 'true';
     }
@@ -1199,7 +1201,6 @@ function toggleThirdVersion(enable) {
     buildChapterNavigation();
     displayComparison();
     updateVariableDiffIfVisible();
-    updateChapterVariablesPanelIfVisible();
 }
 
 function initializeThirdVersionControls() {
@@ -1580,9 +1581,6 @@ function closeVariableSourcePanel() {
 function toggleVariablePanel() {
     const panel = document.getElementById('variable-diff-panel');
     const btn = document.getElementById('show-vars-btn');
-    // Close chapter vars panel when opening global vars
-    const chapterPanel = document.getElementById('chapter-vars-panel');
-    const chapterBtn = document.getElementById('show-chapter-vars-btn');
 
     if (!panel) return;
 
@@ -1591,12 +1589,6 @@ function toggleVariablePanel() {
 
     if (btn) {
         btn.classList.toggle('active', isHidden);
-    }
-
-    // Close the other panel if we're opening this one
-    if (isHidden && chapterPanel && !chapterPanel.classList.contains('hidden')) {
-        chapterPanel.classList.add('hidden');
-        if (chapterBtn) chapterBtn.classList.remove('active');
     }
 
     if (isHidden) {
@@ -1611,31 +1603,10 @@ function initializeVariablePanel() {
     }
 }
 
-// Chapter Variables Panel
-function toggleChapterVariablesPanel() {
-    const panel = document.getElementById('chapter-vars-panel');
-    const btn = document.getElementById('show-chapter-vars-btn');
-    // Close global vars panel when opening chapter vars
-    const globalPanel = document.getElementById('variable-diff-panel');
-    const globalBtn = document.getElementById('show-vars-btn');
-
-    if (!panel) return;
-
-    const isHidden = panel.classList.contains('hidden');
-    panel.classList.toggle('hidden', !isHidden);
-
+function initializeSourceCodeMode() {
+    const btn = document.getElementById('source-code-mode-btn');
     if (btn) {
-        btn.classList.toggle('active', isHidden);
-    }
-
-    // Close the other panel if we're opening this one
-    if (isHidden && globalPanel && !globalPanel.classList.contains('hidden')) {
-        globalPanel.classList.add('hidden');
-        if (globalBtn) globalBtn.classList.remove('active');
-    }
-
-    if (isHidden) {
-        updateChapterVariablesPanel();
+        btn.addEventListener('click', toggleSourceCodeMode);
     }
 }
 
@@ -2033,457 +2004,191 @@ function findMacroReferences(text) {
     return macros;
 }
 
-function extractChapterVariablePatterns(varName) {
-    // Get the source for the current chapter
-    const sourceKey = SOURCE_KEY_BY_CHAPTER[currentChapter];
-    if (!sourceKey || !originSources || !originSources.chapters[sourceKey]) {
-        return { activePatterns: [], inactivePatterns: [] };
-    }
+// Chapter ordering constant used by navigation and Gonzo mode
+const CHAPTER_ORDER = ['prologue',
+                     'chapter1', 'chapter2', 'chapter3', 'chapter4', 'chapter5',
+                     'chapter6', 'chapter7', 'chapter8', 'chapter9',
+                     'part2', 'chapter10', 'chapter11', 'chapter12', 'chapter13',
+                     'chapter14', 'chapter15',
+                     'part3', 'chapter16', 'chapter17', 'chapter18',
+                     'notes'];
 
-    const sourceContent = originSources.chapters[sourceKey].content;
-    if (!sourceContent) return { activePatterns: [], inactivePatterns: [] };
-
-    const activePatterns = [];
-    const inactivePatterns = [];
-
-    // Match conditional blocks: [@varname>active text|inactive text] or [@varname>active text]
-    // Also handles: [^@varname>text...], [*tag*@varname>text...]
-    const varPattern = new RegExp(
-        `\\[(?:\\*\\w+\\*)?@${varName}>([^\\[\\]]+?)(?:\\|([^\\[\\]]+?))?\\]`,
-        'g'
-    );
-
-    let match;
-    while ((match = varPattern.exec(sourceContent)) !== null) {
-        const activeText = match[1] ? match[1].trim() : '';
-        const inactiveText = match[2] ? match[2].trim() : '';
-
-        // Clean up Quant markup
-        const cleanText = (text) => {
-            return text
-                .replace(/\{i\/([^}]+)\}/g, '$1')  // {i/text} -> text
-                .replace(/\{[^}]+\}/g, '')          // Remove other macros
-                .replace(/\s+/g, ' ')
-                .trim();
-        };
-
-        const cleanActive = cleanText(activeText);
-        const cleanInactive = cleanText(inactiveText);
-
-        if (cleanActive.length >= 8) {
-            activePatterns.push(cleanActive.substring(0, 80));
-        }
-        if (cleanInactive.length >= 8) {
-            inactivePatterns.push(cleanInactive.substring(0, 80));
-        }
-    }
-
-    return { activePatterns, inactivePatterns };
+function getChapterDisplayName(chapterId) {
+    if (chapterId === 'introduction') return 'Intro';
+    if (chapterId === 'prologue') return 'Part 1';
+    if (chapterId === 'part2') return 'Part 2';
+    if (chapterId === 'part3') return 'Part 3';
+    if (chapterId === 'chapter18') return 'Epilogue';
+    if (chapterId === 'notes') return 'Notes';
+    if (chapterId.startsWith('chapter')) return `Ch ${chapterId.replace('chapter', '')}`;
+    return chapterId;
 }
 
-function detectChapterVariableInText(varName, chapterText) {
-    const { activePatterns, inactivePatterns } = extractChapterVariablePatterns(varName);
-
-    if (activePatterns.length === 0 && inactivePatterns.length === 0) {
-        return 'unknown';
-    }
-
-    const textNormalized = chapterText.replace(/\s+/g, ' ');
-
-    // Check for active patterns
-    const hasActivePattern = activePatterns.some(pattern => {
-        const patternNormalized = pattern.replace(/\s+/g, ' ');
-        return textNormalized.includes(patternNormalized);
-    });
-
-    // Check for inactive patterns
-    const hasInactivePattern = inactivePatterns.some(pattern => {
-        const patternNormalized = pattern.replace(/\s+/g, ' ');
-        return textNormalized.includes(patternNormalized);
-    });
-
-    if (hasActivePattern && !hasInactivePattern) return 'active';
-    if (hasInactivePattern && !hasActivePattern) return 'inactive';
-    if (hasActivePattern && hasInactivePattern) return 'both'; // Shouldn't happen normally
-    return 'unknown';
-}
-
-function updateChapterVariablesPanel() {
-    const content = document.getElementById('chapter-vars-content');
-    if (!content) return;
-
-    if (!chapterVariables || !currentChapter || !chapterVariables[currentChapter]) {
-        content.innerHTML = '<span class="var-list-empty">No chapter-local variables defined in this chapter</span>';
-        return;
-    }
-
-    const vars = chapterVariables[currentChapter];
-
-    // Get chapter text for each version
-    const chapterDataA = getChapterContent(versionA, currentChapter);
-    const chapterDataB = getChapterContent(versionB, currentChapter);
-    const chapterDataC = versionC ? getChapterContent(versionC, currentChapter) : null;
-
-    const textA = (chapterDataA.paragraphs || []).join(' ');
-    const textB = (chapterDataB.paragraphs || []).join(' ');
-    const textC = chapterDataC ? (chapterDataC.paragraphs || []).join(' ') : '';
-
-    // Collect all chapter variable names and detect which are active in each version
-    const allVarNames = [];
-    vars.forEach(def => {
-        def.variables.forEach(v => allVarNames.push(v));
-    });
-
-    const varsInA = new Set();
-    const varsInB = new Set();
-    const varsInC = new Set();
-
-    allVarNames.forEach(varName => {
-        const statusA = detectChapterVariableInText(varName, textA);
-        const statusB = detectChapterVariableInText(varName, textB);
-
-        if (statusA === 'active') varsInA.add(varName);
-        if (statusB === 'active') varsInB.add(varName);
-
-        if (versionC && textC) {
-            const statusC = detectChapterVariableInText(varName, textC);
-            if (statusC === 'active') varsInC.add(varName);
-        }
-    });
-
-    // Calculate differences
-    let onlyInA, onlyInB, onlyInC, shared;
-
-    if (versionC) {
-        onlyInA = [...varsInA].filter(v => !varsInB.has(v) && !varsInC.has(v)).sort();
-        onlyInB = [...varsInB].filter(v => !varsInA.has(v) && !varsInC.has(v)).sort();
-        onlyInC = [...varsInC].filter(v => !varsInA.has(v) && !varsInB.has(v)).sort();
-        shared = [...varsInA].filter(v => varsInB.has(v) && varsInC.has(v)).sort();
-    } else {
-        onlyInA = [...varsInA].filter(v => !varsInB.has(v)).sort();
-        onlyInB = [...varsInB].filter(v => !varsInA.has(v)).sort();
-        onlyInC = [];
-        shared = [...varsInA].filter(v => varsInB.has(v)).sort();
-    }
-
-    // Find variables that couldn't be detected in either version
-    const detected = new Set([...varsInA, ...varsInB, ...varsInC]);
-    const undetected = allVarNames.filter(v => !detected.has(v)).sort();
-
-    // Render function
-    const renderVars = (varNames, clickable = true) => {
-        if (varNames.length === 0) return '<span class="var-list-empty">none</span>';
-        return varNames.map(v => {
-            // Find the definition for this variable to get description
-            let description = '';
-            for (const def of vars) {
-                if (def.variables.includes(v)) {
-                    description = def.description || '';
-                    break;
-                }
-            }
-            const clickClass = clickable ? 'clickable' : '';
-            const tooltipText = description || (clickable ? 'Click to highlight' : '');
-            return `<span class="chapter-var-tag ${clickClass}" data-varname="${v}" data-tooltip="${escapeHtml(tooltipText)}">@${v}</span>`;
-        }).join('');
-    };
-
-    // Simple inline layout matching Global Variables panel style
-    let html = '';
-
-    // Only in A
-    html += `
-        <div class="chapter-var-diff-section">
-            <span class="chapter-var-diff-label">Only in ${versionA || 'A'}:</span>
-            <span class="chapter-var-list var-list-a">${renderVars(onlyInA)}</span>
-        </div>
-    `;
-
-    // Only in B
-    html += `
-        <div class="chapter-var-diff-section">
-            <span class="chapter-var-diff-label">Only in ${versionB || 'B'}:</span>
-            <span class="chapter-var-list var-list-b">${renderVars(onlyInB)}</span>
-        </div>
-    `;
-
-    // Only in C (if three-version mode)
-    if (versionC) {
-        html += `
-            <div class="chapter-var-diff-section">
-                <span class="chapter-var-diff-label">Only in ${versionC}:</span>
-                <span class="chapter-var-list var-list-c">${renderVars(onlyInC)}</span>
-            </div>
-        `;
-    }
-
-    // Shared
-    html += `
-        <div class="chapter-var-diff-section shared">
-            <span class="chapter-var-diff-label">${versionC ? 'In all:' : 'Shared'}:</span>
-            <span class="chapter-var-list var-list-shared">${renderVars(shared)}</span>
-        </div>
-    `;
-
-    // Undetected (if any)
-    if (undetected.length > 0) {
-        html += `
-            <div class="chapter-var-diff-section undetected">
-                <span class="chapter-var-diff-label">Undetected:</span>
-                <span class="chapter-var-list var-list-undetected">${renderVars(undetected, false)}</span>
-            </div>
-        `;
-    }
-
-    content.innerHTML = html;
-
-    // Add click handlers to variable tags
-    content.querySelectorAll('.chapter-var-tag.clickable').forEach(tag => {
-        tag.addEventListener('click', () => {
-            const varName = tag.dataset.varname;
-            highlightChapterVariableText(varName);
-        });
-    });
-}
-
-function initializeChapterVariablesPanel() {
-    const btn = document.getElementById('show-chapter-vars-btn');
-    if (btn) {
-        btn.addEventListener('click', toggleChapterVariablesPanel);
-    }
-}
-
-function initializeSourceCodeMode() {
-    const btn = document.getElementById('source-code-mode-btn');
-    if (btn) {
-        btn.addEventListener('click', toggleSourceCodeMode);
-    }
-}
-
-function highlightChapterVariableText(varName) {
-    // Clear any existing variable highlights and source buttons
-    document.querySelectorAll('.var-highlight').forEach(el => {
-        el.classList.remove('var-highlight');
-    });
-    document.querySelectorAll('.var-source-btn').forEach(el => {
-        el.remove();
-    });
-    closeVariableSourcePanel();
-
-    // Use the shared pattern extraction function
-    const { activePatterns, inactivePatterns } = extractChapterVariablePatterns(varName);
-
-    // Combine all patterns (both active and inactive text will help us find the right paragraphs)
-    const patterns = [...activePatterns, ...inactivePatterns];
-
-    if (patterns.length === 0) {
-        showNotification(`Variable "@${varName}" has no text patterns in this chapter`, 'info');
-        return;
-    }
-
-    currentHighlightedVar = varName;
-
-    // Helper to check if text matches any pattern
-    const matchesPattern = (text) => {
-        const cleanText = (text || '').replace(/\s+/g, ' ');
-        return patterns.some(pattern => {
-            const cleanPattern = pattern.replace(/\s+/g, ' ').trim();
-            return cleanText.includes(cleanPattern.substring(0, 50));
-        });
-    };
-
-    // Get original paragraph data for each version
-    const chapterDataA = getChapterContent(versionA, currentChapter);
-    const chapterDataB = getChapterContent(versionB, currentChapter);
-    const chapterDataC = versionC ? getChapterContent(versionC, currentChapter) : null;
-
-    const paragraphsA = chapterDataA.paragraphs || [];
-    const paragraphsB = chapterDataB.paragraphs || [];
-    const paragraphsC = chapterDataC ? (chapterDataC.paragraphs || []) : [];
-
-    // Find matching paragraph indices in original data
-    const matchingIndicesA = new Set();
-    const matchingIndicesB = new Set();
-    const matchingIndicesC = new Set();
-
-    paragraphsA.forEach((text, idx) => {
-        if (matchesPattern(text)) matchingIndicesA.add(idx);
-    });
-    paragraphsB.forEach((text, idx) => {
-        if (matchesPattern(text)) matchingIndicesB.add(idx);
-    });
-    paragraphsC.forEach((text, idx) => {
-        if (matchesPattern(text)) matchingIndicesC.add(idx);
-    });
-
-    const container = document.getElementById('comparison-display');
-    if (!container) {
-        showNotification('Could not find comparison display', 'error');
-        return;
-    }
-
-    let matchCount = 0;
-    let firstMatch = null;
-
-    if (currentMode === 'sidebyside' || currentMode === 'unified') {
-        // In side-by-side and unified, paragraphs have data-version-id and data-paragraph-index
-        const domParagraphs = container.querySelectorAll('p[data-paragraph-index], .source-paragraph[data-paragraph-index]');
-        domParagraphs.forEach(para => {
-            const idx = parseInt(para.dataset.paragraphIndex, 10);
-            const version = para.dataset.versionId;
-
-            let matches = false;
-            if (version === versionA && matchingIndicesA.has(idx)) matches = true;
-            if (version === versionB && matchingIndicesB.has(idx)) matches = true;
-            if (version === versionC && matchingIndicesC.has(idx)) matches = true;
-
-            if (matches) {
-                para.classList.add('var-highlight');
-                matchCount++;
-                if (!firstMatch) firstMatch = para;
-                addViewSourceButton(para, varName);
-            }
-        });
-    } else if (currentMode === 'diff') {
-        // In diff view, paragraph index is the alignment index
-        // We need to map alignment indices to original paragraph indices
-        const alignments = versionC
-            ? alignThreeParagraphs(paragraphsA, paragraphsB, paragraphsC)
-            : alignParagraphs(paragraphsA, paragraphsB);
-
-        const domParagraphs = container.querySelectorAll('.diff-view p[data-paragraph-index]');
-        domParagraphs.forEach(para => {
-            const alignIdx = parseInt(para.dataset.paragraphIndex, 10);
-            const alignment = alignments[alignIdx];
-            if (!alignment) return;
-
-            let matches = false;
-            // Check if any of the aligned original paragraphs match
-            if (alignment.indexA !== null && matchingIndicesA.has(alignment.indexA)) matches = true;
-            if (alignment.indexB !== null && matchingIndicesB.has(alignment.indexB)) matches = true;
-            if (alignment.indexC !== undefined && alignment.indexC !== null && matchingIndicesC.has(alignment.indexC)) matches = true;
-
-            if (matches) {
-                para.classList.add('var-highlight');
-                matchCount++;
-                if (!firstMatch) firstMatch = para;
-                addViewSourceButton(para, varName);
-            }
-        });
-    } else if (currentMode === 'comparison') {
-        // In collation view, each alignment row has 2 or 3 .comparison-paragraph elements
-        const alignments = versionC
-            ? alignThreeParagraphs(paragraphsA, paragraphsB, paragraphsC)
-            : alignParagraphs(paragraphsA, paragraphsB);
-
-        const domParagraphs = container.querySelectorAll('.comparison-paragraph[data-paragraph-index]');
-        const numVersions = versionC ? 3 : 2;
-
-        domParagraphs.forEach((para, domIdx) => {
-            const rowIndex = parseInt(para.dataset.paragraphIndex, 10);
-            const versionInRow = domIdx % numVersions; // 0 = A, 1 = B, 2 = C
-            const alignment = alignments[rowIndex];
-            if (!alignment) return;
-
-            let matches = false;
-            if (versionInRow === 0 && alignment.indexA !== null && matchingIndicesA.has(alignment.indexA)) matches = true;
-            if (versionInRow === 1 && alignment.indexB !== null && matchingIndicesB.has(alignment.indexB)) matches = true;
-            if (versionInRow === 2 && alignment.indexC !== undefined && alignment.indexC !== null && matchingIndicesC.has(alignment.indexC)) matches = true;
-
-            if (matches) {
-                para.classList.add('var-highlight');
-                matchCount++;
-                if (!firstMatch) firstMatch = para;
-                addViewSourceButton(para, varName);
-            }
-        });
-    }
-
-    if (matchCount > 0) {
-        showNotification(`Highlighted ${matchCount} paragraph${matchCount > 1 ? 's' : ''} affected by "@${varName}" - click the code icon to view source`, 'success');
-        // Scroll to first match
-        if (firstMatch) {
-            firstMatch.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-    } else {
-        showNotification(`No paragraphs found matching patterns for "@${varName}"`, 'info');
-    }
-}
-
-function updateChapterVariablesPanelIfVisible() {
-    const panel = document.getElementById('chapter-vars-panel');
-    if (panel && !panel.classList.contains('hidden')) {
-        updateChapterVariablesPanel();
-    }
-}
+// Cached list of available chapters for the current version pair
+let availableChapters = [];
 
 function buildChapterNavigation() {
-    const nav = document.getElementById('chapter-nav');
-    nav.innerHTML = '';
+    const select = document.getElementById('chapter-select');
+    if (!select) return;
 
     // Get chapters from both selected versions (to show all available chapters)
     const chaptersSet = new Set();
-
     getChaptersForVersion(versionA).forEach(chapterId => chaptersSet.add(chapterId));
     getChaptersForVersion(versionB).forEach(chapterId => chaptersSet.add(chapterId));
 
-    // Convert to array and sort in a logical order
-    // Exclude: epilogue, alternatescene, backers, aboutauthor, aboutcopy (per user request)
-    // chapter18 is the Epilogue
-    const chapterOrder = ['prologue',
-                         'chapter1', 'chapter2', 'chapter3', 'chapter4', 'chapter5',
-                         'chapter6', 'chapter7', 'chapter8', 'chapter9',
-                         'part2', 'chapter10', 'chapter11', 'chapter12', 'chapter13',
-                         'chapter14', 'chapter15',
-                         'part3', 'chapter16', 'chapter17', 'chapter18',
-                         'notes'];
+    availableChapters = CHAPTER_ORDER.filter(ch => chaptersSet.has(ch));
 
-    const chapters = chapterOrder.filter(ch => chaptersSet.has(ch));
-
-    if (chapters.length > 0 && !chapters.includes(currentChapter)) {
-        currentChapter = chapters[0];
+    if (availableChapters.length > 0 && !availableChapters.includes(currentChapter)) {
+        currentChapter = availableChapters[0];
     }
 
-    chapters.forEach(chapterId => {
-        const button = document.createElement('button');
-        button.className = 'nav-btn';
-        button.setAttribute('data-chapter', chapterId);
+    // Populate dropdown
+    select.innerHTML = '';
+    availableChapters.forEach(chapterId => {
+        const option = document.createElement('option');
+        option.value = chapterId;
+        option.textContent = getChapterDisplayName(chapterId);
         if (chapterId === currentChapter) {
-            button.classList.add('active');
+            option.selected = true;
         }
+        select.appendChild(option);
+    });
 
-        // Format button text
-        let buttonText;
-        if (chapterId === 'introduction') {
-            buttonText = 'Intro';
-        } else if (chapterId === 'prologue') {
-            buttonText = 'Part 1';
-        } else if (chapterId === 'part2') {
-            buttonText = 'Part 2';
-        } else if (chapterId === 'part3') {
-            buttonText = 'Part 3';
-        } else if (chapterId === 'chapter18') {
-            buttonText = 'Epilogue';
-        } else if (chapterId === 'notes') {
-            buttonText = 'Notes';
-        } else if (chapterId.startsWith('chapter')) {
-            buttonText = `Ch ${chapterId.replace('chapter', '')}`;
+    updateChapterNavArrows();
+}
+
+function updateChapterNavArrows() {
+    const prevBtn = document.getElementById('chapter-prev-btn');
+    const nextBtn = document.getElementById('chapter-next-btn');
+    if (!prevBtn || !nextBtn) return;
+
+    const currentIndex = availableChapters.indexOf(currentChapter);
+    prevBtn.disabled = currentIndex <= 0;
+    nextBtn.disabled = currentIndex >= availableChapters.length - 1;
+}
+
+function navigateChapter(direction) {
+    const currentIndex = availableChapters.indexOf(currentChapter);
+    const newIndex = currentIndex + direction;
+    if (newIndex < 0 || newIndex >= availableChapters.length) return;
+
+    currentChapter = availableChapters[newIndex];
+
+    const select = document.getElementById('chapter-select');
+    if (select) select.value = currentChapter;
+
+    updateChapterNavArrows();
+    displayComparison();
+    updateVariableDiffIfVisible();
+}
+
+function updateChapterSelect() {
+    const select = document.getElementById('chapter-select');
+    if (select) select.value = currentChapter;
+    updateChapterNavArrows();
+}
+
+// ==========================================
+// CONTROL PANEL (View / Analyze dropdowns)
+// ==========================================
+
+function initializeControlPanel() {
+    const viewBtn = document.getElementById('view-toggle-btn');
+    const analyzeBtn = document.getElementById('analyze-toggle-btn');
+    const viewPanel = document.getElementById('view-panel');
+    const analyzePanel = document.getElementById('analyze-panel');
+
+    // Load saved state
+    let panelState = { view: false, analyze: false };
+    try {
+        const saved = localStorage.getItem('subcutanean_panel_state');
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            // Handle both old and new format
+            if (parsed.sections) {
+                panelState = parsed.sections;
+            } else {
+                panelState = parsed;
+            }
+        }
+    } catch (e) { /* ignore */ }
+
+    function savePanelState() {
+        try {
+            localStorage.setItem('subcutanean_panel_state', JSON.stringify(panelState));
+        } catch (e) { /* ignore */ }
+    }
+
+    function toggleDropdown(name) {
+        const btn = name === 'view' ? viewBtn : analyzeBtn;
+        const panel = name === 'view' ? viewPanel : analyzePanel;
+        const otherName = name === 'view' ? 'analyze' : 'view';
+        const otherBtn = name === 'view' ? analyzeBtn : viewBtn;
+        const otherPanel = name === 'view' ? analyzePanel : viewPanel;
+
+        if (!btn || !panel) return;
+
+        const isOpen = !panel.classList.contains('hidden');
+
+        if (isOpen) {
+            // Close this panel
+            panel.classList.add('hidden');
+            btn.classList.remove('active');
+            panelState[name] = false;
         } else {
-            buttonText = chapterId;
+            // Close the other panel first
+            if (otherPanel && !otherPanel.classList.contains('hidden')) {
+                otherPanel.classList.add('hidden');
+                if (otherBtn) otherBtn.classList.remove('active');
+                panelState[otherName] = false;
+            }
+            // Open this panel
+            panel.classList.remove('hidden');
+            btn.classList.add('active');
+            panelState[name] = true;
         }
+        savePanelState();
+    }
 
-        button.textContent = buttonText;
-        button.addEventListener('click', () => {
-            currentChapter = chapterId;
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
+    if (viewBtn) {
+        viewBtn.addEventListener('click', () => toggleDropdown('view'));
+    }
+    if (analyzeBtn) {
+        analyzeBtn.addEventListener('click', () => toggleDropdown('analyze'));
+    }
+
+    // Restore saved state
+    if (panelState.view && viewPanel && viewBtn) {
+        viewPanel.classList.remove('hidden');
+        viewBtn.classList.add('active');
+    }
+    if (panelState.analyze && analyzePanel && analyzeBtn) {
+        analyzePanel.classList.remove('hidden');
+        analyzeBtn.classList.add('active');
+    }
+
+    // Chapter navigation
+    const chapterSelect = document.getElementById('chapter-select');
+    const chapterPrevBtn = document.getElementById('chapter-prev-btn');
+    const chapterNextBtn = document.getElementById('chapter-next-btn');
+
+    if (chapterSelect) {
+        chapterSelect.addEventListener('change', () => {
+            currentChapter = chapterSelect.value;
+            updateChapterNavArrows();
             displayComparison();
             updateVariableDiffIfVisible();
-            updateChapterVariablesPanelIfVisible();
-        });
 
-        nav.appendChild(button);
-    });
+        });
+    }
+
+    if (chapterPrevBtn) {
+        chapterPrevBtn.addEventListener('click', () => navigateChapter(-1));
+    }
+
+    if (chapterNextBtn) {
+        chapterNextBtn.addEventListener('click', () => navigateChapter(1));
+    }
 }
 
 function setupViewModeButtons() {
@@ -3856,16 +3561,8 @@ function goToOccurrence(index) {
     if (occurrence.chapterId !== currentChapter) {
         currentChapter = occurrence.chapterId;
 
-        // Update active chapter button
-        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-        const chapterButtons = document.querySelectorAll('.nav-btn');
-        chapterButtons.forEach(btn => {
-            const btnChapter = btn.textContent.toLowerCase();
-            const occChapter = occurrence.chapterName.toLowerCase();
-            if (btnChapter.includes(occChapter) || occChapter.includes(btnChapter)) {
-                btn.classList.add('active');
-            }
-        });
+        // Update chapter dropdown
+        updateChapterSelect();
 
         // Display the new chapter
         displayComparison();
@@ -4288,14 +3985,8 @@ function jumpToChapterWithWord(chapterId, word) {
     // Update current chapter
     currentChapter = chapterId;
 
-    // Update active chapter button
-    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-    const chapterButtons = document.querySelectorAll('.nav-btn');
-    chapterButtons.forEach(btn => {
-        if (btn.textContent.toLowerCase().includes(chapterId.replace('chapter', '').replace('part', ''))) {
-            btn.classList.add('active');
-        }
-    });
+    // Update chapter dropdown
+    updateChapterSelect();
 
     // Display the chapter
     displayComparison();
@@ -4335,16 +4026,8 @@ function navigateToChapter(chapterId) {
     // Update current chapter
     currentChapter = chapterId;
 
-    // Update active chapter button
-    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-    const chapterButtons = document.querySelectorAll('.nav-btn');
-    chapterButtons.forEach(btn => {
-        // Match button by data attribute or text content
-        const btnChapter = btn.getAttribute('data-chapter');
-        if (btnChapter === chapterId) {
-            btn.classList.add('active');
-        }
-    });
+    // Update chapter dropdown
+    updateChapterSelect();
 
     // Display the chapter
     displayComparison();
@@ -4772,6 +4455,7 @@ function acceptManageInfoAndProceed() {
 // Close all modals helper
 function closeAllModals() {
     const modalIds = [
+        'welcome-modal',
         'about-modal',
         'generate-modal',
         'globals-modal',
@@ -4792,6 +4476,66 @@ function closeAllModals() {
     });
     // Also close any open nav dropdowns
     closeAllNavDropdowns();
+}
+
+// Welcome Modal (shows on first visit, then every 24 hours)
+
+function shouldShowWelcome() {
+    try {
+        const lastShown = localStorage.getItem('subcutanean_welcome_last_shown');
+        if (!lastShown) return true;
+        const elapsed = Date.now() - parseInt(lastShown, 10);
+        const twentyFourHours = 24 * 60 * 60 * 1000;
+        return elapsed >= twentyFourHours;
+    } catch (e) {
+        return true;
+    }
+}
+
+function openWelcomeModal() {
+    const modal = document.getElementById('welcome-modal');
+    if (!modal) return;
+    modal.classList.remove('hidden');
+    // Initialize Lucide icons inside the modal
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons({ nodes: [modal] });
+    }
+}
+
+function closeWelcomeModal() {
+    const modal = document.getElementById('welcome-modal');
+    if (!modal) return;
+    modal.classList.add('hidden');
+    try {
+        localStorage.setItem('subcutanean_welcome_last_shown', Date.now().toString());
+    } catch (e) { /* ignore */ }
+}
+
+function initializeWelcomeModal() {
+    const closeBtn = document.getElementById('welcome-close-btn');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeWelcomeModal);
+    }
+
+    const modal = document.getElementById('welcome-modal');
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeWelcomeModal();
+        });
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            const welcomeModal = document.getElementById('welcome-modal');
+            if (welcomeModal && !welcomeModal.classList.contains('hidden')) {
+                closeWelcomeModal();
+            }
+        }
+    });
+
+    if (shouldShowWelcome()) {
+        openWelcomeModal();
+    }
 }
 
 // About Modal functionality
@@ -6731,27 +6475,23 @@ async function loadVariableInfo() {
             throw new Error(`HTTP ${response.status}`);
         }
         const data = await response.json();
-        // Handle new structure with variables, groups, macros, and chapter_variables
+        // Handle new structure with variables, groups, and macros
         if (data.variables) {
             variableInfo = data.variables;
             variableGroups = data.groups || [];
             variableMacros = data.macros || {};
-            chapterVariables = data.chapter_variables || {};
         } else {
             // Fallback for old format (direct variable dict)
             variableInfo = data;
             variableGroups = [];
             variableMacros = {};
-            chapterVariables = {};
         }
-        const chapterVarCount = Object.values(chapterVariables).reduce((sum, defs) => sum + defs.length, 0);
-        console.log(`Loaded info for ${Object.keys(variableInfo).length} variables, ${variableGroups.length} groups, ${chapterVarCount} chapter-local vars`);
+        console.log(`Loaded info for ${Object.keys(variableInfo).length} variables, ${variableGroups.length} groups`);
     } catch (error) {
         console.error('Error loading variable info:', error);
         variableInfo = null;
         variableGroups = [];
         variableMacros = {};
-        chapterVariables = {};
     }
 
     // Load scholarly descriptions (separate from source materials)
@@ -7576,6 +7316,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initializeTheme();
     setupViewModeButtons();
+    initializeControlPanel();
     loadBookmarksFromStorage();
     refreshBookmarkUI();
     loadAnnotationsFromStorage();
@@ -7588,9 +7329,9 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeGenerateForm();
     initializeGlobalsModal();
     initializeVariablePanel();
-    initializeChapterVariablesPanel();
     initializeSourceCodeMode();
     initializeThirdVersionControls();
+    initializeWelcomeModal();
 
     // Theme toggle event listener
     const themeToggle = document.getElementById('theme-toggle');
@@ -8632,13 +8373,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Set chapter to current Gonzo chapter
         currentChapter = gonzoCurrentChapter;
 
-        // Update active chapter button
-        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-            if (btn.dataset.chapter === currentChapter) {
-                btn.classList.add('active');
-            }
-        });
+        // Update chapter dropdown
+        updateChapterSelect();
 
         // Close Gonzo mode
         closeGonzoModal();

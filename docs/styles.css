@@ -57,40 +57,12 @@ header {
     position: relative;
     background-color: var(--header-bg);
     color: white;
-    padding: 2rem 1rem 1rem;
-    text-align: center;
+    padding: 0.5rem 1rem;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-header h1 {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
-    font-weight: normal;
-    color: var(--accent-color);
-    text-shadow:
-        0 0 10px rgba(255, 136, 0, 0.8),
-        0 0 20px rgba(255, 136, 0, 0.6),
-        0 0 30px rgba(255, 136, 0, 0.4),
-        0 0 40px rgba(255, 136, 0, 0.2);
-    letter-spacing: 0.05em;
-}
-
-[data-theme="light"] header h1 {
-    text-shadow:
-        0 0 8px rgba(217, 104, 0, 0.6),
-        0 0 16px rgba(217, 104, 0, 0.4),
-        0 0 24px rgba(217, 104, 0, 0.2);
 }
 
 [data-theme="light"] header {
     color: var(--text-color);
-}
-
-.subtitle {
-    font-size: 1rem;
-    opacity: 0.9;
-    font-style: italic;
-    margin-bottom: 1rem;
 }
 
 .base-selector {
@@ -123,58 +95,11 @@ header h1 {
     border-color: var(--accent-color);
 }
 
-.chapter-nav {
-    display: flex;
-    justify-content: flex-start;
-    gap: 0.5rem;
-    margin-top: 1.5rem;
-    overflow-x: auto;
-    padding: 0.5rem;
-    max-width: 100%;
-    -webkit-overflow-scrolling: touch;
-}
-
-.chapter-nav::-webkit-scrollbar {
-    height: 6px;
-}
-
-.chapter-nav::-webkit-scrollbar-track {
-    background: rgba(255,255,255,0.1);
-}
-
-.chapter-nav::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.3);
-    border-radius: 3px;
-}
-
-.chapter-nav::-webkit-scrollbar-thumb:hover {
-    background: rgba(255,255,255,0.5);
-}
-
-.nav-btn {
-    background-color: rgba(255,255,255,0.1);
-    color: white;
-    border: 2px solid rgba(255,255,255,0.3);
-    padding: 0.5rem 1.5rem;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border-radius: 4px;
-}
-
-.nav-btn:hover {
-    background-color: rgba(255,255,255,0.2);
-}
-
-.nav-btn.active {
-    background-color: var(--accent-color);
-    border-color: var(--accent-color);
-}
 
 main {
     max-width: var(--max-width);
     margin: 0 auto;
-    padding: 2rem 1rem;
+    padding: 1rem 1rem;
 }
 
 #info-panel {
@@ -424,19 +349,7 @@ footer a:hover {
     }
 
     header {
-        padding: 1.5rem 1rem 0.75rem;
-    }
-
-    header h1 {
-        font-size: 2rem;
-        text-shadow:
-            0 0 8px rgba(255, 136, 0, 0.8),
-            0 0 16px rgba(255, 136, 0, 0.6),
-            0 0 24px rgba(255, 136, 0, 0.4);
-    }
-
-    .subtitle {
-        font-size: 0.9rem;
+        padding: 0.5rem 0.75rem;
     }
 
     main {
@@ -459,29 +372,7 @@ footer a:hover {
     }
 
     header {
-        padding: 1rem 0.75rem 0.5rem;
-    }
-
-    header h1 {
-        font-size: 1.75rem;
-        text-shadow:
-            0 0 6px rgba(255, 136, 0, 0.8),
-            0 0 12px rgba(255, 136, 0, 0.6),
-            0 0 18px rgba(255, 136, 0, 0.4);
-    }
-
-    .subtitle {
-        font-size: 0.85rem;
-    }
-
-    .nav-btn {
-        padding: 0.5rem 1rem;
-        font-size: 0.9rem;
-    }
-
-    .chapter-nav {
-        gap: 0.4rem;
-        padding: 0.5rem 0;
+        padding: 0.5rem 0.5rem;
     }
 
     main {

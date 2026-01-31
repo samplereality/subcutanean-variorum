@@ -146,11 +146,9 @@
     </div>
 
     <header>
-        <h1>Subcutanean Variorum</h1>
-        <p class="subtitle">Compare multiple versions of Aaron Reed’s variable novel, <em>Subcutanean</em> (2020)</p>
-
-        <div class="comparison-controls">
-            <div class="version-selectors">
+        <!-- Essential controls strip - always visible -->
+        <div class="essential-controls">
+            <div class="version-selectors-compact">
                 <div class="selector-group">
                     <label for="version-a-select">Compare</label>
                     <select id="version-a-select" class="version-select">
@@ -178,84 +176,99 @@
                 <button id="add-version-c-btn" class="tool-btn add-version-btn" title="Add a third version to compare">
                     <i data-lucide="plus"></i>
                 </button>
+            </div>
 
-                <button id="show-vars-btn" class="tool-btn vars-toggle" title="Show variable differences between versions">
-                    <i data-lucide="variable"></i> Global Variables
+            <div class="chapter-nav-compact">
+                <button id="chapter-prev-btn" class="chapter-arrow-btn" title="Previous chapter">
+                    <i data-lucide="chevron-left"></i>
                 </button>
-                <button id="show-chapter-vars-btn" class="tool-btn chapter-vars-toggle" title="Show variables defined in current chapter">
-                    <i data-lucide="file-text"></i> Chapter Variables
-                </button>
-                <button id="source-code-mode-btn" class="tool-btn source-code-toggle" title="Enable Source Code Mode - click any paragraph to view its Quant source">
-                    <i data-lucide="code"></i> Source Mode
+                <select id="chapter-select" class="chapter-select">
+                    <!-- Options populated by JavaScript -->
+                </select>
+                <button id="chapter-next-btn" class="chapter-arrow-btn" title="Next chapter">
+                    <i data-lucide="chevron-right"></i>
                 </button>
             </div>
 
-            <div id="chapter-vars-panel" class="chapter-vars-panel hidden">
-                <div class="var-panel-description">
-                    Variables defined within the current chapter's source file. These are local to this chapter and affect text variations only within this section.
-                </div>
-                <div id="chapter-vars-content" class="chapter-vars-content">
-                    <span class="var-list-empty">No chapter-local variables in this chapter</span>
-                </div>
-            </div>
+            <button id="view-toggle-btn" class="panel-toggle-btn" title="View mode options">
+                <i data-lucide="layout-grid"></i> View
+            </button>
+            <button id="analyze-toggle-btn" class="panel-toggle-btn" title="Analysis tools">
+                <i data-lucide="search"></i> Analyze
+            </button>
+        </div>
 
-            <div id="variable-diff-panel" class="variable-diff-panel hidden">
-                <div class="var-panel-description">
-                    These variables are declared in <a href="#" id="show-globals-link" class="globals-link">globals.txt</a> and are determined upon seed generation. They affect both minor and major narrative decisions.
-                </div>
-                <div class="var-diff-section">
-                    <span class="var-diff-label">Only in <span id="var-diff-a-label">A</span>:</span>
-                    <span id="vars-only-a" class="var-list var-list-a"></span>
-                </div>
-                <div class="var-diff-section">
-                    <span class="var-diff-label">Only in <span id="var-diff-b-label">B</span>:</span>
-                    <span id="vars-only-b" class="var-list var-list-b"></span>
-                </div>
-                <div class="var-diff-section var-diff-c hidden" id="var-diff-c-section">
-                    <span class="var-diff-label">Only in <span id="var-diff-c-label">C</span>:</span>
-                    <span id="vars-only-c" class="var-list var-list-c"></span>
-                </div>
-                <div class="var-diff-section var-diff-shared">
-                    <span class="var-diff-label"><span id="var-shared-label">Shared</span>:</span>
-                    <span id="vars-shared" class="var-list var-list-shared"></span>
-                </div>
-            </div>
-
+        <!-- View dropdown panel -->
+        <div id="view-panel" class="header-dropdown-panel hidden">
             <div class="view-mode-selector">
-                <label>View mode:</label>
                 <div class="button-group">
-                    <button id="mode-unified" class="mode-btn" title="Read a single version without comparison" data-short="Unified">Unified</button>
-                    <button id="mode-sidebyside" class="mode-btn active" title="View two versions in parallel columns" data-short="Side/Side">Side-by-side</button>
-                    <button id="mode-diff" class="mode-btn" title="Highlight additions and deletions between versions" data-short="Diff">Track Changes</button>
-                    <button id="mode-comparison" class="mode-btn" title="Compare variations across multiple witnesses" data-short="Collation">Collation</button>
-                    <button id="syntax-toggle-btn" class="mode-btn hidden" title="Toggle Quant syntax highlighting" data-short="Syntax">Enable Syntax Highlighting</button>
+                    <button id="mode-unified" class="mode-btn" title="Read a single version without comparison" data-short="Unified"><i data-lucide="file-text"></i> <span class="btn-label">Unified</span></button>
+                    <button id="mode-sidebyside" class="mode-btn active" title="View two versions in parallel columns" data-short="Side/Side"><i data-lucide="columns-2"></i> <span class="btn-label">Side-by-side</span></button>
+                    <button id="mode-diff" class="mode-btn" title="Highlight additions and deletions between versions" data-short="Diff"><i data-lucide="git-compare"></i> <span class="btn-label">Track Changes</span></button>
+                    <button id="mode-comparison" class="mode-btn" title="Compare variations across multiple witnesses" data-short="Collation"><i data-lucide="table"></i> <span class="btn-label">Collation</span></button>
+                    <button id="syntax-toggle-btn" class="mode-btn hidden" title="Toggle Quant syntax highlighting" data-short="Syntax"><i data-lucide="highlighter"></i> <span class="btn-label">Syntax Highlighting</span></button>
                 </div>
             </div>
+        </div>
 
-            <div class="tools-row">
+        <!-- Analyze dropdown panel -->
+        <div id="analyze-panel" class="header-dropdown-panel hidden">
+            <div class="analyze-search-row">
                 <div class="search-box">
                     <input type="text" id="search-input" placeholder="Search text..." />
-                    <button id="search-btn" class="tool-btn" title="Search across all chapters">Find</button>
+                    <button id="search-btn" class="tool-btn" title="Search across all chapters"><i data-lucide="search"></i> Find</button>
                     <div class="search-navigation hidden" id="search-navigation">
-                        <button id="search-prev-btn" class="search-nav-btn" title="Previous occurrence">←</button>
+                        <button id="search-prev-btn" class="search-nav-btn" title="Previous occurrence">&#8592;</button>
                         <div class="search-info">
                             <span id="search-results-count" class="search-count">0 of 0</span>
                             <span id="search-chapter-label" class="search-chapter"></span>
                         </div>
-                        <button id="search-next-btn" class="search-nav-btn" title="Next occurrence">→</button>
+                        <button id="search-next-btn" class="search-nav-btn" title="Next occurrence">&#8594;</button>
                     </div>
-                    <button id="clear-search-btn" class="tool-btn" title="Clear search results">Clear</button>
+                    <button id="clear-search-btn" class="tool-btn" title="Clear search results"><i data-lucide="x"></i> Clear</button>
                 </div>
-                <button id="word-diff-btn" class="tool-btn" title="Compare unique vocabulary between two versions">Word Differential</button>
-                <button id="heatmap-btn" class="tool-btn" title="View chapter-by-chapter variation density">Chapter Heatmap</button>
-                <button id="gonzo-btn" class="tool-btn" title="View same paragraphs across all 25 versions in a 5x5 grid">Gonzo Mode</button>
             </div>
-
+            <div class="analyze-tools-row">
+                <button id="source-code-mode-btn" class="tool-btn source-code-toggle" title="Enable Source Code Mode - click any paragraph to view its Quant source">
+                    <i data-lucide="code"></i> Source
+                </button>
+                <button id="show-vars-btn" class="tool-btn vars-toggle" title="Show variable differences between versions">
+                    <i data-lucide="variable"></i> Global Vars
+                </button>
+                <button id="word-diff-btn" class="tool-btn" title="Compare unique vocabulary between two versions">
+                    <i data-lucide="split"></i> Word Diff
+                </button>
+                <button id="heatmap-btn" class="tool-btn" title="View chapter-by-chapter variation density">
+                    <i data-lucide="flame"></i> Heatmap
+                </button>
+                <button id="gonzo-btn" class="tool-btn" title="View same paragraphs across all 25 versions in a 5x5 grid">
+                    <i data-lucide="grid-3x3"></i> Gonzo
+                </button>
+            </div>
         </div>
 
-        <nav id="chapter-nav" class="chapter-nav">
-            <!-- Chapter buttons will be populated by JavaScript -->
-        </nav>
+        <!-- Variable panel (outside collapsible, always accessible when toggled) -->
+        <div id="variable-diff-panel" class="variable-diff-panel hidden">
+            <div class="var-panel-description">
+                These variables are declared in <a href="#" id="show-globals-link" class="globals-link">globals.txt</a> and are determined upon seed generation. They affect both minor and major narrative decisions.
+            </div>
+            <div class="var-diff-section">
+                <span class="var-diff-label">Only in <span id="var-diff-a-label">A</span>:</span>
+                <span id="vars-only-a" class="var-list var-list-a"></span>
+            </div>
+            <div class="var-diff-section">
+                <span class="var-diff-label">Only in <span id="var-diff-b-label">B</span>:</span>
+                <span id="vars-only-b" class="var-list var-list-b"></span>
+            </div>
+            <div class="var-diff-section var-diff-c hidden" id="var-diff-c-section">
+                <span class="var-diff-label">Only in <span id="var-diff-c-label">C</span>:</span>
+                <span id="vars-only-c" class="var-list var-list-c"></span>
+            </div>
+            <div class="var-diff-section var-diff-shared">
+                <span class="var-diff-label"><span id="var-shared-label">Shared</span>:</span>
+                <span id="vars-shared" class="var-list var-list-shared"></span>
+            </div>
+        </div>
     </header>
 
     <main>
@@ -650,6 +663,45 @@
             </div>
             <div class="modal-body globals-modal-body" id="globals-modal-body">
                 <pre id="globals-content" class="globals-source-code"></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Welcome Modal -->
+    <div id="welcome-modal" class="modal hidden">
+        <div class="modal-content welcome-modal-content">
+            <div class="welcome-title-area">
+                <h1 class="welcome-title">Subcutanean Variorum</h1>
+                <p class="welcome-subtitle">Compare multiple versions of Aaron Reed's variable novel</p>
+            </div>
+            <div class="modal-body welcome-modal-body">
+                <p>Every copy of <em>Subcutanean</em> is unique. This tool lets you explore the differences across 25 generated versions.</p>
+
+                <h4>Quick Start</h4>
+                <ul>
+                    <li><strong>Compare</strong> and <strong>With</strong> dropdowns select which two seeds to compare</li>
+                    <li>Use the <strong>chapter dropdown</strong> to navigate between chapters</li>
+                    <li>Click <strong>View</strong> to switch display modes, or <strong>Analyze</strong> for search, source code, and other tools</li>
+                </ul>
+
+                <h4>View Modes</h4>
+                <ul>
+                    <li><strong>Side-by-side</strong> — Two versions in parallel columns</li>
+                    <li><strong>Unified</strong> — Single version view</li>
+                    <li><strong>Track Changes</strong> — Additions and deletions highlighted</li>
+                    <li><strong>Collation</strong> — Table format for all versions</li>
+                </ul>
+
+                <h4>Analysis Tools</h4>
+                <ul>
+                    <li><strong>Source Mode</strong> — Click any paragraph to see its Quant source code</li>
+                    <li><strong>Variables</strong> — See which variables differ between versions</li>
+                    <li><strong>Gonzo Mode</strong> — View all 25 versions simultaneously in a 5x5 grid</li>
+                </ul>
+
+                <div class="welcome-footer">
+                    <button id="welcome-close-btn" class="welcome-dismiss-btn">Get Started</button>
+                </div>
             </div>
         </div>
     </div>
