@@ -29,6 +29,8 @@
 
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <!-- Leader Line (connector lines between note panels and paragraphs) -->
+    <script src="https://cdn.jsdelivr.net/npm/leader-line-new@1.1.9/leader-line.min.js"></script>
 </head>
 <body>
     <!-- Main Navigation Bar -->
@@ -105,6 +107,7 @@
         <div class="dropdown-header">
             <span>Research Notes</span>
             <span id="annotations-count" class="annotations-badge hidden">0</span>
+            <button id="toggle-note-lines-btn" class="note-lines-toggle active" title="Show/hide connector lines"><i data-lucide="link"></i></button>
         </div>
         <div class="dropdown-body">
             <p class="annotations-instruction">Double-click any paragraph to add a note.</p>
@@ -401,6 +404,24 @@
                 </ul>
                 <p class="privacy-note">Use this manager to view and delete uploaded versions from your browser's storage.</p>
                 <button id="manage-info-understand-btn" class="tool-btn">Got it, show my uploads</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bookmark Name Modal -->
+    <div id="bookmark-name-modal" class="modal hidden">
+        <div class="modal-content bookmark-name-content">
+            <div class="modal-header">
+                <h2><i data-lucide="bookmark" class="modal-header-icon"></i> Save Bookmark</h2>
+                <button id="close-bookmark-name-modal-btn" class="close-btn"><i data-lucide="x"></i></button>
+            </div>
+            <div class="modal-body">
+                <label class="bookmark-name-label" for="bookmark-name-input">Name</label>
+                <input type="text" id="bookmark-name-input" class="bookmark-name-input" placeholder="Enter bookmark name..." />
+                <div class="bookmark-name-actions">
+                    <button id="bookmark-name-cancel-btn" class="tool-btn">Cancel</button>
+                    <button id="bookmark-name-save-btn" class="tool-btn primary">Save</button>
+                </div>
             </div>
         </div>
     </div>

@@ -3360,6 +3360,68 @@ main {
     background-color: #8B4513;
 }
 
+/* Bookmark Name Modal */
+
+.bookmark-name-content {
+    max-width: 480px;
+}
+
+.bookmark-name-label {
+    display: block;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 0.4rem;
+}
+
+.bookmark-name-input {
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.95rem;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    color: var(--text-color);
+    outline: none;
+    box-sizing: border-box;
+}
+
+.bookmark-name-input:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(255, 136, 0, 0.2);
+}
+
+.bookmark-name-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.bookmark-name-actions .tool-btn.primary {
+    background-color: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+}
+
+.bookmark-name-actions .tool-btn.primary:hover {
+    background-color: #cc6d00;
+}
+
+[data-theme="light"] .bookmark-name-label {
+    color: rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="light"] .bookmark-name-input {
+    background-color: #ffffff;
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="light"] .bookmark-name-input:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(217, 104, 0, 0.15);
+}
+
 /* ============================================
    Annotation Styles
    ============================================ */
@@ -3577,14 +3639,20 @@ main {
 
 /* Floating Note Panels */
 .note-panel {
-    position: fixed;
+    position: absolute;
     width: 320px;
-    background-color: var(--bg-secondary, #1a2636);
-    border: 1px solid rgba(255, 136, 0, 0.3);
+    background-color: #1c1f2e;
+    border: 1px solid rgba(255, 136, 0, 0.45);
     border-radius: 8px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 136, 0, 0.18), 0 0 6px rgba(255, 136, 0, 0.12);
     font-size: 0.9rem;
     overflow: hidden;
+    transition: opacity 0.2s ease;
+}
+
+.note-panel.behind-header {
+    opacity: 0;
+    pointer-events: none;
 }
 
 .note-panel-header {
@@ -3592,8 +3660,8 @@ main {
     align-items: center;
     padding: 0.5rem 0.75rem;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-    background-color: rgba(255, 136, 0, 0.1);
-    border-bottom: 1px solid rgba(255, 136, 0, 0.2);
+    background-color: rgba(255, 136, 0, 0.15);
+    border-bottom: 1px solid rgba(255, 136, 0, 0.25);
     cursor: grab;
     user-select: none;
 }
@@ -3626,11 +3694,11 @@ main {
     padding: 0.5rem 0.75rem;
     font-size: 0.8rem;
     font-style: italic;
-    color: rgba(255, 255, 255, 0.6);
-    background-color: rgba(0, 0, 0, 0.15);
+    color: rgba(255, 255, 255, 0.55);
+    background-color: rgba(0, 0, 0, 0.2);
     line-height: 1.4;
-    border-radius: 0 0 4px 4px;
-    margin-bottom: 0.5rem;
+    margin: 0.5rem;
+    border-radius: 4px;
 }
 
 .note-panel-textarea {
@@ -3719,14 +3787,14 @@ main {
 
 /* Light mode for note panels */
 [data-theme="light"] .note-panel {
-    background-color: #ffffff;
-    border-color: rgba(217, 104, 0, 0.3);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    background-color: #fffbf5;
+    border-color: rgba(217, 104, 0, 0.4);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12), 0 0 18px rgba(217, 104, 0, 0.15), 0 0 6px rgba(217, 104, 0, 0.1);
 }
 
 [data-theme="light"] .note-panel-header {
-    background-color: rgba(217, 104, 0, 0.08);
-    border-bottom-color: rgba(217, 104, 0, 0.15);
+    background-color: rgba(217, 104, 0, 0.1);
+    border-bottom-color: rgba(217, 104, 0, 0.2);
 }
 
 [data-theme="light"] .note-panel-close {
@@ -3734,8 +3802,8 @@ main {
 }
 
 [data-theme="light"] .note-panel-preview {
-    color: rgba(0, 0, 0, 0.6);
-    background-color: rgba(0, 0, 0, 0.03);
+    color: rgba(0, 0, 0, 0.55);
+    background-color: rgba(217, 104, 0, 0.04);
 }
 
 [data-theme="light"] .note-panel-textarea {
@@ -3970,6 +4038,53 @@ main {
 
 .annotation-indicator:hover {
     opacity: 1;
+}
+
+/* Leader line SVG connectors (note panel → paragraph) */
+.leader-line {
+    z-index: 5999 !important;
+}
+
+#annotations-dropdown .dropdown-header {
+    display: flex;
+    align-items: center;
+}
+
+.note-lines-toggle {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    padding: 2px;
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s ease;
+}
+
+.note-lines-toggle [data-lucide] {
+    width: 16px;
+    height: 16px;
+}
+
+.note-lines-toggle:hover {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.note-lines-toggle.active {
+    color: var(--accent-color);
+}
+
+[data-theme="light"] .note-lines-toggle {
+    color: rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="light"] .note-lines-toggle:hover {
+    color: rgba(0, 0, 0, 0.7);
+}
+
+[data-theme="light"] .note-lines-toggle.active {
+    color: var(--accent-color);
 }
 
 /* Jump-to-annotation highlight effect */

@@ -79,6 +79,7 @@ function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     updateThemeToggleUI();
     localStorage.setItem('subcutanean_theme', theme);
+    recreateAllNoteLines();
 }
 
 function toggleTheme() {
@@ -2304,6 +2305,7 @@ function displayComparison() {
         toggledSourceParagraphs.clear();
         originalParagraphContent.clear();
         clearSourceMappingCache();
+        closeAllNotePanels();
         lastDisplayedChapter = currentChapter;
     }
 
@@ -2359,6 +2361,9 @@ function displayComparison() {
 
     // Append bottom chapter navigation
     appendBottomChapterNav(display);
+
+    // Reconnect leader lines after DOM re-render
+    setTimeout(() => recreateAllNoteLines(), 50);
 }
 
 function renderParagraphs(container, paragraphs, isSource, versionId) {
@@ -4833,10 +4838,38 @@ function saveCurrentBookmark() {
         ? `${formatVersionLabel(versionA)} vs ${formatVersionLabel(versionB)} vs ${formatVersionLabel(versionC)}`
         : `${formatVersionLabel(versionA)} vs ${formatVersionLabel(versionB)}`;
     const defaultName = `${versionLabel} – ${formatChapterLabel(currentChapter)} (${formatModeLabel(currentMode)})${panelInfo}`;
-    const label = prompt('Name this bookmark:', defaultName);
-    if (label === null) return;
-    const trimmed = label.trim();
-    if (!trimmed) return;
+
+    // Open the bookmark name modal instead of prompt()
+    const modal = document.getElementById('bookmark-name-modal');
+    const input = document.getElementById('bookmark-name-input');
+    if (!modal || !input) return;
+
+    input.value = defaultName;
+    modal.classList.remove('hidden');
+
+    // Focus and select the input text
+    setTimeout(() => {
+        input.focus();
+        input.select();
+    }, 50);
+
+    // Store state for the confirm handler
+    modal._pendingBookmark = { openPanels, scrollPosition: window.scrollY };
+}
+
+function confirmBookmarkSave() {
+    const modal = document.getElementById('bookmark-name-modal');
+    const input = document.getElementById('bookmark-name-input');
+    if (!modal || !input) return;
+
+    const trimmed = input.value.trim();
+    if (!trimmed) {
+        input.focus();
+        return;
+    }
+
+    const pending = modal._pendingBookmark;
+    if (!pending) return;
 
     // Get notes from textarea
     const notesInput = document.getElementById('bookmark-notes-input');
@@ -4847,12 +4880,12 @@ function saveCurrentBookmark() {
         name: trimmed,
         versionA: versionA,
         versionB: versionB,
-        versionC: versionC || null, // Optional third version
+        versionC: versionC || null,
         chapter: currentChapter,
         mode: currentMode,
-        scrollPosition: window.scrollY,
+        scrollPosition: pending.scrollPosition,
         notes: notes,
-        openNotePanels: openPanels // Save open note panels and their positions
+        openNotePanels: pending.openPanels
     };
 
     bookmarks.push(bookmark);
@@ -4862,6 +4895,16 @@ function saveCurrentBookmark() {
     // Clear the notes input
     if (notesInput) {
         notesInput.value = '';
+    }
+
+    closeBookmarkNameModal();
+}
+
+function closeBookmarkNameModal() {
+    const modal = document.getElementById('bookmark-name-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal._pendingBookmark = null;
     }
 }
 
@@ -4950,6 +4993,150 @@ function getBookmarkById(id) {
 let annotations = {};
 let openNotePanels = {}; // Track open floating note panels { panelId: { element, annotationKey, position } }
 let notePanelZIndex = 6000; // Starting z-index for note panels
+let noteLines = {}; // { panelId: LeaderLine instance }
+let noteLinesVisible = true; // Toggle state for leader lines
+
+// ============================================
+// Leader Lines (note panel → paragraph connectors)
+// ============================================
+
+function findAnnotatedParagraph(container, paragraphIndex, version) {
+    const matching = container.querySelectorAll(`[data-paragraph-index="${paragraphIndex}"]`);
+    for (const para of matching) {
+        if (para.classList.contains('has-annotation')) {
+            let paraVersion = para.dataset.versionId || null;
+            if (!paraVersion) {
+                const panel = para.closest('.version-panel');
+                if (panel) {
+                    const panels = container.querySelectorAll('.version-panel');
+                    paraVersion = Array.from(panels).indexOf(panel) === 0 ? versionA : versionB;
+                }
+            }
+            if (!paraVersion) paraVersion = versionA;
+            if (paraVersion === version) return para;
+        }
+    }
+    return null;
+}
+
+function createNoteLine(panelId) {
+    if (!noteLinesVisible || typeof LeaderLine === 'undefined') return;
+
+    const panelInfo = openNotePanels[panelId];
+    if (!panelInfo) return;
+
+    const panel = panelInfo.element;
+    const key = panelInfo.annotationKey;
+    const parts = key.split(':');
+    const paragraphIndex = parts[2];
+
+    const container = document.getElementById('comparison-display');
+    if (!container) return;
+
+    const para = findAnnotatedParagraph(container, paragraphIndex, parts[0]);
+    if (!para) return;
+
+    removeNoteLine(panelId);
+
+    try {
+        const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+        noteLines[panelId] = new LeaderLine(
+            panel,
+            para,
+            {
+                color: isDark ? 'rgba(255, 136, 0, 0.35)' : 'rgba(217, 104, 0, 0.35)',
+                size: 1.5,
+                path: 'fluid',
+                startSocket: 'auto',
+                endSocket: 'auto',
+                startPlug: 'disc',
+                endPlug: 'disc',
+                startPlugSize: 1.5,
+                endPlugSize: 1.5,
+            }
+        );
+    } catch (e) {
+        // Silently fail if elements not visible
+    }
+}
+
+function removeNoteLine(panelId) {
+    if (noteLines[panelId]) {
+        try { noteLines[panelId].remove(); } catch (e) {}
+        delete noteLines[panelId];
+    }
+}
+
+function removeAllNoteLines() {
+    Object.keys(noteLines).forEach(id => removeNoteLine(id));
+}
+
+function updateAllNoteLines() {
+    Object.keys(noteLines).forEach(id => {
+        try { noteLines[id].position(); } catch (e) {
+            removeNoteLine(id);
+        }
+    });
+}
+
+function recreateAllNoteLines() {
+    removeAllNoteLines();
+    if (!noteLinesVisible) return;
+    Object.keys(openNotePanels).forEach(id => createNoteLine(id));
+}
+
+// Hide note panels and their leader lines when they scroll behind the sticky header
+function updateNotePanelVisibility() {
+    const panelIds = Object.keys(openNotePanels);
+    if (panelIds.length === 0) return;
+
+    // Find the bottom edge of the sticky header zone
+    // The sticky h2 headers sit at top: 50px; find the actual bottom
+    const container = document.getElementById('comparison-display');
+    if (!container) return;
+    const stickyHeaders = container.querySelectorAll('h2');
+    let headerBottom = 50; // fallback: nav bar height
+    for (const h2 of stickyHeaders) {
+        const rect = h2.getBoundingClientRect();
+        // Only consider headers that are actually stuck (near top of viewport)
+        if (rect.top < 120) {
+            headerBottom = Math.max(headerBottom, rect.bottom);
+        }
+    }
+
+    for (const panelId of panelIds) {
+        const panelInfo = openNotePanels[panelId];
+        if (!panelInfo) continue;
+        const panel = panelInfo.element;
+        if (!panel) continue;
+
+        const rect = panel.getBoundingClientRect();
+        // Hide if the panel's bottom edge is above the header zone
+        const isBehindHeader = rect.bottom < headerBottom + 10;
+
+        if (isBehindHeader) {
+            if (!panel.classList.contains('behind-header')) {
+                panel.classList.add('behind-header');
+                // Hide the leader line too
+                if (noteLines[panelId]) {
+                    try {
+                        noteLines[panelId].hide('none');
+                    } catch (e) {}
+                }
+            }
+        } else {
+            if (panel.classList.contains('behind-header')) {
+                panel.classList.remove('behind-header');
+                // Show the leader line again
+                if (noteLines[panelId]) {
+                    try {
+                        noteLines[panelId].show('none');
+                    } catch (e) {}
+                }
+            }
+        }
+    }
+}
 
 function loadAnnotationsFromStorage() {
     try {
@@ -5011,21 +5198,56 @@ function openAnnotationModal(paragraphIndex, paragraphText, version, clickEvent)
     panel.dataset.chapter = currentChapter;
     panel.dataset.annotationId = existing ? existing.id : '';
 
-    // Position panel near the click location, or use default offset
+    // Position panel to the side of the paragraph (absolute positioning, page coordinates)
     const panelWidth = 320;
     const panelHeight = 250; // approximate
+    const scrollX = window.scrollX;
+    const scrollY = window.scrollY;
     let top, left;
 
-    if (clickEvent && clickEvent.clientX !== undefined) {
-        // Position near click, but ensure it stays on screen
-        left = Math.min(clickEvent.clientX + 20, window.innerWidth - panelWidth - 20);
-        top = Math.min(clickEvent.clientY - 50, window.innerHeight - panelHeight - 20);
-        top = Math.max(20, top);
+    if (clickEvent && clickEvent.target) {
+        // Find the paragraph element to position relative to it
+        const targetPara = clickEvent.target.closest('[data-paragraph-index]') || clickEvent.target.closest('p');
+        const paraRect = targetPara ? targetPara.getBoundingClientRect() : null;
+
+        if (paraRect) {
+            // Try to place to the right of the paragraph
+            const rightSpace = window.innerWidth - paraRect.right;
+            const leftSpace = paraRect.left;
+
+            if (rightSpace >= panelWidth + 20) {
+                left = paraRect.right + scrollX + 10;
+                top = paraRect.top + scrollY + 10;
+            } else if (leftSpace >= panelWidth + 20) {
+                left = paraRect.left + scrollX - panelWidth - 10;
+                top = paraRect.top + scrollY + 10;
+            } else {
+                // Not enough space on either side — place above or below the paragraph
+                left = Math.max(20, paraRect.left + scrollX + (paraRect.width - panelWidth) / 2);
+                left = Math.min(left, window.innerWidth + scrollX - panelWidth - 20);
+                const spaceAbove = paraRect.top;
+                const spaceBelow = window.innerHeight - paraRect.bottom;
+                if (spaceBelow >= panelHeight + 20) {
+                    top = paraRect.bottom + scrollY + 10;
+                } else if (spaceAbove >= panelHeight + 20) {
+                    top = paraRect.top + scrollY - panelHeight - 10;
+                } else {
+                    // Truly cramped — place below anyway
+                    top = paraRect.bottom + scrollY + 10;
+                }
+            }
+        } else {
+            left = Math.min(clickEvent.clientX + scrollX + 20, window.innerWidth + scrollX - panelWidth - 20);
+            top = Math.max(scrollY + 20, clickEvent.clientY + scrollY - 50);
+        }
+
+        // Clamp to visible area
+        top = Math.max(scrollY + 20, Math.min(top, scrollY + window.innerHeight - panelHeight - 20));
         left = Math.max(20, left);
     } else {
         // Fallback: offset from other panels
         const offset = Object.keys(openNotePanels).length * 30;
-        top = 100 + offset;
+        top = scrollY + 100 + offset;
         left = 100 + offset;
     }
 
@@ -5064,6 +5286,9 @@ function openAnnotationModal(paragraphIndex, paragraphText, version, clickEvent)
     // Set up event handlers
     setupNotePanelEvents(panel);
 
+    // Create leader line to annotated paragraph
+    createNoteLine(panelId);
+
     // Focus the textarea
     panel.querySelector('.note-panel-textarea').focus();
 }
@@ -5089,8 +5314,10 @@ function setupNotePanelEvents(panel) {
         hasMoved = false;
         startPos.x = e.clientX;
         startPos.y = e.clientY;
-        dragOffset.x = e.clientX - panel.offsetLeft;
-        dragOffset.y = e.clientY - panel.offsetTop;
+        // With position: absolute, offsetLeft/offsetTop are page-relative
+        // but clientX/clientY are viewport-relative, so add scroll offset
+        dragOffset.x = (e.clientX + window.scrollX) - panel.offsetLeft;
+        dragOffset.y = (e.clientY + window.scrollY) - panel.offsetTop;
         bringNotePanelToFront(panel);
         header.style.cursor = 'grabbing';
     });
@@ -5105,13 +5332,18 @@ function setupNotePanelEvents(panel) {
             hasMoved = true;
         }
 
-        const newLeft = e.clientX - dragOffset.x;
-        const newTop = e.clientY - dragOffset.y;
+        // Convert viewport coords to page coords for absolute positioning
+        const newLeft = (e.clientX + window.scrollX) - dragOffset.x;
+        const newTop = (e.clientY + window.scrollY) - dragOffset.y;
         panel.style.left = `${Math.max(0, newLeft)}px`;
         panel.style.top = `${Math.max(0, newTop)}px`;
         // Update tracked position
         if (openNotePanels[panel.id]) {
             openNotePanels[panel.id].position = { top: panel.style.top, left: panel.style.left };
+        }
+        // Update leader line position during drag
+        if (noteLines[panel.id]) {
+            try { noteLines[panel.id].position(); } catch (e) {}
         }
     });
 
@@ -5169,6 +5401,7 @@ function bringNotePanelToFront(panel) {
 }
 
 function closeNotePanel(panelId) {
+    removeNoteLine(panelId);
     const panel = document.getElementById(panelId);
     if (panel) {
         panel.remove();
@@ -5413,24 +5646,35 @@ function saveNotePanel(panel) {
         panel.querySelector('.note-panel-delete').classList.remove('hidden');
     }
 
+    const isNew = !existingId;
+
     saveAnnotationsToStorage();
     refreshAnnotationsUI();
     markAnnotatedParagraphs();
 
-    // Visual feedback and switch to read-only mode
-    const saveBtn = panel.querySelector('.note-panel-save');
-    const editBtn = panel.querySelector('.note-panel-edit');
-    saveBtn.textContent = 'Saved!';
-    saveBtn.disabled = true;
+    if (isNew) {
+        // First save — close the panel after brief feedback
+        const saveBtn = panel.querySelector('.note-panel-save');
+        saveBtn.textContent = 'Saved!';
+        saveBtn.disabled = true;
+        setTimeout(() => {
+            closeNotePanel(panel.id);
+        }, 400);
+    } else {
+        // Editing existing — switch to read-only mode
+        const saveBtn = panel.querySelector('.note-panel-save');
+        const editBtn = panel.querySelector('.note-panel-edit');
+        saveBtn.textContent = 'Saved!';
+        saveBtn.disabled = true;
 
-    setTimeout(() => {
-        // Switch to read-only mode
-        textarea.setAttribute('readonly', '');
-        saveBtn.textContent = 'Save';
-        saveBtn.disabled = false;
-        saveBtn.classList.add('hidden');
-        editBtn.classList.remove('hidden');
-    }, 800);
+        setTimeout(() => {
+            textarea.setAttribute('readonly', '');
+            saveBtn.textContent = 'Save';
+            saveBtn.disabled = false;
+            saveBtn.classList.add('hidden');
+            editBtn.classList.remove('hidden');
+        }, 800);
+    }
 }
 
 function getOpenNotePanelsState() {
@@ -5642,10 +5886,23 @@ function jumpToAnnotation(annotation) {
     // Close dropdown
     closeAllNavDropdowns();
 
-    // Scroll to the annotated paragraph after render
-    // Use longer timeout to ensure content is fully rendered
+    // Scroll to the annotated paragraph and open the note panel after render
     setTimeout(() => {
         scrollToAnnotatedParagraph(annotation);
+
+        // Close any existing panel for this annotation so it reopens near the paragraph
+        const key = createAnnotationKey(annotation.version, annotation.chapter, annotation.paragraphIndex);
+        const existingPanel = Object.values(openNotePanels).find(p => p.annotationKey === key);
+        if (existingPanel) {
+            closeNotePanel(existingPanel.element.id);
+        }
+
+        // Find the paragraph element to pass as positioning context
+        const container = document.getElementById('comparison-display');
+        const targetPara = container ? container.querySelector(`[data-paragraph-index="${annotation.paragraphIndex}"]`) : null;
+        const syntheticEvent = targetPara ? { target: targetPara, clientX: 0, clientY: 0 } : null;
+
+        openAnnotationModal(annotation.paragraphIndex, annotation.paragraphPreview, annotation.version, syntheticEvent);
     }, 500);
 }
 
@@ -7394,6 +7651,34 @@ document.addEventListener('DOMContentLoaded', () => {
     loadAnnotationsFromStorage();
     refreshAnnotationsUI();
     setupParagraphClickHandlers();
+
+    // Leader line toggle button
+    const toggleLinesBtn = document.getElementById('toggle-note-lines-btn');
+    if (toggleLinesBtn) {
+        toggleLinesBtn.addEventListener('click', () => {
+            noteLinesVisible = !noteLinesVisible;
+            toggleLinesBtn.classList.toggle('active', noteLinesVisible);
+            if (noteLinesVisible) {
+                recreateAllNoteLines();
+            } else {
+                removeAllNoteLines();
+            }
+        });
+    }
+
+    // Update leader lines and note panel visibility on scroll (throttled via rAF)
+    let lineUpdateScheduled = false;
+    window.addEventListener('scroll', () => {
+        if (!lineUpdateScheduled && Object.keys(openNotePanels).length > 0) {
+            lineUpdateScheduled = true;
+            requestAnimationFrame(() => {
+                updateAllNoteLines();
+                updateNotePanelVisibility();
+                lineUpdateScheduled = false;
+            });
+        }
+    });
+
     loadAllVersions();
     loadOriginSources();
     loadVariableInfo();
@@ -7661,6 +7946,39 @@ document.addEventListener('DOMContentLoaded', () => {
             closeManageInfoModal();
         }
     });
+
+    // Bookmark name modal event listeners
+    const bookmarkNameModal = document.getElementById('bookmark-name-modal');
+    const closeBookmarkNameBtn = document.getElementById('close-bookmark-name-modal-btn');
+    const bookmarkNameCancelBtn = document.getElementById('bookmark-name-cancel-btn');
+    const bookmarkNameSaveBtn = document.getElementById('bookmark-name-save-btn');
+    const bookmarkNameInput = document.getElementById('bookmark-name-input');
+
+    if (closeBookmarkNameBtn) closeBookmarkNameBtn.addEventListener('click', closeBookmarkNameModal);
+    if (bookmarkNameCancelBtn) bookmarkNameCancelBtn.addEventListener('click', closeBookmarkNameModal);
+    if (bookmarkNameSaveBtn) bookmarkNameSaveBtn.addEventListener('click', confirmBookmarkSave);
+
+    // Enter to save, Escape to cancel
+    if (bookmarkNameInput) {
+        bookmarkNameInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                confirmBookmarkSave();
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                closeBookmarkNameModal();
+            }
+        });
+    }
+
+    // Close when clicking outside
+    if (bookmarkNameModal) {
+        bookmarkNameModal.addEventListener('click', (e) => {
+            if (e.target === bookmarkNameModal) {
+                closeBookmarkNameModal();
+            }
+        });
+    }
 
     // About modal event listeners
     const closeAboutModalBtn = document.getElementById('close-about-modal-btn');
