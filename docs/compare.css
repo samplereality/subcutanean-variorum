@@ -464,16 +464,28 @@ header {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Analyze panel: search row */
+/* Analyze panel: single-line layout on desktop */
+#analyze-panel {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+#analyze-panel.hidden {
+    display: none;
+}
+
 .analyze-search-row {
-    margin-bottom: 0.5rem;
+    flex: 1;
+    min-width: 200px;
 }
 
 /* Analyze panel: tools row */
 .analyze-tools-row {
     display: flex;
     gap: 0.5rem;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: center;
 }
 
@@ -2714,6 +2726,10 @@ main {
 
     .analyze-tools-row {
         flex-wrap: wrap;
+    }
+
+    .analyze-search-row {
+        min-width: 100%;
     }
 
     .view-mode-selector {
