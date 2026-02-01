@@ -4653,13 +4653,13 @@ function openGlobalsModal() {
         const globalsContent = originSources.chapters.globals.content || '';
         contentEl.innerHTML = highlightQuantSyntax(globalsContent);
     } else {
-        contentEl.innerHTML = '<span style="color: #888;">Loading globals.txt...</span>';
+        contentEl.innerHTML = '<span style="color: var(--text-dim);">Loading globals.txt...</span>';
         // Try to load origin sources if not loaded
         loadOriginSources().then(() => {
             if (originSources && originSources.chapters && originSources.chapters.globals) {
                 contentEl.innerHTML = highlightQuantSyntax(originSources.chapters.globals.content || '');
             } else {
-                contentEl.innerHTML = '<span style="color: #f66;">Could not load globals.txt</span>';
+                contentEl.innerHTML = '<span style="color: var(--color-error);">Could not load globals.txt</span>';
             }
         });
     }
@@ -5003,18 +5003,16 @@ let noteLinesVisible = true; // Toggle state for leader lines
 function findAnnotatedParagraph(container, paragraphIndex, version) {
     const matching = container.querySelectorAll(`[data-paragraph-index="${paragraphIndex}"]`);
     for (const para of matching) {
-        if (para.classList.contains('has-annotation')) {
-            let paraVersion = para.dataset.versionId || null;
-            if (!paraVersion) {
-                const panel = para.closest('.version-panel');
-                if (panel) {
-                    const panels = container.querySelectorAll('.version-panel');
-                    paraVersion = Array.from(panels).indexOf(panel) === 0 ? versionA : versionB;
-                }
+        let paraVersion = para.dataset.versionId || null;
+        if (!paraVersion) {
+            const panel = para.closest('.version-panel');
+            if (panel) {
+                const panels = container.querySelectorAll('.version-panel');
+                paraVersion = Array.from(panels).indexOf(panel) === 0 ? versionA : versionB;
             }
-            if (!paraVersion) paraVersion = versionA;
-            if (paraVersion === version) return para;
         }
+        if (!paraVersion) paraVersion = versionA;
+        if (paraVersion === version) return para;
     }
     return null;
 }
@@ -5044,7 +5042,7 @@ function createNoteLine(panelId) {
             panel,
             para,
             {
-                color: isDark ? 'rgba(255, 136, 0, 0.35)' : 'rgba(217, 104, 0, 0.35)',
+                color: isDark ? 'rgba(255, 136, 0, 0.5)' : 'rgba(217, 104, 0, 0.4)',
                 size: 1.5,
                 path: 'fluid',
                 startSocket: 'auto',
@@ -5083,6 +5081,26 @@ function recreateAllNoteLines() {
     removeAllNoteLines();
     if (!noteLinesVisible) return;
     Object.keys(openNotePanels).forEach(id => createNoteLine(id));
+}
+
+// Hide note panels and leader lines when a modal or nav dropdown is open (z-index conflict)
+function setupOverlayNotePanelSync() {
+    const sync = () => {
+        const anyOverlayOpen = !!document.querySelector('.modal:not(.hidden), .nav-dropdown.open');
+        document.querySelectorAll('.note-panel').forEach(p => {
+            p.style.visibility = anyOverlayOpen ? 'hidden' : '';
+        });
+        Object.values(noteLines).forEach(line => {
+            try {
+                if (anyOverlayOpen) line.hide('none');
+                else if (noteLinesVisible) line.show('none');
+            } catch (e) {}
+        });
+    };
+    const observer = new MutationObserver(sync);
+    document.querySelectorAll('.modal, .nav-dropdown').forEach(el => {
+        observer.observe(el, { attributes: true, attributeFilter: ['class'] });
+    });
 }
 
 // Hide note panels and their leader lines when they scroll behind the sticky header
@@ -7689,6 +7707,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeSourceCodeMode();
     initializeThirdVersionControls();
     initializeWelcomeModal();
+    setupOverlayNotePanelSync();
 
     // Theme toggle event listener
     const themeToggle = document.getElementById('theme-toggle');
