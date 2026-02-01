@@ -55,6 +55,83 @@ button [data-lucide],
     margin: 0;
 }
 
+/* ============================================
+   UI Font — sans-serif for all interface elements
+   Novel text inherits serif from body via --content-font
+   ============================================ */
+
+/* Buttons, inputs, selects, labels, and UI containers */
+button,
+input,
+select,
+textarea,
+label,
+.tool-btn,
+.mode-btn,
+.panel-toggle-btn,
+.chapter-arrow-btn,
+.sort-btn,
+.search-nav-btn,
+.close-btn,
+.nav-dropdown,
+.dropdown-header,
+.dropdown-body,
+.header-dropdown-panel,
+.essential-controls,
+.variable-diff-panel,
+.var-panel-description,
+.heatmap-label,
+.heatmap-legend,
+.heatmap-summary,
+.heatmap-versions,
+.search-info,
+.upload-status,
+.bookmark-label,
+.bookmark-empty,
+.annotations-instruction,
+.annotations-empty,
+.annotation-group-header,
+.annotation-item,
+.annotation-modal-header,
+.annotation-modal-actions,
+.note-panel,
+.modal-header,
+.modal-controls,
+.modal-description,
+.bookmark-name-content,
+.view-mode-selector label,
+.selector-group label,
+.word-popup-header,
+.word-popup-chapters,
+.distance-card,
+.levenshtein-summary,
+.response-msg,
+.gonzo-header,
+.modal-body,
+.unique-words-panel,
+.diff-results,
+.word-count,
+.heatmap-bar-value,
+.word-popup,
+footer {
+    font-family: var(--ui-font);
+}
+
+/* Content-presenting modal bodies use serif for prose */
+.about-modal-body,
+.generate-modal-body,
+.welcome-modal-body,
+.welcome-subtitle {
+    font-family: var(--content-font);
+}
+
+/* But headings within all modals stay sans-serif */
+.modal h2,
+.modal h3,
+.modal h4 {
+    font-family: var(--ui-font);
+}
+
 /* Prevent horizontal scroll on mobile */
 body {
     overflow-x: hidden;
@@ -91,7 +168,7 @@ body {
     padding: 0 1.5rem;
     z-index: 5000;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: var(--ui-font);
 }
 
 .nav-brand {
@@ -362,7 +439,6 @@ header {
     font-size: 0.9rem;
     border-radius: 4px;
     cursor: pointer;
-    font-family: inherit;
     min-width: 100px;
 }
 
@@ -427,7 +503,6 @@ header {
     align-items: center;
     gap: 0.4rem;
     font-size: 0.85rem;
-    font-family: inherit;
     white-space: nowrap;
 }
 
@@ -550,7 +625,6 @@ header {
     font-size: 0.9rem;
     border-radius: 4px;
     cursor: pointer;
-    font-family: inherit;
 }
 
 .version-select:hover {
@@ -781,7 +855,7 @@ header {
     padding: 0.5rem 0.75rem;
     border-radius: 4px;
     font-size: 0.75rem;
-    font-family: system-ui, -apple-system, sans-serif;
+    font-family: var(--ui-font);
     white-space: normal;
     width: max-content;
     max-width: 280px;
@@ -1108,7 +1182,6 @@ header {
     padding: 0.4rem 0.8rem;
     font-size: 0.9rem;
     border-radius: 4px;
-    font-family: inherit;
 }
 
 #search-input:focus {
@@ -1184,7 +1257,6 @@ header {
     color: #2c2c2c;
     border: 2px solid rgba(255,255,255,0.5);
     padding: 0.35rem 0.5rem;
-    font-family: inherit;
     border-radius: 4px;
 }
 
@@ -1230,7 +1302,6 @@ header {
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 4px;
     padding: 0.5rem;
-    font-family: inherit;
     font-size: 0.85rem;
     resize: vertical;
     min-height: 2.5rem;
@@ -1313,6 +1384,7 @@ header {
     padding: 1.25rem;
     border-radius: 6px;
     margin: 1rem 0;
+    font-family: var(--ui-font);
 }
 
 #subcutanean-form label {
@@ -1526,7 +1598,27 @@ header {
 .modal-header h2 {
     margin: 0;
     color: var(--accent-color);
-    font-size: 1.5rem;
+    font-size: 2rem;
+}
+
+#about-modal .modal-header h2,
+#gonzo-about-modal .modal-header h2 {
+    font-family: var(--content-font);
+    font-weight: normal;
+    letter-spacing: 0.05em;
+    text-shadow:
+        0 0 10px rgba(255, 136, 0, 0.8),
+        0 0 20px rgba(255, 136, 0, 0.6),
+        0 0 30px rgba(255, 136, 0, 0.4),
+        0 0 40px rgba(255, 136, 0, 0.2);
+}
+
+[data-theme="light"] #about-modal .modal-header h2,
+[data-theme="light"] #gonzo-about-modal .modal-header h2 {
+    text-shadow:
+        0 0 8px rgba(217, 104, 0, 0.6),
+        0 0 16px rgba(217, 104, 0, 0.4),
+        0 0 24px rgba(217, 104, 0, 0.2);
 }
 
 .modal-description {
@@ -1585,7 +1677,6 @@ header {
     cursor: pointer;
     transition: all 0.3s ease;
     border-radius: 4px;
-    font-family: inherit;
 }
 
 .sort-btn:hover {
@@ -1968,7 +2059,7 @@ header {
 }
 
 .heatmap-bar-value {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: var(--ui-font);
     font-size: 0.75rem;
     font-weight: bold;
     color: rgba(255, 255, 255, 0.95);
@@ -3276,6 +3367,7 @@ main {
 .welcome-modal-body p {
     margin-bottom: 1rem;
     color: var(--text-color);
+    font-size: 0.95rem;
 }
 
 .welcome-modal-body h4 {
@@ -3309,7 +3401,6 @@ main {
     border: none;
     padding: 0.6rem 2rem;
     font-size: 1rem;
-    font-family: inherit;
     border-radius: 4px;
     cursor: pointer;
     transition: opacity 0.2s;
@@ -3393,7 +3484,7 @@ main {
     width: 100%;
     padding: 0.6rem 0.75rem;
     font-size: 0.95rem;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--ui-font);
     background-color: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 6px;
@@ -3523,6 +3614,7 @@ main {
 .annotation-preview-text {
     font-size: 0.8rem;
     color: rgba(255, 255, 255, 0.6);
+    font-family: var(--content-font);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -3612,6 +3704,7 @@ main {
     line-height: 1.4;
     color: rgba(255, 255, 255, 0.7);
     font-style: italic;
+    font-family: var(--content-font);
     padding: 0.75rem 1rem;
     background-color: rgba(0, 0, 0, 0.15);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -3626,7 +3719,6 @@ main {
     border: none;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding: 0.75rem 1rem;
-    font-family: inherit;
     font-size: 0.95rem;
     resize: none;
     min-height: 80px;
@@ -3675,7 +3767,7 @@ main {
     display: flex;
     align-items: center;
     padding: 0.5rem 0.75rem;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--ui-font);
     background-color: rgba(255, 136, 0, 0.15);
     border-bottom: 1px solid rgba(255, 136, 0, 0.25);
     cursor: grab;
@@ -3710,6 +3802,7 @@ main {
     padding: 0.5rem 0.75rem;
     font-size: 0.8rem;
     font-style: italic;
+    font-family: var(--content-font);
     color: rgba(255, 255, 255, 0.55);
     background-color: rgba(0, 0, 0, 0.2);
     line-height: 1.4;
@@ -3726,7 +3819,7 @@ main {
     border: none;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     color: var(--text-color);
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--ui-font);
     font-size: 0.85rem;
     resize: vertical;
 }
@@ -4811,7 +4904,6 @@ main {
     background: transparent;
     border: none;
     color: var(--text-color);
-    font-family: inherit;
     font-size: 0.9rem;
     cursor: pointer;
     border-radius: 4px;
@@ -4949,7 +5041,7 @@ main {
 
 /* Individual Grid Cell */
 .gonzo-cell {
-    background-color: var(--bg-color);
+    background-color: #141e30;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -4958,8 +5050,8 @@ main {
 
 .gonzo-cell-header {
     padding: 0.2rem 0.4rem;
-    background-color: rgba(229, 225, 221, 0.12);
-    border-bottom: 1px solid rgba(229, 225, 221, 0.2);
+    background-color: #0e1622;
+    border-bottom: 1px solid rgba(255, 136, 0, 0.25);
     font-size: 0.65rem;
     font-weight: bold;
     color: var(--accent-color);
@@ -4979,7 +5071,7 @@ main {
     flex: 1;
     padding: 0.4rem;
     overflow-y: auto;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: var(--ui-font);
     font-size: 0.8rem;
     line-height: 1.4;
     color: var(--text-color);
@@ -5118,12 +5210,12 @@ main {
 }
 
 [data-theme="light"] .gonzo-cell {
-    background-color: var(--bg-color);
+    background-color: #faf8f5;
 }
 
 [data-theme="light"] .gonzo-cell-header {
-    background-color: rgba(60, 60, 60, 0.08);
-    border-bottom-color: rgba(60, 60, 60, 0.15);
+    background-color: rgba(217, 104, 0, 0.1);
+    border-bottom-color: rgba(217, 104, 0, 0.18);
 }
 
 [data-theme="light"] .gonzo-grid {
