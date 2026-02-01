@@ -5188,12 +5188,10 @@ function openAnnotationModal(paragraphIndex, paragraphText, version, clickEvent)
     // Create a floating note panel instead of a modal
     const key = createAnnotationKey(version, currentChapter, paragraphIndex);
 
-    // Check if panel for this annotation is already open
-    const existingPanel = Object.values(openNotePanels).find(p => p.annotationKey === key);
-    if (existingPanel) {
-        // Bring to front
-        bringNotePanelToFront(existingPanel.element);
-        existingPanel.element.querySelector('.note-panel-textarea').focus();
+    // Toggle: if panel for this annotation is already open, close it
+    const existingEntry = Object.entries(openNotePanels).find(([, p]) => p.annotationKey === key);
+    if (existingEntry) {
+        closeNotePanel(existingEntry[0]);
         return;
     }
 
