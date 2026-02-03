@@ -1466,7 +1466,7 @@ function highlightVariableText(varName) {
     });
 
     if (matchCount > 0) {
-        showNotification(`Highlighted ${matchCount} paragraph${matchCount > 1 ? 's' : ''} affected by "${varName}" - click the code icon to view source`, 'success');
+        // Scroll directly to first match without showing a notification
         if (firstMatch) {
             firstMatch.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
