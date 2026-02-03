@@ -222,13 +222,52 @@ def extract_text_from_macro_call(macro_text):
     return content.strip()
 
 
+def find_chapter_boundaries(content, default_chapter):
+    """Find chapter boundaries within a source file.
+
+    Some source files (like ch05.txt, ch08.txt) contain content for multiple chapters.
+    This function finds {chapter/N} markers and returns a list of (position, chapter_id) tuples.
+
+    Returns: List of (start_position, chapter_id) sorted by position
+    """
+    boundaries = [(0, default_chapter)]  # Start with default chapter at position 0
+
+    # Find {chapter/N} markers (e.g., {chapter/6}, {chapter/9}, {chapter/EPILOGUE})
+    for match in re.finditer(r'\{chapter/(\d+|EPILOGUE)\}', content):
+        chapter_num = match.group(1)
+        if chapter_num == 'EPILOGUE':
+            chapter_id = 'chapter18'
+        else:
+            chapter_id = f'chapter{chapter_num}'
+        boundaries.append((match.start(), chapter_id))
+
+    # Sort by position
+    boundaries.sort(key=lambda x: x[0])
+    return boundaries
+
+
+def get_chapter_for_position(position, boundaries):
+    """Get the chapter ID for a given position based on chapter boundaries."""
+    current_chapter = boundaries[0][1]
+    for boundary_pos, chapter_id in boundaries:
+        if position >= boundary_pos:
+            current_chapter = chapter_id
+        else:
+            break
+    return current_chapter
+
+
 def extract_chapter_patterns(variables, macros, macro_patterns):
     """Extract text patterns for each variable to help with highlighting.
 
-    Patterns come from two sources:
+    Patterns come from three sources:
     1. Direct conditionals in chapter source: [@varname>text...]
     2. Macro definitions when the macro is used in a chapter: {MacroName}
     3. Text inside macro calls within conditionals: [@var>{macroname/text...}]
+
+    Handles cross-chapter content: some source files (ch05.txt, ch08.txt) contain
+    content for multiple chapters. Patterns are assigned to the correct chapter
+    based on their position relative to {chapter/N} markers.
     """
 
     for var_name in variables:
@@ -239,8 +278,11 @@ def extract_chapter_patterns(variables, macros, macro_patterns):
             continue
 
         stem = source_file.stem
-        chapter_id = CHAPTER_MAPPING.get(stem, stem)
+        default_chapter = CHAPTER_MAPPING.get(stem, stem)
         content = source_file.read_text(encoding='utf-8')
+
+        # Find chapter boundaries within this file
+        chapter_boundaries = find_chapter_boundaries(content, default_chapter)
 
         # Find conditional blocks: [@varname>text...] or |@varname>text...]
         # First form: starts with [ for initial conditional
@@ -251,6 +293,10 @@ def extract_chapter_patterns(variables, macros, macro_patterns):
         for match in re.finditer(pattern, content):
             var_name = match.group(1)
             text_snippet = match.group(2).strip()
+            match_position = match.start()
+
+            # Determine which chapter this pattern belongs to
+            chapter_id = get_chapter_for_position(match_position, chapter_boundaries)
 
             if var_name in variables:
                 if chapter_id not in variables[var_name]['patterns']:
@@ -287,8 +333,12 @@ def extract_chapter_patterns(variables, macros, macro_patterns):
                             )
 
         # Find macro usage and add patterns from macro definitions
-        macro_refs = set(re.findall(r'\{(\w+)(?:/[^}]*)?\}', content))
-        for macro_name in macro_refs:
+        # For macros, we need to track position too for cross-chapter assignment
+        for macro_match in re.finditer(r'\{(\w+)(?:/[^}]*)?\}', content):
+            macro_name = macro_match.group(1)
+            macro_position = macro_match.start()
+            chapter_id = get_chapter_for_position(macro_position, chapter_boundaries)
+
             if macro_name in macro_patterns:
                 # Add patterns from this macro to the relevant variables
                 for var_name, patterns in macro_patterns[macro_name].items():

@@ -260,7 +260,9 @@
           "Hey, it's us.  \n\tCan we have a key?  \n\tWe'd like a way back.",
           "their house",
           "Nothing was waiting for us, which I found mildly deflating, and seemed to validate Niko's black mood",
-          "It felt ridiculous signing our own names to ourselves, so we'd signed it with a smiley face. Niko ha",
+          "It felt ridiculous signing our own names to ourselves, so we'd signed it with a smiley face. Niko ha"
+        ],
+        "chapter6": [
           "I wanted to be back Downstairs.",
           "there, it was an excuse to spend time with Niko, we had an experiment to follow up on",
           "Hey, it's us.  \n\tCan not have a key.  \n\tYou'd stay a way back.",
@@ -272,8 +274,7 @@
         "chapter7": [
           "the same fucking note",
           "The other me already got to the key on this side and took it through with him. There's no key left t"
-        ],
-        "chapter6": []
+        ]
       }
     },
     "fridgetunnel": {
@@ -1315,8 +1316,8 @@
           "Dhalgren"
         ],
         "chapter5": [
-          "Dhalgren",
-          "Samuel Delany"
+          "Samuel Delany",
+          "Dhalgren"
         ]
       }
     },
@@ -1351,8 +1352,8 @@
           "Imajica"
         ],
         "chapter5": [
-          "Imajica",
-          "Clive Barker"
+          "Clive Barker",
+          "Imajica"
         ]
       }
     },
@@ -1387,8 +1388,8 @@
           "Little, Big"
         ],
         "chapter5": [
-          "Little, Big",
-          "John Crowley"
+          "John Crowley",
+          "Little, Big"
         ]
       }
     },
@@ -1661,24 +1662,24 @@
       "optional": false,
       "patterns": {
         "notes": [
-          "red",
-          "orange",
+          "blue",
           "yellow",
-          "blue"
+          "orange",
+          "red"
         ],
         "chapter17": [
           "red",
           "fiery"
         ],
         "chapter10": [
-          "Black and blue.",
-          "blue"
+          "blue",
+          "Black and blue."
         ],
         "chapter11": [
-          "sea-blue",
-          "orange",
           "yellow",
-          "amber"
+          "sea-blue",
+          "amber",
+          "orange"
         ],
         "chapter12": [
           "orange"
@@ -1713,24 +1714,24 @@
       "optional": false,
       "patterns": {
         "notes": [
-          "blue",
-          "yellow",
+          "red",
           "orange",
-          "red"
+          "yellow",
+          "blue"
         ],
         "chapter17": [
           "blue",
           "cerulean"
         ],
         "chapter10": [
-          "Black and blood.",
-          "red"
+          "red",
+          "Black and blood."
         ],
         "chapter11": [
-          "blood-red",
-          "yellow",
           "orange",
-          "ochre"
+          "blood-red",
+          "ochre",
+          "yellow"
         ],
         "chapter12": [
           "yellow"
@@ -1765,24 +1766,24 @@
       "optional": false,
       "patterns": {
         "notes": [
-          "green",
-          "yellow",
+          "red",
           "silver",
-          "red"
+          "yellow",
+          "green"
         ],
         "chapter17": [
           "green",
           "emerald"
         ],
         "chapter10": [
-          "Black and blood.",
-          "red"
+          "red",
+          "Black and blood."
         ],
         "chapter11": [
-          "blood-red",
-          "yellow",
           "silver",
-          "pale gray"
+          "blood-red",
+          "pale gray",
+          "yellow"
         ],
         "chapter12": [
           "yellow"
@@ -2172,43 +2173,43 @@
       "favbarker"
     ],
     "color1": [
-      "colorseq2",
       "colorseq3",
+      "colorseq2",
       "colorseq1"
     ],
     "color1poetic": [
-      "colorseq2",
       "colorseq3",
+      "colorseq2",
       "colorseq1"
     ],
     "color1shades": [
-      "colorseq2",
       "colorseq3",
+      "colorseq2",
       "colorseq1"
     ],
     "color2": [
-      "colorseq2",
       "colorseq3",
+      "colorseq2",
       "colorseq1"
     ],
     "color2edge": [
-      "colorseq2",
       "colorseq3",
+      "colorseq2",
       "colorseq1"
     ],
     "color3": [
-      "colorseq2",
       "colorseq3",
+      "colorseq2",
       "colorseq1"
     ],
     "color4": [
-      "colorseq2",
       "colorseq3",
+      "colorseq2",
       "colorseq1"
     ],
     "color4adj": [
-      "colorseq2",
       "colorseq3",
+      "colorseq2",
       "colorseq1"
     ]
   },
