@@ -1304,9 +1304,90 @@ function updateVariableDiff() {
     document.querySelectorAll('.var-tag-clickable').forEach(tag => {
         tag.addEventListener('click', () => {
             const varName = tag.dataset.var;
-            highlightVariableText(varName);
+            handleVariableClick(varName);
         });
     });
+}
+
+// Track whether user has seen the variable highlight explanation
+let hasSeenVarHighlightExplanation = localStorage.getItem('subcutanean_seen_var_highlight') === 'true';
+
+function handleVariableClick(varName) {
+    if (!hasSeenVarHighlightExplanation) {
+        // Show first-time explanation modal
+        showVarHighlightExplanation(varName);
+    } else {
+        // Proceed directly with highlighting
+        highlightVariableText(varName);
+    }
+}
+
+function showVarHighlightExplanation(varName) {
+    // Create modal if it doesn't exist
+    let modal = document.getElementById('var-highlight-explanation-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'var-highlight-explanation-modal';
+        modal.className = 'modal';
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 500px;">
+                <div class="modal-header">
+                    <h2>Variable Highlighting</h2>
+                    <button class="close-btn" onclick="closeVarHighlightExplanation()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>Clicking a variable tag highlights paragraphs in the current chapter that contain text affected by that variable.</p>
+                    <p>A <i data-lucide="file-code" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle;"></i> icon will appear on highlighted paragraphs — click it to view the underlying Quant source code.</p>
+                    <p style="color: var(--text-muted); font-size: 0.9em; margin-top: 1rem;">Note: Only underlined variables affect the current chapter. Other variables listed are version-level differences that may affect other chapters.</p>
+                </div>
+                <div class="modal-footer" style="text-align: right; padding-top: 1rem; border-top: 1px solid var(--border-subtle);">
+                    <button class="tool-btn primary" id="var-explain-continue-btn">Got it</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        // Initialize Lucide icons in the modal
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons({ nodes: [modal] });
+        }
+    }
+
+    // Store the variable name to highlight after closing
+    modal.dataset.pendingVar = varName;
+
+    // Show the modal
+    modal.classList.remove('hidden');
+
+    // Set up continue button
+    const continueBtn = document.getElementById('var-explain-continue-btn');
+    continueBtn.onclick = () => {
+        closeVarHighlightExplanation(true);
+    };
+
+    // Close on click outside
+    modal.onclick = (e) => {
+        if (e.target === modal) {
+            closeVarHighlightExplanation(true);
+        }
+    };
+}
+
+function closeVarHighlightExplanation(proceed = false) {
+    const modal = document.getElementById('var-highlight-explanation-modal');
+    if (!modal) return;
+
+    const pendingVar = modal.dataset.pendingVar;
+    modal.classList.add('hidden');
+
+    // Remember that user has seen the explanation
+    hasSeenVarHighlightExplanation = true;
+    localStorage.setItem('subcutanean_seen_var_highlight', 'true');
+
+    // Proceed with highlighting if requested
+    if (proceed && pendingVar) {
+        highlightVariableText(pendingVar);
+    }
 }
 
 function escapeHtml(text) {
