@@ -12,10 +12,11 @@ In 2025 Reed released the “source code, source text and all prior, current, an
 
 **Multiple View Modes:**
 - **Unified**: Read a single version as clean, uninterrupted text
-- **Side-by-side**: Compare two versions in parallel columns
-- **Track Changes**: Inline highlighting shows exact additions (green) and deletions (red/strikethrough) between two selected versions
+- **Side-by-side**: Compare two or three versions in parallel columns
+- **Track Changes**: Inline highlighting shows exact additions and deletions between two or three selected versions
 - **Collation**: View textual variations across multiple witnesses in a variorum-style format
 - **Source Code**: View the original source code alongside a variant
+- **Gonzo Mode**: View 25 variants at once in parallel
 
 **Search Functionality**: Find any word or phrase across all chapters
 - Searches all chapters in the selected version(s)
@@ -31,14 +32,12 @@ In 2025 Reed released the “source code, source text and all prior, current, an
 - Click any word to see which chapters it appears in
 - Click a chapter name to jump directly to that chapter with the word highlighted
 
-**Jaccard Distance Analysis**: Measure textual similarity between the 25 built-in versions
-- Shows most similar and most different version pairs
-- Interactive distance matrix showing all pairwise comparisons
-- Pre-calculated distances for instant display
-- Click any matrix cell or "Load These Versions" button to immediately compare those versions
-- Note: Only available for the 25 built-in versions (seeds 45443-45467), not uploaded files
+**Chapter Heatmap**: A heatmap of chapter variations between the selected seeds
+- Chapters with the most variation between seeds show up as intense orange
+- Tooltip also shows paragraph count variation
+- Click any chapter to view the selected chapter in side-by-side mode with two or three variants
 
-**25 Unique Editions**: This variorum includes 25 variations of *Subcutanean*, generated from unique seeds, numbered 45443-45467. Why these 25 variations? Because these are 25 copies I purchased for a course I taught at Davidson College called [Transmedia and Vast Narrative](https://docs.google.com/document/d/1SAFwyC6OS1WtbQcql81rMdjFS3JAiHwBSFU2gRd4YlY/edit?usp=sharing). Now that the novel and its source code have been released into the Creative Commons, these versions made a good starting point for the variorum.
+**25 Unique Editions**: This variorum includes 25 variations of *Subcutanean*, generated from unique seeds, numbered 60001-60025. 
 
 **Generate New Variants**: Request a never-before-seen variant of the novel and receive it in PDF and epub formats in a matter of minutes.
 
@@ -53,8 +52,7 @@ In 2025 Reed released the “source code, source text and all prior, current, an
 3. **Navigate chapters** using the horizontal scrolling chapter menu
 4. **Search for text**: Enter a word or phrase and click "Find" to highlight all matches (click "Clear" to remove highlights)
 5. **Analyze word differences**: Click "Word Differential" to see which words are unique to each selected version
-6. **Compare textual similarity**: Click "Jaccard Distance" to see how similar or different the 25 built-in versions are
-7. **Upload custom versions**: Click "Upload EPUB/TXT" to add your own version of the novel for comparison (supports both EPUB and plain text formats)
+6. **Upload custom versions**: Click "Upload EPUB/TXT" to add your own version of the novel for comparison (supports both EPUB and plain text formats)
 8. **Manage uploaded versions**: Click "Manage Uploads" to view all uploaded versions and delete any you no longer need
 9. **Switch between versions** at any time to explore different comparisons
 
