@@ -19,9 +19,7 @@
         "chapter18": [
           "it, to possible it"
         ],
-        "chapter16": [
-          "The possible"
-        ],
+        "chapter16": [],
         "chapter2": [
           "Another thing my overactive imagination had ruled out for me was horror movies.",
           "or, dear god, a possible my brain had decided to believe in at that precise moment"
@@ -33,10 +31,12 @@
           ", the only one I didn't have to possible"
         ],
         "prologue": [
-          "Here's a story I don't think you ever heard.  I'd become an expert at seeing things that weren't the"
+          "Here's a story I don't think you ever heard.",
+          "I'd become an expert at seeing things that weren't there. Useful, sometimes, but usually, usually..."
         ],
         "chapter1": [
           "And at the same time, I could feel that old part of me fighting this, trying to possible, to keep se",
+          ", standing there in the dark.",
           "Whether my eyes had started adjusting to the dim light, or the possible in my brain was shifting int"
         ]
       }
@@ -78,28 +78,31 @@
         ],
         "chapter3": [
           ". I’d never dated or even asked anyone out, and more and more it felt too late to start.",
-          "Niko said, very quiet: “You think there's something wrong with me?”\n\nI opened my eyes, looked at him"
+          "Niko said, very quiet: “You think there's something wrong with me?” I opened my eyes, looked at him."
         ],
         "chapter17": [
           "dad would never be back to tuck me in, just because I'd never hear Niko's laugh again and he wouldn'"
         ],
         "chapter1": [
-          "I stared at the  lost in shadows at the end of the hall and"
+          "lost in shadows at the end of the hall and"
         ],
         "chapter4": [
           "I had a sudden vivid flashback to a photo I’d seen as a kid, still confused about my burgeoning sexu"
         ],
         "chapter10": [
           "And all I can think of in this moment is Bradley, this cute sweet transfer student who a month befor",
-          "your father",
-          "Because my father was dead.\n\n“No,” I managed in a quiet, trembling voice.\n\n“Oh, he's right here, hon",
-          "“Well hey there, son.”\n\nThis is something you probably won't understand unless you've lost a parent.",
-          "“Good to hear your voice.” My dad. He sounded like he meant it. “How you holding up?”\n\n“Dad.” I wasn",
+          "Because my father was dead. “No,” I managed in a quiet, trembling voice. “Oh, he's right here, honey",
+          "There's been a mistake",
+          "Maybe here, he's still alive.",
+          "“Well hey there, son.” This is something you probably won't understand unless you've lost a parent. ",
+          "going deeper",
+          "“Good to hear your voice.” My dad. He sounded like he meant it. “How you holding up?” “Dad.” I wasn'",
           "you both said the next time you called, I was supposed to remind you that you have to go deeper.” He",
           "“So what's the news, son?” my father said, a hint of a smile in his voice. “You in deep enough yet?”"
         ],
         "chapter5": [
-          "Dad was the one who got me into records, back when I was still a kid and he was the most amazing per"
+          "Dad was the one who got me into records, back when I was still a kid and he was the most amazing per",
+          ". I've still got that one, too. I’d idolized dad. He’d worked for the Department of Agriculture, whi"
         ]
       }
     },
@@ -122,13 +125,34 @@
       "optional": false,
       "patterns": {
         "chapter16": [
+          "afraid he'd be someone else if I did, another Niko, another Bradley",
+          "afraid that I'd love the wrong person or the wrong person would love me.",
           "I wasn't Bradley's and Niko wasn't mine and I wasn't his, no matter how much at times we'd wanted to"
         ],
         "chapter3": [
-          "my freshman year, and I'd had no intention of being"
+          "my freshman year, and I'd had no intention of being",
+          "Niko said, very quiet: “Can't get married till you go on at least one date.” “Thanks,” I said. “Good",
+          "“So look, just so you know. Dating is generally speaking a lot better than that.” “So I hear.” My mo"
+        ],
+        "chapter17": [
+          "my first love had betrayed me and I couldn't forgive him, just because my second was trapped in anot"
+        ],
+        "chapter4": [
+          "your next queer",
+          "When Bradley had outed us both in high school the aftermath had been ugly, in more ways than one. My"
         ],
         "chapter10": [
-          "I couldn't conceive of what my life would have been like, if we'd never inscribed those wounds on ea"
+          "And all I can think of in this moment is all the guys this could have been, friends I'd been too shy",
+          "“What?” I managed, my voice small. “He was helping us shop for your sister's prom, remember? The thr",
+          "Maybe in this universe, it was.",
+          "“Hey, gorgeous.” There are some voices you hope you'll never hear again. When a person bends you so ",
+          "I couldn't conceive of what my life would have been like, if we'd never inscribed those wounds on ea",
+          "When you called last night",
+          "so secretive. You said next time we talked I was supposed to remind you that you need to go deeper.”",
+          "“I wrote it down because it was so weird.” I could hear the rustle of a paper: I could see him, squi"
+        ],
+        "chapter5": [
+          "Bradley had been the one who got me into records. I was a cassette tape kid and a Discman high schoo"
         ]
       }
     },
@@ -153,7 +177,7 @@
           "But that was all academic while I was puking my guts out over a toilet bowl, and for much of the awf"
         ],
         "chapter3": [
-          ". Guess that was probably when I started drinking, though. I was a good kid before that.”\n\n“You've a",
+          ". Guess that was probably when I started drinking, though. I was a good kid before that.” “You've al",
           ", focused on getting drunk with everyone else because it seemed like the thing to do",
           "I felt a stab of guilt for getting so wasted, for not looking out for him; pushed down vague resentm"
         ],
@@ -166,13 +190,15 @@
           "(Okay: also the beer.) But someone",
           "I felt proud for not slurring my speech; witty.",
           "a wave of nausea washing over me",
-          "I smiled, embarrassed. “I think, uh. Don’t want to get too far from a bathroom.”\n\nHe eyed me apprais",
+          "I smiled, embarrassed. “I think, uh. Don’t want to get too far from a bathroom.” He eyed me appraisi",
+          "Why do you always, always drink too much? Idiot.",
           "Why do you always, always drink too much? Idiot. I tried to focus on",
           "I tried not to think about my stomach.",
           "It didn’t help that the hallway was spinning and I felt closer and closer to throwing up each second",
           "Or maybe the wave wasn't relief. I swallowed hard to keep my stomach from heaving.",
           "Everything was spinning. My stomach churned and my mouth filled with saliva, like the glands for adr",
           ", the walls refusing to stay still",
+          "Seeing double. You're drunk.",
           "Seeing double. You're drunk. Except I'd never had it happen in three dimensions before, along the z-"
         ],
         "chapter4": [
@@ -203,30 +229,44 @@
           "Different notes, different video"
         ],
         "chapter18": [
-          "We could never figure out why  didn’t use  keys to come through, since  should have had them both, o",
+          "We could never figure out why",
+          "keys to come through, since",
+          "should have had them both, one bent on the counter and the other stuck in the door. We didn’t think ",
+          ", coming back to",
+          "own side from an expedition, might have gone straight through without seeing them at all. How the fo",
+          "had no need for the keys or to get back through, because",
           "Even if we’d had the key, the connection through the fridge was gone. Too shallow, too close to the "
         ],
         "chapter4": [
           "tossed it on the counter for a minute",
-          "I checked my pockets. It wasn't on me. What had I done with it?\n\nA sinking feeling crept over me. It",
-          "It worked if I didn't think about it too hard.\n\nBut then where was the key?\n\nSimple. Still in the lo",
+          "It was still in the lock on the other side.",
+          "I checked my pockets. It wasn't on me. What had I done with it? A sinking feeling crept over me. It ",
+          "But then where was the key?",
+          "It worked if I didn't think about it too hard. But then where was the key? Simple. Still in the lock",
           "them both. Both keys.",
           "squandering whatever opportunity they'd represented"
         ],
         "chapter5": [
           "We can find the other key and---",
-          "“The other two now have both keys, right?”\n\nNiko frowned. “What do you mean?”\n\n“I left one in the fr",
+          "“The other two now have both keys, right?” Niko frowned. “What do you mean?” “I left one in the frid",
           "He took a breath, let it out. “So yeah, you're right. They've got both keys. Unless they come back t",
           "at least try to figure out what was going on, or at least how we could get back. Maybe the fridge wa",
           "And now they've got them both, and we don't have any. We'd be factoring them into our plans if we ha",
-          "Which would allow us to leave something for each other at a rendezvous point.\n\n“The fridge is the na",
+          "Which would allow us to leave something for each other at a rendezvous point. “The fridge is the nat",
           ", and something to say",
           "When we got to the kitchen, we'd leave the note in front of the fridge (since we couldn't open it ou",
-          "I turned to walk back to the landing.\n\nBut as we walked away, I couldn't help remembering how those ",
+          "Just because it’s not real doesn’t mean it can’t hurt.",
+          "I turned to walk back to the landing. But as we walked away, I couldn't help remembering how those g",
+          "Hey, it's us.  \n\tCan we have a key?  \n\tWe'd like a way back.",
+          "their house",
           "Nothing was waiting for us, which I found mildly deflating, and seemed to validate Niko's black mood",
+          "It felt ridiculous signing our own names to ourselves, so we'd signed it with a smiley face. Niko ha",
           "I wanted to be back Downstairs.",
           "there, it was an excuse to spend time with Niko, we had an experiment to follow up on",
-          "We went down to follow up on our experiment when he came out of his funk, at the end of a nervous af"
+          "Hey, it's us.  \n\tCan not have a key.  \n\tYou'd stay a way back.",
+          "We went down to follow up on our experiment when he came out of his funk, at the end of a nervous af",
+          "room, and down the twisting stairs with the weird landings. When we passed the one with the glints, ",
+          "It was still signed with a smiley face. But now instead of dots for eyes above the curved mouth, the"
         ],
         "chapter13": [],
         "chapter7": [
@@ -263,8 +303,7 @@
           "He started idly doodling flip-book animations of a gruesome hanging on the pad of sticky notes."
         ],
         "chapter12": [
-          "There's lots of connection points but the higher-up they are, the easier to get---misaligned. Two la",
-          "Forget lasers."
+          "There's lots of connection points but the higher-up they are, the easier to get---misaligned. Two la"
         ]
       }
     },
@@ -297,13 +336,12 @@
           "A maze of tunnels made from furniture, like a children's dream of a couch fort brought to life, that"
         ],
         "chapter7": [
-          "About half the doors led not to rooms, but to crawlways.\n\nThey were those half-sized doors you find ",
+          "About half the doors led not to rooms, but to crawlways. They were those half-sized doors you find s",
           "he said to the crawlway",
-          "We figured out pretty quick it was a maze.\n\nYou could stoop-walk, but crawling on all fours was a lo",
+          "We figured out pretty quick it was a maze. You could stoop-walk, but crawling on all fours was a lot",
           "Once we realized how easy it would be to get lost, we retraced our steps and sat panting by the entr",
           "half-door's knob",
           "crawling in a promising direction",
-          "the crawlway",
           "The twine scraping against the edge of the junction behind us sounded coarse and ugly, like a rusty ",
           "The sound of the twine scraping the corner seemed way too loud, like someone was holding a mike agai",
           "just around the corner",
@@ -335,13 +373,11 @@
       "patterns": {
         "chapter2": [
           "We did end up dusting off a couple of the old couches down there, and moving down",
-          "half-furnished",
           "an enormous old bureau---empty, like all the furniture---and",
           "aging furniture aside,"
         ],
         "chapter1": [
           "A smattering of old couches and end tables lined the walls, along with",
-          "cleaning up the",
           "Most had a piece or two of abandoned furniture, all decades out of date, dusty, and anonymous."
         ],
         "chapter4": [
@@ -361,9 +397,11 @@
           "you found rooms so well-furnished, he said, you could almost imagine they"
         ],
         "chapter7": [
-          ", trying not to be unnerved by the way our lights carved a thousand sweeping shadow-shapes out of , ",
+          ", trying not to be unnerved by the way our lights carved a thousand sweeping shadow-shapes out of",
+          ", moving and twisting like something alive",
           ", each sway of my headlamp birthing a new imagined terror out of the confusion of shapes around me",
-          "The furniture right around us had been dragged out of shape, but the rest of the way back was unchan"
+          "The furniture right around us had been dragged out of shape,",
+          "but the rest of the way back was unchanged. We swung the lights back and forth ahead but could see n"
         ]
       }
     },
@@ -399,7 +437,8 @@
         ],
         "chapter11": [
           "“Can't walk the length of one of its walls without stopping to sleep. Takes five or six sleeps to wa",
-          "on the streets",
+          "Not that I've checked them all.” He laughed again. “Did the math once. There's ten million houses. G",
+          ". “And under every one of those beds, there's another Downstairs, as big as this one. And if you can",
           "in all that dark"
         ],
         "chapter13": [
@@ -425,6 +464,8 @@
       "optional": false,
       "patterns": {
         "chapter11": [
+          "“Some stairs keep going down. And if you follow them far enough, they open up into black empty space",
+          "you climb up through to get there. “But,” he added, “but you can't get out. You can't get out of any",
           "the right stair. Found"
         ]
       }
@@ -450,28 +491,25 @@
         ],
         "chapter16": [
           ", but Niko had noticed something while scrambling around up top. One of the guy-wires sloping down i",
+          "Niko thought we should head upstream, follow the water toward its source. Too worn down to argue, I ",
           "The path curved gently left, then gently right.",
           "It felt like we were back “inside” again. The sensation of walking through a pipe suspended over emp"
         ],
         "chapter15": [
-          "into darkness",
-          "empty space",
           "lost in vanishing darkness"
         ],
         "chapter14": [
           "The door opened onto nothing. Past the frame, the floor dropped away into blackness. The flashlight ",
-          "into blackness",
           "It made slow, lazy curves as it went, like an immense statue of a snake slithering through grass. Yo",
           "miles-high drop down",
           "a giant snake that had somehow coated itself in superglue and slithered through",
           "the top of the tube-path---the back of the snake---",
           "the twinkling lights far below",
-          "“I think we're above ”",
+          "“I think we're above",
           "There was no wall around the hall we'd come through to get here. It stretched back into empty space ",
           "forward like a sinuous path",
           "the twinkling lights miles below",
-          "Far below the ; new lights winked on in the emptiness between them.",
-          ", miles below"
+          "; new lights winked on in the emptiness between them."
         ]
       }
     },
@@ -489,11 +527,17 @@
       ],
       "optional": false,
       "patterns": {
+        "chapter16": [
+          ", but Elder Niko's plan still seemed sound: get across to a hallway on the other side. On the opposi"
+        ],
         "chapter14": [
           "and cold damp air spilled out;",
+          "The door opened onto a drop-off. The opposite wall was distant but visible at the edge of our light,",
           "Perspectives change. Architecture gets stretched to breaking.",
           "surrounded by endless walls of pink insulation foam,",
           "“We can swing across from there to one of the hallways on the other side. No problemo.”",
+          "“Water,” he said. “Everything ends in water down here. Or maybe we're above",
+          "Sometimes there's smashed-up stuff down there. Ruined furniture, shattered light bulbs with tangled-",
           "forest of insulation"
         ]
       }
@@ -519,8 +563,14 @@
           ", pushing off each one as his weight lifted it off the ground"
         ],
         "chapter15": [
+          "Already I was at a forty-five-degree angle and steepening as the bed groaned and juddered across the",
+          "I sprang up the steepening slope of mattress, toward the receding safety of the top of the bedroom-t",
+          "I dangled twenty feet below the bed I was tied to, now dragged around to the bottom of the cylinder,",
+          "A free-standing doorframe stuck out of the cylinder, about two thirds of the way around the curve to",
+          "weren't pulling our anchor down was that it outweighed us. The pull of the cylinder's strange gravit",
           "If it had been me, we'd all have died. I need time to consider a situation, to think things through.",
           "tugging it across the hardwood above him, grumbling and shedding books like some beast made of libra",
+          "The bed groaned, creaking, and one corner lifted again off the cylinder's surface.",
           "And I'd forgotten I wasn't at the end of my rope. Slack",
           ". It gave me a head start, but also",
           "It curved as the cylinder's gravity tugged it around, hyperbolic, and went wide, whipping underneath",
@@ -528,6 +578,7 @@
         ],
         "chapter14": [
           "I looked for a way to brace myself, and that's when I discovered the furniture wasn't bolted to the ",
+          "the heavy furniture",
           "and was too heavy for its weight to stop him. His momentum pulled it a quarter-revolution around to "
         ]
       }
@@ -548,9 +599,15 @@
       ],
       "optional": false,
       "patterns": {
+        "chapter16": [
+          "Getting back on top of the cylinder had been like navigating an especially surreal and challenging c",
+          "From there he could pull me up; all I had to do with my shredded muscles was keep hanging on, althou"
+        ],
         "chapter15": [
           "I'd never skydived or bungee jumped before; I had no experience with free fall and barely any even w",
-          "He'd stopped his fall by grabbing hold of my rope, but he wasn't tied to it, and was far enough abov"
+          "I dangled thirty feet below the cylinder, two ends of the same rope rising to curve up its top side ",
+          "He'd stopped his fall by grabbing hold of my rope, but he wasn't tied to it, and was far enough abov",
+          "The rope creaked uneasily."
         ],
         "chapter14": [
           "Tie the rope around something.",
@@ -580,14 +637,18 @@
           "on a floating set"
         ],
         "chapter16": [
-          "junctions, no rooms",
-          "right route"
+          "With Niko's help I'd made it back to the top of the suspended bedroom set, as exhausted as I'd ever ",
+          "junctions, no rooms"
         ],
         "chapter15": [
+          "I fell for only a second before",
           "I dangled thirty or forty feet below the underside of the bedroom platform, swinging on my rope. A w",
+          "A network of dark guy-wires splayed out from the bottom corners of the bedroom set, like the ones fr",
+          ", and through luck young Niko's downward path had intersected a cluster of them. He was just clingin",
           "had stopped was that we balanced either other out. But with two bodies on one side of the rope, ther",
           "Like lightning he shot up the rope, climbing hand over hand like a demon. With everything in motion ",
           "But the anchor of furniture groaned above us, shifting uneasily, and as I looked back to Elder Niko ",
+          "Reaching out his hand for my rope.",
           "In another swing Elder reached the loop and grabbed it. Then he hung",
           "a rook's nest of plumbing,",
           "jerked him away in a huge arc, flailing his limbs like a scarecrow. He swung in sickening curves ben",
@@ -606,11 +667,12 @@
         "chapter14": [
           "square platform suspended beneath us in mid-air",
           "a square platform some way below and in front of us. But as I focused on it, I realized it wasn't a ",
+          "Only its base was solid, a room-sized square suspended in midair over that awful drop. Thin metal po",
           "floor of the set",
           "Tatty throw rugs, dollar-store trash cans, secondhand furniture, and a battered desk filled up the f",
           "Not that it was apparent the floating platform was anything but a dead end. I protested weakly, but ",
-          "floating set",
           "The platform swayed with my momentum: slight, but enough to suggest how thin the wires were that hel",
+          "I eyed the bed with suspicious curiosity, but on closer inspection it looked nothing like my own. It",
           "hardwood platform",
           "The shadows from the wires and cables that held the set suspended played across my face like strands",
           "I cast around for something heavy, but the set's furnishings were as accurately cheap as its upstair",
@@ -621,8 +683,10 @@
           "the furniture's bulk",
           "He stretched instead for one of the taut cables holding it up but he was moving too fast",
           "But the rope came up over the edge of the platform and angled across the floor. The force on the bed",
-          "Toward the drop-off and the . Toward a drop there'd be no possible way to survive.",
-          "I moved faster than thought. I'd never considered myself a person with quick reflexes, someone you c"
+          "Toward the drop-off and the",
+          ". Toward a drop there'd be no possible way to survive.",
+          "I moved faster than thought. I'd never considered myself a person with quick reflexes, someone you c",
+          "I had only seconds before it reached the edge. Before I could change my mind, I leapt off the platfo"
         ]
       }
     },
@@ -656,14 +720,14 @@
           "crashed through the flimsy web",
           "lines of chandelier",
           "exploded rays of chandelier",
-          "chandelier net",
           "mesh or net or whatever",
           "With a tinkling smash, I crashed into the net of chandelier. It was like landing on an uncomfortably",
+          "center of the jangling net. Moving was awkward: the mesh was a grid of thin metal wire, squares mayb",
           "of the net up here flattened as it dropped and converged to chandelier",
           "climbing down a ladder",
           "I noticed, disconcertingly, wasn't connected to anything at all. Nevertheless, it was rock-solid, an",
-          "chandelier net",
-          "chandelier-net",
+          "beneath, as if hanging from the ceiling of an ordinary room. Carefully, I pushed my feet over the ti",
+          "hardwood beneath me. I landed hard and dropped into a crouch, adrenaline flaring.",
           "purchase on the jangling net",
           "through a gap in the net, jerking them both",
           "The web of chandelier-stuff bucked and heaved, tinkling like a dump truck full of glass. An eyebolt ",
@@ -672,7 +736,6 @@
           "the beads of glass",
           "out of the net but all his weight was on it now and the wire frame dug into his skin",
           "one of the glass baubles",
-          "jangling net",
           "slipped through a gap in the net and tumbled",
           "the edge of the net. He caught it and the whole thing twisted; but he'd snagged only a single strand",
           "But his grab for the net had dislodged my Niko too, and he was head down and slipping, flailing, gra",
@@ -699,9 +762,10 @@
           ", face battered by the landslide of books only now starting to peter out"
         ],
         "chapter14": [
-          ", or to the integrity of a yellowing  paperback",
+          "With a muffled whump, I crashed into the mountain of books. It would have been like falling onto a l",
+          "flatter middle of the book-path. I was close enough to get a good look now, and recognized a lot of ",
+          ", or to the integrity of a yellowing",
           ", ripped-off pages fluttering in their wake",
-          "the books and",
           "in a rain of paperbacks"
         ]
       }
@@ -723,6 +787,11 @@
       ],
       "optional": false,
       "patterns": {
+        "chapter9": [
+          "Return to Zork",
+          "“There was this weird CD-ROM game I was playing,” I said after a while. “It doesn't exist over here,",
+          "Like the answer to the puzzle."
+        ],
         "notes": [
           "‣ Your Ryan never solved the weird CD-ROM game. Maybe none of them did."
         ],
@@ -730,6 +799,8 @@
           "Like a puzzle in that damn adventure game, a puzzle you don't even know if there's an answer to unti"
         ],
         "chapter4": [
+          "what it all meant",
+          "Warcraft II",
           "I retreated instead into a game I'd bought a few months back but never made much progress with, a CD"
         ],
         "chapter5": [
@@ -786,15 +857,20 @@
           "surprisingly tender,",
           "I sometimes saw him looking at me, out of the corner of my eye, but I couldn’t look back.",
           "The words seemed to shake him out of a daze, and he perked up, flashing a huge grin. “Hell yeah! Let",
-          ", seemed to notice his fingers were still touching my lips, pulled them back. Stared at them.\n\nAnd a",
+          ", seemed to notice his fingers were still touching my lips, pulled them back. Stared at them. And as",
           "And the way he’d fought for me. The way he’d been looking at me.",
           "Somehow we were closer than we’d been a moment before. The curves of his jaw, his cheek, were aches ",
+          "can’t come with me",
           "His lips were too close to mine. It would be so easy. It would last forever, like dying winter sunli",
+          "I’d always wanted made real, at last. “I want to,” I breathed. “Then do it.” The need in his eyes wa",
+          "Trust. What a beautiful, fucked-up, irrational concept. He kept his gaze locked on mine.",
+          "“I’m going through.” I took a deep breath. “But it’s not because I trust you.” He looked alarmed but",
+          "But Niko, you can’t come with me.” Tears sprung like pinpricks to my eyes, but I blinked them back, ",
+          "“Niko, stop,” I said, afraid to look away, to even glance at the walls around us, as if they could r",
           "reaching out for me; but I must have looked shocked, because his expression changed to placating ala",
           "I shook my head, angry, never more certain of anything.",
-          ", ignoring me",
-          "come through",
           "And I couldn’t bear to see that need in his face, reflected back at last after all this time, and wo",
+          "I took a long, ragged breath and realized what I'd said was true. And not just for him. He broke our",
           "His face hardened into a mask as he said this, grim and colorless. Then he looked at me, the corner ",
           ", without spite this time",
           "He wasn’t the Niko I wanted. None of them had been, even if this one thought maybe he could be, was "
@@ -814,7 +890,20 @@
         "originalniko"
       ],
       "optional": false,
-      "patterns": {}
+      "patterns": {
+        "chapter16": [
+          ", dropped his arms to his sides. Fixed me with a look. “You have to go back,” he said.",
+          "“No,” I said. “I'm not leaving you.” “You can't stay here,” he said, shaking his head. “You know why",
+          "You have to go back.",
+          "Don't leave me alone.",
+          "A sharp crack sounded from the wall behind him, but I refused to look away from his eyes, even thoug",
+          "I felt a rush of power. I felt filled with potency. Charged. I could bring this whole place down if ",
+          ". “I belong with you,” I cried, “here. I can't go back there. I'd be alone. Don't leave me alone.” H",
+          "I took a long, ragged breath. And letting it out I knew the words it should make, the ones we should",
+          "“I know,” I said again, “I'll do it. I'll go back. I'll swim through. But not because I trust you.” ",
+          "” I didn't believe it, not really. But saying the words was a good start. “Sorry I fucked everything"
+        ]
+      }
     },
     "originalniko": {
       "description": "Final Niko is in love with Ryan, is not, or ... ? Last to do is \"angryniko\"",
@@ -841,8 +930,12 @@
         ],
         "chapter18": [
           "That pipe might just lead to the city sewer system, but",
-          "Assuming, that is, you survived too.\n\nI think you did. That could be me projecting, one last time. B",
+          "Assuming, that is, you survived too. I think you did. That could be me projecting, one last time. Bu",
+          "I always kill the Nikos first",
           "Your counterpart, the other Niko from the twin universe---he didn't make it. I always kill the Nikos",
+          "went for him. Maybe it wasn't coincidence. So that's my theory. Probably wrong. I'm sure you have yo",
+          "Thinking back on it all, I do take some comfort that when push came to shove, we choose to save each",
+          "above that awful void, and other times besides, when you had every reason to leave me behind. And I ",
           ", lest you think I'm a total mooch.",
           "and you found your way back to a world where people say “fourd” like God intended."
         ],
@@ -851,32 +944,46 @@
           ", making the chamber even more claustrophobic",
           "“Huh.” I looked over; he was staring uneasily into the flooded opening. He caught me looking and for",
           "'d seen it too and",
-          "“Thirty-five meter rope,” he said. “Looks like someone marked the way through.”\n\n“Our doubles?”\n\nHe ",
-          "“I don't want to go alone.”\n\n“It's the only way.” He gazed at me, fierce. “Orion, just trust me, oka",
+          "“Thirty-five meter rope,” he said. “Looks like someone marked the way through.” “Our doubles?” He sh",
+          "We both dropped half into a crouch, but the earthquake stopped, the low rumbles far beneath us faded",
+          "“I don't want to go alone.” “It's the only way.” He gazed at me, fierce. “Orion, just trust me, okay",
+          "“No.” I shook my head, mind racing.",
           "Almost on autopilot I guided Niko through what to expect, through breathing exercises, stroke techni",
           "“Last one back to the right dimension buys the drinks,” I said,"
         ],
         "chapter17": [
-          "our glowsticks",
           "predicted. He followed behind, pulling himself hand over hand along the rope",
           "But faintly, through water rippling as if moving with strange, hot currents, there: another sliding ",
+          "glowstick he was holding. Another me. It could have been a mirror, except he was alone. The water tr",
           "The other sliding door was just ahead of us, but it seemed too as if we",
-          ", while behind me the other Ryan did the same. Our doors clicked shut.\n\nAnd as we turned around to s",
+          ", while behind me the other Ryan did the same. Our doors clicked shut. And as we turned around to sw",
+          "by our chemical lights, there were more of us. Dozens. Floating, unbreathing. Eyes open. Watching. I",
           "they were coming they were going to get us",
           "but it was hopeless. There were too many of them, drifting forward with hands outstretched, serene e",
+          "breathed in",
+          "They weren't real.",
           "Beside me, Niko was preparing to push off against the glass and make a break for the other side, but",
+          "of his thrashing glowstick was doubled, reflecting mirrored patterns in the glass behind him. Someth",
+          "A glowstick and its reflection, now gone horribly still. But the closer one was occluded by the swar",
           "right through the mass of things closing in.",
           "we were moving too fast for them, we were through, we were past them",
-          "We'd reached the glass door on the other side; below us, the drowned Orion sank into erasing darknes"
+          "We'd reached the glass door on the other side; below us, the drowned Orion sank into erasing darknes",
+          ". To pull the door open I'd have to let him go. But as I did I realized the reason for his panic was",
+          "New glass doors spawned above us, below us, to every side. I ignored it all. I pulled the door open ",
+          ". Now I'd never know how much I'd missed. I pulled back gently from his grasping hand, and smiled, a"
         ],
         "chapter15": [
-          "“I let you swim through first,” . “Can't remember. Why. Guess I thought I still owed you. A debt.” ."
+          "“I let you swim through first,”",
+          ". “Can't remember. Why. Guess I thought I still owed you. A debt.”",
+          ". “Stupid. Wrong. Couldn't find my way. Back up. Think about that mistake every day, every day, ever"
         ],
         "chapter4": [
           "with the hand holding the flashlight",
           "I lost my grip on the flashlight, and it tumbled out of my hands, hit the hard shelf underneath me w",
           "felt for the light, grabbed it and shook it",
-          ". Trying to keep my breathing calm, I unscrewed the end of the flashlight by feel, dumped out the ol"
+          ". Trying to keep my breathing calm, I unscrewed the end of the flashlight by feel, dumped out the ol",
+          "Blessed light flooded the tiny chamber.",
+          "Anxious to escape,"
         ]
       }
     },
@@ -912,7 +1019,11 @@
         "noverbositypref"
       ],
       "optional": false,
-      "patterns": {}
+      "patterns": {
+        "notes": [
+          "‣ Your narrator preferred more succinct ways of saying things."
+        ]
+      }
     },
     "noverbositypref": {
       "description": "Define book-wide independent variables affecting random text. Is this narrator wordy, succinct, or no preference?",
@@ -959,7 +1070,11 @@
         "nopolaritypref"
       ],
       "optional": false,
-      "patterns": {}
+      "patterns": {
+        "notes": [
+          "‣ Your narrator was a bit more optimistic than the norm."
+        ]
+      }
     },
     "nopolaritypref": {
       "description": "Does this narrator prefer sentences with a strong negative polarity?",
@@ -1015,7 +1130,11 @@
         "noslangpref"
       ],
       "optional": false,
-      "patterns": {}
+      "patterns": {
+        "notes": [
+          "‣ Your narrator preferred to avoid slang."
+        ]
+      }
     },
     "noslangpref": {
       "description": "Does this narrator prefer or avoid slang/swears?",
@@ -1196,8 +1315,8 @@
           "Dhalgren"
         ],
         "chapter5": [
-          "Samuel Delany",
-          "Dhalgren"
+          "Dhalgren",
+          "Samuel Delany"
         ]
       }
     },
@@ -1232,8 +1351,8 @@
           "Imajica"
         ],
         "chapter5": [
-          "Clive Barker",
-          "Imajica"
+          "Imajica",
+          "Clive Barker"
         ]
       }
     },
@@ -1268,8 +1387,8 @@
           "Little, Big"
         ],
         "chapter5": [
-          "John Crowley",
-          "Little, Big"
+          "Little, Big",
+          "John Crowley"
         ]
       }
     },
@@ -1294,8 +1413,12 @@
         "notes": [
           "Gwendolyn MacEwen"
         ],
-        "prologue": [],
-        "part2": []
+        "prologue": [
+          "This land like a mirror turns you inward  \nAnd you become a forest in a furtive lake;  \nThe dark pin"
+        ],
+        "part2": [
+          "But the dark pines of your mind dip deeper  \nAnd you are sinking, sinking, sleeper  \nIn an elementar"
+        ]
       }
     },
     "epi_group1b": {
@@ -1315,7 +1438,15 @@
         "epi_group1e"
       ],
       "optional": false,
-      "patterns": {}
+      "patterns": {
+        "notes": [],
+        "prologue": [
+          "Icarus should have waited for nightfall,   the moon would have never let him go."
+        ],
+        "part2": [
+          "We two boys together clinging,   One the other never leaving"
+        ]
+      }
     },
     "epi_group1c": {
       "description": "Epigraphs",
@@ -1334,7 +1465,12 @@
         "epi_group1e"
       ],
       "optional": false,
-      "patterns": {}
+      "patterns": {
+        "notes": [],
+        "part2": [
+          "You and I   Again and again   Always almost   Never enough."
+        ]
+      }
     },
     "epi_group1d": {
       "description": "Epigraphs",
@@ -1353,7 +1489,16 @@
         "epi_group1e"
       ],
       "optional": false,
-      "patterns": {}
+      "patterns": {
+        "notes": [],
+        "prologue": [
+          "Deep in the human unconscious is a pervasive need for a logical universe that makes sense. But the r",
+          "One cannot write about something one is still inside."
+        ],
+        "part2": [
+          "They have no idea what happiness is. They don't know that for us, without our love, there is neither"
+        ]
+      }
     },
     "epi_group1e": {
       "description": "Epigraphs",
@@ -1372,7 +1517,15 @@
         "epi_group1e"
       ],
       "optional": false,
-      "patterns": {}
+      "patterns": {
+        "notes": [],
+        "prologue": [
+          "Maybe I was destined to forever fall in love with people I couldn’t have. Maybe there’s a whole asso"
+        ],
+        "part2": [
+          "Than the gentleman above-named, there is nobody, in the whole circle of my acquaintance, whom I have"
+        ]
+      }
     },
     "epi_group2a": {
       "description": null,
@@ -1391,11 +1544,13 @@
       ],
       "optional": false,
       "patterns": {
-        "notes": [
-          "Abraham Cowley"
+        "notes": [],
+        "chapter18": [
+          "But love that moulds one man up out of two,  \nMakes me forget and injure you.\t \nI took you for mysel"
         ],
-        "chapter18": [],
-        "part3": []
+        "part3": [
+          "Some things do through our judgment pass  \nAs through a multiplying glass.  \nAnd sometimes, if the o"
+        ]
       }
     },
     "epi_group2b": {
@@ -1414,7 +1569,15 @@
         "epi_group2d"
       ],
       "optional": false,
-      "patterns": {}
+      "patterns": {
+        "notes": [],
+        "chapter18": [
+          "When you are old and grey and full of sleep,  \nAnd nodding by the fire, take down this book,  \nAnd s"
+        ],
+        "part3": [
+          "How should we like it were stars to burn  \nWith a passion for us we could not return?"
+        ]
+      }
     },
     "epi_group2c": {
       "description": null,
@@ -1432,7 +1595,17 @@
         "epi_group2d"
       ],
       "optional": false,
-      "patterns": {}
+      "patterns": {
+        "notes": [
+          "Charlotte Mary Mew"
+        ],
+        "chapter18": [
+          "The art of losing isn’t hard to master;   so many things seem filled with the intent   to be lost th"
+        ],
+        "part3": [
+          "...before I die I want to see   The world that lies behind the strangeness of your eyes,   There is "
+        ]
+      }
     },
     "epi_group2d": {
       "description": null,
@@ -1450,7 +1623,15 @@
         "epi_group2d"
       ],
       "optional": false,
-      "patterns": {}
+      "patterns": {
+        "notes": [],
+        "chapter18": [
+          "To have known him, to have loved him,   After loneness long;   And then to be estranged in life,   A"
+        ],
+        "part3": [
+          "As long as the sky whirls  \nYou will be my redemption and my doom"
+        ]
+      }
     },
     "colorseq1": {
       "description": "Glowstick colors. The symbolism of these color sequences is left as an exercise for the reader.",
@@ -1480,24 +1661,24 @@
       "optional": false,
       "patterns": {
         "notes": [
-          "orange",
           "red",
+          "orange",
           "yellow",
           "blue"
         ],
         "chapter17": [
-          "fiery",
-          "red"
+          "red",
+          "fiery"
         ],
         "chapter10": [
-          "blue",
-          "Black and blue."
+          "Black and blue.",
+          "blue"
         ],
         "chapter11": [
-          "orange",
           "sea-blue",
-          "amber",
-          "yellow"
+          "orange",
+          "yellow",
+          "amber"
         ],
         "chapter12": [
           "orange"
@@ -1532,24 +1713,24 @@
       "optional": false,
       "patterns": {
         "notes": [
-          "yellow",
           "blue",
+          "yellow",
           "orange",
           "red"
         ],
         "chapter17": [
-          "cerulean",
-          "blue"
+          "blue",
+          "cerulean"
         ],
         "chapter10": [
-          "red",
-          "Black and blood."
+          "Black and blood.",
+          "red"
         ],
         "chapter11": [
-          "yellow",
           "blood-red",
-          "ochre",
-          "orange"
+          "yellow",
+          "orange",
+          "ochre"
         ],
         "chapter12": [
           "yellow"
@@ -1584,24 +1765,24 @@
       "optional": false,
       "patterns": {
         "notes": [
-          "yellow",
           "green",
+          "yellow",
           "silver",
           "red"
         ],
         "chapter17": [
-          "emerald",
-          "green"
+          "green",
+          "emerald"
         ],
         "chapter10": [
-          "red",
-          "Black and blood."
+          "Black and blood.",
+          "red"
         ],
         "chapter11": [
-          "yellow",
           "blood-red",
-          "pale gray",
-          "silver"
+          "yellow",
+          "silver",
+          "pale gray"
         ],
         "chapter12": [
           "yellow"
@@ -1976,59 +2157,59 @@
   ],
   "macros": {
     "FavBook": [
+      "favcrowley",
       "favdelany",
-      "favbarker",
-      "favcrowley"
+      "favbarker"
     ],
     "AltBook": [
+      "favcrowley",
       "favdelany",
-      "favbarker",
-      "favcrowley"
+      "favbarker"
     ],
     "FavAuthor": [
+      "favcrowley",
       "favdelany",
-      "favbarker",
-      "favcrowley"
+      "favbarker"
     ],
     "color1": [
-      "colorseq1",
       "colorseq2",
-      "colorseq3"
+      "colorseq3",
+      "colorseq1"
     ],
     "color1poetic": [
-      "colorseq1",
       "colorseq2",
-      "colorseq3"
+      "colorseq3",
+      "colorseq1"
     ],
     "color1shades": [
-      "colorseq1",
       "colorseq2",
-      "colorseq3"
+      "colorseq3",
+      "colorseq1"
     ],
     "color2": [
-      "colorseq1",
       "colorseq2",
-      "colorseq3"
+      "colorseq3",
+      "colorseq1"
     ],
     "color2edge": [
-      "colorseq1",
       "colorseq2",
-      "colorseq3"
+      "colorseq3",
+      "colorseq1"
     ],
     "color3": [
-      "colorseq1",
       "colorseq2",
-      "colorseq3"
+      "colorseq3",
+      "colorseq1"
     ],
     "color4": [
-      "colorseq1",
       "colorseq2",
-      "colorseq3"
+      "colorseq3",
+      "colorseq1"
     ],
     "color4adj": [
-      "colorseq1",
       "colorseq2",
-      "colorseq3"
+      "colorseq3",
+      "colorseq1"
     ]
   },
   "chapter_variables": {

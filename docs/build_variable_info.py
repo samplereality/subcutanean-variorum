@@ -190,12 +190,45 @@ def find_variable_usage(variables, macros):
     return variables
 
 
+def extract_text_from_macro_call(macro_text):
+    """Extract readable text from a macro call like {epigraph/text.../author}.
+
+    Returns the text content, stripping macro name and handling special formats:
+    - {i/text} -> text (italics)
+    - {epigraph/quote text/author} -> quote text
+    - {MacroName} -> '' (no argument)
+    """
+    if '/' not in macro_text:
+        return ''
+
+    # Split on first /
+    parts = macro_text.split('/', 1)
+    if len(parts) < 2:
+        return ''
+
+    macro_name = parts[0]
+    content = parts[1]
+
+    # For epigraph macro, content is "quote text/author" - extract quote
+    if macro_name.lower() == 'epigraph':
+        # Find last / to separate quote from author
+        last_slash = content.rfind('/')
+        if last_slash > 0:
+            content = content[:last_slash]
+
+    # Clean up escape sequences
+    content = content.replace('\\\\', ' ').replace('\\', '')
+
+    return content.strip()
+
+
 def extract_chapter_patterns(variables, macros, macro_patterns):
     """Extract text patterns for each variable to help with highlighting.
 
     Patterns come from two sources:
     1. Direct conditionals in chapter source: [@varname>text...]
     2. Macro definitions when the macro is used in a chapter: {MacroName}
+    3. Text inside macro calls within conditionals: [@var>{macroname/text...}]
     """
 
     for var_name in variables:
@@ -209,8 +242,11 @@ def extract_chapter_patterns(variables, macros, macro_patterns):
         chapter_id = CHAPTER_MAPPING.get(stem, stem)
         content = source_file.read_text(encoding='utf-8')
 
-        # Find direct conditional blocks: [@varname>text...]
-        pattern = r'\[(?:\*\w+\*)?[\^]?@(\w+)>([^\[\]|]+)'
+        # Find conditional blocks: [@varname>text...] or |@varname>text...]
+        # First form: starts with [ for initial conditional
+        # Second form: starts with | for alternative branches in multi-variable conditionals
+        # Pattern captures content including macro calls (allow { and } chars)
+        pattern = r'(?:\[|\|)(?:\*\w+\*)?[\^]?@(\w+)>([^\[\]|]+(?:\{[^}]+\}[^\[\]|]*)*)'
 
         for match in re.finditer(pattern, content):
             var_name = match.group(1)
@@ -220,14 +256,35 @@ def extract_chapter_patterns(variables, macros, macro_patterns):
                 if chapter_id not in variables[var_name]['patterns']:
                     variables[var_name]['patterns'][chapter_id] = []
 
-                clean_snippet = re.sub(r'\{i/([^}]+)\}', r'\1', text_snippet)
-                clean_snippet = re.sub(r'\{[^}]+\}', '', clean_snippet)
-                clean_snippet = clean_snippet.strip()
+                # First, extract text from any macro calls in the snippet
+                macro_texts = []
+                for macro_match in re.finditer(r'\{([^}]+)\}', text_snippet):
+                    macro_content = macro_match.group(1)
+                    extracted = extract_text_from_macro_call(macro_content)
+                    if extracted and len(extracted) > 10:
+                        macro_texts.append(extracted[:100])
 
-                if clean_snippet and len(clean_snippet) > 10:
-                    variables[var_name]['patterns'][chapter_id].append(
-                        clean_snippet[:100]
-                    )
+                # Handle italics macro specially - keep the content
+                clean_snippet = re.sub(r'\{i/([^}]+)\}', r'\1', text_snippet)
+
+                # Split on other macros to get text segments before/after
+                # This handles cases like "text {MacroName} more text"
+                segments = re.split(r'\{[^}]+\}', clean_snippet)
+
+                # Add extracted macro texts as patterns
+                for mt in macro_texts:
+                    if mt not in variables[var_name]['patterns'][chapter_id]:
+                        variables[var_name]['patterns'][chapter_id].append(mt)
+
+                # Add each substantial text segment as a pattern
+                for segment in segments:
+                    # Normalize whitespace
+                    segment = re.sub(r'\s+', ' ', segment).strip()
+                    if segment and len(segment) > 15:  # Higher threshold for segments
+                        if segment[:100] not in variables[var_name]['patterns'][chapter_id]:
+                            variables[var_name]['patterns'][chapter_id].append(
+                                segment[:100]
+                            )
 
         # Find macro usage and add patterns from macro definitions
         macro_refs = set(re.findall(r'\{(\w+)(?:/[^}]*)?\}', content))

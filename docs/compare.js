@@ -1357,12 +1357,19 @@ function highlightVariableText(varName) {
     let matchCount = 0;
     let firstMatch = null;
 
+    // Normalize quotes/apostrophes for comparison (EPUB text often has curly quotes)
+    const normalizeQuotes = (str) => str
+        .replace(/[\u2018\u2019\u201B\u2032]/g, "'")  // curly single quotes → straight
+        .replace(/[\u201C\u201D\u201F\u2033]/g, '"')  // curly double quotes → straight
+        .replace(/[\u2014]/g, '--')                   // em dash → double hyphen
+        .replace(/[\u2013]/g, '-');                   // en dash → hyphen
+
     paragraphs.forEach(para => {
         const text = para.textContent || '';
         const hasMatch = patterns.some(pattern => {
-            // Clean up pattern and check if paragraph contains it
-            const cleanPattern = pattern.replace(/\s+/g, ' ').trim();
-            const cleanText = text.replace(/\s+/g, ' ');
+            // Clean up and normalize quotes in both pattern and text
+            const cleanPattern = normalizeQuotes(pattern.replace(/\s+/g, ' ').trim());
+            const cleanText = normalizeQuotes(text.replace(/\s+/g, ' '));
             // Use substring matching (patterns may be truncated)
             return cleanText.includes(cleanPattern.substring(0, 50));
         });
