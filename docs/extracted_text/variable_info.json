@@ -44,6 +44,7 @@
     "dadphone": {
       "description": "Is Ryan's \"can't control who you love trauma\" because of his dad's sudden death, or his toxic relationship with Bradley?",
       "chapters": [
+        "prologue",
         "chapter1",
         "chapter2",
         "chapter3",
@@ -55,7 +56,7 @@
         "chapter17",
         "notes"
       ],
-      "usage_count": 10,
+      "usage_count": 11,
       "macros": [],
       "group": [
         "dadphone",
@@ -82,6 +83,9 @@
         ],
         "chapter17": [
           "dad would never be back to tuck me in, just because I'd never hear Niko's laugh again and he wouldn'"
+        ],
+        "prologue": [
+          "I don't think I ever told this to you. When I was little, my dad used to come tuck me in at night, a"
         ],
         "chapter1": [
           "lost in shadows at the end of the hall and"
@@ -408,68 +412,27 @@
     },
     "TheCity": {
       "description": "Is Elder's story of an epic lower level a huge city of houses, or an endless basement floor?",
-      "chapters": [
-        "chapter11",
-        "chapter12",
-        "chapter13",
-        "chapter14",
-        "chapter15",
-        "notes"
-      ],
-      "usage_count": 6,
+      "chapters": [],
+      "usage_count": 0,
       "macros": [],
       "group": [
         "TheCity",
         "TheBasement"
       ],
       "optional": false,
-      "patterns": {
-        "notes": [
-          "a city of recursive houses"
-        ],
-        "chapter15": [
-          "The faint streetlights miles below, the pools of desk lights and floor lamps above, bookended but di"
-        ],
-        "chapter14": [
-          "the City. With all the houses, like I told you.",
-          "From down there you sometimes see clusters of lights, way up above. This must be one of them.",
-          "lights of the city seemed to drop, expand",
-          "lights of the city of houses"
-        ],
-        "chapter11": [
-          "“Can't walk the length of one of its walls without stopping to sleep. Takes five or six sleeps to wa",
-          "Not that I've checked them all.” He laughed again. “Did the math once. There's ten million houses. G",
-          ". “And under every one of those beds, there's another Downstairs, as big as this one. And if you can",
-          "in all that dark"
-        ],
-        "chapter13": [
-          "He spoke of rooms where the carpet was worn, could be ripped up to reveal floorboards underneath. He"
-        ],
-        "chapter12": [
-          "Sometimes those houses down there",
-          "out of those houses, those millions of houses"
-        ]
-      }
+      "patterns": {}
     },
     "TheBasement": {
       "description": "Is Elder's story of an epic lower level a huge city of houses, or an endless basement floor?",
-      "chapters": [
-        "chapter11"
-      ],
-      "usage_count": 1,
+      "chapters": [],
+      "usage_count": 0,
       "macros": [],
       "group": [
         "TheCity",
         "TheBasement"
       ],
       "optional": false,
-      "patterns": {
-        "chapter11": [
-          "“Some stairs keep going down. And if you follow them far enough, they open up into black empty space",
-          "you climb up through to get there. “But,” he added, “but you can't get out. You can't get out of any",
-          "the right stair. Found"
-        ]
-      }
+      "patterns": {}
     },
     "ffdropoff": {
       "description": "Details for the final fight scene",
@@ -2159,58 +2122,58 @@
   "macros": {
     "FavBook": [
       "favcrowley",
-      "favdelany",
-      "favbarker"
+      "favbarker",
+      "favdelany"
     ],
     "AltBook": [
       "favcrowley",
-      "favdelany",
-      "favbarker"
+      "favbarker",
+      "favdelany"
     ],
     "FavAuthor": [
       "favcrowley",
-      "favdelany",
-      "favbarker"
+      "favbarker",
+      "favdelany"
     ],
     "color1": [
-      "colorseq3",
       "colorseq2",
-      "colorseq1"
+      "colorseq1",
+      "colorseq3"
     ],
     "color1poetic": [
-      "colorseq3",
       "colorseq2",
-      "colorseq1"
+      "colorseq1",
+      "colorseq3"
     ],
     "color1shades": [
-      "colorseq3",
       "colorseq2",
-      "colorseq1"
+      "colorseq1",
+      "colorseq3"
     ],
     "color2": [
-      "colorseq3",
       "colorseq2",
-      "colorseq1"
+      "colorseq1",
+      "colorseq3"
     ],
     "color2edge": [
-      "colorseq3",
       "colorseq2",
-      "colorseq1"
+      "colorseq1",
+      "colorseq3"
     ],
     "color3": [
-      "colorseq3",
       "colorseq2",
-      "colorseq1"
+      "colorseq1",
+      "colorseq3"
     ],
     "color4": [
-      "colorseq3",
       "colorseq2",
-      "colorseq1"
+      "colorseq1",
+      "colorseq3"
     ],
     "color4adj": [
-      "colorseq3",
       "colorseq2",
-      "colorseq1"
+      "colorseq1",
+      "colorseq3"
     ]
   },
   "chapter_variables": {

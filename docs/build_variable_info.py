@@ -163,9 +163,10 @@ def find_variable_usage(variables, macros):
         chapter_id = CHAPTER_MAPPING.get(stem, stem)
         content = source_file.read_text(encoding='utf-8')
 
-        # Find direct variable references: @varname
-        direct_refs = set(re.findall(r'@(\w+)', content))
-        for var_name in direct_refs:
+        # Find direct variable references: @varname (case-insensitive)
+        direct_refs = set(re.findall(r'@(\w+)', content, re.IGNORECASE))
+        for var_name_raw in direct_refs:
+            var_name = var_name_raw.lower()  # Normalize to lowercase
             if var_name in variables:
                 if chapter_id not in variables[var_name]['chapters']:
                     variables[var_name]['chapters'].append(chapter_id)
@@ -290,8 +291,10 @@ def extract_chapter_patterns(variables, macros, macro_patterns):
         # Pattern captures content including macro calls (allow { and } chars)
         pattern = r'(?:\[|\|)(?:\*\w+\*)?[\^]?@(\w+)>([^\[\]|]+(?:\{[^}]+\}[^\[\]|]*)*)'
 
-        for match in re.finditer(pattern, content):
-            var_name = match.group(1)
+        for match in re.finditer(pattern, content, re.IGNORECASE):
+            var_name_raw = match.group(1)
+            # Normalize to lowercase for matching (source may use dadPhone vs dadphone)
+            var_name = var_name_raw.lower()
             text_snippet = match.group(2).strip()
             match_position = match.start()
 
