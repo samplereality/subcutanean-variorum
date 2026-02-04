@@ -530,8 +530,10 @@ function buildSourceMatchIndex(sourceData) {
         // Skip comments
         if (trimmed.startsWith('#')) continue;
 
-        // Skip standalone DEFINE blocks
-        if (/^\[DEFINE\s/.test(trimmed)) continue;
+        // Note: We no longer skip DEFINE blocks here because some blocks have
+        // [DEFINE @var] followed by actual content on the next line within the same block.
+        // stripQuantMarkup() removes the DEFINE, and blocks with no remaining content
+        // will be filtered out by the "too few matchable words" check below.
 
         // Skip standalone MACRO/STICKY_MACRO definitions (just the definition, no surrounding text)
         if (/^\[(STICKY_)?MACRO\s/.test(trimmed)) continue;
