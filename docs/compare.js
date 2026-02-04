@@ -49,6 +49,25 @@ let mobileNavOpen = false;
 // Theme state
 let currentTheme = 'dark';
 
+// First-time feature toast state
+let shownFeatureTips = new Set();
+let activeToast = null;
+let toastDismissTimeout = null;
+
+// Feature tip definitions (Gonzo excluded - it has its own About button)
+const FEATURE_TIPS = {
+    // View modes
+    'sidebyside': 'Side-by-side view shows two versions in parallel columns for easy comparison.',
+    'diff': 'Track Changes highlights additions in green and deletions in red, like a word processor.',
+    'comparison': 'Collation view arranges all versions in a table, showing variation at each paragraph.',
+    // Analysis tools
+    'source': 'Source Code Mode lets you click any paragraph to see its underlying Quant markup.',
+    'global-vars': 'Global Variables shows which narrative variables differ between compared versions.',
+    'chapter-vars': 'Chapter Variables shows local variables and macros defined in this chapter.',
+    'word-diff': 'Word Differential reveals unique vocabulary in each version across the entire book.',
+    'heatmap': 'Heatmap shows which chapters have the most textual variation between versions.'
+};
+
 // Gonzo Mode state
 let gonzoCurrentChapter = 'prologue';
 let gonzoCurrentParagraphIndex = 0;
@@ -107,6 +126,112 @@ function updateThemeToggleUI() {
         if (typeof lucide !== 'undefined') {
             lucide.createIcons();
         }
+    }
+}
+
+// First-time feature toast functions
+function loadShownFeatureTips() {
+    try {
+        const saved = localStorage.getItem('subcutanean_shown_tips');
+        if (saved) {
+            shownFeatureTips = new Set(JSON.parse(saved));
+        }
+    } catch (e) {
+        shownFeatureTips = new Set();
+    }
+}
+
+function saveShownFeatureTips() {
+    try {
+        localStorage.setItem('subcutanean_shown_tips', JSON.stringify([...shownFeatureTips]));
+    } catch (e) {
+        // Ignore storage errors
+    }
+}
+
+function showFeatureToast(featureKey, anchorElement) {
+    // Don't show if already shown before
+    if (shownFeatureTips.has(featureKey)) return;
+
+    // Don't show if no tip defined
+    const tipText = FEATURE_TIPS[featureKey];
+    if (!tipText) return;
+
+    // Dismiss any existing toast
+    dismissFeatureToast(true);
+
+    // Mark as shown
+    shownFeatureTips.add(featureKey);
+    saveShownFeatureTips();
+
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = 'feature-toast';
+    toast.innerHTML = `
+        <p class="feature-toast-text">${tipText}</p>
+        <span class="feature-toast-dismiss">Click anywhere to dismiss</span>
+    `;
+    document.body.appendChild(toast);
+    activeToast = toast;
+
+    // Position below the anchor element
+    const rect = anchorElement.getBoundingClientRect();
+    const toastRect = toast.getBoundingClientRect();
+
+    let left = rect.left + (rect.width / 2) - (toastRect.width / 2);
+    let top = rect.bottom + 8;
+
+    // Keep toast within viewport
+    if (left < 10) left = 10;
+    if (left + toastRect.width > window.innerWidth - 10) {
+        left = window.innerWidth - toastRect.width - 10;
+    }
+
+    // If not enough room below, show above
+    if (top + toastRect.height > window.innerHeight - 10) {
+        top = rect.top - toastRect.height - 8;
+        toast.classList.add('toast-below');
+    }
+
+    toast.style.left = `${left}px`;
+    toast.style.top = `${top}px`;
+
+    // Auto-dismiss after 5 seconds
+    toastDismissTimeout = setTimeout(() => {
+        dismissFeatureToast();
+    }, 5000);
+
+    // Dismiss on any click (after a brief delay to avoid immediate dismissal)
+    setTimeout(() => {
+        document.addEventListener('click', handleToastDismissClick, { once: true });
+    }, 100);
+}
+
+function handleToastDismissClick() {
+    dismissFeatureToast();
+}
+
+function dismissFeatureToast(immediate = false) {
+    if (!activeToast) return;
+
+    if (toastDismissTimeout) {
+        clearTimeout(toastDismissTimeout);
+        toastDismissTimeout = null;
+    }
+
+    document.removeEventListener('click', handleToastDismissClick);
+
+    if (immediate) {
+        activeToast.remove();
+        activeToast = null;
+    } else {
+        // Fade out animation
+        activeToast.classList.add('toast-fade-out');
+        const toastToRemove = activeToast;
+        activeToast = null;
+        setTimeout(() => {
+            toastToRemove.remove();
+        }, 200);
     }
 }
 
@@ -194,6 +319,8 @@ function initializeNavigation() {
 
     // Close dropdowns when clicking outside
     document.addEventListener('click', (e) => {
+        // Don't close if clicking inside a modal (confirmation dialogs, etc.)
+        if (e.target.closest('.modal')) return;
         if (!e.target.closest('.nav-dropdown') && !e.target.closest('.nav-item')) {
             closeAllNavDropdowns();
         }
@@ -2456,7 +2583,14 @@ function toggleVariablePanel() {
 function initializeVariablePanel() {
     const btn = document.getElementById('show-vars-btn');
     if (btn) {
-        btn.addEventListener('click', toggleVariablePanel);
+        btn.addEventListener('click', () => {
+            // Show toast only when opening (panel currently hidden)
+            const panel = document.getElementById('variable-diff-panel');
+            if (panel && panel.classList.contains('hidden')) {
+                showFeatureToast('global-vars', btn);
+            }
+            toggleVariablePanel();
+        });
     }
 }
 
@@ -2485,14 +2619,27 @@ function toggleChapterVarsPanel() {
 function initializeChapterVarsPanel() {
     const btn = document.getElementById('show-chapter-vars-btn');
     if (btn) {
-        btn.addEventListener('click', toggleChapterVarsPanel);
+        btn.addEventListener('click', () => {
+            // Show toast only when opening (panel currently hidden)
+            const panel = document.getElementById('chapter-vars-panel');
+            if (panel && panel.classList.contains('hidden')) {
+                showFeatureToast('chapter-vars', btn);
+            }
+            toggleChapterVarsPanel();
+        });
     }
 }
 
 function initializeSourceCodeMode() {
     const btn = document.getElementById('source-code-mode-btn');
     if (btn) {
-        btn.addEventListener('click', toggleSourceCodeMode);
+        btn.addEventListener('click', () => {
+            // Show toast only when enabling (before the toggle)
+            if (!sourceCodeModeEnabled) {
+                showFeatureToast('source', btn);
+            }
+            toggleSourceCodeMode();
+        });
     }
 }
 
@@ -3261,16 +3408,22 @@ function setupViewModeButtons() {
         setViewMode('unified');
     });
 
-    document.getElementById('mode-sidebyside').addEventListener('click', () => {
+    const sideBySideBtn = document.getElementById('mode-sidebyside');
+    sideBySideBtn.addEventListener('click', () => {
         setViewMode('sidebyside');
+        showFeatureToast('sidebyside', sideBySideBtn);
     });
 
-    document.getElementById('mode-diff').addEventListener('click', () => {
+    const diffBtn = document.getElementById('mode-diff');
+    diffBtn.addEventListener('click', () => {
         setViewMode('diff');
+        showFeatureToast('diff', diffBtn);
     });
 
-    document.getElementById('mode-comparison').addEventListener('click', () => {
+    const comparisonBtn = document.getElementById('mode-comparison');
+    comparisonBtn.addEventListener('click', () => {
         setViewMode('comparison');
+        showFeatureToast('comparison', comparisonBtn);
     });
 }
 
@@ -6867,6 +7020,12 @@ function refreshAnnotationsUI() {
                     'Delete Annotation',
                     `Are you sure you want to delete this annotation?\n\n"${previewText}"`,
                     () => {
+                        // Close any open floating panel for this annotation
+                        const key = createAnnotationKey(ann.version, ann.chapter, ann.paragraphIndex);
+                        const openPanelEntry = Object.entries(openNotePanels).find(([, p]) => p.annotationKey === key);
+                        if (openPanelEntry) {
+                            closeNotePanel(openPanelEntry[0]);
+                        }
                         delete annotations[ann.id];
                         saveAnnotationsToStorage();
                         refreshAnnotationsUI();
@@ -8665,6 +8824,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     initializeTheme();
+    loadShownFeatureTips();
     setupViewModeButtons();
     initializeControlPanel();
     loadBookmarksFromStorage();
@@ -8752,7 +8912,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeModalBtn = document.getElementById('close-modal-btn');
     const modal = document.getElementById('word-diff-modal');
 
-    wordDiffBtn.addEventListener('click', calculateWordDifferential);
+    wordDiffBtn.addEventListener('click', () => {
+        showFeatureToast('word-diff', wordDiffBtn);
+        calculateWordDifferential();
+    });
     closeModalBtn.addEventListener('click', closeModal);
 
     // Close modal when clicking outside
@@ -9840,7 +10003,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const heatmapModal = document.getElementById('heatmap-modal');
 
     if (heatmapBtn) {
-        heatmapBtn.addEventListener('click', openHeatmapModal);
+        heatmapBtn.addEventListener('click', () => {
+            showFeatureToast('heatmap', heatmapBtn);
+            openHeatmapModal();
+        });
     }
     if (closeHeatmapBtn) {
         closeHeatmapBtn.addEventListener('click', closeHeatmapModal);
@@ -9864,6 +10030,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const gonzoNextBtn = document.getElementById('gonzo-next-btn');
 
     if (gonzoBtn) {
+        // No toast for Gonzo - it has its own About button in the fullscreen header
         gonzoBtn.addEventListener('click', openGonzoModal);
     }
     if (gonzoCloseBtn) {

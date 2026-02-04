@@ -5294,4 +5294,85 @@ main {
 .hidden {
     display: none !important;
 }
-:root {
+
+/* ============================================
+   First-Time Feature Toasts
+   ============================================ */
+
+.feature-toast {
+    position: fixed;
+    background: var(--bg-elevated);
+    border: 1px solid var(--accent-color);
+    border-radius: 6px;
+    padding: 0.6rem 1rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 8px rgba(255, 136, 0, 0.15);
+    z-index: 5500;
+    max-width: 320px;
+    font-size: 0.85rem;
+    color: var(--text-color);
+    line-height: 1.4;
+    animation: toast-appear 0.25s ease-out;
+    pointer-events: auto;
+}
+
+.feature-toast::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-bottom-color: var(--accent-color);
+    border-top: none;
+}
+
+.feature-toast.toast-below::before {
+    top: auto;
+    bottom: -6px;
+    border-bottom: none;
+    border-top-color: var(--accent-color);
+}
+
+.feature-toast-text {
+    margin: 0;
+}
+
+.feature-toast-dismiss {
+    display: block;
+    margin-top: 0.4rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+@keyframes toast-appear {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.feature-toast.toast-fade-out {
+    animation: toast-disappear 0.2s ease-in forwards;
+}
+
+@keyframes toast-disappear {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+}
+
+[data-theme="light"] .feature-toast {
+    background: #ffffff;
+    border-color: var(--accent-color);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15), 0 0 8px rgba(217, 104, 0, 0.1);
+}
