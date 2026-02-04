@@ -405,20 +405,34 @@ function normalizeHtmlContent(html) {
     return normalizePlainText(temp.textContent || '');
 }
 
-function convertSourceContentToParagraphs(content) {
+function convertSourceContentToParagraphs(content, sourceFileName = null) {
     const normalized = (content || '').replace(/\r\n/g, '\n');
     const blocks = normalized.split(/\n{2,}/);
     const htmlBlocks = [];
     const highlightedBlocks = [];
     const normalizedBlocks = [];
     const rawBlocks = [];
+    const conditionalContexts = []; // Track which variable conditional each block is inside
 
     // Also track content-only paragraphs (excluding macro definitions) for better alignment
     const contentOnlyHighlighted = [];
     const contentOnlyRaw = [];
 
     // And macro definitions for lookup
-    const macroDefinitions = new Map(); // macroName -> { raw, highlighted }
+    const macroDefinitions = new Map(); // macroName -> { raw, highlighted, sourceFile, lineNumber }
+
+    // Pre-compute line numbers for each character position
+    const lineNumbers = [];
+    let lineNum = 1;
+    for (let i = 0; i < normalized.length; i++) {
+        lineNumbers[i] = lineNum;
+        if (normalized[i] === '\n') lineNum++;
+    }
+
+    // Helper to get line number from position
+    function getLineNumber(pos) {
+        return pos >= 0 && pos < lineNumbers.length ? lineNumbers[pos] : 1;
+    }
 
     // Helper to check if a block is a formatting-only code (not actual content)
     function isFormattingOnlyBlock(text) {
@@ -438,9 +452,99 @@ function convertSourceContentToParagraphs(content) {
         return trimmed.startsWith('|');
     }
 
+    // Pre-compute conditional context for each block by tracking bracket nesting
+    // This identifies blocks that are inside [@var>...] conditionals even if they
+    // don't have their own Quant syntax
+    function computeConditionalContexts() {
+        let pos = 0;
+        let bracketDepth = 0;
+        let currentContext = []; // Stack of variable names we're inside
+        const blockContexts = [];
+
+        for (const block of blocks) {
+            const blockStart = normalized.indexOf(block, pos);
+            if (blockStart === -1) {
+                blockContexts.push([...currentContext]);
+                continue;
+            }
+
+            // Scan from current pos to block start, tracking context changes
+            for (let i = pos; i < blockStart; i++) {
+                const char = normalized[i];
+                if (char === '[') {
+                    bracketDepth++;
+                    // Check if this is a variable conditional: [@var> or [*tag*@var>
+                    const remaining = normalized.slice(i);
+                    const varMatch = remaining.match(/^\[(?:\*\w+\*)?@(\w+)>/);
+                    if (varMatch) {
+                        currentContext.push(varMatch[1].toLowerCase());
+                    }
+                } else if (char === ']') {
+                    bracketDepth--;
+                    if (bracketDepth < currentContext.length && currentContext.length > 0) {
+                        currentContext.pop();
+                    }
+                } else if (char === '|') {
+                    // Check if this is an alternative: |@var>
+                    const remaining = normalized.slice(i);
+                    const altMatch = remaining.match(/^\|@(\w+)>/);
+                    if (altMatch && currentContext.length > 0) {
+                        // Replace current context variable with the new alternative
+                        currentContext[currentContext.length - 1] = altMatch[1].toLowerCase();
+                    }
+                }
+            }
+
+            // Also scan the block itself for context changes at its START
+            const blockTrimmed = block.trim();
+            const blockVarMatch = blockTrimmed.match(/^(?:\[(?:\*\w+\*)?@(\w+)>|\|@(\w+)>)/);
+            if (blockVarMatch) {
+                const varName = (blockVarMatch[1] || blockVarMatch[2]).toLowerCase();
+                // This block introduces or switches to a new context
+                blockContexts.push([...currentContext, varName]);
+            } else {
+                blockContexts.push([...currentContext]);
+            }
+
+            // Update pos and scan the block content for bracket changes
+            pos = blockStart;
+            for (let i = 0; i < block.length; i++) {
+                const char = block[i];
+                if (char === '[') {
+                    bracketDepth++;
+                    const remaining = block.slice(i);
+                    const varMatch = remaining.match(/^\[(?:\*\w+\*)?@(\w+)>/);
+                    if (varMatch) {
+                        currentContext.push(varMatch[1].toLowerCase());
+                    }
+                } else if (char === ']') {
+                    bracketDepth--;
+                    if (bracketDepth < currentContext.length && currentContext.length > 0) {
+                        currentContext.pop();
+                    }
+                } else if (char === '|') {
+                    const remaining = block.slice(i);
+                    const altMatch = remaining.match(/^\|@(\w+)>/);
+                    if (altMatch && currentContext.length > 0) {
+                        currentContext[currentContext.length - 1] = altMatch[1].toLowerCase();
+                    }
+                }
+            }
+            pos = blockStart + block.length;
+        }
+
+        return blockContexts;
+    }
+
+    const blockContexts = computeConditionalContexts();
+    let blockIndex = 0;
+
     blocks.forEach(block => {
         const withoutLeadingNewlines = block.replace(/^\n+/, '').replace(/\n+$/, '');
-        if (!withoutLeadingNewlines.trim()) return;
+        if (!withoutLeadingNewlines.trim()) {
+            blockIndex++;
+            return;
+        }
 
         const html = escapeHTML(withoutLeadingNewlines).replace(/\n/g, '<br>');
         const highlighted = `<div class="source-snippet">${highlightQuantSyntax(withoutLeadingNewlines)}</div>`;
@@ -449,15 +553,39 @@ function convertSourceContentToParagraphs(content) {
         highlightedBlocks.push(highlighted);
         normalizedBlocks.push(normalizePlainText(withoutLeadingNewlines));
         rawBlocks.push(withoutLeadingNewlines);
+        conditionalContexts.push(blockContexts[blockIndex] || []);
 
-        // Check if this is a macro definition
-        const macroMatch = withoutLeadingNewlines.match(/^\[MACRO\s+([^\]]+)\]/);
-        if (macroMatch) {
+        // Check for ALL macro definitions in the block (there may be multiple on consecutive lines)
+        const macroRegex = /\[MACRO\s+([^\]]+)\](\[[^\]]*\])?/g;
+        let macroMatch;
+        let hasMacro = false;
+        const blockPos = normalized.indexOf(block);
+
+        while ((macroMatch = macroRegex.exec(withoutLeadingNewlines)) !== null) {
+            hasMacro = true;
             const macroName = macroMatch[1].trim();
+            const macroOffsetInBlock = macroMatch.index;
+
+            // Find the full line containing this macro by finding line boundaries
+            let lineStart = withoutLeadingNewlines.lastIndexOf('\n', macroOffsetInBlock);
+            lineStart = lineStart === -1 ? 0 : lineStart + 1;
+            let lineEnd = withoutLeadingNewlines.indexOf('\n', macroOffsetInBlock);
+            lineEnd = lineEnd === -1 ? withoutLeadingNewlines.length : lineEnd;
+            const macroLineContent = withoutLeadingNewlines.slice(lineStart, lineEnd);
+
+            // Calculate the actual line number in the file
+            const lineNum = getLineNumber(blockPos + macroOffsetInBlock);
+
             macroDefinitions.set(macroName, {
-                raw: withoutLeadingNewlines,
-                highlighted: highlighted
+                raw: macroLineContent.trim() || macroMatch[0],
+                highlighted: `<div class="source-snippet">${highlightQuantSyntax(macroLineContent.trim() || macroMatch[0])}</div>`,
+                sourceFile: sourceFileName,
+                lineNumber: lineNum
             });
+        }
+
+        if (hasMacro) {
+            // Block contains macro(s), don't add to content-only arrays
         } else if (!withoutLeadingNewlines.startsWith('#') &&
                    !isFormattingOnlyBlock(withoutLeadingNewlines) &&
                    !isContinuationAlternative(withoutLeadingNewlines)) {
@@ -465,6 +593,8 @@ function convertSourceContentToParagraphs(content) {
             contentOnlyHighlighted.push(highlighted);
             contentOnlyRaw.push(withoutLeadingNewlines);
         }
+
+        blockIndex++;
     });
     const rawText = normalized;
 
@@ -474,6 +604,7 @@ function convertSourceContentToParagraphs(content) {
         normalized: normalizedBlocks,
         raw: rawBlocks,
         rawText,
+        conditionalContexts, // NEW: which variable(s) each block is inside
         // New fields for source code mode
         contentOnlyHighlighted,
         contentOnlyRaw,
@@ -489,10 +620,11 @@ function convertSourceContentToParagraphs(content) {
 function stripQuantMarkup(text) {
     if (!text) return '';
     return text
-        // Remove DEFINE and MACRO declarations
+        // Remove entire lines that are MACRO/STICKY_MACRO definitions (including their content)
+        // These often appear after content paragraphs and pollute the word set
+        .replace(/^\[(?:STICKY_)?MACRO\s+[^\]]*\].*$/gm, '')
+        // Remove DEFINE declarations (just the declaration part, content may follow)
         .replace(/\[DEFINE\s+[^\]]*\]/g, '')
-        .replace(/\[MACRO\s+[^\]]*\]/g, '')
-        .replace(/\[STICKY_MACRO\s+[^\]]*\]/g, '')
         // Remove starred labels like *Ch8SpiralHall*
         .replace(/\*[A-Za-z0-9_]+\*/g, '')
         // Remove conditional openers: [@var>, [^@var>, |@var>
@@ -574,20 +706,22 @@ function findBestSourceMatch(renderedText, matchIndex, startHint) {
     const renderedWords = new Set(plainRendered.split(/\s+/).filter(w => w.length >= 3));
     if (renderedWords.size < 1) return -1;
 
+    // Helper to compute overlap score
+    function computeOverlap(wordSet) {
+        let intersectionCount = 0;
+        for (const word of renderedWords) {
+            if (wordSet.has(word)) intersectionCount++;
+        }
+        const minSize = Math.min(renderedWords.size, wordSet.size);
+        return minSize > 0 ? intersectionCount / minSize : 0;
+    }
+
     let bestScore = 0;
     let bestBlockIndex = -1;
 
+    // First pass: match against single blocks
     for (const entry of matchIndex) {
-        // Compute overlap coefficient: |intersection| / min(|A|, |B|)
-        let intersectionCount = 0;
-        for (const word of renderedWords) {
-            if (entry.words.has(word)) intersectionCount++;
-        }
-
-        const minSize = Math.min(renderedWords.size, entry.words.size);
-        if (minSize === 0) continue;
-
-        const score = intersectionCount / minSize;
+        const score = computeOverlap(entry.words);
 
         // Use score, with sequential proximity as tiebreaker
         if (score > bestScore + 0.01) {
@@ -602,6 +736,29 @@ function findBestSourceMatch(renderedText, matchIndex, startHint) {
                     bestScore = score;
                     bestBlockIndex = entry.blockIndex;
                 }
+            }
+        }
+    }
+
+    // Second pass: if best score is low, try matching against consecutive block pairs
+    // This helps when source paragraphs are split across blocks due to blank lines
+    if (bestScore < 0.5 && matchIndex.length > 1) {
+        for (let i = 0; i < matchIndex.length - 1; i++) {
+            const entry1 = matchIndex[i];
+            const entry2 = matchIndex[i + 1];
+
+            // Only try merging blocks that are close together in the source
+            if (entry2.blockIndex - entry1.blockIndex > 3) continue;
+
+            // Merge word sets
+            const mergedWords = new Set([...entry1.words, ...entry2.words]);
+            const mergedScore = computeOverlap(mergedWords);
+
+            // Use merged match if it's significantly better
+            if (mergedScore > bestScore + 0.1) {
+                bestScore = mergedScore;
+                // Return the first block of the pair (the start of the paragraph)
+                bestBlockIndex = entry1.blockIndex;
             }
         }
     }
@@ -2411,10 +2568,18 @@ function addSourceToggleIcons(container) {
 
 /**
  * Check if source text contains Quant syntax (conditionals, macros, etc.)
+ * OR if the block is inside a conditional context (e.g., part of a multi-paragraph
+ * section controlled by a variable like @clubintro).
  * Used to only show source toggle button for "interesting" paragraphs
  * where the source differs from plain text output.
+ *
+ * @param {string} rawSourceText - The raw source text of the block
+ * @param {string[]} conditionalContext - Optional array of variable names this block is inside
  */
-function sourceHasQuantSyntax(rawSourceText) {
+function sourceHasQuantSyntax(rawSourceText, conditionalContext = null) {
+    // If block is inside a conditional context, it's Quant-controlled even without explicit syntax
+    if (conditionalContext && conditionalContext.length > 0) return true;
+
     if (!rawSourceText) return false;
 
     // Check for variable conditionals: [@varname> or [^@varname> or [*tag*@varname>
@@ -2446,6 +2611,7 @@ function computeSourceAvailability() {
     if (!sourceData || !sourceData.raw.length) return availability;
 
     const rawBlocks = sourceData.raw;
+    const conditionalContexts = sourceData.conditionalContexts || [];
 
     if (currentMode === 'diff') {
         // For diff view, check version A's mapping against alignment indices
@@ -2469,9 +2635,9 @@ function computeSourceAvailability() {
         diffAlignments.forEach((alignment, idx) => {
             if (alignment.indexA !== null && mapping.has(alignment.indexA)) {
                 const sourceBlockIndex = mapping.get(alignment.indexA);
-                // Only show button if source contains Quant syntax
+                // Only show button if source contains Quant syntax or is inside conditional context
                 if (sourceBlockIndex !== undefined && rawBlocks[sourceBlockIndex] &&
-                    sourceHasQuantSyntax(rawBlocks[sourceBlockIndex])) {
+                    sourceHasQuantSyntax(rawBlocks[sourceBlockIndex], conditionalContexts[sourceBlockIndex])) {
                     availability.set(`${versionA}-${idx}`, true);
                 }
             }
@@ -2484,9 +2650,9 @@ function computeSourceAvailability() {
             if (isSourceVersion(ver)) continue;
             const mapping = buildChapterSourceMapping(ver, currentChapter);
             for (const [paraIdx, sourceBlockIndex] of mapping) {
-                // Only show button if source contains Quant syntax
+                // Only show button if source contains Quant syntax or is inside conditional context
                 if (sourceBlockIndex !== undefined && rawBlocks[sourceBlockIndex] &&
-                    sourceHasQuantSyntax(rawBlocks[sourceBlockIndex])) {
+                    sourceHasQuantSyntax(rawBlocks[sourceBlockIndex], conditionalContexts[sourceBlockIndex])) {
                     availability.set(`${ver}-orig-${paraIdx}`, true);
                 }
             }
@@ -2499,9 +2665,9 @@ function computeSourceAvailability() {
             if (isSourceVersion(ver)) continue;
             const mapping = buildChapterSourceMapping(ver, currentChapter);
             for (const [paraIdx, sourceBlockIndex] of mapping) {
-                // Only show button if source contains Quant syntax
+                // Only show button if source contains Quant syntax or is inside conditional context
                 if (sourceBlockIndex !== undefined && rawBlocks[sourceBlockIndex] &&
-                    sourceHasQuantSyntax(rawBlocks[sourceBlockIndex])) {
+                    sourceHasQuantSyntax(rawBlocks[sourceBlockIndex], conditionalContexts[sourceBlockIndex])) {
                     availability.set(`${ver}-${paraIdx}`, true);
                 }
             }
@@ -2695,6 +2861,17 @@ function getSourceForRenderedParagraph(versionId, paragraphIndex, originalIndex 
             const macroDef = lookupMacro(macroName);
             if (macroDef && !includedMacros.has(macroName)) {
                 includedMacros.add(macroName);
+                // Show macro location header
+                let macroHeader = `<div class="macro-location">`;
+                if (macroDef.sourceFile && macroDef.lineNumber) {
+                    macroHeader += `<span class="macro-location-text">Macro <strong>{${macroName}}</strong> defined in <code>${macroDef.sourceFile}:${macroDef.lineNumber}</code></span>`;
+                } else if (macroDef.sourceFile) {
+                    macroHeader += `<span class="macro-location-text">Macro <strong>{${macroName}}</strong> defined in <code>${macroDef.sourceFile}</code></span>`;
+                } else {
+                    macroHeader += `<span class="macro-location-text">Macro <strong>{${macroName}}</strong></span>`;
+                }
+                macroHeader += `</div>`;
+                result += macroHeader;
                 result += `<div class="source-snippet macro-definition">${highlightQuantSyntax(macroDef.raw)}</div>`;
 
                 const nestedRefs = findMacroReferences(macroDef.raw);
@@ -2702,6 +2879,17 @@ function getSourceForRenderedParagraph(versionId, paragraphIndex, originalIndex 
                     const nestedDef = lookupMacro(nestedMacro);
                     if (nestedDef && !includedMacros.has(nestedMacro)) {
                         includedMacros.add(nestedMacro);
+                        // Show nested macro location header
+                        let nestedHeader = `<div class="macro-location nested">`;
+                        if (nestedDef.sourceFile && nestedDef.lineNumber) {
+                            nestedHeader += `<span class="macro-location-text">Macro <strong>{${nestedMacro}}</strong> defined in <code>${nestedDef.sourceFile}:${nestedDef.lineNumber}</code></span>`;
+                        } else if (nestedDef.sourceFile) {
+                            nestedHeader += `<span class="macro-location-text">Macro <strong>{${nestedMacro}}</strong> defined in <code>${nestedDef.sourceFile}</code></span>`;
+                        } else {
+                            nestedHeader += `<span class="macro-location-text">Macro <strong>{${nestedMacro}}</strong></span>`;
+                        }
+                        nestedHeader += `</div>`;
+                        result += nestedHeader;
                         result += `<div class="source-snippet macro-definition">${highlightQuantSyntax(nestedDef.raw)}</div>`;
                     }
                 }
@@ -2720,7 +2908,9 @@ function getSourceChapterData(chapterId) {
     }
 
     if (!sourceParagraphCache[key]) {
-        sourceParagraphCache[key] = convertSourceContentToParagraphs(originSources.chapters[key].content || '');
+        const chapterData = originSources.chapters[key];
+        const sourceFileName = chapterData.filename || `${key}.txt`;
+        sourceParagraphCache[key] = convertSourceContentToParagraphs(chapterData.content || '', sourceFileName);
     }
 
     return sourceParagraphCache[key];
@@ -2740,23 +2930,57 @@ function getGlobalMacros() {
 
     const globalsContent = originSources.chapters['globals'].content || '';
     const normalized = globalsContent.replace(/\r\n/g, '\n');
-    const blocks = normalized.split(/\n{2,}/);
+    const lines = normalized.split('\n');
 
-    blocks.forEach(block => {
-        const trimmed = block.replace(/^\n+/, '').replace(/\n+$/, '');
-        if (!trimmed) return;
+    // Track line numbers for each macro
+    let currentBlock = '';
+    let blockStartLine = 1;
 
-        // Check if this is a MACRO or STICKY_MACRO definition
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const lineNum = i + 1;
+
+        if (line.trim() === '') {
+            // End of block - check if it's a macro
+            if (currentBlock.trim()) {
+                const trimmed = currentBlock.trim();
+                const macroMatch = trimmed.match(/^\[(STICKY_)?MACRO\s+([^\]]+)\]/);
+                if (macroMatch) {
+                    const macroName = macroMatch[2].trim();
+                    const highlighted = `<div class="source-snippet">${highlightQuantSyntax(trimmed)}</div>`;
+                    globalMacrosCache.set(macroName, {
+                        raw: trimmed,
+                        highlighted: highlighted,
+                        sourceFile: 'globals.txt',
+                        lineNumber: blockStartLine
+                    });
+                }
+            }
+            currentBlock = '';
+            blockStartLine = lineNum + 1;
+        } else {
+            if (currentBlock === '') {
+                blockStartLine = lineNum;
+            }
+            currentBlock += (currentBlock ? '\n' : '') + line;
+        }
+    }
+
+    // Handle last block if no trailing newline
+    if (currentBlock.trim()) {
+        const trimmed = currentBlock.trim();
         const macroMatch = trimmed.match(/^\[(STICKY_)?MACRO\s+([^\]]+)\]/);
         if (macroMatch) {
             const macroName = macroMatch[2].trim();
             const highlighted = `<div class="source-snippet">${highlightQuantSyntax(trimmed)}</div>`;
             globalMacrosCache.set(macroName, {
                 raw: trimmed,
-                highlighted: highlighted
+                highlighted: highlighted,
+                sourceFile: 'globals.txt',
+                lineNumber: blockStartLine
             });
         }
-    });
+    }
 
     return globalMacrosCache;
 }
@@ -3207,7 +3431,7 @@ function displayUnified(container, dataA, dataB, dataC = null) {
     const { paragraphs, isSource } = activeData;
 
     const heading = document.createElement('h2');
-    heading.textContent = formatVersionLabel(activeVersion);
+    heading.textContent = `${formatVersionLabel(activeVersion)} – ${formatChapterLabel(currentChapter)}`;
     div.appendChild(heading);
 
     renderParagraphs(div, paragraphs, isSource, activeVersion);
@@ -3226,7 +3450,7 @@ function displaySideBySide(container, dataA, dataB, dataC = null) {
     panelA.className = 'version-panel';
 
     const headingA = document.createElement('h2');
-    headingA.textContent = formatVersionLabel(versionA);
+    headingA.textContent = `${formatVersionLabel(versionA)} – ${formatChapterLabel(currentChapter)}`;
     panelA.appendChild(headingA);
 
     renderParagraphs(panelA, paragraphsA, isSourceA, versionA);
@@ -3236,7 +3460,7 @@ function displaySideBySide(container, dataA, dataB, dataC = null) {
     panelB.className = 'version-panel';
 
     const headingB = document.createElement('h2');
-    headingB.textContent = formatVersionLabel(versionB);
+    headingB.textContent = `${formatVersionLabel(versionB)} – ${formatChapterLabel(currentChapter)}`;
     panelB.appendChild(headingB);
 
     renderParagraphs(panelB, paragraphsB, isSourceB, versionB);
@@ -3251,7 +3475,7 @@ function displaySideBySide(container, dataA, dataB, dataC = null) {
         panelC.className = 'version-panel';
 
         const headingC = document.createElement('h2');
-        headingC.textContent = formatVersionLabel(versionC);
+        headingC.textContent = `${formatVersionLabel(versionC)} – ${formatChapterLabel(currentChapter)}`;
         panelC.appendChild(headingC);
 
         renderParagraphs(panelC, paragraphsC, isSourceC, versionC);
@@ -3279,9 +3503,9 @@ function displayDiff(container, dataA, dataB, dataC = null) {
 
     const heading = document.createElement('h2');
     if (dataC) {
-        heading.textContent = `Tracking Changes: ${formatVersionLabel(versionA)} as base`;
+        heading.textContent = `Tracking Changes: ${formatVersionLabel(versionA)} as base – ${formatChapterLabel(currentChapter)}`;
     } else {
-        heading.textContent = `Tracking Changes: ${formatVersionLabel(versionA)} → ${formatVersionLabel(versionB)}`;
+        heading.textContent = `Tracking Changes: ${formatVersionLabel(versionA)} → ${formatVersionLabel(versionB)} – ${formatChapterLabel(currentChapter)}`;
     }
     div.appendChild(heading);
 
@@ -3789,9 +4013,9 @@ function displayParagraphComparison(container, dataA, dataB, dataC = null) {
 
     const heading = document.createElement('h2');
     if (dataC) {
-        heading.textContent = `Collation: ${formatVersionLabel(versionA)} vs ${formatVersionLabel(versionB)} vs ${formatVersionLabel(versionC)}`;
+        heading.textContent = `Collation: ${formatVersionLabel(versionA)} vs ${formatVersionLabel(versionB)} vs ${formatVersionLabel(versionC)} – ${formatChapterLabel(currentChapter)}`;
     } else {
-        heading.textContent = `Collation: ${formatVersionLabel(versionA)} vs ${formatVersionLabel(versionB)}`;
+        heading.textContent = `Collation: ${formatVersionLabel(versionA)} vs ${formatVersionLabel(versionB)} – ${formatChapterLabel(currentChapter)}`;
     }
     div.appendChild(heading);
 

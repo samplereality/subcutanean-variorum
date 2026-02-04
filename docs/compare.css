@@ -708,31 +708,66 @@ header {
     color: #2c2c2c;
 }
 
+/* Macro location header */
+.macro-location {
+    margin-top: 1rem;
+    padding: 0.4rem 0.6rem;
+    background: rgba(129, 199, 132, 0.15);
+    border-left: 3px solid rgba(129, 199, 132, 0.7);
+    border-radius: 0 4px 4px 0;
+    font-size: 0.8rem;
+    color: rgba(129, 199, 132, 0.95);
+}
+
+.macro-location.nested {
+    margin-left: 1rem;
+    border-left-color: rgba(100, 180, 120, 0.5);
+    background: rgba(129, 199, 132, 0.08);
+}
+
+.macro-location-text {
+    font-family: var(--ui-font);
+}
+
+.macro-location-text code {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+    font-size: 0.85em;
+}
+
+.macro-location-text strong {
+    color: #a5d6a7;
+}
+
 /* Macro definitions shown with source */
 .source-snippet.macro-definition {
-    margin-top: 0.75rem;
+    margin-top: 0.25rem;
     border-left: 3px solid rgba(129, 199, 132, 0.6);
     background: rgba(129, 199, 132, 0.08);
 }
 
-.source-snippet.macro-definition::before {
-    content: "Macro:";
-    display: block;
-    font-size: 0.7rem;
-    font-weight: 600;
-    color: rgba(129, 199, 132, 0.9);
-    margin-bottom: 0.3rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+[data-theme="light"] .macro-location {
+    background: rgba(76, 175, 80, 0.12);
+    border-left-color: rgba(76, 175, 80, 0.6);
+    color: rgba(46, 125, 50, 0.95);
+}
+
+[data-theme="light"] .macro-location.nested {
+    background: rgba(76, 175, 80, 0.06);
+}
+
+[data-theme="light"] .macro-location-text code {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .macro-location-text strong {
+    color: #2e7d32;
 }
 
 [data-theme="light"] .source-snippet.macro-definition {
     background: rgba(76, 175, 80, 0.08);
     border-left-color: rgba(76, 175, 80, 0.5);
-}
-
-[data-theme="light"] .source-snippet.macro-definition::before {
-    color: rgba(56, 142, 60, 0.9);
 }
 
 /* Variable diff panel */
