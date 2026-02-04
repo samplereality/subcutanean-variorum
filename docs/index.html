@@ -236,8 +236,11 @@
                 <button id="source-code-mode-btn" class="tool-btn source-code-toggle" title="Enable Source Code Mode - click any paragraph to view its Quant source">
                     <i data-lucide="code"></i> Source
                 </button>
-                <button id="show-vars-btn" class="tool-btn vars-toggle" title="Show variable differences between versions">
+                <button id="show-vars-btn" class="tool-btn vars-toggle" title="Show global variable differences between versions">
                     <i data-lucide="variable"></i> Global Vars
+                </button>
+                <button id="show-chapter-vars-btn" class="tool-btn chapter-vars-toggle" title="Show chapter-local variables and macros">
+                    <i data-lucide="bookmark"></i> Chapter Vars
                 </button>
                 <button id="word-diff-btn" class="tool-btn" title="Compare unique vocabulary between two versions">
                     <i data-lucide="split"></i> Word Diff
@@ -268,6 +271,16 @@
             <div class="var-diff-section var-diff-shared">
                 <span class="var-diff-label"><span id="var-shared-label">Shared</span>:</span>
                 <span id="vars-shared" class="var-list var-list-shared"></span>
+            </div>
+        </div>
+
+        <!-- Chapter Variables panel (for chapter-local variables and macros) -->
+        <div id="chapter-vars-panel" class="chapter-vars-panel hidden">
+            <div class="var-panel-description">
+                These variables and macros are defined within this chapter's source file and affect local narrative variations.
+            </div>
+            <div id="chapter-vars-content">
+                <!-- Chapter variables and macros will be rendered here -->
             </div>
         </div>
     </header>

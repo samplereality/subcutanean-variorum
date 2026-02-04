@@ -152,6 +152,75 @@ def parse_globals():
     return variables, macros, macro_patterns, variable_groups
 
 
+def parse_chapter_macros(global_variables):
+    """Parse chapter files for local macro definitions.
+
+    Chapter files can define macros with [MACRO name]... syntax.
+    These macros may reference global variables in patterns like:
+    [MACRO ch16possiblebit][@possibles>The possible|What]
+
+    Returns:
+        chapter_macros: dict mapping chapter_id -> macro_name -> {vars: [...], patterns: {var: [text]}}
+    """
+    chapter_macros = {}
+
+    for source_file in ORIGIN_DIR.glob('*.txt'):
+        if source_file.name in ('globals.txt', 'manifest.txt'):
+            continue
+
+        stem = source_file.stem
+        chapter_id = CHAPTER_MAPPING.get(stem, stem)
+        content = source_file.read_text(encoding='utf-8')
+
+        macros_in_chapter = {}
+
+        # Find all MACRO definitions in this chapter
+        for macro_match in re.finditer(r'\[MACRO\s+([\w\s]+)\](.+)', content):
+            macro_name = macro_match.group(1).strip()
+            macro_content = macro_match.group(2)
+
+            # Find all variables referenced in this macro (case-insensitive)
+            vars_in_macro = [v.lower() for v in re.findall(r'@(\w+)', macro_content, re.IGNORECASE)]
+            vars_in_macro = [v for v in vars_in_macro if v in global_variables]
+
+            if not vars_in_macro:
+                continue
+
+            # Extract text patterns from macro definition: @varname>text|alternative
+            # The text before | is for when the variable is active
+            patterns = {}
+            for var_match in re.finditer(r'@(\w+)>([^|\]\[]+)', macro_content, re.IGNORECASE):
+                var_name = var_match.group(1).lower()
+                if var_name not in global_variables:
+                    continue
+                text_snippet = var_match.group(2).strip()
+
+                # Clean up the snippet (remove nested macros, keep italic text)
+                clean_snippet = re.sub(r'\{i/([^}]+)\}', r'\1', text_snippet)
+                clean_snippet = re.sub(r'\{[^}]+\}', '', clean_snippet)
+                clean_snippet = clean_snippet.strip()
+
+                # Strip leading ^ (Quant paragraph break marker)
+                if clean_snippet.startswith('^'):
+                    clean_snippet = clean_snippet[1:].strip()
+
+                if clean_snippet and len(clean_snippet) >= 3:
+                    if var_name not in patterns:
+                        patterns[var_name] = []
+                    patterns[var_name].append(clean_snippet)
+
+            if patterns:
+                macros_in_chapter[macro_name] = {
+                    'vars': list(set(vars_in_macro)),
+                    'patterns': patterns
+                }
+
+        if macros_in_chapter:
+            chapter_macros[chapter_id] = macros_in_chapter
+
+    return chapter_macros
+
+
 def find_variable_usage(variables, macros):
     """Scan chapter files for variable usage (direct and via macros)."""
 
@@ -258,18 +327,21 @@ def get_chapter_for_position(position, boundaries):
     return current_chapter
 
 
-def extract_chapter_patterns(variables, macros, macro_patterns):
+def extract_chapter_patterns(variables, macros, macro_patterns, chapter_macros=None):
     """Extract text patterns for each variable to help with highlighting.
 
-    Patterns come from three sources:
+    Patterns come from four sources:
     1. Direct conditionals in chapter source: [@varname>text...]
-    2. Macro definitions when the macro is used in a chapter: {MacroName}
+    2. Global macro definitions when the macro is used in a chapter: {MacroName}
     3. Text inside macro calls within conditionals: [@var>{macroname/text...}]
+    4. Chapter-local macro definitions: [MACRO name][@var>text|alt]
 
     Handles cross-chapter content: some source files (ch05.txt, ch08.txt) contain
     content for multiple chapters. Patterns are assigned to the correct chapter
     based on their position relative to {chapter/N} markers.
     """
+    if chapter_macros is None:
+        chapter_macros = {}
 
     for var_name in variables:
         variables[var_name]['patterns'] = {}
@@ -329,6 +401,9 @@ def extract_chapter_patterns(variables, macros, macro_patterns):
                 for segment in segments:
                     # Normalize whitespace
                     segment = re.sub(r'\s+', ' ', segment).strip()
+                    # Strip leading ^ (Quant paragraph break marker)
+                    if segment.startswith('^'):
+                        segment = segment[1:].strip()
                     if segment and len(segment) > 15:  # Higher threshold for segments
                         if segment[:100] not in variables[var_name]['patterns'][chapter_id]:
                             variables[var_name]['patterns'][chapter_id].append(
@@ -337,11 +412,12 @@ def extract_chapter_patterns(variables, macros, macro_patterns):
 
         # Find macro usage and add patterns from macro definitions
         # For macros, we need to track position too for cross-chapter assignment
-        for macro_match in re.finditer(r'\{(\w+)(?:/[^}]*)?\}', content):
-            macro_name = macro_match.group(1)
+        for macro_match in re.finditer(r'\{([\w\s]+)(?:/[^}]*)?\}', content):
+            macro_name = macro_match.group(1).strip()
             macro_position = macro_match.start()
             chapter_id = get_chapter_for_position(macro_position, chapter_boundaries)
 
+            # Check global macros (from globals.txt)
             if macro_name in macro_patterns:
                 # Add patterns from this macro to the relevant variables
                 for var_name, patterns in macro_patterns[macro_name].items():
@@ -352,13 +428,60 @@ def extract_chapter_patterns(variables, macros, macro_patterns):
                             if pat not in variables[var_name]['patterns'][chapter_id]:
                                 variables[var_name]['patterns'][chapter_id].append(pat)
 
+            # Check chapter-local macros
+            # Note: chapter-local macros are defined in the same file where they're used
+            if default_chapter in chapter_macros and macro_name in chapter_macros[default_chapter]:
+                local_macro = chapter_macros[default_chapter][macro_name]
+                for var_name, patterns in local_macro['patterns'].items():
+                    if var_name in variables:
+                        if chapter_id not in variables[var_name]['patterns']:
+                            variables[var_name]['patterns'][chapter_id] = []
+                        for pat in patterns:
+                            if pat not in variables[var_name]['patterns'][chapter_id]:
+                                variables[var_name]['patterns'][chapter_id].append(pat)
+
     return variables
+
+
+def extract_patterns_for_chapter_variable(var_name, content):
+    """Extract text patterns for a chapter-local variable from chapter content.
+
+    Looks for conditional blocks: [@varname>text...] or |@varname>text...]
+    Returns a list of text patterns.
+    """
+    patterns = []
+
+    # Pattern for variable conditionals
+    pattern = r'(?:\[|\|)(?:\*\w+\*)?[\^]?@' + re.escape(var_name) + r'>([^\[\]|]+(?:\{[^}]+\}[^\[\]|]*)*)'
+
+    for match in re.finditer(pattern, content, re.IGNORECASE):
+        text_snippet = match.group(1).strip()
+
+        # Handle italics macro - keep the content
+        clean_snippet = re.sub(r'\{i/([^}]+)\}', r'\1', text_snippet)
+
+        # Remove other macros but keep segments
+        segments = re.split(r'\{[^}]+\}', clean_snippet)
+
+        for segment in segments:
+            # Normalize whitespace
+            segment = re.sub(r'\s+', ' ', segment).strip()
+            # Strip leading ^ (Quant paragraph break marker)
+            if segment.startswith('^'):
+                segment = segment[1:].strip()
+            # Add if substantial (but lower threshold for chapter-local vars)
+            if segment and len(segment) >= 3:
+                truncated = segment[:100]
+                if truncated not in patterns:
+                    patterns.append(truncated)
+
+    return patterns
 
 
 def extract_chapter_variables(global_variables):
     """Extract variables defined within chapter files (not in globals.txt).
 
-    Returns a dict: chapter_id -> list of variable definitions
+    Returns a dict: chapter_id -> list of variable definitions with patterns
     """
     chapter_variables = {}
 
@@ -390,7 +513,7 @@ def extract_chapter_variables(global_variables):
                 var_names = re.findall(r'@(\w+)', define_content)
 
                 # Skip if all variables are global (already in globals.txt)
-                local_vars = [v for v in var_names if v not in global_variables]
+                local_vars = [v.lower() for v in var_names if v.lower() not in global_variables]
                 if not local_vars:
                     current_comment = []
                     continue
@@ -401,10 +524,17 @@ def extract_chapter_variables(global_variables):
                 is_group = len(local_vars) > 1
 
                 # Check for optional (^) prefix
-                is_optional = any(f'^@{v}' in define_content for v in local_vars)
+                is_optional = any(f'^@{v}' in define_content.lower() for v in local_vars)
 
                 # Extract probabilities if present
                 has_probabilities = bool(re.search(r'\d+>', define_content))
+
+                # Extract text patterns for each variable in the group
+                patterns = {}
+                for var_name in local_vars:
+                    var_patterns = extract_patterns_for_chapter_variable(var_name, content)
+                    if var_patterns:
+                        patterns[var_name] = var_patterns
 
                 chapter_vars.append({
                     'variables': local_vars,
@@ -412,7 +542,8 @@ def extract_chapter_variables(global_variables):
                     'is_group': is_group,
                     'is_optional': is_optional,
                     'has_probabilities': has_probabilities,
-                    'raw': define_content.strip()
+                    'raw': define_content.strip(),
+                    'patterns': patterns
                 })
 
                 current_comment = []
@@ -427,6 +558,115 @@ def extract_chapter_variables(global_variables):
     return chapter_variables
 
 
+def extract_all_chapter_macros(global_variables, chapter_variables):
+    """Extract ALL macro definitions from chapter files.
+
+    Unlike parse_chapter_macros() which only extracts macros referencing global variables,
+    this extracts every macro definition for display in the UI.
+
+    Returns: dict mapping chapter_id -> macro_name -> macro info
+    """
+    # Build set of all known variables (global + chapter-local)
+    all_vars = set(global_variables.keys())
+    for chapter_id, var_defs in chapter_variables.items():
+        for var_def in var_defs:
+            all_vars.update(var_def['variables'])
+
+    chapter_macros = {}
+
+    for source_file in ORIGIN_DIR.glob('*.txt'):
+        if source_file.name in ('globals.txt', 'manifest.txt'):
+            continue
+
+        stem = source_file.stem
+        chapter_id = CHAPTER_MAPPING.get(stem, stem)
+        content = source_file.read_text(encoding='utf-8')
+
+        macros_in_chapter = {}
+
+        # Find all MACRO definitions: [MACRO name][content]
+        # The regex captures macro name and its content (which follows in square brackets)
+        for macro_match in re.finditer(r'\[MACRO\s+([\w\s]+)\](\[[^\]]*\]|\S+)', content):
+            macro_name = macro_match.group(1).strip()
+            macro_content = macro_match.group(2)
+
+            # Remove surrounding brackets if present
+            if macro_content.startswith('[') and macro_content.endswith(']'):
+                macro_content = macro_content[1:-1]
+
+            # Extract text variants by splitting on | (but not inside nested brackets)
+            # Simple approach: split on | that's not inside a conditional
+            variants = []
+            current_variant = ""
+            bracket_depth = 0
+
+            for char in macro_content:
+                if char == '[':
+                    bracket_depth += 1
+                    current_variant += char
+                elif char == ']':
+                    bracket_depth -= 1
+                    current_variant += char
+                elif char == '|' and bracket_depth == 0:
+                    if current_variant.strip():
+                        variants.append(current_variant.strip())
+                    current_variant = ""
+                else:
+                    current_variant += char
+
+            if current_variant.strip():
+                variants.append(current_variant.strip())
+
+            # Clean up variants - remove probability prefixes like "80>" and variable conditionals
+            clean_variants = []
+            for v in variants:
+                # Remove probability prefix
+                v = re.sub(r'^\d+>', '', v).strip()
+                # Remove variable conditional prefix like @varname>
+                v = re.sub(r'^@\w+>', '', v).strip()
+                # Clean up italics macro
+                v = re.sub(r'\{i/([^}]+)\}', r'\1', v)
+                # Handle ^ paragraph breaks
+                if v.startswith('^'):
+                    v = v[1:].strip()
+                if v:
+                    clean_variants.append(v)
+
+            # Check for probabilities
+            has_probabilities = bool(re.search(r'\d+>', macro_content))
+
+            # Find variables referenced in this macro
+            vars_referenced = []
+            for var_match in re.findall(r'@(\w+)', macro_content, re.IGNORECASE):
+                var_name = var_match.lower()
+                if var_name in all_vars:
+                    vars_referenced.append(var_name)
+            vars_referenced = list(set(vars_referenced))
+
+            # Find other macros referenced
+            macros_referenced = []
+            for ref_match in re.findall(r'\{([\w\s]+)(?:/[^}]*)?\}', macro_content):
+                ref_name = ref_match.strip()
+                # Skip common non-macro patterns like {i/text}
+                if ref_name.lower() not in ('i', 'b', 'chapter', 'part', 'epigraph', 'vspace'):
+                    macros_referenced.append(ref_name)
+            macros_referenced = list(set(macros_referenced))
+
+            macros_in_chapter[macro_name] = {
+                'variants': clean_variants,
+                'variant_count': len(clean_variants) if clean_variants else len(variants),
+                'has_probabilities': has_probabilities,
+                'references_vars': vars_referenced,
+                'references_macros': macros_referenced,
+                'raw': macro_content
+            }
+
+        if macros_in_chapter:
+            chapter_macros[chapter_id] = macros_in_chapter
+
+    return chapter_macros
+
+
 def main():
     print("Parsing globals.txt for variables and macros...")
     variables, macros, macro_patterns, variable_groups = parse_globals()
@@ -435,11 +675,16 @@ def main():
     macros_with_patterns = sum(1 for mp in macro_patterns.values() if mp)
     print(f"  {macros_with_patterns} macros have extractable text patterns")
 
+    print("\nParsing chapter files for local macro definitions...")
+    chapter_macros = parse_chapter_macros(variables)
+    total_chapter_macros = sum(len(m) for m in chapter_macros.values())
+    print(f"  Found {total_chapter_macros} chapter-local macros in {len(chapter_macros)} chapters")
+
     print("\nScanning chapters for variable usage (direct + via macros)...")
     variables = find_variable_usage(variables, macros)
 
     print("\nExtracting text patterns (direct + from macros)...")
-    variables = extract_chapter_patterns(variables, macros, macro_patterns)
+    variables = extract_chapter_patterns(variables, macros, macro_patterns, chapter_macros)
 
     with_chapters = sum(1 for v in variables.values() if v.get('chapters'))
     with_patterns = sum(1 for v in variables.values() if v.get('patterns'))
@@ -451,12 +696,25 @@ def main():
     total_chapter_vars = sum(len(defs) for defs in chapter_variables.values())
     print(f"  Found {total_chapter_vars} chapter-local variable definitions in {len(chapter_variables)} chapters")
 
+    # Count chapter-local variables with patterns
+    vars_with_patterns = sum(
+        1 for defs in chapter_variables.values()
+        for d in defs if d.get('patterns')
+    )
+    print(f"  {vars_with_patterns} definitions have text patterns for highlighting")
+
+    print("\nExtracting all chapter-local macro definitions...")
+    all_chapter_macros = extract_all_chapter_macros(variables, chapter_variables)
+    total_all_macros = sum(len(m) for m in all_chapter_macros.values())
+    print(f"  Found {total_all_macros} total chapter-local macros in {len(all_chapter_macros)} chapters")
+
     # Build final output with variables and groups for inference
     output_data = {
         'variables': variables,
         'groups': variable_groups,
         'macros': macros,
         'chapter_variables': chapter_variables,
+        'chapter_macros': all_chapter_macros,
     }
 
     OUTPUT_PATH.parent.mkdir(exist_ok=True)
