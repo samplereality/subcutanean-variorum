@@ -78,8 +78,7 @@ label,
 .dropdown-body,
 .header-dropdown-panel,
 .essential-controls,
-.variable-diff-panel,
-.chapter-vars-panel,
+.variables-panel,
 .var-panel-description,
 .heatmap-label,
 .heatmap-legend,
@@ -645,7 +644,6 @@ header {
 }
 
 .vars-toggle.active,
-.chapter-vars-toggle.active,
 .source-code-toggle.active {
     background-color: var(--accent-color);
     color: #000;
@@ -770,24 +768,8 @@ header {
     border-left-color: rgba(76, 175, 80, 0.5);
 }
 
-/* Variable diff panel */
-.variable-diff-panel {
-    background-color: rgba(0, 0, 0, 0.3);
-    border-radius: 6px;
-    padding: 0.75rem 1rem;
-    margin-bottom: 1rem;
-    font-size: 0.85rem;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-.variable-diff-panel.hidden {
-    display: none;
-}
-
-/* Chapter Variables panel */
-.chapter-vars-panel {
+/* Unified Variables panel */
+.variables-panel {
     background-color: rgba(0, 0, 0, 0.3);
     border-radius: 6px;
     padding: 0.75rem 1rem;
@@ -795,20 +777,25 @@ header {
     font-size: 0.85rem;
 }
 
-.chapter-vars-panel.hidden {
+.variables-panel.hidden {
     display: none;
 }
 
-/* Chapter variables section - matches global variables column layout */
-.chapter-vars-columns {
+/* Two-column layout for Only in A / Only in B */
+.var-diff-columns {
     display: flex;
-    flex-wrap: wrap;
     gap: 1rem;
-    width: 100%;
+    margin-bottom: 0.25rem;
 }
 
-[data-theme="light"] .chapter-vars-panel {
-    background-color: rgba(0, 0, 0, 0.08);
+.var-diff-column {
+    flex: 1;
+    min-width: 0;
+}
+
+.var-diff-column .var-diff-label {
+    display: block;
+    margin-bottom: 0.25rem;
 }
 
 .var-panel-description {
@@ -833,8 +820,7 @@ header {
     display: flex;
     align-items: flex-start;
     gap: 0.5rem;
-    flex: 1;
-    min-width: 200px;
+    margin-bottom: 0.25rem;
 }
 
 .var-diff-label {
@@ -875,10 +861,6 @@ header {
     color: #ce93d8;
 }
 
-.var-diff-c.hidden {
-    display: none;
-}
-
 .var-list-shared .var-tag,
 .var-list-shared .chapter-var-tag {
     background-color: rgba(150, 150, 150, 0.3);
@@ -888,11 +870,6 @@ header {
 .var-list-undetected .chapter-var-tag {
     background-color: rgba(255, 255, 255, 0.1);
     color: rgba(255, 255, 255, 0.5);
-}
-
-.var-diff-shared {
-    width: 100%;
-    flex: none;
 }
 
 .var-list-empty {
@@ -1016,9 +993,26 @@ header {
     margin-bottom: 0.5rem;
 }
 
-/* Chapter variable tags get same styling as regular var-tags */
+/* Chapter variable tags: dashed border to distinguish from global vars */
 .chapter-var-tag {
     font-weight: 500;
+    border: 1px dashed currentColor;
+    border-radius: 3px;
+}
+
+.chapter-var-tag.var-tag-not-rendered {
+    border-style: dotted;
+}
+
+/* Separator between global and chapter-local tags within a list */
+.var-list-separator {
+    display: inline-block;
+    width: 1px;
+    height: 1.1em;
+    background: currentColor;
+    opacity: 0.25;
+    vertical-align: middle;
+    margin: 0 0.15rem;
 }
 
 /* Variable highlight on paragraphs */
@@ -1171,7 +1165,7 @@ header {
 }
 
 /* Light mode variable diff */
-[data-theme="light"] .variable-diff-panel {
+[data-theme="light"] .variables-panel {
     background-color: rgba(0, 0, 0, 0.08);
 }
 
@@ -2929,6 +2923,11 @@ main {
 
     .analyze-tools-row {
         flex-wrap: wrap;
+    }
+
+    .var-diff-columns {
+        flex-direction: column;
+        gap: 0.25rem;
     }
 
     .analyze-search-row {

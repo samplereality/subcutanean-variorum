@@ -62,8 +62,7 @@ const FEATURE_TIPS = {
     'comparison': 'Collation view arranges all versions in a table, showing variation at each paragraph.',
     // Analysis tools
     'source': 'Source Code Mode lets you click any paragraph to see its underlying Quant markup.',
-    'global-vars': 'Global Variables shows which narrative variables differ between compared versions.',
-    'chapter-vars': 'Chapter Variables shows local variables and macros defined in this chapter.',
+    'variables': 'Shows which Quant variables differ between compared versions, both global and chapter-local.',
     'word-diff': 'Word Differential reveals unique vocabulary in each version across the entire book.',
     'heatmap': 'Heatmap shows which chapters have the most textual variation between versions.'
 };
@@ -1445,15 +1444,9 @@ function populateVersionSelectors() {
 }
 
 function updateVariableDiffIfVisible() {
-    const panel = document.getElementById('variable-diff-panel');
+    const panel = document.getElementById('variables-panel');
     if (panel && !panel.classList.contains('hidden')) {
-        updateVariableDiff();
-    }
-
-    // Also update chapter vars panel if visible
-    const chapterPanel = document.getElementById('chapter-vars-panel');
-    if (chapterPanel && !chapterPanel.classList.contains('hidden')) {
-        renderChapterLocalSections();
+        renderVariablesPanel();
     }
 }
 
@@ -1462,7 +1455,6 @@ function toggleThirdVersion(enable) {
     const group = document.getElementById('version-c-group');
     const addBtn = document.getElementById('add-version-c-btn');
     const selectorC = document.getElementById('version-c-select');
-    const varDiffCSection = document.getElementById('var-diff-c-section');
 
     if (enable) {
         // Show version C selector
@@ -1475,9 +1467,6 @@ function toggleThirdVersion(enable) {
             if (selectorC) selectorC.value = versionC;
         }
 
-        // Show version C in variables panel
-        if (varDiffCSection) varDiffCSection.classList.remove('hidden');
-
         // Initialize Lucide icons for the remove button
         if (typeof lucide !== 'undefined') {
             lucide.createIcons();
@@ -1487,9 +1476,6 @@ function toggleThirdVersion(enable) {
         if (group) group.classList.add('hidden');
         if (addBtn) addBtn.classList.remove('hidden');
         versionC = null;
-
-        // Hide version C in variables panel
-        if (varDiffCSection) varDiffCSection.classList.add('hidden');
     }
 
     // Re-render comparison with new version state
@@ -1740,69 +1726,88 @@ function checkChapterLocalPatternsInVersionText(patterns, targetVersionId) {
     return false;
 }
 
-function updateVariableDiff() {
-    const varsOnlyA = document.getElementById('vars-only-a');
-    const varsOnlyB = document.getElementById('vars-only-b');
-    const varsOnlyC = document.getElementById('vars-only-c');
-    const varsShared = document.getElementById('vars-shared');
-    const labelA = document.getElementById('var-diff-a-label');
-    const labelB = document.getElementById('var-diff-b-label');
-    const labelC = document.getElementById('var-diff-c-label');
-    const sharedLabel = document.getElementById('var-shared-label');
+/**
+ * Unified render function for the Variables panel.
+ * Combines global variables and chapter-local variables into a single view.
+ */
+function renderVariablesPanel() {
+    const container = document.getElementById('variables-panel-content');
+    if (!container) return;
 
-    if (!varsOnlyA || !varsOnlyB || !varsShared) return;
+    let html = '';
 
-    // Helper to filter to only global variables (defined in globals.txt)
+    // --- Compute Global Variables ---
     const isGlobalVar = (v) => variableInfo && variableInfo[v];
-
-    // Get version variables, filtered to only include global variables
     const varsA = new Set(getVersionVariables(versionA).filter(isGlobalVar));
     const varsB = new Set(getVersionVariables(versionB).filter(isGlobalVar));
     const varsC = versionC ? new Set(getVersionVariables(versionC).filter(isGlobalVar)) : null;
 
-    // Update labels
-    if (labelA) labelA.textContent = versionA || 'A';
-    if (labelB) labelB.textContent = versionB || 'B';
-    if (labelC) labelC.textContent = versionC || 'C';
-
-    // Calculate differences
-    let onlyInA, onlyInB, onlyInC, shared;
+    let globalOnlyA, globalOnlyB, globalOnlyC, globalShared;
 
     if (versionC && varsC) {
-        // Three-way comparison
-        onlyInA = [...varsA].filter(v => !varsB.has(v) && !varsC.has(v)).sort();
-        onlyInB = [...varsB].filter(v => !varsA.has(v) && !varsC.has(v)).sort();
-        onlyInC = [...varsC].filter(v => !varsA.has(v) && !varsB.has(v)).sort();
-        shared = [...varsA].filter(v => varsB.has(v) && varsC.has(v)).sort();
-        if (sharedLabel) sharedLabel.textContent = 'In all three';
+        globalOnlyA = [...varsA].filter(v => !varsB.has(v) && !varsC.has(v)).sort();
+        globalOnlyB = [...varsB].filter(v => !varsA.has(v) && !varsC.has(v)).sort();
+        globalOnlyC = [...varsC].filter(v => !varsA.has(v) && !varsB.has(v)).sort();
+        globalShared = [...varsA].filter(v => varsB.has(v) && varsC.has(v)).sort();
     } else {
-        // Two-way comparison
-        onlyInA = [...varsA].filter(v => !varsB.has(v)).sort();
-        onlyInB = [...varsB].filter(v => !varsA.has(v)).sort();
-        onlyInC = [];
-        shared = [...varsA].filter(v => varsB.has(v)).sort();
-        if (sharedLabel) sharedLabel.textContent = 'Shared';
+        globalOnlyA = [...varsA].filter(v => !varsB.has(v)).sort();
+        globalOnlyB = [...varsB].filter(v => !varsA.has(v)).sort();
+        globalOnlyC = [];
+        globalShared = [...varsA].filter(v => varsB.has(v)).sort();
     }
 
-    // Render variable tags with tooltips and click handlers
-    // targetVersion: which version to check for pattern matches (null = check all)
-    const renderVars = (vars, targetVersion) => {
-        if (vars.length === 0) return '<span class="var-list-empty">none</span>';
+    // --- Compute Chapter-Local Variables ---
+    const hasChapterVars = chapterVariables[currentChapter] && chapterVariables[currentChapter].length > 0;
+    let chOnlyInA = [], chOnlyInB = [], chOnlyInC = [], chShared = [];
+
+    if (hasChapterVars) {
+        const varDefs = chapterVariables[currentChapter];
+        const activeVarsA = inferChapterLocalVariables(versionA, currentChapter);
+        const activeVarsB = inferChapterLocalVariables(versionB, currentChapter);
+        const activeVarsC = versionC ? inferChapterLocalVariables(versionC, currentChapter) : {};
+
+        for (const varDef of varDefs) {
+            for (const varName of varDef.variables) {
+                const inA = activeVarsA[varName];
+                const inB = activeVarsB[varName];
+                const inC = versionC ? activeVarsC[varName] : false;
+
+                const patterns = varDef.patterns?.[varName] || [];
+                const groupContext = varDef.is_group && varDef.variables.length > 1
+                    ? varDef.variables.filter(v => v !== varName).join('/')
+                    : null;
+
+                const crossRef = varDef.cross_ref_from || null;
+                const varInfo = { varName, patterns, groupContext, crossRef, varDef };
+
+                if (versionC) {
+                    if (inA && !inB && !inC) chOnlyInA.push(varInfo);
+                    else if (inB && !inA && !inC) chOnlyInB.push(varInfo);
+                    else if (inC && !inA && !inB) chOnlyInC.push(varInfo);
+                    else if (inA && inB && inC) chShared.push(varInfo);
+                } else {
+                    if (inA && !inB) chOnlyInA.push(varInfo);
+                    else if (inB && !inA) chOnlyInB.push(varInfo);
+                    else if (inA && inB) chShared.push(varInfo);
+                }
+            }
+        }
+    }
+
+    // --- Tag Renderers ---
+    const renderGlobalVarTags = (vars, targetVersion) => {
         return vars.map(v => {
             const info = variableInfo ? variableInfo[v] : null;
-            // Scholarly descriptions take precedence over source descriptions
             const scholarlyDesc = scholarlyDescriptions ? scholarlyDescriptions[v] : null;
             const sourceDesc = info?.description;
             const description = scholarlyDesc || sourceDesc || 'No description available';
             const chapters = info?.chapters || [];
             const inCurrentChapter = chapters.includes(currentChapter);
 
-            // Check if patterns actually exist in the rendered text for this version
             let patternsFound = false;
             if (inCurrentChapter && targetVersion) {
                 patternsFound = checkPatternsInVersionText(v, targetVersion);
             } else if (inCurrentChapter) {
-                // For shared variables, check if patterns exist in any version
                 patternsFound = checkPatternsInVersionText(v, versionA) || checkPatternsInVersionText(v, versionB);
             }
 
@@ -1815,7 +1820,6 @@ function updateVariableDiff() {
                 if (patternsFound) {
                     chapterHint = ' (click to highlight)';
                     clickable = 'var-tag-clickable';
-                    // Store which version(s) to highlight in
                     if (targetVersion) {
                         targetVersionAttr = `data-target-version="${targetVersion}"`;
                     }
@@ -1829,13 +1833,91 @@ function updateVariableDiff() {
         }).join('');
     };
 
-    varsOnlyA.innerHTML = renderVars(onlyInA, versionA);
-    varsOnlyB.innerHTML = renderVars(onlyInB, versionB);
-    if (varsOnlyC) varsOnlyC.innerHTML = renderVars(onlyInC, versionC);
-    varsShared.innerHTML = renderVars(shared, null);
+    const renderChapterVarTags = (vars, targetVersion) => {
+        return vars.map(({ varName, patterns, groupContext, crossRef }) => {
+            const patternsFound = targetVersion
+                ? checkChapterLocalPatternsInVersionText(patterns, targetVersion)
+                : (checkChapterLocalPatternsInVersionText(patterns, versionA) ||
+                   checkChapterLocalPatternsInVersionText(patterns, versionB));
 
-    // Add click handlers for variable highlighting
-    document.querySelectorAll('.var-tag-clickable').forEach(tag => {
+            const clickable = patternsFound ? 'var-tag-clickable' : '';
+            const notRendered = patternsFound ? '' : 'var-tag-not-rendered';
+            const hint = patternsFound ? ' (click to highlight)' : ' (not rendered)';
+            const contextStr = groupContext ? ` (vs ${groupContext})` : '';
+            const crossRefStr = crossRef ? ` [from ${crossRef}]` : '';
+            const targetAttr = targetVersion ? `data-target-version="${targetVersion}"` : '';
+
+            return `<span class="var-tag chapter-var-tag ${clickable} ${notRendered}"
+                data-var="${varName}"
+                data-chapter-local="true"
+                ${targetAttr}
+                data-tooltip="Chapter-local variable${contextStr}${crossRefStr}${hint}">${varName}</span>`;
+        }).join('');
+    };
+
+    // Combines global + chapter tags for a given list, with a separator between them
+    const renderCombinedTags = (globalVars, chapterVars, globalTargetVersion, chapterTargetVersion) => {
+        const hasGlobal = globalVars.length > 0;
+        const hasChapter = chapterVars.length > 0;
+        if (!hasGlobal && !hasChapter) return '<span class="var-list-empty">none</span>';
+
+        let result = '';
+        if (hasGlobal) {
+            result += renderGlobalVarTags(globalVars, globalTargetVersion);
+        }
+        if (hasGlobal && hasChapter) {
+            result += '<span class="var-list-separator" title="Chapter-local variables follow"></span>';
+        }
+        if (hasChapter) {
+            result += renderChapterVarTags(chapterVars, chapterTargetVersion);
+        }
+        return result;
+    };
+
+    // --- Render Panel ---
+    html += '<div class="var-panel-description">Global variables from <a href="#" id="show-globals-link" class="globals-link">globals.txt</a>';
+    if (hasChapterVars) {
+        html += '; <span class="chapter-var-tag var-tag" style="cursor:default;font-size:0.7rem;">ch</span> = chapter-local';
+    }
+    html += '.</div>';
+
+    const sharedLabel = versionC ? 'In all three' : 'Shared';
+
+    // Two-column layout for Only in A / Only in B
+    html += '<div class="var-diff-columns">';
+    html += `<div class="var-diff-column var-diff-col-a">
+        <span class="var-diff-label">Only in ${versionA || 'A'}:</span>
+        <span class="var-list var-list-a">${renderCombinedTags(globalOnlyA, chOnlyInA, versionA, versionA)}</span>
+    </div>`;
+    html += `<div class="var-diff-column var-diff-col-b">
+        <span class="var-diff-label">Only in ${versionB || 'B'}:</span>
+        <span class="var-list var-list-b">${renderCombinedTags(globalOnlyB, chOnlyInB, versionB, versionB)}</span>
+    </div>`;
+    html += '</div>';
+
+    if (versionC && (globalOnlyC.length > 0 || chOnlyInC.length > 0)) {
+        html += `<div class="var-diff-section"><span class="var-diff-label">Only in ${versionC}:</span>
+            <span class="var-list var-list-c">${renderCombinedTags(globalOnlyC, chOnlyInC, versionC, versionC)}</span></div>`;
+    }
+
+    html += `<div class="var-diff-section var-diff-shared"><span class="var-diff-label">${sharedLabel}:</span>
+        <span class="var-list var-list-shared">${renderCombinedTags(globalShared, chShared, null, null)}</span></div>`;
+
+    container.innerHTML = html;
+
+    // --- Wire up event handlers ---
+
+    // Globals link
+    const globalsLink = container.querySelector('#show-globals-link');
+    if (globalsLink) {
+        globalsLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            openGlobalsModal();
+        });
+    }
+
+    // Click handlers for all variable tags (global and chapter-local)
+    container.querySelectorAll('.var-tag-clickable').forEach(tag => {
         tag.addEventListener('click', () => {
             const varName = tag.dataset.var;
             const targetVersion = tag.dataset.targetVersion || null;
@@ -1844,8 +1926,8 @@ function updateVariableDiff() {
         });
     });
 
-    // Add click handlers for macro tags
-    document.querySelectorAll('.macro-tag').forEach(tag => {
+    // Click handlers for macro tags
+    container.querySelectorAll('.macro-tag').forEach(tag => {
         tag.addEventListener('click', () => {
             const macroName = tag.dataset.macro;
             const chapterId = tag.dataset.chapter;
@@ -1853,130 +1935,8 @@ function updateVariableDiff() {
         });
     });
 
-    // Add mouseenter handlers for tooltip edge detection
+    // Tooltip edge detection
     setupVarTagTooltipPositioning();
-}
-
-/**
- * Render Chapter Variables and Chapter Macros sections in the Chapter Variables panel.
- */
-function renderChapterLocalSections() {
-    const contentContainer = document.getElementById('chapter-vars-content');
-    if (!contentContainer) return;
-
-    // Clear existing content
-    contentContainer.innerHTML = '';
-
-    const hasChapterVars = chapterVariables[currentChapter] && chapterVariables[currentChapter].length > 0;
-
-    if (!hasChapterVars) {
-        contentContainer.innerHTML = '<div class="var-list-empty">No chapter-local variables defined for this chapter.</div>';
-        return;
-    }
-
-    // Render chapter variables section
-    if (hasChapterVars) {
-        const varDefs = chapterVariables[currentChapter];
-
-        // Infer which chapter-local variables are active for each version
-        const activeVarsA = inferChapterLocalVariables(versionA, currentChapter);
-        const activeVarsB = inferChapterLocalVariables(versionB, currentChapter);
-        const activeVarsC = versionC ? inferChapterLocalVariables(versionC, currentChapter) : {};
-
-        // Collect variables unique to each version and shared
-        const onlyInA = [];
-        const onlyInB = [];
-        const onlyInC = [];
-        const sharedChapterVars = [];
-
-        for (const varDef of varDefs) {
-            for (const varName of varDef.variables) {
-                const inA = activeVarsA[varName];
-                const inB = activeVarsB[varName];
-                const inC = versionC ? activeVarsC[varName] : false;
-
-                // Get patterns for this variable
-                const patterns = varDef.patterns?.[varName] || [];
-
-                // Determine group context for display
-                const groupContext = varDef.is_group && varDef.variables.length > 1
-                    ? varDef.variables.filter(v => v !== varName).join('/')
-                    : null;
-
-                const varInfo = { varName, patterns, groupContext, varDef };
-
-                if (versionC) {
-                    if (inA && !inB && !inC) onlyInA.push(varInfo);
-                    else if (inB && !inA && !inC) onlyInB.push(varInfo);
-                    else if (inC && !inA && !inB) onlyInC.push(varInfo);
-                    else if (inA && inB && inC) sharedChapterVars.push(varInfo);
-                } else {
-                    if (inA && !inB) onlyInA.push(varInfo);
-                    else if (inB && !inA) onlyInB.push(varInfo);
-                    else if (inA && inB) sharedChapterVars.push(varInfo);
-                }
-            }
-        }
-
-        // Helper to render chapter-local variable tags
-        const renderChapterVarTags = (vars, targetVersion) => {
-            if (vars.length === 0) return '<span class="var-list-empty">none detected</span>';
-            return vars.map(({ varName, patterns, groupContext }) => {
-                const patternsFound = targetVersion
-                    ? checkChapterLocalPatternsInVersionText(patterns, targetVersion)
-                    : (checkChapterLocalPatternsInVersionText(patterns, versionA) ||
-                       checkChapterLocalPatternsInVersionText(patterns, versionB));
-
-                const clickable = patternsFound ? 'var-tag-clickable' : '';
-                const notRendered = patternsFound ? '' : 'var-tag-not-rendered';
-                const hint = patternsFound ? ' (click to highlight)' : ' (not rendered)';
-                const contextStr = groupContext ? ` (vs ${groupContext})` : '';
-                const targetAttr = targetVersion ? `data-target-version="${targetVersion}"` : '';
-
-                return `<span class="var-tag chapter-var-tag ${clickable} ${notRendered}"
-                    data-var="${varName}"
-                    data-chapter-local="true"
-                    ${targetAttr}
-                    data-tooltip="Chapter-local variable${contextStr}${hint}">${varName}</span>`;
-            }).join('');
-        };
-
-        // Use same column layout as global variables panel
-        let html = '<div class="chapter-vars-columns">';
-
-        if (onlyInA.length > 0 || onlyInB.length > 0 || (versionC && onlyInC.length > 0) || sharedChapterVars.length > 0) {
-            if (onlyInA.length > 0) {
-                html += `<div class="var-diff-section"><span class="var-diff-label">Only in ${versionA}:</span>
-                    <span class="var-list var-list-a">${renderChapterVarTags(onlyInA, versionA)}</span></div>`;
-            }
-            if (onlyInB.length > 0) {
-                html += `<div class="var-diff-section"><span class="var-diff-label">Only in ${versionB}:</span>
-                    <span class="var-list var-list-b">${renderChapterVarTags(onlyInB, versionB)}</span></div>`;
-            }
-            if (versionC && onlyInC.length > 0) {
-                html += `<div class="var-diff-section"><span class="var-diff-label">Only in ${versionC}:</span>
-                    <span class="var-list var-list-c">${renderChapterVarTags(onlyInC, versionC)}</span></div>`;
-            }
-            if (sharedChapterVars.length > 0) {
-                html += `<div class="var-diff-section var-diff-shared"><span class="var-diff-label">Shared:</span>
-                    <span class="var-list var-list-shared">${renderChapterVarTags(sharedChapterVars, null)}</span></div>`;
-            }
-        } else {
-            html += '<div class="var-diff-section"><span class="var-list-empty">No differences detected</span></div>';
-        }
-
-        html += '</div>';
-        contentContainer.insertAdjacentHTML('beforeend', html);
-    }
-
-    // Add click handlers for chapter variable tags
-    contentContainer.querySelectorAll('.chapter-var-tag.var-tag-clickable').forEach(tag => {
-        tag.addEventListener('click', () => {
-            const varName = tag.dataset.var;
-            const targetVersion = tag.dataset.targetVersion || null;
-            highlightVariableText(varName, targetVersion, true);
-        });
-    });
 }
 
 /**
@@ -2560,7 +2520,7 @@ function closeVariableSourcePanel() {
 }
 
 function toggleVariablePanel() {
-    const panel = document.getElementById('variable-diff-panel');
+    const panel = document.getElementById('variables-panel');
     const btn = document.getElementById('show-vars-btn');
 
     if (!panel) return;
@@ -2573,9 +2533,8 @@ function toggleVariablePanel() {
     }
 
     if (isHidden) {
-        updateVariableDiff();
+        renderVariablesPanel();
     } else {
-        // Clear highlights when panel is closed
         clearVariableHighlights();
     }
 }
@@ -2584,48 +2543,11 @@ function initializeVariablePanel() {
     const btn = document.getElementById('show-vars-btn');
     if (btn) {
         btn.addEventListener('click', () => {
-            // Show toast only when opening (panel currently hidden)
-            const panel = document.getElementById('variable-diff-panel');
+            const panel = document.getElementById('variables-panel');
             if (panel && panel.classList.contains('hidden')) {
-                showFeatureToast('global-vars', btn);
+                showFeatureToast('variables', btn);
             }
             toggleVariablePanel();
-        });
-    }
-}
-
-function toggleChapterVarsPanel() {
-    const panel = document.getElementById('chapter-vars-panel');
-    const btn = document.getElementById('show-chapter-vars-btn');
-
-    if (!panel) return;
-
-    const isHidden = panel.classList.contains('hidden');
-    panel.classList.toggle('hidden', !isHidden);
-
-    if (btn) {
-        btn.classList.toggle('active', isHidden);
-    }
-
-    if (isHidden) {
-        // Render chapter-local variables and macros when panel is shown
-        renderChapterLocalSections();
-    } else {
-        // Clear highlights when panel is closed
-        clearVariableHighlights();
-    }
-}
-
-function initializeChapterVarsPanel() {
-    const btn = document.getElementById('show-chapter-vars-btn');
-    if (btn) {
-        btn.addEventListener('click', () => {
-            // Show toast only when opening (panel currently hidden)
-            const panel = document.getElementById('chapter-vars-panel');
-            if (panel && panel.classList.contains('hidden')) {
-                showFeatureToast('chapter-vars', btn);
-            }
-            toggleChapterVarsPanel();
         });
     }
 }
@@ -8867,7 +8789,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeGenerateForm();
     initializeGlobalsModal();
     initializeVariablePanel();
-    initializeChapterVarsPanel();
     initializeSourceCodeMode();
     initializeThirdVersionControls();
     initializeWelcomeModal();

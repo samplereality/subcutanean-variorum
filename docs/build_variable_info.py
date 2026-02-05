@@ -443,16 +443,45 @@ def extract_chapter_patterns(variables, macros, macro_patterns, chapter_macros=N
     return variables
 
 
+def _strip_quant_markup(text):
+    """Strip Quant syntax from a line to get comparable plain text."""
+    # Remove DEFINE/MACRO directives
+    text = re.sub(r'\[DEFINE\s+[^\]]+\]', '', text)
+    text = re.sub(r'\[MACRO\s+[^\]]+\]', '', text)
+    # Remove variable conditionals: [@var>text] → text (keep first branch)
+    text = re.sub(r'\[@?\w+>', '', text)
+    text = re.sub(r'\[\^@\w+>', '', text)
+    # Remove probability prefixes
+    text = re.sub(r'\d+>', '', text)
+    # Remove alternative markers and brackets
+    text = re.sub(r'[|\[\]]', ' ', text)
+    # Handle italics macro
+    text = re.sub(r'\{i/([^}]+)\}', r'\1', text)
+    # Remove other macros
+    text = re.sub(r'\{[^}]*\}', '', text)
+    # Remove comments
+    text = re.sub(r'#.*$', '', text, flags=re.MULTILINE)
+    # Normalize whitespace
+    text = re.sub(r'\s+', ' ', text).strip()
+    return text
+
+
 def extract_patterns_for_chapter_variable(var_name, content):
     """Extract text patterns for a chapter-local variable from chapter content.
 
     Looks for conditional blocks: [@varname>text...] or |@varname>text...]
     Returns a list of text patterns.
+
+    For short conditionals (< 15 chars), also extracts the surrounding line
+    stripped of Quant markup to provide enough context for accurate matching.
     """
     patterns = []
 
     # Pattern for variable conditionals
     pattern = r'(?:\[|\|)(?:\*\w+\*)?[\^]?@' + re.escape(var_name) + r'>([^\[\]|]+(?:\{[^}]+\}[^\[\]|]*)*)'
+
+    # Split content into lines for context lookup
+    lines = content.split('\n')
 
     for match in re.finditer(pattern, content, re.IGNORECASE):
         text_snippet = match.group(1).strip()
@@ -463,17 +492,35 @@ def extract_patterns_for_chapter_variable(var_name, content):
         # Remove other macros but keep segments
         segments = re.split(r'\{[^}]+\}', clean_snippet)
 
+        has_long_segment = False
         for segment in segments:
             # Normalize whitespace
             segment = re.sub(r'\s+', ' ', segment).strip()
             # Strip leading ^ (Quant paragraph break marker)
             if segment.startswith('^'):
                 segment = segment[1:].strip()
-            # Add if substantial (but lower threshold for chapter-local vars)
-            if segment and len(segment) >= 3:
+            # Use same threshold as global variables for direct patterns
+            if segment and len(segment) >= MIN_INFERENCE_PATTERN_LENGTH:
                 truncated = segment[:100]
                 if truncated not in patterns:
                     patterns.append(truncated)
+                has_long_segment = True
+
+        # For short conditionals, extract the full line as context
+        if not has_long_segment:
+            # Find which line contains this match
+            match_pos = match.start()
+            char_count = 0
+            for line in lines:
+                char_count += len(line) + 1  # +1 for newline
+                if char_count > match_pos:
+                    # Strip Quant markup from the whole line for context
+                    context = _strip_quant_markup(line)
+                    if context and len(context) >= MIN_INFERENCE_PATTERN_LENGTH:
+                        truncated = context[:100]
+                        if truncated not in patterns:
+                            patterns.append(truncated)
+                    break
 
     return patterns
 
@@ -554,6 +601,109 @@ def extract_chapter_variables(global_variables):
 
         if chapter_vars:
             chapter_variables[chapter_id] = chapter_vars
+
+    # Second pass: find cross-chapter references via {chapter/N} markers
+    # Some source files (e.g., ch08.txt) contain {chapter/N} markers that push content
+    # into the next chapter. When a chapter-local variable (like @nikofalls) has text
+    # that spans such a boundary, we need to track it in the target chapter too.
+    #
+    # Strategy: Only add cross-references for variables whose defining source file
+    # contains {chapter/N} markers. The variable + group is added to the target chapter
+    # with patterns extracted from the content after the {chapter/N} marker.
+
+    for source_file in ORIGIN_DIR.glob('*.txt'):
+        if source_file.name in ('globals.txt', 'manifest.txt'):
+            continue
+
+        stem = source_file.stem
+        file_chapter_id = CHAPTER_MAPPING.get(stem, stem)
+        content = source_file.read_text(encoding='utf-8')
+
+        # Find chapter boundaries within this file
+        chapter_boundaries = find_chapter_boundaries(content, file_chapter_id)
+
+        # Skip files that only have one chapter (no cross-chapter content)
+        if len(chapter_boundaries) <= 1:
+            continue
+
+        # This file spans multiple chapters. Find chapter-local variables defined here
+        # and add cross-references for content that appears in other chapters.
+        file_var_defs = chapter_variables.get(file_chapter_id, [])
+        if not file_var_defs:
+            continue
+
+        # Get the other chapter IDs this file contributes to
+        target_chapters = set(ch for _, ch in chapter_boundaries if ch != file_chapter_id)
+
+        for target_chapter in target_chapters:
+            for var_def in file_var_defs:
+                # Skip if already cross-referenced
+                if var_def.get('cross_ref_from'):
+                    continue
+
+                # Extract patterns from this file that belong to the target chapter
+                cross_patterns = {}
+                lines = content.split('\n')
+                for var_name in var_def['variables']:
+                    var_pattern = r'(?:\[|\|)(?:\*\w+\*)?[\^]?@' + re.escape(var_name) + r'>([^\[\]|]+(?:\{[^}]+\}[^\[\]|]*)*)'
+                    for pat_match in re.finditer(var_pattern, content, re.IGNORECASE):
+                        pat_chapter = get_chapter_for_position(pat_match.start(), chapter_boundaries)
+                        if pat_chapter == target_chapter:
+                            snippet = pat_match.group(1).strip()
+                            clean = re.sub(r'\{i/([^}]+)\}', r'\1', snippet)
+                            segments = re.split(r'\{[^}]+\}', clean)
+                            has_long_segment = False
+                            for seg in segments:
+                                seg = re.sub(r'\s+', ' ', seg).strip()
+                                if seg.startswith('^'):
+                                    seg = seg[1:].strip()
+                                if seg and len(seg) >= MIN_INFERENCE_PATTERN_LENGTH:
+                                    if var_name not in cross_patterns:
+                                        cross_patterns[var_name] = []
+                                    truncated = seg[:100]
+                                    if truncated not in cross_patterns[var_name]:
+                                        cross_patterns[var_name].append(truncated)
+                                    has_long_segment = True
+
+                            # For short conditionals, use full-line context
+                            if not has_long_segment:
+                                match_pos = pat_match.start()
+                                char_count = 0
+                                for line in lines:
+                                    char_count += len(line) + 1
+                                    if char_count > match_pos:
+                                        context = _strip_quant_markup(line)
+                                        if context and len(context) >= MIN_INFERENCE_PATTERN_LENGTH:
+                                            if var_name not in cross_patterns:
+                                                cross_patterns[var_name] = []
+                                            truncated = context[:100]
+                                            if truncated not in cross_patterns[var_name]:
+                                                cross_patterns[var_name].append(truncated)
+                                        break
+
+                # Only add if we found patterns in the target chapter
+                if not cross_patterns:
+                    continue
+
+                if target_chapter not in chapter_variables:
+                    chapter_variables[target_chapter] = []
+
+                # Check if already added
+                already_added = any(
+                    set(d['variables']) == set(var_def['variables']) and d.get('cross_ref_from')
+                    for d in chapter_variables[target_chapter]
+                )
+                if not already_added:
+                    chapter_variables[target_chapter].append({
+                        'variables': var_def['variables'],
+                        'description': var_def.get('description'),
+                        'is_group': var_def['is_group'],
+                        'is_optional': var_def['is_optional'],
+                        'has_probabilities': var_def['has_probabilities'],
+                        'raw': var_def['raw'],
+                        'patterns': cross_patterns,
+                        'cross_ref_from': file_chapter_id,
+                    })
 
     return chapter_variables
 

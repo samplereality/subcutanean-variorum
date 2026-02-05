@@ -2172,59 +2172,59 @@
   ],
   "macros": {
     "FavBook": [
+      "favdelany",
       "favcrowley",
-      "favbarker",
-      "favdelany"
+      "favbarker"
     ],
     "AltBook": [
+      "favdelany",
       "favcrowley",
-      "favbarker",
-      "favdelany"
+      "favbarker"
     ],
     "FavAuthor": [
+      "favdelany",
       "favcrowley",
-      "favbarker",
-      "favdelany"
+      "favbarker"
     ],
     "color1": [
-      "colorseq3",
+      "colorseq1",
       "colorseq2",
-      "colorseq1"
+      "colorseq3"
     ],
     "color1poetic": [
-      "colorseq3",
+      "colorseq1",
       "colorseq2",
-      "colorseq1"
+      "colorseq3"
     ],
     "color1shades": [
-      "colorseq3",
+      "colorseq1",
       "colorseq2",
-      "colorseq1"
+      "colorseq3"
     ],
     "color2": [
-      "colorseq3",
+      "colorseq1",
       "colorseq2",
-      "colorseq1"
+      "colorseq3"
     ],
     "color2edge": [
-      "colorseq3",
+      "colorseq1",
       "colorseq2",
-      "colorseq1"
+      "colorseq3"
     ],
     "color3": [
-      "colorseq3",
+      "colorseq1",
       "colorseq2",
-      "colorseq1"
+      "colorseq3"
     ],
     "color4": [
-      "colorseq3",
+      "colorseq1",
       "colorseq2",
-      "colorseq1"
+      "colorseq3"
     ],
     "color4adj": [
-      "colorseq3",
+      "colorseq1",
       "colorseq2",
-      "colorseq1"
+      "colorseq3"
     ]
   },
   "chapter_variables": {
@@ -2251,7 +2251,7 @@
             "the grappling hook ripped through the molding of the wooden doorframe far above, and Niko fell.",
             "Time seemed to snap and twist back on itself in opposing directions, both too fast and too slow. Ter",
             "We made it to the top, in the end. It took a series of shorter climbs to each sideways room, treatin",
-            "our original"
+            "The door frame where our original the grapples had been attached wasn't damaged. We'd seated them pr"
           ]
         }
       },
@@ -2291,12 +2291,12 @@
         "patterns": {
           "ch8intro1": [
             "So it's progress, right?",
-            "Progress?",
-            "The"
+            "“Progress? @ch8introOh yeah? Does it? How? ” I winced, prodding a tender spot.",
+            "“The It's the first concrete sign there's something down there. Not glints of light. Not sounds. Som"
           ],
           "ch8intro2": [
             "So this is huge,",
-            "Oh yeah?"
+            "“Progress? @ch8introOh yeah? Does it? How? ” I winced, prodding a tender spot."
           ],
           "ch8intro3": [
             "This changes everything,"
@@ -2398,7 +2398,8 @@
         "raw": "@bossf",
         "patterns": {
           "bossf": [
-            "She"
+            "I tried to take a midterm and it was a disaster. I hadn't been to class in weeks, which didn't help,",
+            "I'd thought s he was telling me to commit suicide."
           ]
         }
       },
@@ -2413,10 +2414,43 @@
         "raw": "^@ch9weI",
         "patterns": {
           "ch9wei": [
-            "we'd",
-            "our lives"
+            "My headaches weren't getting worse, not yet anyway were getting worse, too, but it wasn't the pain t"
           ]
         }
+      },
+      {
+        "variables": [
+          "spiralhall",
+          "nikofalls"
+        ],
+        "description": "Pick one of two significant moments: either a spiral hallway that one of them doesn't see, or Niko almost falling and Ryan having to talk him to safety.",
+        "is_group": true,
+        "is_optional": false,
+        "has_probabilities": true,
+        "raw": "50>@spiralhall|50>@nikofalls",
+        "patterns": {
+          "nikofalls": [
+            "The door frame where our original the grapples had been attached wasn't damaged. We'd seated them pr"
+          ]
+        },
+        "cross_ref_from": "chapter8"
+      },
+      {
+        "variables": [
+          "tapetooshort"
+        ],
+        "description": null,
+        "is_group": false,
+        "is_optional": true,
+        "has_probabilities": false,
+        "raw": "^@tapeTooShort",
+        "patterns": {
+          "tapetooshort": [
+            ": but after only a few seconds we saw ourselves spring back up from the pit in fast motion, first me",
+            "for another thirty seconds, until the tape reached its end and clunked to a stop"
+          ]
+        },
+        "cross_ref_from": "chapter8"
       }
     ],
     "chapter2": [
@@ -2431,6 +2465,7 @@
         "raw": "@rooftop",
         "patterns": {
           "rooftop": [
+            "Zero natural light is kind of a downer, even for well-adjusted people. Niko made some noise about br",
             "It felt a lot like the rooftop. Forbidden, charged with risk, with dangers from within and without. ",
             "Like we were the only people who knew how to get there."
           ]
@@ -2449,16 +2484,16 @@
         "raw": "@octagon|@hexagon|@pentagon",
         "patterns": {
           "octagon": [
-            "octagon",
-            "an octagonal"
+            "octagon @hexagon>hexagon @pentagon>pentagon",
+            "A few more paces down the hallway, it opened into an octagonal @hexagon>a six-sided @pentagon>a pent"
           ],
           "hexagon": [
-            "hexagon",
-            "a six-sided"
+            "octagon @hexagon>hexagon @pentagon>pentagon",
+            "A few more paces down the hallway, it opened into an octagonal @hexagon>a six-sided @pentagon>a pent"
           ],
           "pentagon": [
-            "pentagon",
-            "a pentagonal"
+            "octagon @hexagon>hexagon @pentagon>pentagon",
+            "A few more paces down the hallway, it opened into an octagonal @hexagon>a six-sided @pentagon>a pent"
           ]
         }
       }
@@ -2493,8 +2528,7 @@
         "raw": "@ch1stairs|@ch1staircase",
         "patterns": {
           "ch1stairs": [
-            "them",
-            "they"
+            "This is what happened, Niko, ^ when we found , ."
           ]
         }
       }
@@ -2514,7 +2548,8 @@
         "patterns": {
           "clubintro": [
             "I hadn't wanted to go to the club. But Niko insisted. “Russian techno, man, one night only. That new",
-            "I’d worn my rainbow pride bracelet at his insistence, the one I’d bought a few months back and mostl"
+            "I’d worn my rainbow pride bracelet at his insistence, the one I’d bought a few months back and mostl",
+            "By the time we hit the top of the hill and saw the house, we were ready to be back indoors. I'd gott"
           ],
           "makeupintro": [
             "I was on the back porch, looking over the dying backyard grass at the sunset reddening the top of co",
@@ -2557,7 +2592,7 @@
           "diary": [
             "Diary,” I'd imagined writing in my nonexistent diary,",
             "You used to put self-deprecating shit like that in diaries, back before social media was invented. N",
-            "Diary"
+            "Diary LiveJournal"
           ]
         }
       },
@@ -2589,9 +2624,10 @@
         "raw": "@justRyan|@justNiko|@ryanAndNiko",
         "patterns": {
           "justryan": [
-            "It was me.",
+            "Niko, and me. @justRyan>It was me. @justNiko>It was Niko. Obviously.",
             "The person in the mirror, except I'd never seen him from this far away before",
             "There was more than one of them.",
+            "The second of each stood just behind the first, so I couldn't see their faces its face either: but t",
             "a him I could believe in instead of a me I couldn’t"
           ],
           "justniko": [
@@ -2602,32 +2638,23 @@
             "Silence. I looked back up, unwillingly",
             "I knew the shape of his body as well as I knew my own.",
             "There was more than one of him.",
-            "Niko",
+            "The second of each stood just behind the first, so I couldn't see their faces its face either: but t",
             "a him that was familiar instead of a thing that wasn't"
           ],
           "ryanandniko": [
             "two people standing there, holding hands",
             "them, to resolve them",
-            "People",
-            "people",
-            "They",
-            "they",
-            "them",
-            "their",
-            "were",
-            "themselves",
-            "theirs",
-            "They moved.",
+            "People A person",
+            "themselves himself",
             "Still holding hands, the shadows",
             "Like deer not sure if they're seeing a bobcat or a bush.",
-            "Niko, and me.",
+            "Niko, and me. @justRyan>It was me. @justNiko>It was Niko. Obviously.",
             "they held themselves, the silhouettes they made, the shoes.",
             "There were more than two of them.",
-            "of each",
-            "their faces",
+            "The second of each stood just behind the first, so I couldn't see their faces its face either: but t",
             "they had the same silhouettes",
             "A second pair, identical.",
-            "set"
+            "they were moving again, lifting up the other foot, still slow, still hesitant, following the doubles"
           ]
         }
       },
@@ -2643,17 +2670,17 @@
         "raw": "75>@facingforward|25>@facingback",
         "patterns": {
           "facingforward": [
-            "Watching me.",
+            "Watching me. Facing away.",
             "forward, slow and deliberate",
+            "They moved. Still holding hands, the shadows It moved. The shadow took a step forward, slow and deli",
             "eyes or expression but",
             "facing me, looking at me.",
             "And then I realized"
           ],
           "facingback": [
-            ". Back",
             "toward me, facing away",
             "with his back to me",
-            "hidden",
+            "Silence. I looked back up, unwillingly. The face still hidden dark but I recognized the way they hel",
             ", or from this angle",
             "Still turned away.",
             "walk backwards, toward me, at a steady pace"
@@ -2763,61 +2790,61 @@
         "raw": "15>@lookieloos|8>@huskmen|3>@husks|7>@ringers|7>@dittomen|6>@mimeos|6>@mimickers|6>@shamfriends|5>@mockups|5>@mockeries|5>@caricatures|4>@alterboys|6>@semblances|6>@creepermen|3>@inchmen|4>@shapes|2>@lingerers|1>@lingermen|1>@likenesses",
         "patterns": {
           "lookieloos": [
-            "Lookie-Loos"
+            "Lookie-Loos @huskmen>Husk-Men @husks>Husks @ringers>Ringers @dittomen>Ditto-Men @mimeos>Mimeos @mimi"
           ],
           "huskmen": [
-            "Husk-Men"
+            "Lookie-Loos @huskmen>Husk-Men @husks>Husks @ringers>Ringers @dittomen>Ditto-Men @mimeos>Mimeos @mimi"
           ],
           "husks": [
-            "Husks"
+            "Lookie-Loos @huskmen>Husk-Men @husks>Husks @ringers>Ringers @dittomen>Ditto-Men @mimeos>Mimeos @mimi"
           ],
           "ringers": [
-            "Ringers"
+            "Lookie-Loos @huskmen>Husk-Men @husks>Husks @ringers>Ringers @dittomen>Ditto-Men @mimeos>Mimeos @mimi"
           ],
           "dittomen": [
-            "Ditto-Men"
+            "Lookie-Loos @huskmen>Husk-Men @husks>Husks @ringers>Ringers @dittomen>Ditto-Men @mimeos>Mimeos @mimi"
           ],
           "mimeos": [
-            "Mimeos"
+            "Lookie-Loos @huskmen>Husk-Men @husks>Husks @ringers>Ringers @dittomen>Ditto-Men @mimeos>Mimeos @mimi"
           ],
           "mimickers": [
-            "Mimickers"
+            "Lookie-Loos @huskmen>Husk-Men @husks>Husks @ringers>Ringers @dittomen>Ditto-Men @mimeos>Mimeos @mimi"
           ],
           "shamfriends": [
-            "Sham-Friends"
+            "Lookie-Loos @huskmen>Husk-Men @husks>Husks @ringers>Ringers @dittomen>Ditto-Men @mimeos>Mimeos @mimi"
           ],
           "mockups": [
-            "Mockups"
+            "Lookie-Loos @huskmen>Husk-Men @husks>Husks @ringers>Ringers @dittomen>Ditto-Men @mimeos>Mimeos @mimi"
           ],
           "mockeries": [
-            "Mockeries"
+            "Lookie-Loos @huskmen>Husk-Men @husks>Husks @ringers>Ringers @dittomen>Ditto-Men @mimeos>Mimeos @mimi"
           ],
           "caricatures": [
-            "Caricatures"
+            "Lookie-Loos @huskmen>Husk-Men @husks>Husks @ringers>Ringers @dittomen>Ditto-Men @mimeos>Mimeos @mimi"
           ],
           "alterboys": [
-            "Alter-Boys"
+            "Lookie-Loos @huskmen>Husk-Men @husks>Husks @ringers>Ringers @dittomen>Ditto-Men @mimeos>Mimeos @mimi"
           ],
           "semblances": [
-            "Semblances"
+            "Lookie-Loos @huskmen>Husk-Men @husks>Husks @ringers>Ringers @dittomen>Ditto-Men @mimeos>Mimeos @mimi"
           ],
           "creepermen": [
-            "Creeper-Men"
+            "Lookie-Loos @huskmen>Husk-Men @husks>Husks @ringers>Ringers @dittomen>Ditto-Men @mimeos>Mimeos @mimi"
           ],
           "inchmen": [
-            "Inch-Men"
+            "Lookie-Loos @huskmen>Husk-Men @husks>Husks @ringers>Ringers @dittomen>Ditto-Men @mimeos>Mimeos @mimi"
           ],
           "shapes": [
-            "Shapes"
+            "Lookie-Loos @huskmen>Husk-Men @husks>Husks @ringers>Ringers @dittomen>Ditto-Men @mimeos>Mimeos @mimi"
           ],
           "lingerers": [
-            "Lingerers"
+            "Lookie-Loos @huskmen>Husk-Men @husks>Husks @ringers>Ringers @dittomen>Ditto-Men @mimeos>Mimeos @mimi"
           ],
           "lingermen": [
-            "Linger-Men"
+            "Lookie-Loos @huskmen>Husk-Men @husks>Husks @ringers>Ringers @dittomen>Ditto-Men @mimeos>Mimeos @mimi"
           ],
           "likenesses": [
-            "Likenesses"
+            "Lookie-Loos @huskmen>Husk-Men @husks>Husks @ringers>Ringers @dittomen>Ditto-Men @mimeos>Mimeos @mimi"
           ]
         }
       }
@@ -2835,7 +2862,7 @@
         "raw": "@tables|@sofas",
         "patterns": {
           "tables": [
-            "tables",
+            "tables @sofas>couches",
             "Flimsy plastic folding tables, huge oak dining tables, card tables, end tables, TV trays, workbenche",
             "Bending down, we shone our flashlights through an endless sea of legs. There was enough space to cra",
             "that desert of furniture",
@@ -2844,13 +2871,13 @@
             "another table leg"
           ],
           "sofas": [
-            "couches",
+            "tables @sofas>couches",
             "Couches, chairs, recliners, loveseats, and sectionals, upholstered or varnished in a hundred styles,",
             "But the arrangement was orderly enough that there were pathways through the furniture. Tunnels you c",
-            "basement",
+            "basement kitchen",
             "largest furniture surplus store",
             "the padded side of a dusty couch",
-            "a chair leg",
+            "another table leg @sofas>a chair leg",
             "the first few feet of couch fort distorted, unstable,"
           ]
         }
@@ -2873,7 +2900,6 @@
           "vortex": [
             "It was a blurry copy of an old newspaper",
             "some attraction called “",
-            "I noticed the",
             "and almost choked on my tea.",
             "The ad looked for all the world like one of those terrible roadside attractions desperate for touris",
             ", that kind of thing.",
@@ -2883,21 +2909,17 @@
             "There was no further explanation. Admission to the Vortex was ten cents and it was closed Sundays.",
             "The second page was a short newspaper clipping about the Vortex being shut down---not over a grisly ",
             "Nothing much of note had ever happened there. Built to keep white settlers safe from the natives the",
-            "ghosts, or"
+            "I shook my head, more sure of it now. “ That's not it. It's not ghosts, or @vortex>ghosts, or @snake"
           ],
           "gardens": [
             "It was a blurry copy of an old newspaper",
             "some attraction called “",
-            "I noticed the",
             "and almost choked on my tea.",
             "Our house had once stood on the site of a large private garden, it seemed, collected by a woman the ",
             ". The gardens were apparently extensive---",
             ", the copy read, which to be fair was a more defensible claim about their extent than calling them e",
             "There was a short clipping announcing that de La Fontaine's gardens had been closed to the public, w",
-            ", and",
-            ", and finally",
             ". This last ribbon was draped over a small oval portrait in the lower right of three mustachioed men",
-            "and",
             "and, even bolder underneath that:",
             "The final clipping was from a few years later, an official notice that the bank had been shut down. ",
             "She noticed me looking and tapped the portrait with a pencil. “Italians,” she said with a smug littl"
@@ -2906,17 +2928,15 @@
             "drawing of Dr. Henneson's storefront",
             "It was a blurry copy of an old newspaper",
             "some product called “",
-            "I noticed the",
             "and almost choked on my tea.",
             "The house in the picture was ours, no question about it: much newer and without the later extensions",
-            "and",
             ". Tiny print along the bottom praised Dr. Henneson's unmatched skill at distilling his own secret me",
             "The second page was a similar ad, but now the drawing of the house had been replaced with a sketch o",
             ", the ribbons said now, and",
             ", and finally, even bolder underneath that:",
             ". Expanding. The final clipping was a short article giving notice that the house at our address, now",
             "I turned back to the first article and stared at it. The history lady noticed me staring and tapped ",
-            "ghost story",
+            "I couldn't take this any more. Her racist bullshit aside, the notion that what was happening to me w",
             "voodoo, or ghosts, or"
           ],
           "caves": [
@@ -2924,8 +2944,8 @@
             "The remaining articles painted a grim picture of the subsequent week of rescue attempts, the breathl",
             ". It announced that after fifteen days the rescue efforts had been abandoned. No voices had been hea",
             "The old woman caught me looking and smiled knowingly. “Been hearing their voices, have you?” “I'm so",
-            "ghost story",
-            "ghosts, or"
+            "I couldn't take this any more. Her racist bullshit aside, the notion that what was happening to me w",
+            "I shook my head, more sure of it now. “ That's not it. It's not ghosts, or @vortex>ghosts, or @snake"
           ]
         }
       },
@@ -2942,11 +2962,11 @@
         "patterns": {
           "bubbles": [
             "before I realized he didn't seem concerned about me breaking in. His hair was matted and he had a di",
-            "eyes"
+            "I let him focus on me before saying, “There's no eyes @shadows>shadows .”"
           ],
           "shadows": [
             ". He was screaming at me. “What the fuck are you doing in here?” His face twisted with a rage I'd ne",
-            "shadows"
+            "I let him focus on me before saying, “There's no eyes @shadows>shadows .”"
           ]
         }
       }
@@ -2983,7 +3003,7 @@
             "place of endless ducts and exposed plumbing. Bulky metal curves and protrusions poked from the walls",
             ". A smell like rotting leaves wafted from the sharp metal ruins of a boiler that looked like it had ",
             "echoed off a thousand metal boxes",
-            "wall",
+            "I staggered back, pain exploding from my neck, but he stepped forward at the same time, looking bore",
             "punched the wall, leaving his fist in the cracked indentation it made for a long moment",
             "room of metal tubes"
           ]
@@ -3130,9 +3150,9 @@
         "variant_count": 3,
         "has_probabilities": false,
         "references_vars": [
-          "justniko",
           "ryanandniko",
-          "justryan"
+          "justryan",
+          "justniko"
         ],
         "references_macros": [],
         "raw": "@justRyan>myself|@justNiko>Niko|@ryanAndNiko>ourselves"
@@ -3173,9 +3193,9 @@
         "variant_count": 4,
         "has_probabilities": false,
         "references_vars": [
-          "vortex",
           "caves",
           "gardens",
+          "vortex",
           "snakeoil"
         ],
         "references_macros": [],
@@ -3214,8 +3234,8 @@
         "variant_count": 2,
         "has_probabilities": false,
         "references_vars": [
-          "hamsterwheel",
-          "stageladder"
+          "stageladder",
+          "hamsterwheel"
         ],
         "references_macros": [],
         "raw": "@hamsterwheel>‣ Your versions of Ryan and Niko found the Hamster Wheel.|@stageladder>‣ Your versions of Ryan and Niko found the ladder to nowhere."
@@ -3321,11 +3341,11 @@
         "variant_count": 5,
         "has_probabilities": false,
         "references_vars": [
-          "epi_group1b",
-          "epi_group1e",
-          "epi_group1c",
+          "epi_group1d",
           "epi_group1a",
-          "epi_group1d"
+          "epi_group1c",
+          "epi_group1b",
+          "epi_group1e"
         ],
         "references_macros": [],
         "raw": "@epi_group1a>Gwendolyn MacEwen|@epi_group1b>Walt Whitman|@epi_group1c>Italo Calvino|@epi_group1d>Leo Tolstoy|@epi_group1e>Sarah Teasdale"
@@ -3340,9 +3360,9 @@
         "variant_count": 4,
         "has_probabilities": false,
         "references_vars": [
+          "epi_group2a",
           "epi_group2d",
           "epi_group2b",
-          "epi_group2a",
           "epi_group2c"
         ],
         "references_macros": [],
@@ -3541,8 +3561,8 @@
         "has_probabilities": false,
         "references_vars": [],
         "references_macros": [
-          "trapdoor description",
-          "trapdoor under what"
+          "trapdoor under what",
+          "trapdoor description"
         ],
         "raw": "~---although it seemed like there were only two options, one way down the tube or the other---but Niko had found a better option while he'd been scrambling around up top. Directly {trapdoor under what}, {trapdoor description}\n\n"
       },
@@ -3729,8 +3749,8 @@
         "has_probabilities": false,
         "references_vars": [],
         "references_macros": [
-          "notshadows dadbit",
-          "nikoloveaddendum"
+          "nikoloveaddendum",
+          "notshadows dadbit"
         ],
         "raw": "~Each of them were tales disguised as truths; worlds that I yearned to slip into like tailored gloves, sized just right; stories reassuring me that I finally understood what I deserved, good or bad, where I belonged and who I belonged to, and who belonged to me, where I didn’t have to be {notshadows dadbit} \n\nBut people don’t wrap up like that into nice little cages, contained. We weren't each others' stories. {nikoloveaddendum} We’d mistaken shadows for substance, all of us: chased them and failed, of course, to grab them, become shadows ourselves in failing.\n\nBut we weren’t shadows. We were more than that. We deserved more.\n\nSomething swayed inside me, as if I’d let go of one handhold and gripped another, shifting my weight even though I wasn't sure the new grip would hold. But by then I'd already done it, already committed. And it held. It didn’t let me fall."
       },
@@ -3896,8 +3916,8 @@
         "has_probabilities": false,
         "references_vars": [],
         "references_macros": [
-          "maybe singular12 bit",
-          "maybe singular08 bit"
+          "maybe singular08 bit",
+          "maybe singular12 bit"
         ],
         "raw": "~Sometimes, I did too.\n\nOnce, on a bad day, I'd been sitting on the roof of the sciences tower, crying. It was supposed to be off-limits but we'd figured out how to get up there one night: another shared secret. Keeping me company was a rusted-out telescope, a hulking cube of HVAC, and a ten-story drop. I wasn't seriously considering anything but took some morbid comfort from having the option at hand.\n\nThe access door creaked open and I looked back with a guilty start, ready to be reprimanded or maybe arrested. But it was only Niko. He came over to sit next to me, pulling out two cigarettes and angling one at me. Uncharacteristically, I accepted. \n\nWe sat there smoking for a long time.\n\n“How did you know I was up here?” I finally asked.\n\nHe shrugged. “Came home and you weren't there. Kinda had a feeling.”\n\nWe sat there looking down the gently sloping hill of campus, its landmarks and avenues made abstract and manageable. A miniature city you could wrap your arms around, contain. {maybe singular08 bit}{maybe singular12 bit}\n\nNo one did end up moving Downstairs."
       },
@@ -3935,9 +3955,9 @@
         "variant_count": 3,
         "has_probabilities": false,
         "references_vars": [
-          "hexagon",
           "octagon",
-          "pentagon"
+          "pentagon",
+          "hexagon"
         ],
         "references_macros": [],
         "raw": "@octagon>octagon|@hexagon>hexagon|@pentagon>pentagon"
@@ -4118,11 +4138,11 @@
         "has_probabilities": false,
         "references_vars": [],
         "references_macros": [
-          "ch1stairsitthem",
+          "find out",
           "ch1stairsitthey",
           "took all the way down",
           "climb all the way down",
-          "find out"
+          "ch1stairsitthem"
         ],
         "raw": "and decided to {find out} where {ch1stairsitthey} led|and decided to take {ch1stairsitthem} all the way down|and decided to {find out} where {ch1stairsitthey} ended|and decided to {find out} where {ch1stairsitthey} led|and took {ch1stairsitthem}{took all the way down}|and decided to climb {ch1stairsitthem}{climb all the way down}"
       },
@@ -4313,8 +4333,8 @@
           "dadphone"
         ],
         "references_macros": [
-          "possibles story",
-          "personCh1"
+          "personCh1",
+          "possibles story"
         ],
         "raw": "@dadphone>{possibles story}\n\nI stared at the {personCh1} lost in shadows at the end of the hall and|I stared and"
       },
@@ -4644,8 +4664,8 @@
         "has_probabilities": false,
         "references_vars": [],
         "references_macros": [
-          "nikoSmashTarget",
-          "bookcase halt details"
+          "bookcase halt details",
+          "nikoSmashTarget"
         ],
         "raw": "~smashing into {nikoSmashTarget} that I'm pretty sure was an IKEA Billy. He grabbed for a shelf but it pulled free, designed to resist only force pulling it down; books flew everywhere, but Niko's grip flashed to the solid side of the bookshelf and he jerked to a halt, {bookcase halt details}"
       },
@@ -5147,9 +5167,9 @@
         "variant_count": 3,
         "has_probabilities": false,
         "references_vars": [
-          "justniko",
           "ryanandniko",
-          "justryan"
+          "justryan",
+          "justniko"
         ],
         "references_macros": [],
         "raw": "@justRyan>Only this time it wasn’t me down there, it was him,|@justNiko>It was him again,|@ryanAndNiko>There was only one this time: Niko,"
@@ -5392,25 +5412,25 @@
         "variant_count": 19,
         "has_probabilities": false,
         "references_vars": [
-          "huskmen",
+          "lingermen",
+          "ringers",
           "creepermen",
           "dittomen",
-          "shamfriends",
-          "shapes",
-          "mockeries",
-          "inchmen",
-          "mockups",
-          "mimickers",
-          "caricatures",
-          "husks",
           "likenesses",
-          "alterboys",
-          "lingerers",
-          "semblances",
-          "ringers",
           "lookieloos",
           "mimeos",
-          "lingermen"
+          "lingerers",
+          "mockeries",
+          "mimickers",
+          "shamfriends",
+          "mockups",
+          "semblances",
+          "husks",
+          "inchmen",
+          "huskmen",
+          "alterboys",
+          "shapes",
+          "caricatures"
         ],
         "references_macros": [],
         "raw": "@lookieloos>Lookie-Loos|@huskmen>Husk-Men|@husks>Husks|@ringers>Ringers|@dittomen>Ditto-Men|@mimeos>Mimeos|@mimickers>Mimickers|@shamfriends>Sham-Friends|@mockups>Mockups|@mockeries>Mockeries|@caricatures>Caricatures|@alterboys>Alter-Boys|@semblances>Semblances|@creepermen>Creeper-Men|@inchmen>Inch-Men|@shapes>Shapes|@lingerers>Lingerers|@lingermen>Linger-Men|@likenesses>Likenesses"

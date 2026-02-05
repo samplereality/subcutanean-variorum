@@ -236,11 +236,8 @@
                 <button id="source-code-mode-btn" class="tool-btn source-code-toggle" title="Enable Source Code Mode - click any paragraph to view its Quant source">
                     <i data-lucide="code"></i> Source
                 </button>
-                <button id="show-vars-btn" class="tool-btn vars-toggle" title="Show global variable differences between versions">
-                    <i data-lucide="variable"></i> Global Vars
-                </button>
-                <button id="show-chapter-vars-btn" class="tool-btn chapter-vars-toggle" title="Show chapter-local variables and macros">
-                    <i data-lucide="bookmark"></i> Chapter Vars
+                <button id="show-vars-btn" class="tool-btn vars-toggle" title="Show variable differences between versions">
+                    <i data-lucide="variable"></i> Variables
                 </button>
                 <button id="word-diff-btn" class="tool-btn" title="Compare unique vocabulary between two versions">
                     <i data-lucide="split"></i> Word Diff
@@ -251,36 +248,10 @@
             </div>
         </div>
 
-        <!-- Variable panel (outside collapsible, always accessible when toggled) -->
-        <div id="variable-diff-panel" class="variable-diff-panel hidden">
-            <div class="var-panel-description">
-                These variables are declared in <a href="#" id="show-globals-link" class="globals-link">globals.txt</a> and are determined upon seed generation. They affect both minor and major narrative decisions.
-            </div>
-            <div class="var-diff-section">
-                <span class="var-diff-label">Only in <span id="var-diff-a-label">A</span>:</span>
-                <span id="vars-only-a" class="var-list var-list-a"></span>
-            </div>
-            <div class="var-diff-section">
-                <span class="var-diff-label">Only in <span id="var-diff-b-label">B</span>:</span>
-                <span id="vars-only-b" class="var-list var-list-b"></span>
-            </div>
-            <div class="var-diff-section var-diff-c hidden" id="var-diff-c-section">
-                <span class="var-diff-label">Only in <span id="var-diff-c-label">C</span>:</span>
-                <span id="vars-only-c" class="var-list var-list-c"></span>
-            </div>
-            <div class="var-diff-section var-diff-shared">
-                <span class="var-diff-label"><span id="var-shared-label">Shared</span>:</span>
-                <span id="vars-shared" class="var-list var-list-shared"></span>
-            </div>
-        </div>
-
-        <!-- Chapter Variables panel (for chapter-local variables and macros) -->
-        <div id="chapter-vars-panel" class="chapter-vars-panel hidden">
-            <div class="var-panel-description">
-                These variables and macros are defined within this chapter's source file and affect local narrative variations.
-            </div>
-            <div id="chapter-vars-content">
-                <!-- Chapter variables and macros will be rendered here -->
+        <!-- Unified Variables panel (global + chapter-local) -->
+        <div id="variables-panel" class="variables-panel hidden">
+            <div id="variables-panel-content">
+                <!-- Global and chapter-local variables rendered dynamically -->
             </div>
         </div>
     </header>
