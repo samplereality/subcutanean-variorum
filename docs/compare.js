@@ -1170,12 +1170,18 @@ function getChapterContent(versionId, chapterId) {
 
 function updateToolbarVisibility() {
     const sourceSelected = isSourceCodeVisible();
-    const diffBtn = document.getElementById('mode-diff');
-    const comparisonBtn = document.getElementById('mode-comparison');
-    const syntaxBtn = document.getElementById('syntax-toggle-btn');
+    const viewMenu = document.getElementById('view-menu');
 
-    if (diffBtn) diffBtn.classList.toggle('hidden', sourceSelected);
-    if (comparisonBtn) comparisonBtn.classList.toggle('hidden', sourceSelected);
+    // Hide diff/comparison modes when source code is visible
+    if (viewMenu) {
+        const diffBtn = viewMenu.querySelector('[data-mode="diff"]');
+        const comparisonBtn = viewMenu.querySelector('[data-mode="comparison"]');
+        if (diffBtn) diffBtn.classList.toggle('hidden', sourceSelected);
+        if (comparisonBtn) comparisonBtn.classList.toggle('hidden', sourceSelected);
+    }
+
+    // Show/hide syntax toggle button
+    const syntaxBtn = document.getElementById('syntax-toggle-btn');
     if (syntaxBtn) {
         syntaxBtn.classList.toggle('hidden', !sourceSelected);
         syntaxBtn.disabled = !sourceSelected;
@@ -1183,10 +1189,6 @@ function updateToolbarVisibility() {
             sourceSyntaxHighlightingEnabled = false;
         }
         syntaxBtn.classList.toggle('syntax-active', sourceSyntaxHighlightingEnabled);
-        const syntaxLabel = syntaxBtn.querySelector('.btn-label');
-        if (syntaxLabel) {
-            syntaxLabel.textContent = sourceSyntaxHighlightingEnabled ? 'Syntax Off' : 'Syntax Highlighting';
-        }
     }
 }
 
@@ -2543,11 +2545,14 @@ function initializeVariablePanel() {
     const btn = document.getElementById('show-vars-btn');
     if (btn) {
         btn.addEventListener('click', () => {
-            const panel = document.getElementById('variables-panel');
-            if (panel && panel.classList.contains('hidden')) {
-                showFeatureToast('variables', btn);
-            }
             toggleVariablePanel();
+            // Close the analyze dropdown after a brief pause
+            setTimeout(() => {
+                const analyzeMenu = document.getElementById('analyze-menu');
+                const analyzeBtn = document.getElementById('analyze-toggle-btn');
+                if (analyzeMenu) analyzeMenu.classList.add('hidden');
+                if (analyzeBtn) analyzeBtn.classList.remove('active');
+            }, 150);
         });
     }
 }
@@ -2556,11 +2561,14 @@ function initializeSourceCodeMode() {
     const btn = document.getElementById('source-code-mode-btn');
     if (btn) {
         btn.addEventListener('click', () => {
-            // Show toast only when enabling (before the toggle)
-            if (!sourceCodeModeEnabled) {
-                showFeatureToast('source', btn);
-            }
             toggleSourceCodeMode();
+            // Close the analyze dropdown after a brief pause
+            setTimeout(() => {
+                const analyzeMenu = document.getElementById('analyze-menu');
+                const analyzeBtn = document.getElementById('analyze-toggle-btn');
+                if (analyzeMenu) analyzeMenu.classList.add('hidden');
+                if (analyzeBtn) analyzeBtn.classList.remove('active');
+            }, 150);
         });
     }
 }
@@ -3223,83 +3231,124 @@ function appendBottomChapterNav(container) {
 }
 
 // ==========================================
-// CONTROL PANEL (View / Analyze dropdowns)
-// ==========================================
+// CONTROL PANEL (View / Analyze / Search dropdowns)
+// ==================================================
 
 function initializeControlPanel() {
     const viewBtn = document.getElementById('view-toggle-btn');
+    const viewMenu = document.getElementById('view-menu');
     const analyzeBtn = document.getElementById('analyze-toggle-btn');
-    const viewPanel = document.getElementById('view-panel');
-    const analyzePanel = document.getElementById('analyze-panel');
+    const analyzeMenu = document.getElementById('analyze-menu');
+    const searchBtn = document.getElementById('search-toggle-btn');
+    const searchPanel = document.getElementById('search-panel');
 
-    // Load saved state
-    let panelState = { view: false, analyze: false };
-    try {
-        const saved = localStorage.getItem('subcutanean_panel_state');
-        if (saved) {
-            const parsed = JSON.parse(saved);
-            // Handle both old and new format
-            if (parsed.sections) {
-                panelState = parsed.sections;
-            } else {
-                panelState = parsed;
-            }
-        }
-    } catch (e) { /* ignore */ }
+    // Track which dropdown is open
+    let openDropdown = null;
 
-    function savePanelState() {
-        try {
-            localStorage.setItem('subcutanean_panel_state', JSON.stringify(panelState));
-        } catch (e) { /* ignore */ }
+    function closeAllDropdowns() {
+        if (viewMenu) viewMenu.classList.add('hidden');
+        if (analyzeMenu) analyzeMenu.classList.add('hidden');
+        if (viewBtn) viewBtn.classList.remove('active');
+        if (analyzeBtn) analyzeBtn.classList.remove('active');
+        openDropdown = null;
     }
 
     function toggleDropdown(name) {
         const btn = name === 'view' ? viewBtn : analyzeBtn;
-        const panel = name === 'view' ? viewPanel : analyzePanel;
-        const otherName = name === 'view' ? 'analyze' : 'view';
-        const otherBtn = name === 'view' ? analyzeBtn : viewBtn;
-        const otherPanel = name === 'view' ? analyzePanel : viewPanel;
+        const menu = name === 'view' ? viewMenu : analyzeMenu;
 
-        if (!btn || !panel) return;
+        if (!btn || !menu) return;
 
-        const isOpen = !panel.classList.contains('hidden');
+        const isOpen = !menu.classList.contains('hidden');
 
-        if (isOpen) {
-            // Close this panel
-            panel.classList.add('hidden');
-            btn.classList.remove('active');
-            panelState[name] = false;
-        } else {
-            // Close the other panel first
-            if (otherPanel && !otherPanel.classList.contains('hidden')) {
-                otherPanel.classList.add('hidden');
-                if (otherBtn) otherBtn.classList.remove('active');
-                panelState[otherName] = false;
-            }
-            // Open this panel
-            panel.classList.remove('hidden');
+        // Close all dropdowns first
+        closeAllDropdowns();
+
+        if (!isOpen) {
+            // Open this dropdown
+            menu.classList.remove('hidden');
             btn.classList.add('active');
-            panelState[name] = true;
+            openDropdown = name;
         }
-        savePanelState();
     }
 
+    // View dropdown toggle
     if (viewBtn) {
-        viewBtn.addEventListener('click', () => toggleDropdown('view'));
-    }
-    if (analyzeBtn) {
-        analyzeBtn.addEventListener('click', () => toggleDropdown('analyze'));
+        viewBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleDropdown('view');
+        });
     }
 
-    // Restore saved state
-    if (panelState.view && viewPanel && viewBtn) {
-        viewPanel.classList.remove('hidden');
-        viewBtn.classList.add('active');
+    // Analyze dropdown toggle
+    if (analyzeBtn) {
+        analyzeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleDropdown('analyze');
+        });
     }
-    if (panelState.analyze && analyzePanel && analyzeBtn) {
-        analyzePanel.classList.remove('hidden');
-        analyzeBtn.classList.add('active');
+
+    // Search panel toggle (persists open/closed state)
+    let searchOpen = false;
+    try {
+        const saved = localStorage.getItem('subcutanean_search_open');
+        if (saved) searchOpen = JSON.parse(saved);
+    } catch (e) { /* ignore */ }
+
+    function updateSearchPanelHeight() {
+        if (searchPanel && !searchPanel.classList.contains('hidden')) {
+            const height = searchPanel.offsetHeight;
+            document.documentElement.style.setProperty('--search-panel-height', `${height}px`);
+        } else {
+            document.documentElement.style.setProperty('--search-panel-height', '0px');
+        }
     }
+
+    function toggleSearchPanel() {
+        if (!searchPanel || !searchBtn) return;
+        searchOpen = !searchOpen;
+        if (searchOpen) {
+            searchPanel.classList.remove('hidden');
+            searchBtn.classList.add('active');
+            // Focus the search input
+            const input = document.getElementById('search-input');
+            if (input) setTimeout(() => input.focus(), 50);
+        } else {
+            searchPanel.classList.add('hidden');
+            searchBtn.classList.remove('active');
+        }
+        updateSearchPanelHeight();
+        try {
+            localStorage.setItem('subcutanean_search_open', JSON.stringify(searchOpen));
+        } catch (e) { /* ignore */ }
+    }
+
+    if (searchBtn) {
+        searchBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeAllDropdowns();
+            toggleSearchPanel();
+        });
+    }
+
+    // Restore search panel state
+    if (searchOpen && searchPanel && searchBtn) {
+        searchPanel.classList.remove('hidden');
+        searchBtn.classList.add('active');
+    }
+    updateSearchPanelHeight();
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', (e) => {
+        if (openDropdown) {
+            const viewDropdown = document.getElementById('view-dropdown');
+            const analyzeDropdown = document.getElementById('analyze-dropdown');
+            if (viewDropdown && !viewDropdown.contains(e.target) &&
+                analyzeDropdown && !analyzeDropdown.contains(e.target)) {
+                closeAllDropdowns();
+            }
+        }
+    });
 
     // Chapter navigation
     const chapterSelect = document.getElementById('chapter-select');
@@ -3312,7 +3361,6 @@ function initializeControlPanel() {
             updateChapterNavArrows();
             displayComparison();
             updateVariableDiffIfVisible();
-
         });
     }
 
@@ -3326,33 +3374,37 @@ function initializeControlPanel() {
 }
 
 function setupViewModeButtons() {
-    document.getElementById('mode-unified').addEventListener('click', () => {
-        setViewMode('unified');
-    });
-
-    const sideBySideBtn = document.getElementById('mode-sidebyside');
-    sideBySideBtn.addEventListener('click', () => {
-        setViewMode('sidebyside');
-        showFeatureToast('sidebyside', sideBySideBtn);
-    });
-
-    const diffBtn = document.getElementById('mode-diff');
-    diffBtn.addEventListener('click', () => {
-        setViewMode('diff');
-        showFeatureToast('diff', diffBtn);
-    });
-
-    const comparisonBtn = document.getElementById('mode-comparison');
-    comparisonBtn.addEventListener('click', () => {
-        setViewMode('comparison');
-        showFeatureToast('comparison', comparisonBtn);
-    });
+    // View mode dropdown items
+    const viewMenu = document.getElementById('view-menu');
+    if (viewMenu) {
+        viewMenu.querySelectorAll('.dropdown-item[data-mode]').forEach(item => {
+            item.addEventListener('click', () => {
+                const mode = item.dataset.mode;
+                if (mode === 'gonzo') {
+                    openGonzoMode();
+                } else {
+                    setViewMode(mode);
+                }
+                // Close the dropdown after a brief pause
+                setTimeout(() => {
+                    viewMenu.classList.add('hidden');
+                    const viewBtn = document.getElementById('view-toggle-btn');
+                    if (viewBtn) viewBtn.classList.remove('active');
+                }, 150);
+            });
+        });
+    }
 }
 
 function setViewMode(mode) {
     currentMode = mode;
-    document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
-    document.getElementById(`mode-${mode}`).classList.add('active');
+    // Update active state on dropdown items
+    const viewMenu = document.getElementById('view-menu');
+    if (viewMenu) {
+        viewMenu.querySelectorAll('.dropdown-item[data-mode]').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.mode === mode);
+        });
+    }
     displayComparison();
 }
 
@@ -3363,9 +3415,13 @@ function displayComparison() {
     }
     if (isSourceCodeVisible() && (currentMode === 'diff' || currentMode === 'comparison')) {
         currentMode = 'sidebyside';
-        document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
-        const sideBtn = document.getElementById('mode-sidebyside');
-        if (sideBtn) sideBtn.classList.add('active');
+        // Update dropdown active state
+        const viewMenu = document.getElementById('view-menu');
+        if (viewMenu) {
+            viewMenu.querySelectorAll('.dropdown-item[data-mode]').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.mode === 'sidebyside');
+            });
+        }
     }
     teardownSourceSync();
     updateToolbarVisibility();
@@ -4548,8 +4604,9 @@ function initializeSourceSync({ panelA, panelB, dataA, dataB }) {
 
 // Search functionality
 let currentSearchTerm = '';
-let allSearchOccurrences = [];
-let currentOccurrenceIndex = -1;
+let searchMatchChapters = [];  // ordered chapter IDs that contain matches
+let currentHighlightIndex = -1;  // index into DOM .search-highlight elements in current chapter
+let searchScope = 'chapter';  // 'chapter' or 'global'
 
 function highlightSearchMatches(searchTerm) {
     if (!searchTerm) return;
@@ -4614,17 +4671,12 @@ function clearSearchHighlights(resetState = true) {
 
     if (resetState) {
         currentSearchTerm = '';
-        allSearchOccurrences = [];
-        currentOccurrenceIndex = -1;
+        searchMatchChapters = [];
+        currentHighlightIndex = -1;
 
-        // Hide navigation (both inline and floating)
         const navigation = document.getElementById('search-navigation');
         if (navigation) {
             navigation.classList.add('hidden');
-        }
-        const floatingNav = document.getElementById('floating-search-nav');
-        if (floatingNav) {
-            floatingNav.classList.add('hidden');
         }
     }
 }
@@ -4633,47 +4685,49 @@ function escapeRegex(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-function findAllOccurrences(searchTerm) {
-    const occurrences = [];
-    const searchRegex = new RegExp(`\\b${escapeRegex(searchTerm)}\\b`, 'gi');
+// Returns ordered list of chapter IDs that contain the search term.
+// Used for cross-chapter F3 navigation. The actual match count comes
+// from DOM highlights after rendering, so this just needs to know
+// which chapters to visit.
+function findChaptersWithMatches(searchTerm) {
+    const chapters = [];
+    const searchLower = searchTerm.toLowerCase();
 
-    // Get all chapters from the first version
-    const firstVersion = allVersions[versionIds[0]];
-    const chapters = Object.keys(firstVersion).filter(key => key !== 'version_id');
+    // Use the selected version to determine chapter list
+    const refVersion = allVersions[versionA] || allVersions[versionIds[0]];
+    if (!refVersion) return chapters;
 
-    chapters.forEach(chapterId => {
-        // Get text based on current mode
-        let textToSearch = '';
+    const chapterIds = Object.keys(refVersion).filter(key => key !== 'version_id');
 
-        if (currentMode === 'unified') {
-            const paragraphs = getChapterParagraphs(versionA, chapterId);
-            textToSearch = paragraphs.join(' ');
-        } else if (currentMode === 'sidebyside') {
-            const paragraphsA = getChapterParagraphs(versionA, chapterId);
-            const paragraphsB = getChapterParagraphs(versionB, chapterId);
-            textToSearch = paragraphsA.join(' ') + ' ' + paragraphsB.join(' ');
-        } else if (currentMode === 'diff') {
-            const paragraphsA = getChapterParagraphs(versionA, chapterId);
-            const paragraphsB = getChapterParagraphs(versionB, chapterId);
-            textToSearch = paragraphsA.join(' ') + ' ' + paragraphsB.join(' ');
+    chapterIds.forEach(chapterId => {
+        let hasMatch = false;
+
+        // Check version A paragraphs
+        const paragraphsA = getChapterParagraphs(versionA, chapterId) || [];
+        for (const para of paragraphsA) {
+            if (para.replace(/<[^>]*>/g, ' ').toLowerCase().includes(searchLower)) {
+                hasMatch = true;
+                break;
+            }
         }
 
-        // Remove HTML tags for searching
-        const cleanText = textToSearch.replace(/<[^>]*>/g, ' ');
+        // For comparison modes, also check version B
+        if (!hasMatch && currentMode !== 'unified') {
+            const paragraphsB = getChapterParagraphs(versionB, chapterId) || [];
+            for (const para of paragraphsB) {
+                if (para.replace(/<[^>]*>/g, ' ').toLowerCase().includes(searchLower)) {
+                    hasMatch = true;
+                    break;
+                }
+            }
+        }
 
-        // Find all matches in this chapter
-        let match;
-        searchRegex.lastIndex = 0;
-        while ((match = searchRegex.exec(cleanText)) !== null) {
-            occurrences.push({
-                chapterId: chapterId,
-                chapterName: formatChapterName(chapterId),
-                index: match.index
-            });
+        if (hasMatch) {
+            chapters.push(chapterId);
         }
     });
 
-    return occurrences;
+    return chapters;
 }
 
 function performSearch() {
@@ -4684,76 +4738,122 @@ function performSearch() {
 
     currentSearchTerm = searchTerm;
 
-    // Find all occurrences across all chapters
-    allSearchOccurrences = findAllOccurrences(searchTerm);
+    if (searchScope === 'global') {
+        // Global: find all chapters with matches, jump to first if needed
+        searchMatchChapters = findChaptersWithMatches(searchTerm);
 
-    if (allSearchOccurrences.length === 0) {
-        updateSearchUI();
-        return;
-    }
-
-    // Find the first occurrence in or after the current chapter
-    let startIndex = allSearchOccurrences.findIndex(occ => occ.chapterId === currentChapter);
-    if (startIndex === -1) {
-        startIndex = 0;
-    }
-
-    currentOccurrenceIndex = startIndex;
-    goToOccurrence(currentOccurrenceIndex);
-}
-
-function goToOccurrence(index) {
-    if (index < 0 || index >= allSearchOccurrences.length) return;
-
-    const occurrence = allSearchOccurrences[index];
-    currentOccurrenceIndex = index;
-
-    // Switch chapter if needed
-    if (occurrence.chapterId !== currentChapter) {
-        currentChapter = occurrence.chapterId;
-
-        // Update chapter dropdown
-        updateChapterSelect();
-
-        // Display the new chapter
-        displayComparison();
-    }
-
-    // Wait for rendering, then highlight
-    setTimeout(() => {
-        clearSearchHighlights(false); // Don't reset state, just remove highlights
-        highlightSearchMatches(currentSearchTerm);
-
-        // Mark current occurrence
-        const highlights = document.querySelectorAll('.search-highlight');
-        if (highlights.length > 0) {
-            // Find which highlight in this chapter corresponds to our occurrence
-            let chapterOccurrences = allSearchOccurrences.filter(occ => occ.chapterId === currentChapter);
-            let indexInChapter = chapterOccurrences.findIndex(occ => occ === occurrence);
-
-            if (indexInChapter >= 0 && indexInChapter < highlights.length) {
-                highlights[indexInChapter].classList.add('current');
-                highlights[indexInChapter].scrollIntoView({ behavior: 'smooth', block: 'center' });
-            } else if (highlights[0]) {
-                highlights[0].classList.add('current');
-                highlights[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
+        if (searchMatchChapters.length === 0) {
+            currentHighlightIndex = -1;
+            updateSearchUI();
+            return;
         }
 
+        const needsChapterSwitch = !searchMatchChapters.includes(currentChapter);
+        if (needsChapterSwitch) {
+            currentChapter = searchMatchChapters[0];
+            updateChapterSelect();
+            displayComparison();
+        }
+
+        setTimeout(() => {
+            clearSearchHighlights(false);
+            highlightSearchMatches(currentSearchTerm);
+            // Don't auto-scroll; wait for user to click next
+            currentHighlightIndex = -1;
+            updateSearchUI();
+        }, needsChapterSwitch ? 100 : 0);
+    } else {
+        // Chapter: search current chapter only, never jump away
+        searchMatchChapters = [currentChapter];
+
+        clearSearchHighlights(false);
+        highlightSearchMatches(currentSearchTerm);
+        // Don't auto-scroll; wait for user to click next
+        currentHighlightIndex = -1;
         updateSearchUI();
-    }, occurrence.chapterId !== currentChapter ? 100 : 0);
+    }
+}
+
+function scrollToCurrentHighlight() {
+    const highlights = document.querySelectorAll('.search-highlight');
+    highlights.forEach(h => h.classList.remove('current'));
+
+    if (currentHighlightIndex >= 0 && currentHighlightIndex < highlights.length) {
+        highlights[currentHighlightIndex].classList.add('current');
+        highlights[currentHighlightIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
 }
 
 function goToPreviousOccurrence() {
-    if (currentOccurrenceIndex > 0) {
-        goToOccurrence(currentOccurrenceIndex - 1);
+    if (currentHighlightIndex > 0) {
+        // Previous highlight in current chapter
+        currentHighlightIndex--;
+        scrollToCurrentHighlight();
+        updateSearchUI();
+    } else if (searchScope === 'global') {
+        // Global mode: move to previous chapter with matches
+        const currentChapterIdx = searchMatchChapters.indexOf(currentChapter);
+        if (currentChapterIdx > 0) {
+            currentChapter = searchMatchChapters[currentChapterIdx - 1];
+            updateChapterSelect();
+            displayComparison();
+
+            setTimeout(() => {
+                clearSearchHighlights(false);
+                highlightSearchMatches(currentSearchTerm);
+                // Go to last highlight in previous chapter
+                const highlights = document.querySelectorAll('.search-highlight');
+                currentHighlightIndex = highlights.length - 1;
+                scrollToCurrentHighlight();
+                updateSearchUI();
+            }, 100);
+        }
     }
 }
 
 function goToNextOccurrence() {
-    if (currentOccurrenceIndex < allSearchOccurrences.length - 1) {
-        goToOccurrence(currentOccurrenceIndex + 1);
+    const highlights = document.querySelectorAll('.search-highlight');
+    if (highlights.length === 0) return;
+
+    if (currentHighlightIndex < highlights.length - 1) {
+        // Next highlight in current chapter (also handles -1 → 0 for first click)
+        currentHighlightIndex++;
+        scrollToCurrentHighlight();
+        updateSearchUI();
+    } else if (searchScope === 'global') {
+        // Global mode: move to next chapter with matches
+        const currentChapterIdx = searchMatchChapters.indexOf(currentChapter);
+        if (currentChapterIdx < searchMatchChapters.length - 1) {
+            currentChapter = searchMatchChapters[currentChapterIdx + 1];
+            updateChapterSelect();
+            displayComparison();
+
+            setTimeout(() => {
+                clearSearchHighlights(false);
+                highlightSearchMatches(currentSearchTerm);
+                currentHighlightIndex = 0;
+                scrollToCurrentHighlight();
+                updateSearchUI();
+            }, 100);
+        }
     }
+}
+
+// Check which seeds contain the search term in the current chapter
+function getSearchSeedInfo(searchTerm) {
+    const searchLower = searchTerm.toLowerCase();
+    const inA = (getChapterParagraphs(versionA, currentChapter) || [])
+        .some(p => p.replace(/<[^>]*>/g, ' ').toLowerCase().includes(searchLower));
+    const inB = (getChapterParagraphs(versionB, currentChapter) || [])
+        .some(p => p.replace(/<[^>]*>/g, ' ').toLowerCase().includes(searchLower));
+
+    const labelA = versionA.startsWith('uploaded_') ? versionA : `Seed ${versionA}`;
+    const labelB = versionB.startsWith('uploaded_') ? versionB : `Seed ${versionB}`;
+
+    if (inA && inB) return `in both ${labelA} and ${labelB}`;
+    if (inA) return `in ${labelA} only`;
+    if (inB) return `in ${labelB} only`;
+    return '';
 }
 
 function updateSearchUI() {
@@ -4763,49 +4863,61 @@ function updateSearchUI() {
     const prevBtn = document.getElementById('search-prev-btn');
     const nextBtn = document.getElementById('search-next-btn');
 
-    // Also update floating navigation
-    const floatingNav = document.getElementById('floating-search-nav');
-    const floatingCount = document.getElementById('floating-count');
-    const floatingChapterLabel = document.getElementById('floating-chapter-label');
-    const floatingPrevBtn = document.getElementById('floating-prev-btn');
-    const floatingNextBtn = document.getElementById('floating-next-btn');
+    // Count is based on actual DOM highlights — always accurate
+    const highlights = document.querySelectorAll('.search-highlight');
+    const totalInChapter = highlights.length;
 
-    if (allSearchOccurrences.length === 0) {
-        navigation.classList.add('hidden');
-        floatingNav.classList.add('hidden');
+    const chapterName = formatChapterName(currentChapter);
+
+    // Handle no results (including chapter-scope with 0 hits)
+    if (totalInChapter === 0 && searchMatchChapters.length === 0) {
+        // No matches anywhere
+        if (navigation) navigation.classList.remove('hidden');
+        if (count) count.textContent = 'No results';
+        if (chapterLabel) chapterLabel.textContent = '';
+        if (prevBtn) prevBtn.disabled = true;
+        if (nextBtn) nextBtn.disabled = true;
         return;
     }
 
-    navigation.classList.remove('hidden');
-    floatingNav.classList.remove('hidden');
-
-    const countText = `${currentOccurrenceIndex + 1} of ${allSearchOccurrences.length}`;
-    const shortCountText = `${currentOccurrenceIndex + 1}/${allSearchOccurrences.length}`;
-
-    count.textContent = countText;
-    floatingCount.textContent = shortCountText;
-
-    // Update chapter labels
-    const currentOccurrence = allSearchOccurrences[currentOccurrenceIndex];
-    if (currentOccurrence) {
-        const chapterName = formatChapterName(currentOccurrence.chapterId);
-        chapterLabel.textContent = `in ${chapterName}`;
-
-        // Shorter version for floating nav
-        let shortChapterName = chapterName;
-        if (chapterName.startsWith('Chapter ')) {
-            shortChapterName = 'Ch ' + chapterName.replace('Chapter ', '');
-        }
-        floatingChapterLabel.textContent = shortChapterName;
+    if (totalInChapter === 0 && searchScope === 'chapter') {
+        // No matches in this chapter, but there may be in others
+        if (navigation) navigation.classList.remove('hidden');
+        if (count) count.textContent = 'No results';
+        if (chapterLabel) chapterLabel.textContent = `in ${chapterName}`;
+        if (prevBtn) prevBtn.disabled = true;
+        if (nextBtn) nextBtn.disabled = true;
+        return;
     }
 
-    const isPrevDisabled = currentOccurrenceIndex <= 0;
-    const isNextDisabled = currentOccurrenceIndex >= allSearchOccurrences.length - 1;
+    if (navigation) navigation.classList.remove('hidden');
 
-    prevBtn.disabled = isPrevDisabled;
-    nextBtn.disabled = isNextDisabled;
-    floatingPrevBtn.disabled = isPrevDisabled;
-    floatingNextBtn.disabled = isNextDisabled;
+    // Before user clicks next, show total found; after, show position
+    const seedInfo = currentSearchTerm ? getSearchSeedInfo(currentSearchTerm) : '';
+    const seedDetail = seedInfo ? ` — ${seedInfo}` : '';
+
+    if (currentHighlightIndex < 0) {
+        // No highlight focused yet — show summary
+        if (count) count.textContent = `${totalInChapter} found`;
+        if (chapterLabel) chapterLabel.textContent = seedDetail;
+    } else {
+        const currentNum = currentHighlightIndex + 1;
+        if (count) count.textContent = `${currentNum} of ${totalInChapter}`;
+        if (chapterLabel) chapterLabel.textContent = seedDetail;
+    }
+
+    // Disable buttons at boundaries
+    const currentChapterIdx = searchMatchChapters.indexOf(currentChapter);
+    const isPrevDisabled = currentHighlightIndex <= 0 && currentChapterIdx <= 0;
+    const isNextDisabled = currentHighlightIndex >= totalInChapter - 1 && currentChapterIdx >= searchMatchChapters.length - 1;
+
+    if (prevBtn) prevBtn.disabled = isPrevDisabled;
+    if (nextBtn) nextBtn.disabled = isNextDisabled;
+
+    // Update sticky offset for seed headers since navigation may have appeared/disappeared
+    if (typeof updateSearchPanelHeight === 'function') {
+        updateSearchPanelHeight();
+    }
 }
 
 // Word differential functionality
@@ -5146,19 +5258,12 @@ function jumpToChapterWithWord(chapterId, word) {
     setTimeout(() => {
         // Start a new search for this word
         currentSearchTerm = word;
-        allSearchOccurrences = findAllOccurrences(word);
-        currentOccurrenceIndex = 0;
+        searchMatchChapters = findChaptersWithMatches(word);
 
         clearSearchHighlights(false);
         highlightSearchMatches(word);
-
-        // Mark first occurrence and scroll to it
-        const firstHighlight = document.querySelector('.search-highlight');
-        if (firstHighlight) {
-            firstHighlight.classList.add('current');
-            firstHighlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-
+        currentHighlightIndex = 0;
+        scrollToCurrentHighlight();
         updateSearchUI();
     }, 100);
 }
@@ -8805,11 +8910,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Search event listeners
-    const searchBtn = document.getElementById('search-btn');
+    const searchChapterBtn = document.getElementById('search-chapter-btn');
+    const searchAllBtn = document.getElementById('search-all-btn');
     const clearSearchBtn = document.getElementById('clear-search-btn');
     const searchInput = document.getElementById('search-input');
 
-    searchBtn.addEventListener('click', performSearch);
+    searchChapterBtn.addEventListener('click', () => {
+        searchScope = 'chapter';
+        performSearch();
+    });
+    searchAllBtn.addEventListener('click', () => {
+        searchScope = 'global';
+        performSearch();
+    });
     clearSearchBtn.addEventListener('click', () => {
         clearSearchHighlights();
         searchInput.value = '';
@@ -8834,8 +8947,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('word-diff-modal');
 
     wordDiffBtn.addEventListener('click', () => {
-        showFeatureToast('word-diff', wordDiffBtn);
         calculateWordDifferential();
+        // Close the analyze dropdown after a brief pause
+        setTimeout(() => {
+            const analyzeMenu = document.getElementById('analyze-menu');
+            const analyzeBtn = document.getElementById('analyze-toggle-btn');
+            if (analyzeMenu) analyzeMenu.classList.add('hidden');
+            if (analyzeBtn) analyzeBtn.classList.remove('active');
+        }, 150);
     });
     closeModalBtn.addEventListener('click', closeModal);
 
@@ -8868,17 +8987,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Floating search navigation event listeners
-    const floatingPrevBtn = document.getElementById('floating-prev-btn');
-    const floatingNextBtn = document.getElementById('floating-next-btn');
-
-    floatingPrevBtn.addEventListener('click', goToPreviousOccurrence);
-    floatingNextBtn.addEventListener('click', goToNextOccurrence);
-
     // Keyboard shortcuts for search navigation
     document.addEventListener('keydown', (e) => {
         // Only respond to keyboard shortcuts if there are active search results
-        if (allSearchOccurrences.length === 0) return;
+        if (searchMatchChapters.length === 0) return;
 
         // F3 - Next occurrence (standard browser find convention)
         if (e.key === 'F3' && !e.shiftKey) {
@@ -9925,8 +10037,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (heatmapBtn) {
         heatmapBtn.addEventListener('click', () => {
-            showFeatureToast('heatmap', heatmapBtn);
             openHeatmapModal();
+            // Close the analyze dropdown after a brief pause
+            setTimeout(() => {
+                const analyzeMenu = document.getElementById('analyze-menu');
+                const analyzeBtn = document.getElementById('analyze-toggle-btn');
+                if (analyzeMenu) analyzeMenu.classList.add('hidden');
+                if (analyzeBtn) analyzeBtn.classList.remove('active');
+            }, 150);
         });
     }
     if (closeHeatmapBtn) {

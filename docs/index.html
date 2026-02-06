@@ -193,59 +193,58 @@
                 </button>
             </div>
 
-            <button id="view-toggle-btn" class="panel-toggle-btn" title="View mode options">
-                <i data-lucide="layout-grid"></i> View
-            </button>
-            <button id="analyze-toggle-btn" class="panel-toggle-btn" title="Analysis tools">
-                <i data-lucide="search"></i> Analyze
-            </button>
-        </div>
-
-        <!-- View dropdown panel -->
-        <div id="view-panel" class="header-dropdown-panel hidden">
-            <div class="view-mode-selector">
-                <div class="button-group">
-                    <button id="mode-unified" class="mode-btn" title="Read a single version without comparison" data-short="Unified"><i data-lucide="file-text"></i> <span class="btn-label">Unified</span></button>
-                    <button id="mode-sidebyside" class="mode-btn active" title="View two versions in parallel columns" data-short="Side/Side"><i data-lucide="columns-2"></i> <span class="btn-label">Side-by-side</span></button>
-                    <button id="mode-diff" class="mode-btn" title="Highlight additions and deletions between versions" data-short="Diff"><i data-lucide="git-compare"></i> <span class="btn-label">Track Changes</span></button>
-                    <button id="mode-comparison" class="mode-btn" title="Compare variations across multiple witnesses" data-short="Collation"><i data-lucide="table"></i> <span class="btn-label">Collation</span></button>
-                    <button id="syntax-toggle-btn" class="mode-btn hidden" title="Toggle Quant syntax highlighting" data-short="Syntax"><i data-lucide="highlighter"></i> <span class="btn-label">Syntax Highlighting</span></button>
-                    <button id="gonzo-btn" class="mode-btn" title="View same paragraphs across all 25 versions in a 5x5 grid" data-short="Gonzo"><i data-lucide="grid-3x3"></i> <span class="btn-label">Gonzo</span></button>
+            <!-- View dropdown -->
+            <div class="control-dropdown" id="view-dropdown">
+                <button id="view-toggle-btn" class="panel-toggle-btn" title="View mode options">
+                    <i data-lucide="layout-grid"></i> <span class="btn-label">View</span>
+                </button>
+                <div class="dropdown-menu hidden" id="view-menu">
+                    <button class="dropdown-item" data-mode="unified" title="Read a single version without comparison">
+                        <i data-lucide="file-text"></i> Unified
+                    </button>
+                    <button class="dropdown-item active" data-mode="sidebyside" title="View two versions in parallel columns">
+                        <i data-lucide="columns-2"></i> Side-by-side
+                    </button>
+                    <button class="dropdown-item" data-mode="diff" title="Highlight additions and deletions between versions">
+                        <i data-lucide="git-compare"></i> Track Changes
+                    </button>
+                    <button class="dropdown-item" data-mode="comparison" title="Compare variations across multiple witnesses">
+                        <i data-lucide="table"></i> Collation
+                    </button>
+                    <button class="dropdown-item" data-mode="gonzo" title="View same paragraphs across all 25 versions in a 5x5 grid">
+                        <i data-lucide="grid-3x3"></i> Gonzo
+                    </button>
+                    <button class="dropdown-item hidden" id="syntax-toggle-btn" title="Toggle Quant syntax highlighting">
+                        <i data-lucide="highlighter"></i> Syntax Highlighting
+                    </button>
                 </div>
             </div>
-        </div>
 
-        <!-- Analyze dropdown panel -->
-        <div id="analyze-panel" class="header-dropdown-panel hidden">
-            <div class="analyze-search-row">
-                <div class="search-box">
-                    <input type="text" id="search-input" placeholder="Search text..." />
-                    <button id="search-btn" class="tool-btn" title="Search across all chapters"><i data-lucide="search"></i> Find</button>
-                    <div class="search-navigation hidden" id="search-navigation">
-                        <button id="search-prev-btn" class="search-nav-btn" title="Previous occurrence">&#8592;</button>
-                        <div class="search-info">
-                            <span id="search-results-count" class="search-count">0 of 0</span>
-                            <span id="search-chapter-label" class="search-chapter"></span>
-                        </div>
-                        <button id="search-next-btn" class="search-nav-btn" title="Next occurrence">&#8594;</button>
-                    </div>
-                    <button id="clear-search-btn" class="tool-btn" title="Clear search results"><i data-lucide="x"></i> Clear</button>
+            <!-- Analyze dropdown -->
+            <div class="control-dropdown" id="analyze-dropdown">
+                <button id="analyze-toggle-btn" class="panel-toggle-btn" title="Analysis tools">
+                    <i data-lucide="bar-chart-2"></i> <span class="btn-label">Analyze</span>
+                </button>
+                <div class="dropdown-menu hidden" id="analyze-menu">
+                    <button class="dropdown-item" id="source-code-mode-btn" title="Enable Source Code Mode - click any paragraph to view its Quant source">
+                        <i data-lucide="code"></i> Source Code
+                    </button>
+                    <button class="dropdown-item" id="show-vars-btn" title="Show variable differences between versions">
+                        <i data-lucide="variable"></i> Variables
+                    </button>
+                    <button class="dropdown-item" id="word-diff-btn" title="Compare unique vocabulary between two versions">
+                        <i data-lucide="split"></i> Word Diff
+                    </button>
+                    <button class="dropdown-item" id="heatmap-btn" title="View chapter-by-chapter variation density">
+                        <i data-lucide="flame"></i> Heatmap
+                    </button>
                 </div>
             </div>
-            <div class="analyze-tools-row">
-                <button id="source-code-mode-btn" class="tool-btn source-code-toggle" title="Enable Source Code Mode - click any paragraph to view its Quant source">
-                    <i data-lucide="code"></i> Source
-                </button>
-                <button id="show-vars-btn" class="tool-btn vars-toggle" title="Show variable differences between versions">
-                    <i data-lucide="variable"></i> Variables
-                </button>
-                <button id="word-diff-btn" class="tool-btn" title="Compare unique vocabulary between two versions">
-                    <i data-lucide="split"></i> Word Diff
-                </button>
-                <button id="heatmap-btn" class="tool-btn" title="View chapter-by-chapter variation density">
-                    <i data-lucide="flame"></i> Heatmap
-                </button>
-            </div>
+
+            <!-- Search toggle -->
+            <button id="search-toggle-btn" class="panel-toggle-btn" title="Search across chapters">
+                <i data-lucide="search"></i> <span class="btn-label">Search</span>
+            </button>
         </div>
 
         <!-- Unified Variables panel (global + chapter-local) -->
@@ -255,6 +254,24 @@
             </div>
         </div>
     </header>
+
+    <!-- Search panel (sticky, outside header so it stays visible on scroll) -->
+    <div id="search-panel" class="hidden">
+        <div class="search-box">
+            <input type="text" id="search-input" placeholder="Search text..." />
+            <button id="search-chapter-btn" class="tool-btn" title="Search this chapter"><i data-lucide="search"></i> Chapter</button>
+            <button id="search-all-btn" class="tool-btn" title="Search all chapters"><i data-lucide="search"></i> All</button>
+            <div class="search-navigation hidden" id="search-navigation">
+                <button id="search-prev-btn" class="search-nav-btn" title="Previous occurrence">&#8592;</button>
+                <div class="search-info">
+                    <span id="search-results-count" class="search-count">0 of 0</span>
+                    <span id="search-chapter-label" class="search-chapter"></span>
+                </div>
+                <button id="search-next-btn" class="search-nav-btn" title="Next occurrence">&#8594;</button>
+            </div>
+            <button id="clear-search-btn" class="tool-btn" title="Clear search results"><i data-lucide="x"></i> Clear</button>
+        </div>
+    </div>
 
     <main>
         <div id="comparison-display">
@@ -316,16 +333,6 @@
         <ul id="word-popup-chapters" class="word-popup-chapters">
             <!-- Chapters will be populated by JavaScript -->
         </ul>
-    </div>
-
-    <!-- Floating Search Navigation -->
-    <div id="floating-search-nav" class="floating-search-nav hidden">
-        <button id="floating-prev-btn" class="floating-nav-btn" title="Previous (Shift+F3)">↑</button>
-        <div class="floating-info">
-            <span id="floating-count" class="floating-count">0/0</span>
-            <span id="floating-chapter-label" class="floating-chapter"></span>
-        </div>
-        <button id="floating-next-btn" class="floating-nav-btn" title="Next (F3)">↓</button>
     </div>
 
     <!-- Manage Uploads Modal -->
