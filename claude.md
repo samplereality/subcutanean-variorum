@@ -16,11 +16,21 @@ A web-based variorum browser for exploring textual variations across 25 versions
 
 2. **Navigation & UI**
    - Persistent navigation bar with dropdowns for Bookmarks, Files, Source, and Generate
+   - View dropdown menu: 5 view modes (Unified, Side-by-side, Track Changes, Collation, Gonzo)
+   - Analyze dropdown menu: 4 tools (Source Code, Variables, Word Diff, Heatmap)
+   - Dropdowns auto-close after selection (150ms delay)
    - Mobile-responsive with hamburger toggle on small screens
    - Modal dialogs for About, Generate Copy, Jaccard Distance, and Macro Inspector
 
-3. **Analysis Tools**
-   - Cross-chapter search with keyboard shortcuts (F3, Shift+F3)
+3. **Search**
+   - Two search modes: "Chapter" (current chapter only) and "All" (cross-chapter)
+   - Sticky search bar (position: sticky below nav bar, persists on scroll)
+   - DOM-driven match counting (counts actual highlighted spans, always accurate)
+   - Shows which seeds contain matches ("in both Seed X and Seed Y", "in Seed X only")
+   - No auto-scroll on search; user clicks next arrow to navigate to matches
+   - F3/Shift+F3 keyboard navigation; cross-chapter only in "All" mode
+
+4. **Analysis Tools**
    - Word differential analysis showing unique vocabulary
    - Jaccard Distance similarity measurement between versions
    - Quant Macro Inspector for viewing source markup
@@ -112,8 +122,13 @@ docs/
 - `renderUnifiedView()` / `renderSideBySideView()` / `renderTrackChangesView()` / `renderCollationView()`
 
 **Search:**
-- `performSearch()` - Cross-chapter text search
-- `navigateSearchResults(direction)` - F3/Shift+F3 navigation
+- `performSearch()` - Runs search in current scope (chapter or global)
+- `findChaptersWithMatches(searchTerm)` - Pre-scans chapters for matches (for cross-chapter F3)
+- `highlightSearchMatches(searchTerm)` - Walks DOM text nodes and wraps matches in `.search-highlight` spans
+- `scrollToCurrentHighlight()` - Scrolls to and marks the current highlight
+- `goToNextOccurrence()` / `goToPreviousOccurrence()` - F3/Shift+F3 navigation (cross-chapter only in global mode)
+- `getSearchSeedInfo(searchTerm)` - Returns which seeds contain the term in the current chapter
+- `updateSearchPanelHeight()` - Updates `--search-panel-height` CSS variable for sticky seed header offset
 
 **Analysis:**
 - `calculateJaccardDistance()` - Vocabulary similarity
@@ -187,7 +202,18 @@ docs/
 <div class="nav-dropdown" id="source-dropdown">...</div>
 
 <!-- Main Content -->
-<header>...</header>
+<header>
+    <!-- Version selectors, chapter nav, View/Analyze dropdowns, Search toggle -->
+</header>
+
+<!-- Sticky search panel (outside header for proper sticky behavior) -->
+<div id="search-panel">
+    <input id="search-input" />
+    <button id="search-chapter-btn">Chapter</button>  <!-- Search current chapter -->
+    <button id="search-all-btn">All</button>           <!-- Search all chapters -->
+    <div id="search-navigation">...</div>              <!-- Prev/next + count + seed info -->
+</div>
+
 <main id="comparison-container">...</main>
 
 <!-- Modals -->
@@ -211,11 +237,14 @@ docs/
 
 - **Navigation Bar**: `.main-nav`, `.nav-brand`, `.nav-links`, `.nav-item`
 - **Dropdowns**: `.nav-dropdown`, `.dropdown-header`, `.dropdown-body`
+- **Control Dropdowns**: `.control-dropdown`, `.dropdown-menu`, `.dropdown-item` (View/Analyze menus)
 - **Modals**: `.modal`, `.modal-content`, `.modal-header`, `.modal-body`
 - **Generate Form**: `.generate-modal-content`, `#subcutanean-form`
+- **Search Panel**: `#search-panel` (sticky), `.search-box`, `.search-navigation`, `.search-highlight`
 - **View Modes**: `.unified-view`, `.side-by-side-view`, `.track-changes-view`, `.collation-view`
 - **Gonzo Mode**: `.gonzo-fullscreen` (z-index: 6000), `.gonzo-header`, `.gonzo-header-btn`, `.gonzo-grid`, `.gonzo-cell`, `.gonzo-cell-header-clickable`, `.gonzo-about-overlay` (z-index: 7000)
 - **Source Code Mode**: `.source-toggle-btn`, `.source-code-panel`, `.source-highlight`
+- **CSS Variables**: `--search-panel-height` (set by JS, used by sticky seed headers)
 - **Responsive**: Media queries at 900px, 768px, 640px breakpoints
 
 ### Generate Copy Form
@@ -471,7 +500,38 @@ Source files (in `origin_text/`) map to browser chapter IDs:
 
 This mapping is defined in `build_variable_info.py` as `CHAPTER_MAPPING`.
 
-## Recent Changes (January 2026)
+## Recent Changes (February 2026)
+
+### Control Panel UI Overhaul
+
+Replaced the old View/Analyze panels (which competed for space) with dropdown menus:
+
+**View/Analyze Dropdowns:**
+- Click "View" button → dropdown with 5 modes (Unified, Side-by-side, Track Changes, Collation, Gonzo)
+- Click "Analyze" button → dropdown with 4 tools (Source Code, Variables, Word Diff, Heatmap)
+- Dropdowns auto-close after selection (150ms delay)
+- Click-outside-to-close behavior
+- CSS classes: `.control-dropdown`, `.dropdown-menu`, `.dropdown-item`
+
+**Search Overhaul:**
+- Two buttons: "Chapter" (current chapter only, never jumps) and "All" (cross-chapter with F3 navigation)
+- Sticky search bar (`position: sticky; top: 50px`) — moved outside `<header>` for proper sticky behavior
+- DOM-driven counting — counts actual `.search-highlight` spans, not pre-computed regex matches
+- Shows seed info: "in both Seed X and Seed Y" or "in Seed X only"
+- No auto-scroll on search; user clicks next arrow to navigate
+- State: `searchScope` ('chapter'|'global'), `searchMatchChapters`, `currentHighlightIndex`
+- New functions: `findChaptersWithMatches()`, `scrollToCurrentHighlight()`, `getSearchSeedInfo()`, `updateSearchPanelHeight()`
+- Removed: `findAllOccurrences()`, `goToOccurrence()`, floating search nav
+
+**Sticky Seed Headers:**
+- `.version-panel h2` uses `top: calc(50px + var(--search-panel-height, 0px))`
+- JS function `updateSearchPanelHeight()` updates `--search-panel-height` CSS variable when search panel shows/hides
+
+**Removed:**
+- Floating search nav (HTML, CSS, JS) — replaced by sticky search bar
+- Feature toast calls from analyze tool handlers (`showFeatureToast()` no longer called)
+
+## Earlier Changes (January 2026)
 
 ### Variables Panel & Variable Inference
 
@@ -740,6 +800,7 @@ The app uses a structured z-index hierarchy. Respect this when adding new overla
 | Element | Z-index | Notes |
 |---------|---------|-------|
 | Standard modals | 2000 | Below nav bar (covered by Gonzo) |
+| Sticky search panel | 4999 | Below nav bar, above page content |
 | Main nav bar | 5000 | Fixed top position |
 | Nav dropdowns | 5001 | Just above nav bar |
 | Leader lines (SVG) | 5999 | Annotation connectors, below note panels |
