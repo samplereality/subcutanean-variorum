@@ -4727,6 +4727,25 @@ main {
     background-color: rgba(217, 104, 0, 0.06) !important;
 }
 
+/* Rarity score indicators (only shown for <1% passages) */
+.rarity-indicator {
+    display: inline-block;
+    font-size: 0.7rem;
+    margin-left: 0.5rem;
+    color: var(--accent-color);
+    font-style: italic;
+    font-weight: 600;
+}
+
+.rare-passage {
+    border-left: 2px solid var(--accent-color);
+    padding-left: 0.5rem;
+}
+
+[data-theme="light"] .rarity-indicator {
+    color: var(--accent-color);
+}
+
 /* Light mode: Track Changes diff styles */
 [data-theme="light"] .diff-line.added {
     background-color: rgba(76, 175, 80, 0.2);
