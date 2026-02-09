@@ -238,6 +238,15 @@
                     <button class="dropdown-item" id="heatmap-btn" title="View chapter-by-chapter variation density">
                         <i data-lucide="flame"></i> Heatmap
                     </button>
+                    <button class="dropdown-item" id="alluvial-btn" title="Alluvial diagram showing narrative branching across 10,000 copies">
+                        <i data-lucide="git-branch"></i> Narrative Flow
+                    </button>
+                    <button class="dropdown-item" id="tapestry-btn" title="Tapestry showing 10,000 variant threads converging and diverging">
+                        <i data-lucide="layers"></i> Tapestry
+                    </button>
+                    <button class="dropdown-item" id="barcode-btn" title="Paragraph-level rarity barcode across 10,000 copies">
+                        <i data-lucide="scan-barcode"></i> Barcode
+                    </button>
                 </div>
             </div>
 
@@ -677,6 +686,72 @@
         </div>
     </div>
 
+    <!-- Alluvial Diagram Modal (Narrative Flow) -->
+    <div id="alluvial-modal" class="modal hidden alluvial-fullscreen">
+        <div class="alluvial-container">
+            <div class="alluvial-header">
+                <h2>Narrative Flow</h2>
+                <p class="alluvial-subtitle">How 10,000 copies diverge and reconverge across chapters</p>
+                <div class="alluvial-header-actions">
+                    <button class="alluvial-header-btn" id="alluvial-close-btn" title="Close">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="alluvial-svg-container" class="alluvial-svg-container">
+                <!-- SVG rendered by JavaScript -->
+            </div>
+            <div id="alluvial-tooltip" class="alluvial-tooltip hidden"></div>
+        </div>
+    </div>
+
+    <!-- Tapestry Visualization Modal -->
+    <div id="tapestry-modal" class="modal hidden tapestry-fullscreen">
+        <div class="tapestry-container">
+            <div class="tapestry-header">
+                <h2>Tapestry</h2>
+                <p class="tapestry-subtitle">10,000 threads converging and diverging across chapters</p>
+                <div class="tapestry-header-actions">
+                    <button class="tapestry-header-btn" id="tapestry-info-btn" title="How to read this chart">
+                        <i data-lucide="info"></i>
+                    </button>
+                    <button class="tapestry-header-btn" id="tapestry-close-btn" title="Close">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="tapestry-svg-container" class="tapestry-svg-container">
+                <!-- SVG rendered by JavaScript -->
+            </div>
+            <div id="tapestry-tooltip" class="tapestry-tooltip hidden"></div>
+        </div>
+    </div>
+
+    <!-- Barcode Visualization Modal -->
+    <div id="barcode-modal" class="modal hidden barcode-fullscreen">
+        <div class="barcode-container">
+            <div class="barcode-header">
+                <h2>Variant Barcode</h2>
+                <p class="barcode-subtitle">Paragraph-level rarity across 10,000 copies</p>
+                <div class="barcode-header-controls">
+                    <select id="barcode-chapter-select" class="barcode-chapter-select"></select>
+                </div>
+                <div class="barcode-header-actions">
+                    <button class="barcode-header-btn" id="barcode-info-btn" title="How to read this chart">
+                        <i data-lucide="info"></i>
+                    </button>
+                    <button class="barcode-header-btn" id="barcode-close-btn" title="Close">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="barcode-canvas-container" class="barcode-canvas-container">
+                <canvas id="barcode-canvas"></canvas>
+            </div>
+            <div id="barcode-tooltip" class="barcode-tooltip hidden"></div>
+        </div>
+    </div>
+
     <!-- Welcome Modal -->
     <div id="welcome-modal" class="modal hidden">
         <div class="modal-content welcome-modal-content">
@@ -719,6 +794,8 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/diff@5.1.0/dist/diff.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script>

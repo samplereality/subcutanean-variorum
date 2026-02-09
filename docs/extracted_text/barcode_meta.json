@@ -1,0 +1,152 @@
+{
+  "meta": {
+    "total_variants": 10000,
+    "chapters": [
+      "prologue",
+      "chapter1",
+      "chapter2",
+      "chapter3",
+      "chapter4",
+      "chapter5",
+      "chapter6",
+      "chapter7",
+      "chapter8",
+      "chapter9",
+      "part2",
+      "chapter10",
+      "chapter11",
+      "chapter12",
+      "chapter13",
+      "chapter14",
+      "chapter15",
+      "part3",
+      "chapter16",
+      "chapter17",
+      "chapter18",
+      "notes"
+    ],
+    "chapter_labels": {
+      "prologue": "Prologue",
+      "chapter1": "Ch 1",
+      "chapter2": "Ch 2",
+      "chapter3": "Ch 3",
+      "chapter4": "Ch 4",
+      "chapter5": "Ch 5",
+      "chapter6": "Ch 6",
+      "chapter7": "Ch 7",
+      "chapter8": "Ch 8",
+      "chapter9": "Ch 9",
+      "part2": "Part II",
+      "chapter10": "Ch 10",
+      "chapter11": "Ch 11",
+      "chapter12": "Ch 12",
+      "chapter13": "Ch 13",
+      "chapter14": "Ch 14",
+      "chapter15": "Ch 15",
+      "part3": "Part III",
+      "chapter16": "Ch 16",
+      "chapter17": "Ch 17",
+      "chapter18": "Epilogue",
+      "notes": "Notes"
+    },
+    "grade_labels": [
+      "Universal",
+      "Common",
+      "Uncommon",
+      "Rare",
+      "Very rare",
+      "Ultra rare"
+    ],
+    "generated": "2026-02-08T22:19:08.394224"
+  },
+  "chapter_stats": {
+    "prologue": {
+      "max_paragraphs": 14,
+      "num_groups": 873
+    },
+    "chapter1": {
+      "max_paragraphs": 111,
+      "num_groups": 9979
+    },
+    "chapter2": {
+      "max_paragraphs": 126,
+      "num_groups": 10000
+    },
+    "chapter3": {
+      "max_paragraphs": 101,
+      "num_groups": 9785
+    },
+    "chapter4": {
+      "max_paragraphs": 148,
+      "num_groups": 9797
+    },
+    "chapter5": {
+      "max_paragraphs": 193,
+      "num_groups": 9330
+    },
+    "chapter6": {
+      "max_paragraphs": 86,
+      "num_groups": 2205
+    },
+    "chapter7": {
+      "max_paragraphs": 63,
+      "num_groups": 9389
+    },
+    "chapter8": {
+      "max_paragraphs": 156,
+      "num_groups": 9988
+    },
+    "chapter9": {
+      "max_paragraphs": 170,
+      "num_groups": 9969
+    },
+    "part2": {
+      "max_paragraphs": 3,
+      "num_groups": 4
+    },
+    "chapter10": {
+      "max_paragraphs": 130,
+      "num_groups": 7681
+    },
+    "chapter11": {
+      "max_paragraphs": 69,
+      "num_groups": 9761
+    },
+    "chapter12": {
+      "max_paragraphs": 84,
+      "num_groups": 9985
+    },
+    "chapter13": {
+      "max_paragraphs": 91,
+      "num_groups": 8449
+    },
+    "chapter14": {
+      "max_paragraphs": 116,
+      "num_groups": 1909
+    },
+    "chapter15": {
+      "max_paragraphs": 105,
+      "num_groups": 1058
+    },
+    "part3": {
+      "max_paragraphs": 2,
+      "num_groups": 1
+    },
+    "chapter16": {
+      "max_paragraphs": 114,
+      "num_groups": 320
+    },
+    "chapter17": {
+      "max_paragraphs": 66,
+      "num_groups": 20
+    },
+    "chapter18": {
+      "max_paragraphs": 43,
+      "num_groups": 2077
+    },
+    "notes": {
+      "max_paragraphs": 28,
+      "num_groups": 4539
+    }
+  }
+}

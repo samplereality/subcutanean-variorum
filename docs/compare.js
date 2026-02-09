@@ -30,6 +30,10 @@ let chapterVariables = {}; // Chapter-local variable definitions (chapter_id -> 
 let chapterMacros = {}; // Chapter-local macro definitions (chapter_id -> macro_name -> info)
 let scholarlyDescriptions = null; // Scholarly annotations (override variableInfo descriptions)
 let rarityData = null; // Rarity scores from 10K variant analysis
+let alluvialData = null; // Alluvial diagram data from 10K variant analysis
+let tapestryData = null; // Tapestry thread data from 10K variant analysis
+let barcodeMetaData = null; // Barcode meta data (chapter stats)
+let barcodeChapterCache = {}; // Cached per-chapter barcode data
 let sourceSyntaxHighlightingEnabled = false;
 const SOURCE_VERSION_ID = 'quant_source';
 const SOURCE_VERSION_LABEL = 'Source Code';
@@ -5725,7 +5729,10 @@ function closeAllModals() {
         'privacy-notice-modal',
         'annotation-modal',
         'export-modal',
-        'heatmap-modal'
+        'heatmap-modal',
+        'alluvial-modal',
+        'tapestry-modal',
+        'barcode-modal'
         // Note: gonzo-modal is excluded so it persists when other modals open
     ];
     modalIds.forEach(id => {
@@ -8182,7 +8189,7 @@ function annotateRarityScores() {
     const paragraphs = container.querySelectorAll('p[data-paragraph-index]');
 
     const total = rarityData.meta.total_variants;
-    const threshold = total * 0.01; // <1% = rare
+    const threshold = total * 0.05; // <5% = rare
 
     paragraphs.forEach(p => {
         const rawText = p.innerHTML;
@@ -9051,6 +9058,9 @@ document.addEventListener('DOMContentLoaded', () => {
     loadOriginSources();
     loadVariableInfo();
     loadRarityData();
+    loadAlluvialData();
+    loadTapestryData();
+    loadBarcodeMetaData();
     initializeNavigation();
     initializeGenerateForm();
     initializeGlobalsModal();
@@ -9766,6 +9776,916 @@ document.addEventListener('DOMContentLoaded', () => {
     window.closeHeatmapModal = closeHeatmapModal;
 
     // ============================================
+    // Alluvial Diagram - Narrative Flow
+    // ============================================
+
+    const ALLUVIAL_COLORS = [
+        '#ff8800',  // orange (accent)
+        '#4fc3f7',  // light blue
+        '#81c784',  // green
+        '#e57373',  // red
+        '#ba68c8',  // purple
+        '#ffd54f',  // yellow
+        '#4db6ac',  // teal
+        '#9e9e9e',  // grey (always "Other")
+    ];
+
+    async function loadAlluvialData() {
+        try {
+            const response = await fetch('extracted_text/alluvial_data.json');
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            alluvialData = await response.json();
+            console.log(`Loaded alluvial data: ${alluvialData.nodes.length} nodes, ${alluvialData.links.length} links`);
+        } catch (error) {
+            console.warn('Alluvial data not available:', error.message);
+            alluvialData = null;
+        }
+    }
+
+    function openAlluvialModal() {
+        if (!alluvialData) {
+            console.warn('Alluvial data not loaded');
+            return;
+        }
+        closeAllModals();
+        closeAllNavDropdowns();
+
+        const modal = document.getElementById('alluvial-modal');
+        if (!modal) return;
+
+        modal.classList.remove('hidden');
+        renderAlluvialDiagram(alluvialData);
+
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons({ nodes: [modal] });
+        }
+
+        document.addEventListener('keydown', handleAlluvialKeydown);
+    }
+
+    function closeAlluvialModal() {
+        const modal = document.getElementById('alluvial-modal');
+        if (modal) {
+            modal.classList.add('hidden');
+        }
+        document.removeEventListener('keydown', handleAlluvialKeydown);
+    }
+
+    function handleAlluvialKeydown(e) {
+        if (e.key === 'Escape') {
+            closeAlluvialModal();
+        }
+    }
+
+    function renderAlluvialDiagram(data) {
+        const container = document.getElementById('alluvial-svg-container');
+        if (!container) return;
+
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+        const margin = { top: 20, bottom: 45, left: 10, right: 10 };
+
+        const chapters = data.meta.chapters;
+        const labels = data.meta.chapter_labels;
+        const total = data.meta.total_variants;
+
+        // Build a lookup from original node ID to data
+        const origNodeMap = {};
+        data.nodes.forEach(n => { origNodeMap[n.id] = n; });
+
+        // Prepare deep copies for d3-sankey (it mutates in place)
+        const sankeyNodes = data.nodes.map(n => ({
+            id: n.id,
+            chapter: n.chapter,
+            clusterIndex: n.index, // preserve before d3-sankey overwrites 'index'
+            count: n.count,
+            label: n.label,
+            fingerprint: n.fingerprint,
+        }));
+        const sankeyLinks = data.links.map(l => ({
+            source: l.source,
+            target: l.target,
+            value: l.value,
+        }));
+
+        // Configure d3-sankey layout
+        const nodeWidth = Math.min((width - margin.left - margin.right) / chapters.length * 0.3, 18);
+        const sankeyLayout = d3.sankey()
+            .nodeId(d => d.id)
+            .nodeWidth(nodeWidth)
+            .nodePadding(3)
+            .nodeAlign(d3.sankeyLeft)
+            .nodeSort(null) // preserve input order (sorted by count desc)
+            .extent([[margin.left, margin.top], [width - margin.right, height - margin.bottom]]);
+
+        const graph = sankeyLayout({
+            nodes: sankeyNodes,
+            links: sankeyLinks,
+        });
+
+        // Clear container and create SVG with D3
+        container.innerHTML = '';
+        const svg = d3.select(container)
+            .append('svg')
+            .attr('width', width)
+            .attr('height', height)
+            .attr('viewBox', `0 0 ${width} ${height}`);
+
+        // Link path generator
+        const linkPath = d3.sankeyLinkHorizontal();
+
+        // Draw links (flows)
+        const linkGroup = svg.append('g')
+            .attr('class', 'alluvial-flows')
+            .attr('fill', 'none');
+
+        linkGroup.selectAll('path')
+            .data(graph.links)
+            .join('path')
+            .attr('d', linkPath)
+            .attr('class', 'alluvial-flow')
+            .attr('stroke', d => {
+                const ci = d.source.clusterIndex;
+                return ALLUVIAL_COLORS[Math.min(ci, ALLUVIAL_COLORS.length - 1)];
+            })
+            .attr('stroke-opacity', 0.4)
+            .attr('stroke-width', d => Math.max(1, d.width))
+            .attr('data-source-id', d => d.source.id)
+            .attr('data-target-id', d => d.target.id)
+            .on('mouseenter', function (event, d) {
+                d3.select(this).attr('stroke-opacity', 0.8);
+                const sourceLabel = labels[d.source.chapter] || d.source.chapter;
+                const targetLabel = labels[d.target.chapter] || d.target.chapter;
+                const pct = ((d.value / total) * 100).toFixed(1);
+                showAlluvialTooltip(event,
+                    `${sourceLabel} \u2192 ${targetLabel}<br>` +
+                    `${d.value.toLocaleString()} copies (${pct}%)`
+                );
+            })
+            .on('mousemove', function (event) { moveAlluvialTooltip(event); })
+            .on('mouseleave', function () {
+                d3.select(this).attr('stroke-opacity', 0.4);
+                hideAlluvialTooltip();
+            });
+
+        // Draw nodes
+        const nodeGroup = svg.append('g')
+            .attr('class', 'alluvial-nodes');
+
+        nodeGroup.selectAll('rect')
+            .data(graph.nodes)
+            .join('rect')
+            .attr('x', d => d.x0)
+            .attr('y', d => d.y0)
+            .attr('width', d => d.x1 - d.x0)
+            .attr('height', d => Math.max(d.y1 - d.y0, 1))
+            .attr('class', 'alluvial-node')
+            .attr('fill', d => ALLUVIAL_COLORS[Math.min(d.clusterIndex, ALLUVIAL_COLORS.length - 1)])
+            .attr('stroke', '#000')
+            .attr('stroke-width', 0.5)
+            .attr('data-node-id', d => d.id)
+            .on('mouseenter', function (event, d) {
+                highlightAlluvialNode(d.id, svg);
+                const chLabel = labels[d.chapter] || d.chapter;
+                let tooltipHTML = `<strong>${chLabel}</strong><br>${d.label}`;
+
+                // Show feature info if available
+                const features = data.features[d.chapter];
+                if (features && d.fingerprint && d.fingerprint !== 'uniform' && d.fingerprint !== 'empty' && d.fingerprint !== 'other') {
+                    tooltipHTML += '<br><span style="color:#888;font-size:0.75rem">';
+                    for (let i = 0; i < d.fingerprint.length && i < features.length; i++) {
+                        const bit = d.fingerprint[i];
+                        const preview = features[i].preview.slice(0, 50);
+                        tooltipHTML += `<br>${bit === '1' ? '\u2713' : '\u2717'} "${preview}..."`;
+                    }
+                    tooltipHTML += '</span>';
+                }
+                showAlluvialTooltip(event, tooltipHTML);
+            })
+            .on('mousemove', function (event) { moveAlluvialTooltip(event); })
+            .on('mouseleave', function () {
+                unhighlightAlluvialNodes(svg);
+                hideAlluvialTooltip();
+            });
+
+        // Draw chapter labels at bottom
+        // Compute column x positions from the sankey-assigned node positions
+        const chapterX = {};
+        graph.nodes.forEach(n => {
+            if (!chapterX[n.chapter]) {
+                chapterX[n.chapter] = (n.x0 + n.x1) / 2;
+            }
+        });
+
+        svg.append('g')
+            .attr('class', 'alluvial-labels')
+            .selectAll('text')
+            .data(chapters)
+            .join('text')
+            .attr('x', ch => chapterX[ch] || 0)
+            .attr('y', height - 8)
+            .attr('class', 'alluvial-label')
+            .text(ch => labels[ch] || ch);
+    }
+
+    function highlightAlluvialNode(nodeId, svg) {
+        // Dim all flows, highlight connected ones
+        svg.selectAll('.alluvial-flow')
+            .attr('stroke-opacity', function () {
+                const srcId = d3.select(this).attr('data-source-id');
+                const tgtId = d3.select(this).attr('data-target-id');
+                return (srcId === nodeId || tgtId === nodeId) ? 0.8 : 0.05;
+            });
+
+        // Build set of connected node IDs
+        const connected = new Set([nodeId]);
+        svg.selectAll('.alluvial-flow').each(function () {
+            const srcId = d3.select(this).attr('data-source-id');
+            const tgtId = d3.select(this).attr('data-target-id');
+            if (srcId === nodeId) connected.add(tgtId);
+            if (tgtId === nodeId) connected.add(srcId);
+        });
+
+        svg.selectAll('.alluvial-node')
+            .attr('opacity', function () {
+                const id = d3.select(this).attr('data-node-id');
+                return connected.has(id) ? 1 : 0.25;
+            })
+            .attr('stroke-width', function () {
+                return d3.select(this).attr('data-node-id') === nodeId ? 2 : 0.5;
+            });
+    }
+
+    function unhighlightAlluvialNodes(svg) {
+        svg.selectAll('.alluvial-flow').attr('stroke-opacity', 0.4);
+        svg.selectAll('.alluvial-node').attr('opacity', 1).attr('stroke-width', 0.5);
+    }
+
+    function showAlluvialTooltip(e, html) {
+        const tooltip = document.getElementById('alluvial-tooltip');
+        if (!tooltip) return;
+        tooltip.innerHTML = html;
+        tooltip.classList.remove('hidden');
+        moveAlluvialTooltip(e);
+    }
+
+    function moveAlluvialTooltip(e) {
+        const tooltip = document.getElementById('alluvial-tooltip');
+        if (!tooltip) return;
+        const container = document.getElementById('alluvial-svg-container');
+        if (!container) return;
+        const rect = container.getBoundingClientRect();
+        let x = e.clientX - rect.left + 15;
+        let y = e.clientY - rect.top + 15;
+        const tw = tooltip.offsetWidth;
+        const th = tooltip.offsetHeight;
+        if (x + tw > rect.width - 10) x = e.clientX - rect.left - tw - 15;
+        if (y + th > rect.height - 10) y = e.clientY - rect.top - th - 15;
+        tooltip.style.left = x + 'px';
+        tooltip.style.top = y + 'px';
+    }
+
+    function hideAlluvialTooltip() {
+        const tooltip = document.getElementById('alluvial-tooltip');
+        if (tooltip) tooltip.classList.add('hidden');
+    }
+
+    // Make functions globally accessible
+    window.openAlluvialModal = openAlluvialModal;
+    window.closeAlluvialModal = closeAlluvialModal;
+
+    // ============================================
+    // Tapestry Visualization - Bundled Thread Paths
+    // ============================================
+
+    const TAPESTRY_COLORS = [
+        '#ff8800',  // orange (prologue cluster 0)
+        '#4fc3f7',  // light blue (prologue cluster 1)
+        '#81c784',  // green (prologue cluster 2)
+        '#e57373',  // red (prologue cluster 3)
+    ];
+
+    async function loadTapestryData() {
+        try {
+            const response = await fetch('extracted_text/tapestry_data.json');
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            tapestryData = await response.json();
+            console.log(`Loaded tapestry data: ${tapestryData.bundles.length} bundles`);
+        } catch (error) {
+            console.warn('Tapestry data not available:', error.message);
+            tapestryData = null;
+        }
+    }
+
+    function openTapestryModal() {
+        if (!tapestryData) {
+            console.warn('Tapestry data not loaded');
+            return;
+        }
+        closeAllModals();
+        closeAllNavDropdowns();
+
+        const modal = document.getElementById('tapestry-modal');
+        if (!modal) return;
+
+        modal.classList.remove('hidden');
+        renderTapestryDiagram(tapestryData);
+
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons({ nodes: [modal] });
+        }
+
+        document.addEventListener('keydown', handleTapestryKeydown);
+    }
+
+    function closeTapestryModal() {
+        const modal = document.getElementById('tapestry-modal');
+        if (modal) {
+            modal.classList.add('hidden');
+        }
+        document.removeEventListener('keydown', handleTapestryKeydown);
+    }
+
+    function toggleTapestryLegend() {
+        const legend = document.querySelector('.tapestry-legend');
+        if (legend) {
+            legend.classList.toggle('hidden');
+        }
+    }
+
+    function handleTapestryKeydown(e) {
+        if (e.key === 'Escape') {
+            closeTapestryModal();
+        } else if (e.key === 'i' || e.key === 'I') {
+            toggleTapestryLegend();
+        }
+    }
+
+    function renderTapestryDiagram(data) {
+        const container = document.getElementById('tapestry-svg-container');
+        if (!container) return;
+
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+        const margin = { top: 25, bottom: 45, left: 50, right: 20 };
+
+        const chapters = data.meta.chapters;
+        const labels = data.meta.chapter_labels;
+        const total = data.meta.total_variants;
+        const bundles = data.bundles;
+
+        // Compute per-chapter distance ranges for normalization
+        const chapterMins = [];
+        const chapterMaxs = [];
+        chapters.forEach((_ch, ci) => {
+            let cMin = 1, cMax = 0;
+            bundles.forEach(b => {
+                if (b.path[ci] < cMin) cMin = b.path[ci];
+                if (b.path[ci] > cMax) cMax = b.path[ci];
+            });
+            chapterMins.push(cMin);
+            chapterMaxs.push(cMax);
+        });
+
+        // Normalize each chapter's values to [0, 1] for full vertical spread
+        function normalizedY(value, ci) {
+            const range = chapterMaxs[ci] - chapterMins[ci];
+            if (range < 0.0001) return 0.5; // uniform chapter
+            return (value - chapterMins[ci]) / range;
+        }
+
+        // Scales
+        const xScale = d3.scalePoint()
+            .domain(chapters)
+            .range([margin.left, width - margin.right]);
+
+        const yScale = d3.scaleLinear()
+            .domain([0, 1])
+            .range([height - margin.bottom, margin.top]); // inverted: high distance at top
+
+        // Line generator — uses per-chapter normalization
+        const lineGen = d3.line()
+            .x((_d, i) => xScale(chapters[i]))
+            .y((d, i) => yScale(normalizedY(d, i)))
+            .curve(d3.curveMonotoneX);
+
+        // Clear and create SVG
+        container.innerHTML = '';
+        const svg = d3.select(container)
+            .append('svg')
+            .attr('width', width)
+            .attr('height', height)
+            .attr('viewBox', `0 0 ${width} ${height}`);
+
+        // Draw threads (largest bundles first = background, small on top)
+        const threadGroup = svg.append('g')
+            .attr('class', 'tapestry-threads');
+
+        threadGroup.selectAll('path')
+            .data(bundles)
+            .join('path')
+            .attr('d', d => lineGen(d.path))
+            .attr('class', 'tapestry-thread')
+            .attr('fill', 'none')
+            .attr('stroke', d => TAPESTRY_COLORS[d.cluster % TAPESTRY_COLORS.length])
+            .attr('stroke-opacity', d => 0.15 + 0.35 * Math.min(d.count / 80, 1))
+            .attr('stroke-width', d => Math.max(0.5, Math.sqrt(d.count) * 0.6))
+            .attr('data-bundle-idx', (_d, i) => i)
+            .on('mouseenter', function (event, d) {
+                // Highlight this thread
+                d3.select(this)
+                    .attr('stroke-opacity', 0.9)
+                    .attr('stroke-width', Math.max(2, Math.sqrt(d.count) * 1.2));
+                // Dim others
+                threadGroup.selectAll('.tapestry-thread')
+                    .filter(function () { return this !== event.currentTarget; })
+                    .attr('stroke-opacity', 0.05);
+
+                const clusterNames = ['A', 'B', 'C', 'D'];
+                const minDist = Math.min(...d.path).toFixed(3);
+                const maxDist = Math.max(...d.path).toFixed(3);
+                const avgDist = (d.path.reduce((s, v) => s + v, 0) / d.path.length).toFixed(3);
+                showTapestryTooltip(event,
+                    `<strong>${d.count.toLocaleString()} copies</strong> (${((d.count / total) * 100).toFixed(1)}%)<br>` +
+                    `Prologue cluster: ${clusterNames[d.cluster] || d.cluster}<br>` +
+                    `Distance range: ${minDist} \u2013 ${maxDist}<br>` +
+                    `Average distance: ${avgDist}`
+                );
+            })
+            .on('mousemove', function (event) { moveTapestryTooltip(event); })
+            .on('mouseleave', function () {
+                // Restore all threads
+                threadGroup.selectAll('.tapestry-thread')
+                    .attr('stroke-opacity', d => 0.15 + 0.35 * Math.min(d.count / 80, 1))
+                    .attr('stroke-width', d => Math.max(0.5, Math.sqrt(d.count) * 0.6));
+                hideTapestryTooltip();
+            });
+
+        // Chapter labels at bottom
+        svg.append('g')
+            .attr('class', 'tapestry-labels')
+            .selectAll('text')
+            .data(chapters)
+            .join('text')
+            .attr('x', ch => xScale(ch))
+            .attr('y', height - 8)
+            .attr('class', 'tapestry-label')
+            .text(ch => labels[ch] || ch);
+
+        // Y-axis labels
+        svg.append('text')
+            .attr('class', 'tapestry-axis-label')
+            .attr('x', 12)
+            .attr('y', margin.top)
+            .attr('text-anchor', 'start')
+            .text('\u2191 More unique text');
+
+        svg.append('text')
+            .attr('class', 'tapestry-axis-label')
+            .attr('x', 12)
+            .attr('y', height - margin.bottom)
+            .attr('text-anchor', 'start')
+            .text('\u2193 More shared text');
+
+        // Build legend panel (HTML overlay, not SVG)
+        let legend = container.querySelector('.tapestry-legend');
+        if (!legend) {
+            legend = document.createElement('div');
+            legend.className = 'tapestry-legend hidden';
+            legend.innerHTML = `
+                <h3>How to read this chart</h3>
+                <div class="tapestry-legend-section">
+                    <div class="tapestry-legend-title">What you're seeing</div>
+                    Each line traces a group of copies through the novel's 22 chapters, from Prologue (left) to Notes (right).
+                    Where lines bunch together, those copies share similar text.
+                    Where they spread apart, the text diverges.
+                    The 10,000 copies are grouped into ~350 bundles based on how similarly their text varies across key chapters.
+                </div>
+                <div class="tapestry-legend-section">
+                    <div class="tapestry-legend-title">How distance is measured</div>
+                    For each copy, every paragraph in a chapter is checked against all 10,000 copies.
+                    A paragraph found in all 10,000 copies scores 0 (universal).
+                    A paragraph found in only 1 copy scores ~1 (unique).<br>
+                    The chapter's <em>distance score</em> is the average of these paragraph scores.
+                    A high score means most of that chapter's text is rare; a low score means it's widely shared.
+                </div>
+                <div class="tapestry-legend-section">
+                    <div class="tapestry-legend-title">Vertical position</div>
+                    Higher = more unusual text (higher distance score).<br>
+                    Lower = more common text (lower distance score).<br>
+                    Each chapter column is scaled independently so the full spread of variation is visible at every point in the novel.
+                </div>
+                <div class="tapestry-legend-section">
+                    <div class="tapestry-legend-title">Line thickness</div>
+                    Thicker lines represent more copies traveling the same path.
+                    A thin wisp is a handful of copies; a thick band is hundreds.
+                </div>
+                <div class="tapestry-legend-section">
+                    <div class="tapestry-legend-title">Colors (by prologue version)</div>
+                    <div class="tapestry-legend-colors">
+                        <div class="tapestry-legend-swatch"><span style="background:#ff8800"></span> Group A</div>
+                        <div class="tapestry-legend-swatch"><span style="background:#4fc3f7"></span> Group B</div>
+                        <div class="tapestry-legend-swatch"><span style="background:#81c784"></span> Group C</div>
+                        <div class="tapestry-legend-swatch"><span style="background:#e57373"></span> Group D</div>
+                    </div>
+                    Each copy is colored by which structural variant of the Prologue it contains (based on the three most distinguishing paragraphs).
+                    This reveals whether copies that begin with similar text continue to track together or scatter across different paths.
+                </div>
+                <div class="tapestry-legend-section" style="color:#888;font-size:0.75rem">
+                    Hover any thread for details. Press <strong>i</strong> to toggle this legend.
+                </div>
+            `;
+            container.appendChild(legend);
+        }
+    }
+
+    function showTapestryTooltip(e, html) {
+        const tooltip = document.getElementById('tapestry-tooltip');
+        if (!tooltip) return;
+        tooltip.innerHTML = html;
+        tooltip.classList.remove('hidden');
+        moveTapestryTooltip(e);
+    }
+
+    function moveTapestryTooltip(e) {
+        const tooltip = document.getElementById('tapestry-tooltip');
+        if (!tooltip) return;
+        const container = document.getElementById('tapestry-svg-container');
+        if (!container) return;
+        const rect = container.getBoundingClientRect();
+        let x = e.clientX - rect.left + 15;
+        let y = e.clientY - rect.top + 15;
+        const tw = tooltip.offsetWidth;
+        const th = tooltip.offsetHeight;
+        if (x + tw > rect.width - 10) x = e.clientX - rect.left - tw - 15;
+        if (y + th > rect.height - 10) y = e.clientY - rect.top - th - 15;
+        tooltip.style.left = x + 'px';
+        tooltip.style.top = y + 'px';
+    }
+
+    function hideTapestryTooltip() {
+        const tooltip = document.getElementById('tapestry-tooltip');
+        if (tooltip) tooltip.classList.add('hidden');
+    }
+
+    window.openTapestryModal = openTapestryModal;
+    window.closeTapestryModal = closeTapestryModal;
+    window.toggleTapestryLegend = toggleTapestryLegend;
+
+    // ============================================
+    // Barcode Visualization - Paragraph-Level Rarity
+    // ============================================
+
+    const BARCODE_COLORS = [
+        '#1a237e',  // Grade 0: Universal (deep blue)
+        '#0277bd',  // Grade 1: Common (blue)
+        '#00897b',  // Grade 2: Uncommon (teal)
+        '#f9a825',  // Grade 3: Rare (amber)
+        '#e65100',  // Grade 4: Very rare (deep orange)
+        '#b71c1c',  // Grade 5: Ultra rare (deep red)
+    ];
+
+    const BARCODE_GAP_COLOR = 'rgba(255, 255, 255, 0.03)';
+
+    let currentBarcodeChapter = 'chapter1';
+
+    async function loadBarcodeMetaData() {
+        try {
+            const response = await fetch('extracted_text/barcode_meta.json');
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            barcodeMetaData = await response.json();
+            console.log(`Loaded barcode meta: ${Object.keys(barcodeMetaData.chapter_stats).length} chapters`);
+        } catch (error) {
+            console.warn('Barcode meta data not available:', error.message);
+            barcodeMetaData = null;
+        }
+    }
+
+    async function loadBarcodeChapter(chapterId) {
+        if (barcodeChapterCache[chapterId]) return barcodeChapterCache[chapterId];
+        try {
+            const response = await fetch(`extracted_text/barcode_ch_${chapterId}.json`);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const data = await response.json();
+            barcodeChapterCache[chapterId] = data;
+            return data;
+        } catch (error) {
+            console.warn(`Barcode data for ${chapterId} not available:`, error.message);
+            return null;
+        }
+    }
+
+    async function openBarcodeModal() {
+        if (!barcodeMetaData) {
+            console.warn('Barcode meta data not loaded');
+            return;
+        }
+        closeAllModals();
+        closeAllNavDropdowns();
+
+        const modal = document.getElementById('barcode-modal');
+        if (!modal) return;
+
+        populateBarcodeChapterSelect();
+        modal.classList.remove('hidden');
+
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons({ nodes: [modal] });
+        }
+
+        document.addEventListener('keydown', handleBarcodeKeydown);
+
+        // Load and render the current chapter
+        const chapterData = await loadBarcodeChapter(currentBarcodeChapter);
+        if (chapterData) {
+            renderBarcodeVisualization(currentBarcodeChapter, chapterData);
+        }
+    }
+
+    function closeBarcodeModal() {
+        const modal = document.getElementById('barcode-modal');
+        if (modal) modal.classList.add('hidden');
+        document.removeEventListener('keydown', handleBarcodeKeydown);
+    }
+
+    function handleBarcodeKeydown(e) {
+        if (e.key === 'Escape') {
+            closeBarcodeModal();
+        } else if (e.key === 'i' || e.key === 'I') {
+            toggleBarcodeLegend();
+        }
+    }
+
+    function toggleBarcodeLegend() {
+        const legend = document.querySelector('.barcode-legend');
+        if (legend) legend.classList.toggle('hidden');
+    }
+
+    function populateBarcodeChapterSelect() {
+        const select = document.getElementById('barcode-chapter-select');
+        if (!select || !barcodeMetaData) return;
+
+        select.innerHTML = '';
+        const chapters = barcodeMetaData.meta.chapters;
+        const labels = barcodeMetaData.meta.chapter_labels;
+
+        chapters.forEach(ch => {
+            const stats = barcodeMetaData.chapter_stats[ch];
+            if (stats && stats.max_paragraphs > 0) {
+                const opt = document.createElement('option');
+                opt.value = ch;
+                opt.textContent = `${labels[ch] || ch} (${stats.max_paragraphs} paras, ${stats.num_groups} groups)`;
+                if (ch === currentBarcodeChapter) opt.selected = true;
+                select.appendChild(opt);
+            }
+        });
+    }
+
+    function renderBarcodeVisualization(chapterId, chapterData) {
+        const container = document.getElementById('barcode-canvas-container');
+        const canvas = document.getElementById('barcode-canvas');
+        if (!container || !canvas || !chapterData) return;
+
+        currentBarcodeChapter = chapterId;
+
+        const dpr = window.devicePixelRatio || 1;
+        const displayWidth = container.clientWidth;
+        const displayHeight = container.clientHeight;
+        canvas.width = displayWidth * dpr;
+        canvas.height = displayHeight * dpr;
+        canvas.style.width = displayWidth + 'px';
+        canvas.style.height = displayHeight + 'px';
+
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+
+        const clusterStripWidth = 4;
+        const labelAreaBottom = 30;
+        const padding = { top: 4, left: clusterStripWidth + 2, right: 4, bottom: labelAreaBottom };
+        const plotWidth = displayWidth - padding.left - padding.right;
+        const plotHeight = displayHeight - padding.top - padding.bottom;
+
+        const groups = chapterData.groups;
+        const maxParas = chapterData.max_paragraphs;
+        const totalCount = groups.reduce((sum, g) => sum + g.c, 0);
+        const colWidth = plotWidth / maxParas;
+
+        // Clear canvas
+        const bgColor = getComputedStyle(document.documentElement)
+            .getPropertyValue('--bg-color').trim() || '#0f1a2a';
+        ctx.fillStyle = bgColor;
+        ctx.fillRect(0, 0, displayWidth, displayHeight);
+
+        // Render groups as horizontal strips
+        let yOffset = padding.top;
+
+        groups.forEach(group => {
+            const stripHeight = (group.c / totalCount) * plotHeight;
+            if (stripHeight < 0.05) return;
+
+            // Cluster indicator strip on left edge
+            const clusterColor = TAPESTRY_COLORS[group.k % TAPESTRY_COLORS.length];
+            ctx.fillStyle = clusterColor;
+            ctx.fillRect(0, yOffset, clusterStripWidth, Math.max(stripHeight, 0.5));
+
+            // Grade colors for each paragraph position
+            const grades = group.g;
+            for (let pi = 0; pi < maxParas; pi++) {
+                const gradeChar = pi < grades.length ? grades[pi] : '.';
+                if (gradeChar === '.') {
+                    ctx.fillStyle = BARCODE_GAP_COLOR;
+                } else {
+                    const grade = parseInt(gradeChar);
+                    ctx.fillStyle = BARCODE_COLORS[grade] || BARCODE_GAP_COLOR;
+                }
+                const x = padding.left + pi * colWidth;
+                ctx.fillRect(x, yOffset, colWidth + 0.5, Math.max(stripHeight, 0.5));
+            }
+
+            yOffset += stripHeight;
+        });
+
+        // Paragraph position labels along the bottom
+        ctx.fillStyle = '#8899aa';
+        ctx.font = '10px system-ui, -apple-system, sans-serif';
+        ctx.textAlign = 'center';
+
+        const labelInterval = maxParas <= 20 ? 1 :
+                              maxParas <= 50 ? 5 :
+                              maxParas <= 100 ? 10 : 20;
+
+        for (let pi = 0; pi < maxParas; pi++) {
+            if (pi % labelInterval === 0 || pi === maxParas - 1) {
+                const x = padding.left + (pi + 0.5) * colWidth;
+                const y = displayHeight - 8;
+                ctx.fillText(String(pi + 1), x, y);
+            }
+        }
+
+        // Build legend panel (HTML overlay)
+        buildBarcodeLegend(container);
+
+        // Store layout info for tooltip hit-testing
+        canvas._barcodeLayout = {
+            padding, plotWidth, plotHeight, colWidth,
+            maxParas, groups, totalCount,
+            totalVariants: barcodeMetaData ? barcodeMetaData.meta.total_variants : totalCount,
+            clusterStripWidth, chapterId
+        };
+    }
+
+    function buildBarcodeLegend(container) {
+        let legend = container.querySelector('.barcode-legend');
+        if (!legend) {
+            legend = document.createElement('div');
+            legend.className = 'barcode-legend hidden';
+            legend.innerHTML = `
+                <h3>How to read this chart</h3>
+                <div class="barcode-legend-section">
+                    <div class="barcode-legend-title">What you're seeing</div>
+                    Each horizontal stripe represents a group of copies with identical
+                    paragraph-by-paragraph rarity patterns for this chapter.
+                    Each vertical column is one paragraph position.
+                </div>
+                <div class="barcode-legend-section">
+                    <div class="barcode-legend-title">Rarity grades</div>
+                    <div class="barcode-legend-colors">
+                        <div class="barcode-legend-swatch"><span style="background:${BARCODE_COLORS[0]}"></span> Universal (&gt;90%)</div>
+                        <div class="barcode-legend-swatch"><span style="background:${BARCODE_COLORS[1]}"></span> Common (50-90%)</div>
+                        <div class="barcode-legend-swatch"><span style="background:${BARCODE_COLORS[2]}"></span> Uncommon (20-50%)</div>
+                        <div class="barcode-legend-swatch"><span style="background:${BARCODE_COLORS[3]}"></span> Rare (5-20%)</div>
+                        <div class="barcode-legend-swatch"><span style="background:${BARCODE_COLORS[4]}"></span> Very rare (1-5%)</div>
+                        <div class="barcode-legend-swatch"><span style="background:${BARCODE_COLORS[5]}"></span> Ultra rare (&lt;1%)</div>
+                    </div>
+                    Each paragraph is graded by how many of the 10,000 copies contain
+                    that exact text. Universal means virtually all copies share it.
+                </div>
+                <div class="barcode-legend-section">
+                    <div class="barcode-legend-title">Visual patterns</div>
+                    A solid-color column means every copy has the same rarity grade
+                    at that paragraph position. Multicolored columns are where the
+                    text structurally diverges between copies.
+                </div>
+                <div class="barcode-legend-section">
+                    <div class="barcode-legend-title">Left-edge color strip</div>
+                    <div class="barcode-legend-colors">
+                        <div class="barcode-legend-swatch"><span style="background:#ff8800"></span> Group A</div>
+                        <div class="barcode-legend-swatch"><span style="background:#4fc3f7"></span> Group B</div>
+                        <div class="barcode-legend-swatch"><span style="background:#81c784"></span> Group C</div>
+                        <div class="barcode-legend-swatch"><span style="background:#e57373"></span> Group D</div>
+                    </div>
+                    Shows prologue cluster identity (which structural variant of the
+                    Prologue each group of copies contains).
+                </div>
+                <div class="barcode-legend-section">
+                    <div class="barcode-legend-title">Stripe thickness</div>
+                    Thicker stripes represent more copies sharing the same pattern.
+                    Use the chapter selector to explore different chapters.
+                </div>
+                <div class="barcode-legend-section" style="color:#888;font-size:0.75rem">
+                    Hover for details. Press <strong>i</strong> to toggle this legend.
+                </div>
+            `;
+            container.appendChild(legend);
+        }
+    }
+
+    function handleBarcodeMouseMove(e) {
+        const canvas = document.getElementById('barcode-canvas');
+        if (!canvas || !canvas._barcodeLayout) return;
+
+        const layout = canvas._barcodeLayout;
+        const rect = canvas.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const my = e.clientY - rect.top;
+
+        // Determine paragraph column
+        const paraIdx = Math.floor((mx - layout.padding.left) / layout.colWidth);
+        if (paraIdx < 0 || paraIdx >= layout.maxParas) {
+            hideBarcodeTooltip();
+            return;
+        }
+
+        // Determine which group row
+        let yOffset = layout.padding.top;
+        let hitGroup = null;
+        for (const group of layout.groups) {
+            const stripHeight = (group.c / layout.totalCount) * layout.plotHeight;
+            if (my >= yOffset && my < yOffset + stripHeight) {
+                hitGroup = group;
+                break;
+            }
+            yOffset += stripHeight;
+        }
+
+        if (!hitGroup) {
+            hideBarcodeTooltip();
+            return;
+        }
+
+        const gradeChar = paraIdx < hitGroup.g.length ? hitGroup.g[paraIdx] : '.';
+        const gradeLabels = barcodeMetaData ? barcodeMetaData.meta.grade_labels : [];
+        let gradeLabel = 'Absent';
+        let gradeNum = -1;
+        if (gradeChar !== '.') {
+            gradeNum = parseInt(gradeChar);
+            gradeLabel = gradeLabels[gradeNum] || `Grade ${gradeNum}`;
+        }
+
+        const pct = ((hitGroup.c / layout.totalVariants) * 100).toFixed(1);
+        const clusterNames = ['A', 'B', 'C', 'D'];
+
+        showBarcodeTooltip(e,
+            `<strong>Paragraph ${paraIdx + 1}</strong><br>` +
+            `Rarity: ${gradeLabel}` +
+            (gradeNum >= 0 ? ` <span style="display:inline-block;width:8px;height:8px;background:${BARCODE_COLORS[gradeNum]};border-radius:1px;vertical-align:middle;margin-left:3px"></span>` : '') + `<br>` +
+            `Group: ${hitGroup.c.toLocaleString()} copies (${pct}%)<br>` +
+            `Prologue cluster: ${clusterNames[hitGroup.k] || hitGroup.k}`
+        );
+    }
+
+    function showBarcodeTooltip(e, html) {
+        const tooltip = document.getElementById('barcode-tooltip');
+        if (!tooltip) return;
+        tooltip.innerHTML = html;
+        tooltip.classList.remove('hidden');
+        moveBarcodeTooltip(e);
+    }
+
+    function moveBarcodeTooltip(e) {
+        const tooltip = document.getElementById('barcode-tooltip');
+        if (!tooltip) return;
+        const container = document.getElementById('barcode-canvas-container');
+        if (!container) return;
+        const rect = container.getBoundingClientRect();
+        let x = e.clientX - rect.left + 15;
+        let y = e.clientY - rect.top + 15;
+        const tw = tooltip.offsetWidth;
+        const th = tooltip.offsetHeight;
+        if (x + tw > rect.width - 10) x = e.clientX - rect.left - tw - 15;
+        if (y + th > rect.height - 10) y = e.clientY - rect.top - th - 15;
+        tooltip.style.left = x + 'px';
+        tooltip.style.top = y + 'px';
+    }
+
+    function hideBarcodeTooltip() {
+        const tooltip = document.getElementById('barcode-tooltip');
+        if (tooltip) tooltip.classList.add('hidden');
+    }
+
+    window.openBarcodeModal = openBarcodeModal;
+    window.closeBarcodeModal = closeBarcodeModal;
+    window.toggleBarcodeLegend = toggleBarcodeLegend;
+
+    // Resize handler for canvas
+    window.addEventListener('resize', () => {
+        const modal = document.getElementById('barcode-modal');
+        if (modal && !modal.classList.contains('hidden') && barcodeChapterCache[currentBarcodeChapter]) {
+            renderBarcodeVisualization(currentBarcodeChapter, barcodeChapterCache[currentBarcodeChapter]);
+        }
+    });
+
+    // ============================================
     // Gonzo Mode - 5x5 Grid View of All 25 Versions
     // ============================================
 
@@ -10217,6 +11137,107 @@ document.addEventListener('DOMContentLoaded', () => {
                 closeHeatmapModal();
             }
         });
+    }
+
+    // Event listeners for Alluvial Diagram
+    const alluvialBtn = document.getElementById('alluvial-btn');
+    const alluvialCloseBtn = document.getElementById('alluvial-close-btn');
+    const alluvialModal = document.getElementById('alluvial-modal');
+
+    if (alluvialBtn) {
+        alluvialBtn.addEventListener('click', () => {
+            openAlluvialModal();
+            setTimeout(() => {
+                const analyzeMenu = document.getElementById('analyze-menu');
+                const analyzeBtn = document.getElementById('analyze-toggle-btn');
+                if (analyzeMenu) analyzeMenu.classList.add('hidden');
+                if (analyzeBtn) analyzeBtn.classList.remove('active');
+            }, 150);
+        });
+    }
+    if (alluvialCloseBtn) {
+        alluvialCloseBtn.addEventListener('click', closeAlluvialModal);
+    }
+    if (alluvialModal) {
+        alluvialModal.addEventListener('click', (e) => {
+            if (e.target === alluvialModal) {
+                closeAlluvialModal();
+            }
+        });
+    }
+
+    // Event listeners for Tapestry
+    const tapestryBtn = document.getElementById('tapestry-btn');
+    const tapestryCloseBtn = document.getElementById('tapestry-close-btn');
+    const tapestryModal = document.getElementById('tapestry-modal');
+
+    if (tapestryBtn) {
+        tapestryBtn.addEventListener('click', () => {
+            openTapestryModal();
+            setTimeout(() => {
+                const analyzeMenu = document.getElementById('analyze-menu');
+                const analyzeBtn = document.getElementById('analyze-toggle-btn');
+                if (analyzeMenu) analyzeMenu.classList.add('hidden');
+                if (analyzeBtn) analyzeBtn.classList.remove('active');
+            }, 150);
+        });
+    }
+    if (tapestryCloseBtn) {
+        tapestryCloseBtn.addEventListener('click', closeTapestryModal);
+    }
+    const tapestryInfoBtn = document.getElementById('tapestry-info-btn');
+    if (tapestryInfoBtn) {
+        tapestryInfoBtn.addEventListener('click', toggleTapestryLegend);
+    }
+    if (tapestryModal) {
+        tapestryModal.addEventListener('click', (e) => {
+            if (e.target === tapestryModal) {
+                closeTapestryModal();
+            }
+        });
+    }
+
+    // Event listeners for Barcode
+    const barcodeBtn = document.getElementById('barcode-btn');
+    const barcodeCloseBtn = document.getElementById('barcode-close-btn');
+    const barcodeInfoBtn = document.getElementById('barcode-info-btn');
+    const barcodeModal = document.getElementById('barcode-modal');
+    const barcodeChapterSelect = document.getElementById('barcode-chapter-select');
+    const barcodeCanvas = document.getElementById('barcode-canvas');
+
+    if (barcodeBtn) {
+        barcodeBtn.addEventListener('click', () => {
+            openBarcodeModal();
+            setTimeout(() => {
+                const analyzeMenu = document.getElementById('analyze-menu');
+                const analyzeBtn = document.getElementById('analyze-toggle-btn');
+                if (analyzeMenu) analyzeMenu.classList.add('hidden');
+                if (analyzeBtn) analyzeBtn.classList.remove('active');
+            }, 150);
+        });
+    }
+    if (barcodeCloseBtn) {
+        barcodeCloseBtn.addEventListener('click', closeBarcodeModal);
+    }
+    if (barcodeInfoBtn) {
+        barcodeInfoBtn.addEventListener('click', toggleBarcodeLegend);
+    }
+    if (barcodeModal) {
+        barcodeModal.addEventListener('click', (e) => {
+            if (e.target === barcodeModal) closeBarcodeModal();
+        });
+    }
+    if (barcodeChapterSelect) {
+        barcodeChapterSelect.addEventListener('change', async (e) => {
+            const chapterData = await loadBarcodeChapter(e.target.value);
+            if (chapterData) {
+                renderBarcodeVisualization(e.target.value, chapterData);
+            }
+        });
+    }
+    if (barcodeCanvas) {
+        barcodeCanvas.addEventListener('mousemove', handleBarcodeMouseMove);
+        barcodeCanvas.addEventListener('mouseleave', hideBarcodeTooltip);
     }
 
     // Event listeners for Gonzo Mode

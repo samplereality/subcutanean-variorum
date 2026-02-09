@@ -4940,6 +4940,591 @@ main {
 }
 
 /* ============================================
+   Alluvial Diagram - Narrative Flow
+   ============================================ */
+
+.alluvial-fullscreen {
+    padding: 0;
+    z-index: 6000;
+}
+
+.alluvial-container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-color, #0f1a2a);
+}
+
+.alluvial-header {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    background-color: #0a1220;
+    border-bottom: 2px solid var(--accent-color);
+    gap: 1rem;
+    flex-shrink: 0;
+}
+
+.alluvial-header h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #e8e8e8;
+    white-space: nowrap;
+}
+
+.alluvial-subtitle {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #8899aa;
+    white-space: nowrap;
+}
+
+.alluvial-header-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.alluvial-header-btn {
+    background: transparent;
+    border: 1px solid rgba(255, 136, 0, 0.3);
+    color: #e8e8e8;
+    padding: 0.4rem;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.alluvial-header-btn:hover {
+    background-color: rgba(255, 136, 0, 0.2);
+}
+
+.alluvial-header-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+.alluvial-svg-container {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+}
+
+.alluvial-svg-container svg {
+    width: 100%;
+    height: 100%;
+}
+
+.alluvial-tooltip {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.9);
+    color: #e8e8e8;
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    pointer-events: none;
+    z-index: 10;
+    white-space: nowrap;
+    border: 1px solid rgba(255, 136, 0, 0.3);
+    max-width: 350px;
+}
+
+.alluvial-tooltip.hidden {
+    display: none;
+}
+
+.alluvial-node {
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.alluvial-flow {
+    transition: stroke-opacity 0.2s;
+}
+
+.alluvial-label {
+    font-family: system-ui, -apple-system, sans-serif;
+    fill: #8899aa;
+    font-size: 11px;
+    text-anchor: middle;
+}
+
+.alluvial-legend {
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 11px;
+}
+
+/* Light mode */
+[data-theme="light"] .alluvial-container {
+    background-color: #f5f5f5;
+}
+
+[data-theme="light"] .alluvial-label {
+    fill: #555;
+}
+
+[data-theme="light"] .alluvial-tooltip {
+    background: rgba(255, 255, 255, 0.95);
+    color: #333;
+    border: 1px solid rgba(217, 104, 0, 0.3);
+}
+
+@media (max-width: 640px) {
+    .alluvial-header {
+        padding: 0.5rem 0.75rem;
+        flex-wrap: wrap;
+    }
+    .alluvial-subtitle {
+        display: none;
+    }
+    .alluvial-label {
+        font-size: 8px;
+    }
+}
+
+/* ============================================
+   Tapestry Visualization
+   ============================================ */
+
+.tapestry-fullscreen {
+    padding: 0;
+    z-index: 6000;
+}
+
+.tapestry-container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-color, #0f1a2a);
+}
+
+.tapestry-header {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    background-color: #0a1220;
+    border-bottom: 2px solid var(--accent-color);
+    gap: 1rem;
+    flex-shrink: 0;
+}
+
+.tapestry-header h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #e8e8e8;
+    white-space: nowrap;
+}
+
+.tapestry-subtitle {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #8899aa;
+    white-space: nowrap;
+}
+
+.tapestry-header-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.tapestry-header-btn {
+    background: transparent;
+    border: 1px solid rgba(255, 136, 0, 0.3);
+    color: #e8e8e8;
+    padding: 0.4rem;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.tapestry-header-btn:hover {
+    background-color: rgba(255, 136, 0, 0.2);
+}
+
+.tapestry-header-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+.tapestry-svg-container {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+}
+
+.tapestry-svg-container svg {
+    width: 100%;
+    height: 100%;
+}
+
+.tapestry-tooltip {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.9);
+    color: #e8e8e8;
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    pointer-events: none;
+    z-index: 10;
+    white-space: nowrap;
+    border: 1px solid rgba(255, 136, 0, 0.3);
+    max-width: 350px;
+}
+
+.tapestry-tooltip.hidden {
+    display: none;
+}
+
+.tapestry-thread {
+    transition: stroke-opacity 0.15s;
+}
+
+.tapestry-label {
+    font-family: system-ui, -apple-system, sans-serif;
+    fill: #8899aa;
+    font-size: 11px;
+    text-anchor: middle;
+}
+
+.tapestry-axis-label {
+    font-family: system-ui, -apple-system, sans-serif;
+    fill: #556677;
+    font-size: 10px;
+}
+
+.tapestry-legend {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    background: rgba(10, 18, 32, 0.92);
+    border: 1px solid rgba(255, 136, 0, 0.25);
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    color: #ccc;
+    font-size: 0.8rem;
+    line-height: 1.6;
+    max-width: 340px;
+    z-index: 5;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+.tapestry-legend.hidden {
+    display: none;
+}
+
+.tapestry-legend h3 {
+    margin: 0 0 0.5rem 0;
+    color: #e8e8e8;
+    font-size: 0.9rem;
+}
+
+.tapestry-legend-section {
+    margin-bottom: 0.6rem;
+}
+
+.tapestry-legend-section:last-child {
+    margin-bottom: 0;
+}
+
+.tapestry-legend-title {
+    color: #ff8800;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-bottom: 0.2rem;
+}
+
+.tapestry-legend-colors {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 0.25rem;
+}
+
+.tapestry-legend-swatch {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.tapestry-legend-swatch span {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+}
+
+[data-theme="light"] .tapestry-legend {
+    background: rgba(245, 245, 245, 0.95);
+    color: #444;
+    border: 1px solid rgba(217, 104, 0, 0.25);
+}
+
+[data-theme="light"] .tapestry-legend h3 {
+    color: #333;
+}
+
+[data-theme="light"] .tapestry-legend-title {
+    color: #d96800;
+}
+
+[data-theme="light"] .tapestry-container {
+    background-color: #f5f5f5;
+}
+
+[data-theme="light"] .tapestry-label {
+    fill: #555;
+}
+
+[data-theme="light"] .tapestry-axis-label {
+    fill: #888;
+}
+
+[data-theme="light"] .tapestry-tooltip {
+    background: rgba(255, 255, 255, 0.95);
+    color: #333;
+    border: 1px solid rgba(217, 104, 0, 0.3);
+}
+
+@media (max-width: 640px) {
+    .tapestry-header {
+        padding: 0.5rem 0.75rem;
+        flex-wrap: wrap;
+    }
+    .tapestry-subtitle {
+        display: none;
+    }
+    .tapestry-label {
+        font-size: 8px;
+    }
+}
+
+/* ============================================
+   Barcode Visualization - Paragraph-Level Rarity
+   ============================================ */
+
+.barcode-fullscreen {
+    padding: 0;
+    z-index: 6000;
+}
+
+.barcode-container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-color, #0f1a2a);
+}
+
+.barcode-header {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    background-color: #0a1220;
+    border-bottom: 2px solid var(--accent-color);
+    gap: 1rem;
+    flex-shrink: 0;
+}
+
+.barcode-header h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #e8e8e8;
+    white-space: nowrap;
+}
+
+.barcode-subtitle {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #8899aa;
+    white-space: nowrap;
+}
+
+.barcode-header-controls {
+    margin-left: auto;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.barcode-chapter-select {
+    background: rgba(255, 255, 255, 0.1);
+    color: #e8e8e8;
+    border: 1px solid rgba(255, 136, 0, 0.3);
+    padding: 0.3rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-family: system-ui, -apple-system, sans-serif;
+    cursor: pointer;
+}
+
+.barcode-chapter-select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.barcode-header-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.barcode-header-btn {
+    background: transparent;
+    border: 1px solid rgba(255, 136, 0, 0.3);
+    color: #e8e8e8;
+    padding: 0.4rem;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.barcode-header-btn:hover {
+    background-color: rgba(255, 136, 0, 0.2);
+}
+
+.barcode-header-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+.barcode-canvas-container {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    cursor: crosshair;
+}
+
+.barcode-canvas-container canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.barcode-tooltip {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.9);
+    color: #e8e8e8;
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    pointer-events: none;
+    z-index: 10;
+    white-space: nowrap;
+    border: 1px solid rgba(255, 136, 0, 0.3);
+    max-width: 400px;
+}
+
+.barcode-tooltip.hidden {
+    display: none;
+}
+
+.barcode-legend {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    background: rgba(10, 18, 32, 0.92);
+    border: 1px solid rgba(255, 136, 0, 0.25);
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    color: #ccc;
+    font-size: 0.8rem;
+    line-height: 1.6;
+    max-width: 340px;
+    z-index: 5;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+.barcode-legend.hidden {
+    display: none;
+}
+
+.barcode-legend h3 {
+    margin: 0 0 0.5rem;
+    color: #e8e8e8;
+    font-size: 0.9rem;
+}
+
+.barcode-legend-section {
+    margin-bottom: 0.6rem;
+}
+
+.barcode-legend-title {
+    font-weight: 600;
+    color: #e8e8e8;
+    margin-bottom: 0.2rem;
+}
+
+.barcode-legend-colors {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0.3rem 0;
+}
+
+.barcode-legend-swatch {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.75rem;
+}
+
+.barcode-legend-swatch span {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+}
+
+[data-theme="light"] .barcode-container {
+    background-color: #f5f5f5;
+}
+
+[data-theme="light"] .barcode-chapter-select {
+    background: rgba(0, 0, 0, 0.05);
+    color: #333;
+    border-color: rgba(217, 104, 0, 0.3);
+}
+
+[data-theme="light"] .barcode-tooltip {
+    background: rgba(255, 255, 255, 0.95);
+    color: #333;
+    border: 1px solid rgba(217, 104, 0, 0.3);
+}
+
+[data-theme="light"] .barcode-legend {
+    background: rgba(245, 245, 245, 0.95);
+    color: #444;
+    border: 1px solid rgba(217, 104, 0, 0.25);
+}
+
+[data-theme="light"] .barcode-legend h3,
+[data-theme="light"] .barcode-legend-title {
+    color: #333;
+}
+
+@media (max-width: 640px) {
+    .barcode-header {
+        padding: 0.5rem 0.75rem;
+        flex-wrap: wrap;
+    }
+    .barcode-subtitle {
+        display: none;
+    }
+}
+
+/* ============================================
    Gonzo Mode - 5x5 Grid Full-Screen View
    ============================================ */
 

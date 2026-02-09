@@ -1,0 +1,2604 @@
+{
+  "meta": {
+    "total_variants": 10000,
+    "chapters": [
+      "prologue",
+      "chapter1",
+      "chapter2",
+      "chapter3",
+      "chapter4",
+      "chapter5",
+      "chapter6",
+      "chapter7",
+      "chapter8",
+      "chapter9",
+      "part2",
+      "chapter10",
+      "chapter11",
+      "chapter12",
+      "chapter13",
+      "chapter14",
+      "chapter15",
+      "part3",
+      "chapter16",
+      "chapter17",
+      "chapter18",
+      "notes"
+    ],
+    "chapter_labels": {
+      "prologue": "Prologue",
+      "chapter1": "Ch 1",
+      "chapter2": "Ch 2",
+      "chapter3": "Ch 3",
+      "chapter4": "Ch 4",
+      "chapter5": "Ch 5",
+      "chapter6": "Ch 6",
+      "chapter7": "Ch 7",
+      "chapter8": "Ch 8",
+      "chapter9": "Ch 9",
+      "part2": "Part II",
+      "chapter10": "Ch 10",
+      "chapter11": "Ch 11",
+      "chapter12": "Ch 12",
+      "chapter13": "Ch 13",
+      "chapter14": "Ch 14",
+      "chapter15": "Ch 15",
+      "part3": "Part III",
+      "chapter16": "Ch 16",
+      "chapter17": "Ch 17",
+      "chapter18": "Epilogue",
+      "notes": "Notes"
+    },
+    "max_clusters_per_chapter": 8,
+    "num_features": 3,
+    "generated": "2026-02-07T23:41:48.020367"
+  },
+  "features": {
+    "prologue": [
+      {
+        "hash": "424c8e436951",
+        "count": 5008,
+        "preview": "maybe premonition. more likely was that i'd fall asleep, waiting for him to come"
+      },
+      {
+        "hash": "b93c1fde1010",
+        "count": 5008,
+        "preview": "i don't think i ever told this to you. when i was little, my dad used to come tu"
+      },
+      {
+        "hash": "47d28b1aabc0",
+        "count": 3936,
+        "preview": "\"dark pines under water,\" gwendolyn macewen (1941-1987)"
+      }
+    ],
+    "chapter1": [
+      {
+        "hash": "7b9983840f77",
+        "count": 5002,
+        "preview": "i've always had an unhealthy imagination. this has manifested itself in various "
+      },
+      {
+        "hash": "54ab9fa658a7",
+        "count": 5008,
+        "preview": "maybe my eyes had adjusted to the dim light, or maybe my imagination was shiftin"
+      },
+      {
+        "hash": "61ec76004e03",
+        "count": 4992,
+        "preview": "whether my eyes had started adjusting to the dim light, or the possible in my br"
+      }
+    ],
+    "chapter2": [
+      {
+        "hash": "fb15b2d111e0",
+        "count": 5008,
+        "preview": "i remembered lying in bed as a kid, waiting to be tucked in, and the person i lo"
+      },
+      {
+        "hash": "0c41905461c2",
+        "count": 5009,
+        "preview": "i mean, the place looked like people should have lived there, but aging furnitur"
+      },
+      {
+        "hash": "40a2dd90fe10",
+        "count": 4991,
+        "preview": "i mean, the place looked like people should have lived there, but there was almo"
+      }
+    ],
+    "chapter3": [
+      {
+        "hash": "052778be9030",
+        "count": 5008,
+        "preview": "i opened my eyes, looked at him. his were still closed. the flashing christmas l"
+      },
+      {
+        "hash": "05c0e256a408",
+        "count": 5008,
+        "preview": "a corner of his mouth lifted. \"stupid question.\""
+      },
+      {
+        "hash": "05f774630311",
+        "count": 5008,
+        "preview": "\"not fucking likely.\" his brow furrowed, but then his face relaxed. he downed th"
+      }
+    ],
+    "chapter4": [
+      {
+        "hash": "1f283bca5523",
+        "count": 4992,
+        "preview": "when bradley had outed us both in high school the aftermath had been ugly, in mo"
+      },
+      {
+        "hash": "c84a6730a8dc",
+        "count": 5008,
+        "preview": "i had a sudden vivid flashback to a photo i'd seen as a kid, still confused abou"
+      },
+      {
+        "hash": "0e45e7766450",
+        "count": 4985,
+        "preview": "i couldn't read his expression. had no idea what it meant at all."
+      }
+    ],
+    "chapter5": [
+      {
+        "hash": "0f02286b2444",
+        "count": 5000,
+        "preview": "despite these discrepancies, something felt right about the way we discussed the"
+      },
+      {
+        "hash": "f9b1a7fdc245",
+        "count": 5000,
+        "preview": "despite these discrepancies, something felt right about the way we discussed the"
+      },
+      {
+        "hash": "0400122a1f8a",
+        "count": 5003,
+        "preview": "niko said he'd never found any keys. and as i tried to piece together the evenin"
+      }
+    ],
+    "chapter6": [
+      {
+        "hash": "8ac3b7bf9798",
+        "count": 4995,
+        "preview": "i noticed the address and almost choked on my tea."
+      },
+      {
+        "hash": "5e6877b7b554",
+        "count": 4968,
+        "preview": "\"there is. there has to be.\" i took a breath. \"we just have to find it.\""
+      },
+      {
+        "hash": "e93d4acbd4f0",
+        "count": 5032,
+        "preview": "\"no. not yet.\" i took a breath. \"not until we find one.\""
+      }
+    ],
+    "chapter7": [
+      {
+        "hash": "03c21756d32a",
+        "count": 5009,
+        "preview": "maybe they really were alive."
+      },
+      {
+        "hash": "184b3a26c0b9",
+        "count": 4991,
+        "preview": "once we realized how easy it would be to get lost, we retraced our steps and sat"
+      },
+      {
+        "hash": "1928c0eeb15c",
+        "count": 5009,
+        "preview": "or maybe ariadne. i had a ball of twine in my pack, so we settled for a simple s"
+      }
+    ],
+    "chapter8": [
+      {
+        "hash": "1348c64ba45f",
+        "count": 5009,
+        "preview": "we decided to explore the vertical shafts, instead of going back into the maze. "
+      },
+      {
+        "hash": "593c27b0aac6",
+        "count": 4991,
+        "preview": "we decided to explore the vertical shafts, instead of going back into the crawlw"
+      },
+      {
+        "hash": "7e8bbc0cba51",
+        "count": 5034,
+        "preview": "i punched the wall, suddenly angry. \"who knows? none of it makes any sense anywa"
+      }
+    ],
+    "chapter9": [
+      {
+        "hash": "1e777852d99d",
+        "count": 4999,
+        "preview": "\"there's nothing good up there. nothing right.\" i kicked my foot for purchase, m"
+      },
+      {
+        "hash": "72580b8327e1",
+        "count": 5001,
+        "preview": "\"there's nothing good up there. nothing right.\" i kicked my foot for purchase, m"
+      },
+      {
+        "hash": "bd5cca793b60",
+        "count": 5003,
+        "preview": "i'd thought she was telling me to commit suicide."
+      }
+    ],
+    "part2": [
+      {
+        "hash": "47d28b1aabc0",
+        "count": 3298,
+        "preview": "\"dark pines under water,\" gwendolyn macewen (1941-1987)"
+      },
+      {
+        "hash": "66d16dedd86b",
+        "count": 3298,
+        "preview": "but the dark pines of your mind dip deeper and you are sinking, sinking, sleeper"
+      },
+      {
+        "hash": "00d5d0b02d72",
+        "count": 2481,
+        "preview": "we two boys together clinging, one the other never leaving"
+      }
+    ],
+    "chapter10": [
+      {
+        "hash": "5afd0b70e64c",
+        "count": 5007,
+        "preview": "something dark and coiling swirled in the water: my rope. i grabbed for it and r"
+      },
+      {
+        "hash": "ecbbb8867f6c",
+        "count": 5007,
+        "preview": "i searched the frothing surface, but saw no sign of a second grapple, or a secon"
+      },
+      {
+        "hash": "0c924cd0dd7f",
+        "count": 5008,
+        "preview": "---dad's voice, drifting faint from those tiny holes in the receiver, as i backe"
+      }
+    ],
+    "chapter11": [
+      {
+        "hash": "a3d0f450ad08",
+        "count": 4959,
+        "preview": "he sniffed. \"you get used to it. stealing clothes. i mean there's no penney's do"
+      },
+      {
+        "hash": "d256b8a4422f",
+        "count": 5041,
+        "preview": "he sniffed. \"you get used to it. stealing clothes, i mean. stops being strange a"
+      },
+      {
+        "hash": "7ff6e76d9419",
+        "count": 4941,
+        "preview": "i finally broke the silence. \"what happened?\""
+      }
+    ],
+    "chapter12": [
+      {
+        "hash": "44460b217799",
+        "count": 4992,
+        "preview": "but then a corner of his mouth lifted and he clapped my shoulder, dropped the ha"
+      },
+      {
+        "hash": "560366958334",
+        "count": 5008,
+        "preview": "he hoisted his pack, started down the hall. \"come on, ry,\" he shouted back over "
+      },
+      {
+        "hash": "a085b76b8ebd",
+        "count": 5008,
+        "preview": "his eyes narrowed, and i could see him weighing something behind them. but then "
+      }
+    ],
+    "chapter13": [
+      {
+        "hash": "23fa49d3e878",
+        "count": 5004,
+        "preview": "\"you just said it. we were friends.\" but something ugly was burrowing up. i shov"
+      },
+      {
+        "hash": "5fa8d85d0708",
+        "count": 5004,
+        "preview": "\"and that only happened,\" he said, hitting my foot harder, \"because we were both"
+      },
+      {
+        "hash": "90a7254bcbf2",
+        "count": 4996,
+        "preview": "he shushed me, and i sensed him stiffen, twist his head away. he switched on the"
+      }
+    ],
+    "chapter14": [
+      {
+        "hash": "3e14b9903c15",
+        "count": 4999,
+        "preview": "downstairs was growing larger."
+      },
+      {
+        "hash": "072fa9ccde7f",
+        "count": 4975,
+        "preview": "but his grab for the net had dislodged my niko too, and he was head down and sli"
+      },
+      {
+        "hash": "080da97b332c",
+        "count": 5025,
+        "preview": "curving down from the base of the doorway was a complex, multi-colored structure"
+      }
+    ],
+    "chapter15": [
+      {
+        "hash": "2f212aaab82f",
+        "count": 4985,
+        "preview": "he smiled, blood spilling from the corner of his mouth, and as it dribbled away "
+      },
+      {
+        "hash": "d977e4ee0639",
+        "count": 5015,
+        "preview": "he smiled, blood spilling from the corner of his mouth, and as it dribbled away "
+      },
+      {
+        "hash": "a7b3bbc11294",
+        "count": 5063,
+        "preview": "but it was a tiny sound, eaten up by miles of pink insulation, fading fast and n"
+      }
+    ],
+    "part3": [
+      {
+        "hash": "7d7d006f1756",
+        "count": 2555,
+        "preview": "\"on the road to the sea,\" charlotte mary mew (1869-1928)"
+      },
+      {
+        "hash": "c8779a59cc53",
+        "count": 2555,
+        "preview": "...before i die i want to see the world that lies behind the strangeness of your"
+      },
+      {
+        "hash": "5bdb344896bb",
+        "count": 2553,
+        "preview": "\"ode: of wit,\" abraham cowley (1618-1667)"
+      }
+    ],
+    "chapter16": [
+      {
+        "hash": "275fe806c67f",
+        "count": 5011,
+        "preview": "\"if this portal thing leads through a toilet,\" niko said, \"i'm out.\""
+      },
+      {
+        "hash": "c8bce184ef74",
+        "count": 5011,
+        "preview": "we could only assume the way through was somewhere out of sight, around a corner"
+      },
+      {
+        "hash": "262afad74df8",
+        "count": 4937,
+        "preview": "gradually, the perfect curve of the ceiling began to straighten. the roof above "
+      }
+    ],
+    "chapter17": [
+      {
+        "hash": "405cdd7be279",
+        "count": 5000,
+        "preview": "expanding once again"
+      },
+      {
+        "hash": "04bac1e07222",
+        "count": 4033,
+        "preview": "the water cooled; the pressure and ambient sound in my ears shifted. i could see"
+      },
+      {
+        "hash": "db786b5c7d69",
+        "count": 3685,
+        "preview": "something brushed my leg. i kicked forward, pulled water with cupped hands and a"
+      }
+    ],
+    "chapter18": [
+      {
+        "hash": "20c86eb70aef",
+        "count": 4992,
+        "preview": "maybe it's ridiculous to think something as tiny as a triple-bagged usb key wrap"
+      },
+      {
+        "hash": "ead4392f6149",
+        "count": 5008,
+        "preview": "maybe it's ridiculous to think something as tiny as a triple-bagged usb key wrap"
+      },
+      {
+        "hash": "0ef508da9b9b",
+        "count": 5018,
+        "preview": "on the other hand, with so many possibilities down there, maybe it's inevitable."
+      }
+    ],
+    "notes": [
+      {
+        "hash": "341ab8156eea",
+        "count": 3733,
+        "preview": "‣ in your ending, orion swam through the final gateway alone, rather than with n"
+      },
+      {
+        "hash": "ac801d99570f",
+        "count": 3618,
+        "preview": "‣ your ryan never found the version of niko he thought he was looking for. that'"
+      },
+      {
+        "hash": "c8ccd449331f",
+        "count": 3346,
+        "preview": "‣ your narrator was a bit more pessimistic than the norm."
+      }
+    ]
+  },
+  "nodes": [
+    {
+      "id": "prologue_0",
+      "chapter": "prologue",
+      "index": 0,
+      "count": 3070,
+      "label": "Most common (30.7%)",
+      "fingerprint": "000"
+    },
+    {
+      "id": "prologue_1",
+      "chapter": "prologue",
+      "index": 1,
+      "count": 2994,
+      "label": "Variant B (29.9%)",
+      "fingerprint": "110"
+    },
+    {
+      "id": "prologue_2",
+      "chapter": "prologue",
+      "index": 2,
+      "count": 2014,
+      "label": "Variant C (20.1%)",
+      "fingerprint": "111"
+    },
+    {
+      "id": "prologue_3",
+      "chapter": "prologue",
+      "index": 3,
+      "count": 1922,
+      "label": "Variant D (19.2%)",
+      "fingerprint": "001"
+    },
+    {
+      "id": "chapter1_0",
+      "chapter": "chapter1",
+      "index": 0,
+      "count": 2539,
+      "label": "Most common (25.4%)",
+      "fingerprint": "110"
+    },
+    {
+      "id": "chapter1_1",
+      "chapter": "chapter1",
+      "index": 1,
+      "count": 2529,
+      "label": "Variant B (25.3%)",
+      "fingerprint": "001"
+    },
+    {
+      "id": "chapter1_2",
+      "chapter": "chapter1",
+      "index": 2,
+      "count": 2469,
+      "label": "Variant C (24.7%)",
+      "fingerprint": "010"
+    },
+    {
+      "id": "chapter1_3",
+      "chapter": "chapter1",
+      "index": 3,
+      "count": 2463,
+      "label": "Variant D (24.6%)",
+      "fingerprint": "101"
+    },
+    {
+      "id": "chapter2_0",
+      "chapter": "chapter2",
+      "index": 0,
+      "count": 2541,
+      "label": "Most common (25.4%)",
+      "fingerprint": "110"
+    },
+    {
+      "id": "chapter2_1",
+      "chapter": "chapter2",
+      "index": 1,
+      "count": 2524,
+      "label": "Variant B (25.2%)",
+      "fingerprint": "001"
+    },
+    {
+      "id": "chapter2_2",
+      "chapter": "chapter2",
+      "index": 2,
+      "count": 2468,
+      "label": "Variant C (24.7%)",
+      "fingerprint": "010"
+    },
+    {
+      "id": "chapter2_3",
+      "chapter": "chapter2",
+      "index": 3,
+      "count": 2467,
+      "label": "Variant D (24.7%)",
+      "fingerprint": "101"
+    },
+    {
+      "id": "chapter3_0",
+      "chapter": "chapter3",
+      "index": 0,
+      "count": 5008,
+      "label": "Most common (50.1%)",
+      "fingerprint": "111"
+    },
+    {
+      "id": "chapter3_1",
+      "chapter": "chapter3",
+      "index": 1,
+      "count": 4992,
+      "label": "Variant B (49.9%)",
+      "fingerprint": "000"
+    },
+    {
+      "id": "chapter4_0",
+      "chapter": "chapter4",
+      "index": 0,
+      "count": 2517,
+      "label": "Most common (25.2%)",
+      "fingerprint": "010"
+    },
+    {
+      "id": "chapter4_1",
+      "chapter": "chapter4",
+      "index": 1,
+      "count": 2498,
+      "label": "Variant B (25.0%)",
+      "fingerprint": "100"
+    },
+    {
+      "id": "chapter4_2",
+      "chapter": "chapter4",
+      "index": 2,
+      "count": 2494,
+      "label": "Variant C (24.9%)",
+      "fingerprint": "101"
+    },
+    {
+      "id": "chapter4_3",
+      "chapter": "chapter4",
+      "index": 3,
+      "count": 2491,
+      "label": "Variant D (24.9%)",
+      "fingerprint": "011"
+    },
+    {
+      "id": "chapter5_0",
+      "chapter": "chapter5",
+      "index": 0,
+      "count": 2510,
+      "label": "Most common (25.1%)",
+      "fingerprint": "101"
+    },
+    {
+      "id": "chapter5_1",
+      "chapter": "chapter5",
+      "index": 1,
+      "count": 2507,
+      "label": "Variant B (25.1%)",
+      "fingerprint": "010"
+    },
+    {
+      "id": "chapter5_2",
+      "chapter": "chapter5",
+      "index": 2,
+      "count": 2493,
+      "label": "Variant C (24.9%)",
+      "fingerprint": "011"
+    },
+    {
+      "id": "chapter5_3",
+      "chapter": "chapter5",
+      "index": 3,
+      "count": 2490,
+      "label": "Variant D (24.9%)",
+      "fingerprint": "100"
+    },
+    {
+      "id": "chapter6_0",
+      "chapter": "chapter6",
+      "index": 0,
+      "count": 2531,
+      "label": "Most common (25.3%)",
+      "fingerprint": "101"
+    },
+    {
+      "id": "chapter6_1",
+      "chapter": "chapter6",
+      "index": 1,
+      "count": 2504,
+      "label": "Variant B (25.0%)",
+      "fingerprint": "010"
+    },
+    {
+      "id": "chapter6_2",
+      "chapter": "chapter6",
+      "index": 2,
+      "count": 2501,
+      "label": "Variant C (25.0%)",
+      "fingerprint": "001"
+    },
+    {
+      "id": "chapter6_3",
+      "chapter": "chapter6",
+      "index": 3,
+      "count": 2464,
+      "label": "Variant D (24.6%)",
+      "fingerprint": "110"
+    },
+    {
+      "id": "chapter7_0",
+      "chapter": "chapter7",
+      "index": 0,
+      "count": 5009,
+      "label": "Most common (50.1%)",
+      "fingerprint": "101"
+    },
+    {
+      "id": "chapter7_1",
+      "chapter": "chapter7",
+      "index": 1,
+      "count": 4991,
+      "label": "Variant B (49.9%)",
+      "fingerprint": "010"
+    },
+    {
+      "id": "chapter8_0",
+      "chapter": "chapter8",
+      "index": 0,
+      "count": 2526,
+      "label": "Most common (25.3%)",
+      "fingerprint": "101"
+    },
+    {
+      "id": "chapter8_1",
+      "chapter": "chapter8",
+      "index": 1,
+      "count": 2508,
+      "label": "Variant B (25.1%)",
+      "fingerprint": "011"
+    },
+    {
+      "id": "chapter8_2",
+      "chapter": "chapter8",
+      "index": 2,
+      "count": 2483,
+      "label": "Variant C (24.8%)",
+      "fingerprint": "100"
+    },
+    {
+      "id": "chapter8_3",
+      "chapter": "chapter8",
+      "index": 3,
+      "count": 2483,
+      "label": "Variant D (24.8%)",
+      "fingerprint": "010"
+    },
+    {
+      "id": "chapter9_0",
+      "chapter": "chapter9",
+      "index": 0,
+      "count": 2528,
+      "label": "Most common (25.3%)",
+      "fingerprint": "011"
+    },
+    {
+      "id": "chapter9_1",
+      "chapter": "chapter9",
+      "index": 1,
+      "count": 2524,
+      "label": "Variant B (25.2%)",
+      "fingerprint": "100"
+    },
+    {
+      "id": "chapter9_2",
+      "chapter": "chapter9",
+      "index": 2,
+      "count": 2475,
+      "label": "Variant C (24.8%)",
+      "fingerprint": "101"
+    },
+    {
+      "id": "chapter9_3",
+      "chapter": "chapter9",
+      "index": 3,
+      "count": 2473,
+      "label": "Variant D (24.7%)",
+      "fingerprint": "010"
+    },
+    {
+      "id": "part2_0",
+      "chapter": "part2",
+      "index": 0,
+      "count": 4221,
+      "label": "Most common (42.2%)",
+      "fingerprint": "000"
+    },
+    {
+      "id": "part2_1",
+      "chapter": "part2",
+      "index": 1,
+      "count": 3298,
+      "label": "Variant B (33.0%)",
+      "fingerprint": "110"
+    },
+    {
+      "id": "part2_2",
+      "chapter": "part2",
+      "index": 2,
+      "count": 2481,
+      "label": "Variant C (24.8%)",
+      "fingerprint": "001"
+    },
+    {
+      "id": "chapter10_0",
+      "chapter": "chapter10",
+      "index": 0,
+      "count": 2521,
+      "label": "Most common (25.2%)",
+      "fingerprint": "111"
+    },
+    {
+      "id": "chapter10_1",
+      "chapter": "chapter10",
+      "index": 1,
+      "count": 2506,
+      "label": "Variant B (25.1%)",
+      "fingerprint": "000"
+    },
+    {
+      "id": "chapter10_2",
+      "chapter": "chapter10",
+      "index": 2,
+      "count": 2487,
+      "label": "Variant C (24.9%)",
+      "fingerprint": "001"
+    },
+    {
+      "id": "chapter10_3",
+      "chapter": "chapter10",
+      "index": 3,
+      "count": 2486,
+      "label": "Variant D (24.9%)",
+      "fingerprint": "110"
+    },
+    {
+      "id": "chapter11_0",
+      "chapter": "chapter11",
+      "index": 0,
+      "count": 3343,
+      "label": "Most common (33.4%)",
+      "fingerprint": "010"
+    },
+    {
+      "id": "chapter11_1",
+      "chapter": "chapter11",
+      "index": 1,
+      "count": 3243,
+      "label": "Variant B (32.4%)",
+      "fingerprint": "101"
+    },
+    {
+      "id": "chapter11_2",
+      "chapter": "chapter11",
+      "index": 2,
+      "count": 1716,
+      "label": "Variant C (17.2%)",
+      "fingerprint": "100"
+    },
+    {
+      "id": "chapter11_3",
+      "chapter": "chapter11",
+      "index": 3,
+      "count": 1698,
+      "label": "Variant D (17.0%)",
+      "fingerprint": "011"
+    },
+    {
+      "id": "chapter12_0",
+      "chapter": "chapter12",
+      "index": 0,
+      "count": 5008,
+      "label": "Most common (50.1%)",
+      "fingerprint": "011"
+    },
+    {
+      "id": "chapter12_1",
+      "chapter": "chapter12",
+      "index": 1,
+      "count": 4992,
+      "label": "Variant B (49.9%)",
+      "fingerprint": "100"
+    },
+    {
+      "id": "chapter13_0",
+      "chapter": "chapter13",
+      "index": 0,
+      "count": 5004,
+      "label": "Most common (50.0%)",
+      "fingerprint": "110"
+    },
+    {
+      "id": "chapter13_1",
+      "chapter": "chapter13",
+      "index": 1,
+      "count": 4996,
+      "label": "Variant B (50.0%)",
+      "fingerprint": "001"
+    },
+    {
+      "id": "chapter14_0",
+      "chapter": "chapter14",
+      "index": 0,
+      "count": 2529,
+      "label": "Most common (25.3%)",
+      "fingerprint": "001"
+    },
+    {
+      "id": "chapter14_1",
+      "chapter": "chapter14",
+      "index": 1,
+      "count": 2503,
+      "label": "Variant B (25.0%)",
+      "fingerprint": "110"
+    },
+    {
+      "id": "chapter14_2",
+      "chapter": "chapter14",
+      "index": 2,
+      "count": 2496,
+      "label": "Variant C (25.0%)",
+      "fingerprint": "101"
+    },
+    {
+      "id": "chapter14_3",
+      "chapter": "chapter14",
+      "index": 3,
+      "count": 2472,
+      "label": "Variant D (24.7%)",
+      "fingerprint": "010"
+    },
+    {
+      "id": "chapter15_0",
+      "chapter": "chapter15",
+      "index": 0,
+      "count": 2556,
+      "label": "Most common (25.6%)",
+      "fingerprint": "101"
+    },
+    {
+      "id": "chapter15_1",
+      "chapter": "chapter15",
+      "index": 1,
+      "count": 2508,
+      "label": "Variant B (25.1%)",
+      "fingerprint": "010"
+    },
+    {
+      "id": "chapter15_2",
+      "chapter": "chapter15",
+      "index": 2,
+      "count": 2507,
+      "label": "Variant C (25.1%)",
+      "fingerprint": "011"
+    },
+    {
+      "id": "chapter15_3",
+      "chapter": "chapter15",
+      "index": 3,
+      "count": 2429,
+      "label": "Variant D (24.3%)",
+      "fingerprint": "100"
+    },
+    {
+      "id": "part3_0",
+      "chapter": "part3",
+      "index": 0,
+      "count": 4892,
+      "label": "Most common (48.9%)",
+      "fingerprint": "000"
+    },
+    {
+      "id": "part3_1",
+      "chapter": "part3",
+      "index": 1,
+      "count": 2555,
+      "label": "Variant B (25.6%)",
+      "fingerprint": "110"
+    },
+    {
+      "id": "part3_2",
+      "chapter": "part3",
+      "index": 2,
+      "count": 2553,
+      "label": "Variant C (25.5%)",
+      "fingerprint": "001"
+    },
+    {
+      "id": "chapter16_0",
+      "chapter": "chapter16",
+      "index": 0,
+      "count": 2532,
+      "label": "Most common (25.3%)",
+      "fingerprint": "110"
+    },
+    {
+      "id": "chapter16_1",
+      "chapter": "chapter16",
+      "index": 1,
+      "count": 2531,
+      "label": "Variant B (25.3%)",
+      "fingerprint": "000"
+    },
+    {
+      "id": "chapter16_2",
+      "chapter": "chapter16",
+      "index": 2,
+      "count": 2479,
+      "label": "Variant C (24.8%)",
+      "fingerprint": "111"
+    },
+    {
+      "id": "chapter16_3",
+      "chapter": "chapter16",
+      "index": 3,
+      "count": 2458,
+      "label": "Variant D (24.6%)",
+      "fingerprint": "001"
+    },
+    {
+      "id": "chapter17_0",
+      "chapter": "chapter17",
+      "index": 0,
+      "count": 2328,
+      "label": "Most common (23.3%)",
+      "fingerprint": "000"
+    },
+    {
+      "id": "chapter17_1",
+      "chapter": "chapter17",
+      "index": 1,
+      "count": 2280,
+      "label": "Variant B (22.8%)",
+      "fingerprint": "100"
+    },
+    {
+      "id": "chapter17_2",
+      "chapter": "chapter17",
+      "index": 2,
+      "count": 1193,
+      "label": "Variant C (11.9%)",
+      "fingerprint": "111"
+    },
+    {
+      "id": "chapter17_3",
+      "chapter": "chapter17",
+      "index": 3,
+      "count": 1133,
+      "label": "Variant D (11.3%)",
+      "fingerprint": "011"
+    },
+    {
+      "id": "chapter17_4",
+      "chapter": "chapter17",
+      "index": 4,
+      "count": 880,
+      "label": "Variant E (8.8%)",
+      "fingerprint": "010"
+    },
+    {
+      "id": "chapter17_5",
+      "chapter": "chapter17",
+      "index": 5,
+      "count": 827,
+      "label": "Variant F (8.3%)",
+      "fingerprint": "110"
+    },
+    {
+      "id": "chapter17_6",
+      "chapter": "chapter17",
+      "index": 6,
+      "count": 700,
+      "label": "Variant G (7.0%)",
+      "fingerprint": "101"
+    },
+    {
+      "id": "chapter17_7",
+      "chapter": "chapter17",
+      "index": 7,
+      "count": 659,
+      "label": "Other (6.6%)",
+      "fingerprint": "other"
+    },
+    {
+      "id": "chapter18_0",
+      "chapter": "chapter18",
+      "index": 0,
+      "count": 2543,
+      "label": "Most common (25.4%)",
+      "fingerprint": "011"
+    },
+    {
+      "id": "chapter18_1",
+      "chapter": "chapter18",
+      "index": 1,
+      "count": 2517,
+      "label": "Variant B (25.2%)",
+      "fingerprint": "100"
+    },
+    {
+      "id": "chapter18_2",
+      "chapter": "chapter18",
+      "index": 2,
+      "count": 2475,
+      "label": "Variant C (24.8%)",
+      "fingerprint": "101"
+    },
+    {
+      "id": "chapter18_3",
+      "chapter": "chapter18",
+      "index": 3,
+      "count": 2465,
+      "label": "Variant D (24.6%)",
+      "fingerprint": "010"
+    },
+    {
+      "id": "notes_0",
+      "chapter": "notes",
+      "index": 0,
+      "count": 2405,
+      "label": "Most common (24.1%)",
+      "fingerprint": "000"
+    },
+    {
+      "id": "notes_1",
+      "chapter": "notes",
+      "index": 1,
+      "count": 1803,
+      "label": "Variant B (18.0%)",
+      "fingerprint": "100"
+    },
+    {
+      "id": "notes_2",
+      "chapter": "notes",
+      "index": 2,
+      "count": 1766,
+      "label": "Variant C (17.7%)",
+      "fingerprint": "010"
+    },
+    {
+      "id": "notes_3",
+      "chapter": "notes",
+      "index": 3,
+      "count": 1238,
+      "label": "Variant D (12.4%)",
+      "fingerprint": "001"
+    },
+    {
+      "id": "notes_4",
+      "chapter": "notes",
+      "index": 4,
+      "count": 936,
+      "label": "Variant E (9.4%)",
+      "fingerprint": "101"
+    },
+    {
+      "id": "notes_5",
+      "chapter": "notes",
+      "index": 5,
+      "count": 858,
+      "label": "Variant F (8.6%)",
+      "fingerprint": "011"
+    },
+    {
+      "id": "notes_6",
+      "chapter": "notes",
+      "index": 6,
+      "count": 680,
+      "label": "Variant G (6.8%)",
+      "fingerprint": "110"
+    },
+    {
+      "id": "notes_7",
+      "chapter": "notes",
+      "index": 7,
+      "count": 314,
+      "label": "Other (3.1%)",
+      "fingerprint": "other"
+    }
+  ],
+  "links": [
+    {
+      "source": "prologue_0",
+      "target": "chapter1_1",
+      "value": 789
+    },
+    {
+      "source": "prologue_1",
+      "target": "chapter1_2",
+      "value": 717
+    },
+    {
+      "source": "prologue_0",
+      "target": "chapter1_3",
+      "value": 744
+    },
+    {
+      "source": "prologue_2",
+      "target": "chapter1_0",
+      "value": 519
+    },
+    {
+      "source": "prologue_0",
+      "target": "chapter1_2",
+      "value": 782
+    },
+    {
+      "source": "prologue_3",
+      "target": "chapter1_0",
+      "value": 510
+    },
+    {
+      "source": "prologue_2",
+      "target": "chapter1_3",
+      "value": 471
+    },
+    {
+      "source": "prologue_1",
+      "target": "chapter1_3",
+      "value": 772
+    },
+    {
+      "source": "prologue_1",
+      "target": "chapter1_0",
+      "value": 755
+    },
+    {
+      "source": "prologue_1",
+      "target": "chapter1_1",
+      "value": 750
+    },
+    {
+      "source": "prologue_2",
+      "target": "chapter1_2",
+      "value": 524
+    },
+    {
+      "source": "prologue_3",
+      "target": "chapter1_1",
+      "value": 490
+    },
+    {
+      "source": "prologue_0",
+      "target": "chapter1_0",
+      "value": 755
+    },
+    {
+      "source": "prologue_2",
+      "target": "chapter1_1",
+      "value": 500
+    },
+    {
+      "source": "prologue_3",
+      "target": "chapter1_2",
+      "value": 446
+    },
+    {
+      "source": "prologue_3",
+      "target": "chapter1_3",
+      "value": 476
+    },
+    {
+      "source": "chapter1_1",
+      "target": "chapter2_1",
+      "value": 649
+    },
+    {
+      "source": "chapter1_2",
+      "target": "chapter2_0",
+      "value": 619
+    },
+    {
+      "source": "chapter1_3",
+      "target": "chapter2_1",
+      "value": 613
+    },
+    {
+      "source": "chapter1_0",
+      "target": "chapter2_0",
+      "value": 639
+    },
+    {
+      "source": "chapter1_2",
+      "target": "chapter2_2",
+      "value": 622
+    },
+    {
+      "source": "chapter1_0",
+      "target": "chapter2_2",
+      "value": 609
+    },
+    {
+      "source": "chapter1_3",
+      "target": "chapter2_3",
+      "value": 603
+    },
+    {
+      "source": "chapter1_1",
+      "target": "chapter2_0",
+      "value": 643
+    },
+    {
+      "source": "chapter1_1",
+      "target": "chapter2_3",
+      "value": 607
+    },
+    {
+      "source": "chapter1_1",
+      "target": "chapter2_2",
+      "value": 630
+    },
+    {
+      "source": "chapter1_2",
+      "target": "chapter2_3",
+      "value": 622
+    },
+    {
+      "source": "chapter1_0",
+      "target": "chapter2_3",
+      "value": 635
+    },
+    {
+      "source": "chapter1_0",
+      "target": "chapter2_1",
+      "value": 656
+    },
+    {
+      "source": "chapter1_2",
+      "target": "chapter2_1",
+      "value": 606
+    },
+    {
+      "source": "chapter1_3",
+      "target": "chapter2_2",
+      "value": 607
+    },
+    {
+      "source": "chapter1_3",
+      "target": "chapter2_0",
+      "value": 640
+    },
+    {
+      "source": "chapter2_1",
+      "target": "chapter3_1",
+      "value": 2524
+    },
+    {
+      "source": "chapter2_0",
+      "target": "chapter3_0",
+      "value": 2541
+    },
+    {
+      "source": "chapter2_2",
+      "target": "chapter3_1",
+      "value": 2468
+    },
+    {
+      "source": "chapter2_3",
+      "target": "chapter3_0",
+      "value": 2467
+    },
+    {
+      "source": "chapter3_1",
+      "target": "chapter4_1",
+      "value": 2498
+    },
+    {
+      "source": "chapter3_0",
+      "target": "chapter4_0",
+      "value": 2517
+    },
+    {
+      "source": "chapter3_0",
+      "target": "chapter4_3",
+      "value": 2491
+    },
+    {
+      "source": "chapter3_1",
+      "target": "chapter4_2",
+      "value": 2494
+    },
+    {
+      "source": "chapter4_1",
+      "target": "chapter5_2",
+      "value": 583
+    },
+    {
+      "source": "chapter4_0",
+      "target": "chapter5_3",
+      "value": 606
+    },
+    {
+      "source": "chapter4_1",
+      "target": "chapter5_1",
+      "value": 642
+    },
+    {
+      "source": "chapter4_3",
+      "target": "chapter5_1",
+      "value": 626
+    },
+    {
+      "source": "chapter4_2",
+      "target": "chapter5_0",
+      "value": 622
+    },
+    {
+      "source": "chapter4_2",
+      "target": "chapter5_3",
+      "value": 642
+    },
+    {
+      "source": "chapter4_3",
+      "target": "chapter5_3",
+      "value": 607
+    },
+    {
+      "source": "chapter4_0",
+      "target": "chapter5_0",
+      "value": 622
+    },
+    {
+      "source": "chapter4_0",
+      "target": "chapter5_2",
+      "value": 646
+    },
+    {
+      "source": "chapter4_3",
+      "target": "chapter5_0",
+      "value": 628
+    },
+    {
+      "source": "chapter4_1",
+      "target": "chapter5_0",
+      "value": 638
+    },
+    {
+      "source": "chapter4_2",
+      "target": "chapter5_2",
+      "value": 634
+    },
+    {
+      "source": "chapter4_1",
+      "target": "chapter5_3",
+      "value": 635
+    },
+    {
+      "source": "chapter4_2",
+      "target": "chapter5_1",
+      "value": 596
+    },
+    {
+      "source": "chapter4_3",
+      "target": "chapter5_2",
+      "value": 630
+    },
+    {
+      "source": "chapter4_0",
+      "target": "chapter5_1",
+      "value": 643
+    },
+    {
+      "source": "chapter5_2",
+      "target": "chapter6_2",
+      "value": 621
+    },
+    {
+      "source": "chapter5_3",
+      "target": "chapter6_3",
+      "value": 581
+    },
+    {
+      "source": "chapter5_1",
+      "target": "chapter6_0",
+      "value": 623
+    },
+    {
+      "source": "chapter5_1",
+      "target": "chapter6_3",
+      "value": 635
+    },
+    {
+      "source": "chapter5_0",
+      "target": "chapter6_3",
+      "value": 637
+    },
+    {
+      "source": "chapter5_3",
+      "target": "chapter6_2",
+      "value": 653
+    },
+    {
+      "source": "chapter5_3",
+      "target": "chapter6_0",
+      "value": 634
+    },
+    {
+      "source": "chapter5_0",
+      "target": "chapter6_1",
+      "value": 606
+    },
+    {
+      "source": "chapter5_2",
+      "target": "chapter6_1",
+      "value": 647
+    },
+    {
+      "source": "chapter5_0",
+      "target": "chapter6_2",
+      "value": 607
+    },
+    {
+      "source": "chapter5_1",
+      "target": "chapter6_2",
+      "value": 620
+    },
+    {
+      "source": "chapter5_0",
+      "target": "chapter6_0",
+      "value": 660
+    },
+    {
+      "source": "chapter5_3",
+      "target": "chapter6_1",
+      "value": 622
+    },
+    {
+      "source": "chapter5_2",
+      "target": "chapter6_3",
+      "value": 611
+    },
+    {
+      "source": "chapter5_1",
+      "target": "chapter6_1",
+      "value": 629
+    },
+    {
+      "source": "chapter5_2",
+      "target": "chapter6_0",
+      "value": 614
+    },
+    {
+      "source": "chapter6_2",
+      "target": "chapter7_1",
+      "value": 1262
+    },
+    {
+      "source": "chapter6_3",
+      "target": "chapter7_0",
+      "value": 1231
+    },
+    {
+      "source": "chapter6_0",
+      "target": "chapter7_1",
+      "value": 1310
+    },
+    {
+      "source": "chapter6_2",
+      "target": "chapter7_0",
+      "value": 1239
+    },
+    {
+      "source": "chapter6_3",
+      "target": "chapter7_1",
+      "value": 1233
+    },
+    {
+      "source": "chapter6_1",
+      "target": "chapter7_1",
+      "value": 1186
+    },
+    {
+      "source": "chapter6_1",
+      "target": "chapter7_0",
+      "value": 1318
+    },
+    {
+      "source": "chapter6_0",
+      "target": "chapter7_0",
+      "value": 1221
+    },
+    {
+      "source": "chapter7_1",
+      "target": "chapter8_1",
+      "value": 2508
+    },
+    {
+      "source": "chapter7_0",
+      "target": "chapter8_2",
+      "value": 2483
+    },
+    {
+      "source": "chapter7_0",
+      "target": "chapter8_0",
+      "value": 2526
+    },
+    {
+      "source": "chapter7_1",
+      "target": "chapter8_3",
+      "value": 2483
+    },
+    {
+      "source": "chapter8_1",
+      "target": "chapter9_3",
+      "value": 593
+    },
+    {
+      "source": "chapter8_2",
+      "target": "chapter9_0",
+      "value": 639
+    },
+    {
+      "source": "chapter8_1",
+      "target": "chapter9_2",
+      "value": 595
+    },
+    {
+      "source": "chapter8_0",
+      "target": "chapter9_2",
+      "value": 605
+    },
+    {
+      "source": "chapter8_2",
+      "target": "chapter9_2",
+      "value": 618
+    },
+    {
+      "source": "chapter8_0",
+      "target": "chapter9_3",
+      "value": 635
+    },
+    {
+      "source": "chapter8_0",
+      "target": "chapter9_0",
+      "value": 620
+    },
+    {
+      "source": "chapter8_1",
+      "target": "chapter9_0",
+      "value": 677
+    },
+    {
+      "source": "chapter8_3",
+      "target": "chapter9_1",
+      "value": 586
+    },
+    {
+      "source": "chapter8_0",
+      "target": "chapter9_1",
+      "value": 666
+    },
+    {
+      "source": "chapter8_3",
+      "target": "chapter9_0",
+      "value": 592
+    },
+    {
+      "source": "chapter8_2",
+      "target": "chapter9_1",
+      "value": 629
+    },
+    {
+      "source": "chapter8_3",
+      "target": "chapter9_3",
+      "value": 648
+    },
+    {
+      "source": "chapter8_1",
+      "target": "chapter9_1",
+      "value": 643
+    },
+    {
+      "source": "chapter8_3",
+      "target": "chapter9_2",
+      "value": 657
+    },
+    {
+      "source": "chapter8_2",
+      "target": "chapter9_3",
+      "value": 597
+    },
+    {
+      "source": "chapter9_3",
+      "target": "part2_2",
+      "value": 612
+    },
+    {
+      "source": "chapter9_0",
+      "target": "part2_0",
+      "value": 1046
+    },
+    {
+      "source": "chapter9_2",
+      "target": "part2_0",
+      "value": 1061
+    },
+    {
+      "source": "chapter9_2",
+      "target": "part2_1",
+      "value": 819
+    },
+    {
+      "source": "chapter9_2",
+      "target": "part2_2",
+      "value": 595
+    },
+    {
+      "source": "chapter9_3",
+      "target": "part2_1",
+      "value": 804
+    },
+    {
+      "source": "chapter9_0",
+      "target": "part2_1",
+      "value": 844
+    },
+    {
+      "source": "chapter9_1",
+      "target": "part2_1",
+      "value": 831
+    },
+    {
+      "source": "chapter9_1",
+      "target": "part2_2",
+      "value": 636
+    },
+    {
+      "source": "chapter9_3",
+      "target": "part2_0",
+      "value": 1057
+    },
+    {
+      "source": "chapter9_1",
+      "target": "part2_0",
+      "value": 1057
+    },
+    {
+      "source": "chapter9_0",
+      "target": "part2_2",
+      "value": 638
+    },
+    {
+      "source": "part2_2",
+      "target": "chapter10_1",
+      "value": 648
+    },
+    {
+      "source": "part2_0",
+      "target": "chapter10_2",
+      "value": 1041
+    },
+    {
+      "source": "part2_0",
+      "target": "chapter10_3",
+      "value": 1077
+    },
+    {
+      "source": "part2_1",
+      "target": "chapter10_0",
+      "value": 845
+    },
+    {
+      "source": "part2_1",
+      "target": "chapter10_1",
+      "value": 811
+    },
+    {
+      "source": "part2_1",
+      "target": "chapter10_2",
+      "value": 859
+    },
+    {
+      "source": "part2_2",
+      "target": "chapter10_2",
+      "value": 587
+    },
+    {
+      "source": "part2_2",
+      "target": "chapter10_0",
+      "value": 620
+    },
+    {
+      "source": "part2_0",
+      "target": "chapter10_0",
+      "value": 1056
+    },
+    {
+      "source": "part2_0",
+      "target": "chapter10_1",
+      "value": 1047
+    },
+    {
+      "source": "part2_2",
+      "target": "chapter10_3",
+      "value": 626
+    },
+    {
+      "source": "part2_1",
+      "target": "chapter10_3",
+      "value": 783
+    },
+    {
+      "source": "chapter10_1",
+      "target": "chapter11_1",
+      "value": 835
+    },
+    {
+      "source": "chapter10_2",
+      "target": "chapter11_1",
+      "value": 825
+    },
+    {
+      "source": "chapter10_3",
+      "target": "chapter11_1",
+      "value": 757
+    },
+    {
+      "source": "chapter10_0",
+      "target": "chapter11_2",
+      "value": 405
+    },
+    {
+      "source": "chapter10_1",
+      "target": "chapter11_2",
+      "value": 418
+    },
+    {
+      "source": "chapter10_3",
+      "target": "chapter11_0",
+      "value": 849
+    },
+    {
+      "source": "chapter10_2",
+      "target": "chapter11_3",
+      "value": 423
+    },
+    {
+      "source": "chapter10_2",
+      "target": "chapter11_0",
+      "value": 796
+    },
+    {
+      "source": "chapter10_2",
+      "target": "chapter11_2",
+      "value": 443
+    },
+    {
+      "source": "chapter10_0",
+      "target": "chapter11_0",
+      "value": 860
+    },
+    {
+      "source": "chapter10_3",
+      "target": "chapter11_3",
+      "value": 430
+    },
+    {
+      "source": "chapter10_1",
+      "target": "chapter11_0",
+      "value": 838
+    },
+    {
+      "source": "chapter10_3",
+      "target": "chapter11_2",
+      "value": 450
+    },
+    {
+      "source": "chapter10_0",
+      "target": "chapter11_1",
+      "value": 826
+    },
+    {
+      "source": "chapter10_1",
+      "target": "chapter11_3",
+      "value": 415
+    },
+    {
+      "source": "chapter10_0",
+      "target": "chapter11_3",
+      "value": 430
+    },
+    {
+      "source": "chapter11_1",
+      "target": "chapter12_1",
+      "value": 1630
+    },
+    {
+      "source": "chapter11_1",
+      "target": "chapter12_0",
+      "value": 1613
+    },
+    {
+      "source": "chapter11_2",
+      "target": "chapter12_1",
+      "value": 874
+    },
+    {
+      "source": "chapter11_2",
+      "target": "chapter12_0",
+      "value": 842
+    },
+    {
+      "source": "chapter11_0",
+      "target": "chapter12_1",
+      "value": 1677
+    },
+    {
+      "source": "chapter11_3",
+      "target": "chapter12_1",
+      "value": 811
+    },
+    {
+      "source": "chapter11_0",
+      "target": "chapter12_0",
+      "value": 1666
+    },
+    {
+      "source": "chapter11_3",
+      "target": "chapter12_0",
+      "value": 887
+    },
+    {
+      "source": "chapter12_1",
+      "target": "chapter13_0",
+      "value": 2474
+    },
+    {
+      "source": "chapter12_0",
+      "target": "chapter13_0",
+      "value": 2530
+    },
+    {
+      "source": "chapter12_0",
+      "target": "chapter13_1",
+      "value": 2478
+    },
+    {
+      "source": "chapter12_1",
+      "target": "chapter13_1",
+      "value": 2518
+    },
+    {
+      "source": "chapter13_0",
+      "target": "chapter14_2",
+      "value": 1208
+    },
+    {
+      "source": "chapter13_0",
+      "target": "chapter14_3",
+      "value": 1259
+    },
+    {
+      "source": "chapter13_1",
+      "target": "chapter14_1",
+      "value": 1252
+    },
+    {
+      "source": "chapter13_1",
+      "target": "chapter14_0",
+      "value": 1243
+    },
+    {
+      "source": "chapter13_0",
+      "target": "chapter14_1",
+      "value": 1251
+    },
+    {
+      "source": "chapter13_1",
+      "target": "chapter14_2",
+      "value": 1288
+    },
+    {
+      "source": "chapter13_1",
+      "target": "chapter14_3",
+      "value": 1213
+    },
+    {
+      "source": "chapter13_0",
+      "target": "chapter14_0",
+      "value": 1286
+    },
+    {
+      "source": "chapter14_2",
+      "target": "chapter15_2",
+      "value": 601
+    },
+    {
+      "source": "chapter14_3",
+      "target": "chapter15_2",
+      "value": 629
+    },
+    {
+      "source": "chapter14_3",
+      "target": "chapter15_0",
+      "value": 608
+    },
+    {
+      "source": "chapter14_1",
+      "target": "chapter15_3",
+      "value": 627
+    },
+    {
+      "source": "chapter14_2",
+      "target": "chapter15_3",
+      "value": 592
+    },
+    {
+      "source": "chapter14_0",
+      "target": "chapter15_0",
+      "value": 657
+    },
+    {
+      "source": "chapter14_3",
+      "target": "chapter15_3",
+      "value": 589
+    },
+    {
+      "source": "chapter14_1",
+      "target": "chapter15_2",
+      "value": 638
+    },
+    {
+      "source": "chapter14_0",
+      "target": "chapter15_2",
+      "value": 639
+    },
+    {
+      "source": "chapter14_2",
+      "target": "chapter15_1",
+      "value": 649
+    },
+    {
+      "source": "chapter14_1",
+      "target": "chapter15_0",
+      "value": 637
+    },
+    {
+      "source": "chapter14_2",
+      "target": "chapter15_0",
+      "value": 654
+    },
+    {
+      "source": "chapter14_0",
+      "target": "chapter15_1",
+      "value": 612
+    },
+    {
+      "source": "chapter14_1",
+      "target": "chapter15_1",
+      "value": 601
+    },
+    {
+      "source": "chapter14_3",
+      "target": "chapter15_1",
+      "value": 646
+    },
+    {
+      "source": "chapter14_0",
+      "target": "chapter15_3",
+      "value": 621
+    },
+    {
+      "source": "chapter15_2",
+      "target": "part3_1",
+      "value": 677
+    },
+    {
+      "source": "chapter15_2",
+      "target": "part3_0",
+      "value": 1189
+    },
+    {
+      "source": "chapter15_0",
+      "target": "part3_1",
+      "value": 625
+    },
+    {
+      "source": "chapter15_3",
+      "target": "part3_0",
+      "value": 1176
+    },
+    {
+      "source": "chapter15_0",
+      "target": "part3_0",
+      "value": 1286
+    },
+    {
+      "source": "chapter15_3",
+      "target": "part3_2",
+      "value": 622
+    },
+    {
+      "source": "chapter15_2",
+      "target": "part3_2",
+      "value": 641
+    },
+    {
+      "source": "chapter15_1",
+      "target": "part3_0",
+      "value": 1241
+    },
+    {
+      "source": "chapter15_1",
+      "target": "part3_1",
+      "value": 622
+    },
+    {
+      "source": "chapter15_3",
+      "target": "part3_1",
+      "value": 631
+    },
+    {
+      "source": "chapter15_0",
+      "target": "part3_2",
+      "value": 645
+    },
+    {
+      "source": "chapter15_1",
+      "target": "part3_2",
+      "value": 645
+    },
+    {
+      "source": "part3_1",
+      "target": "chapter16_0",
+      "value": 664
+    },
+    {
+      "source": "part3_0",
+      "target": "chapter16_0",
+      "value": 1216
+    },
+    {
+      "source": "part3_0",
+      "target": "chapter16_1",
+      "value": 1259
+    },
+    {
+      "source": "part3_1",
+      "target": "chapter16_1",
+      "value": 638
+    },
+    {
+      "source": "part3_0",
+      "target": "chapter16_3",
+      "value": 1197
+    },
+    {
+      "source": "part3_2",
+      "target": "chapter16_3",
+      "value": 649
+    },
+    {
+      "source": "part3_0",
+      "target": "chapter16_2",
+      "value": 1220
+    },
+    {
+      "source": "part3_2",
+      "target": "chapter16_1",
+      "value": 634
+    },
+    {
+      "source": "part3_1",
+      "target": "chapter16_2",
+      "value": 641
+    },
+    {
+      "source": "part3_1",
+      "target": "chapter16_3",
+      "value": 612
+    },
+    {
+      "source": "part3_2",
+      "target": "chapter16_0",
+      "value": 652
+    },
+    {
+      "source": "part3_2",
+      "target": "chapter16_2",
+      "value": 618
+    },
+    {
+      "source": "chapter16_0",
+      "target": "chapter17_2",
+      "value": 302
+    },
+    {
+      "source": "chapter16_0",
+      "target": "chapter17_6",
+      "value": 186
+    },
+    {
+      "source": "chapter16_1",
+      "target": "chapter17_0",
+      "value": 620
+    },
+    {
+      "source": "chapter16_1",
+      "target": "chapter17_5",
+      "value": 201
+    },
+    {
+      "source": "chapter16_3",
+      "target": "chapter17_0",
+      "value": 566
+    },
+    {
+      "source": "chapter16_3",
+      "target": "chapter17_1",
+      "value": 579
+    },
+    {
+      "source": "chapter16_1",
+      "target": "chapter17_3",
+      "value": 288
+    },
+    {
+      "source": "chapter16_3",
+      "target": "chapter17_7",
+      "value": 180
+    },
+    {
+      "source": "chapter16_2",
+      "target": "chapter17_2",
+      "value": 299
+    },
+    {
+      "source": "chapter16_1",
+      "target": "chapter17_1",
+      "value": 564
+    },
+    {
+      "source": "chapter16_0",
+      "target": "chapter17_1",
+      "value": 566
+    },
+    {
+      "source": "chapter16_2",
+      "target": "chapter17_3",
+      "value": 292
+    },
+    {
+      "source": "chapter16_3",
+      "target": "chapter17_4",
+      "value": 196
+    },
+    {
+      "source": "chapter16_2",
+      "target": "chapter17_1",
+      "value": 571
+    },
+    {
+      "source": "chapter16_3",
+      "target": "chapter17_6",
+      "value": 176
+    },
+    {
+      "source": "chapter16_0",
+      "target": "chapter17_0",
+      "value": 579
+    },
+    {
+      "source": "chapter16_2",
+      "target": "chapter17_7",
+      "value": 163
+    },
+    {
+      "source": "chapter16_1",
+      "target": "chapter17_4",
+      "value": 228
+    },
+    {
+      "source": "chapter16_3",
+      "target": "chapter17_2",
+      "value": 280
+    },
+    {
+      "source": "chapter16_2",
+      "target": "chapter17_0",
+      "value": 563
+    },
+    {
+      "source": "chapter16_0",
+      "target": "chapter17_5",
+      "value": 217
+    },
+    {
+      "source": "chapter16_1",
+      "target": "chapter17_7",
+      "value": 151
+    },
+    {
+      "source": "chapter16_0",
+      "target": "chapter17_3",
+      "value": 270
+    },
+    {
+      "source": "chapter16_0",
+      "target": "chapter17_7",
+      "value": 165
+    },
+    {
+      "source": "chapter16_2",
+      "target": "chapter17_4",
+      "value": 209
+    },
+    {
+      "source": "chapter16_3",
+      "target": "chapter17_3",
+      "value": 283
+    },
+    {
+      "source": "chapter16_1",
+      "target": "chapter17_2",
+      "value": 312
+    },
+    {
+      "source": "chapter16_2",
+      "target": "chapter17_6",
+      "value": 171
+    },
+    {
+      "source": "chapter16_0",
+      "target": "chapter17_4",
+      "value": 247
+    },
+    {
+      "source": "chapter16_2",
+      "target": "chapter17_5",
+      "value": 211
+    },
+    {
+      "source": "chapter16_3",
+      "target": "chapter17_5",
+      "value": 198
+    },
+    {
+      "source": "chapter16_1",
+      "target": "chapter17_6",
+      "value": 167
+    },
+    {
+      "source": "chapter17_2",
+      "target": "chapter18_1",
+      "value": 305
+    },
+    {
+      "source": "chapter17_6",
+      "target": "chapter18_3",
+      "value": 167
+    },
+    {
+      "source": "chapter17_0",
+      "target": "chapter18_2",
+      "value": 595
+    },
+    {
+      "source": "chapter17_5",
+      "target": "chapter18_0",
+      "value": 195
+    },
+    {
+      "source": "chapter17_0",
+      "target": "chapter18_3",
+      "value": 564
+    },
+    {
+      "source": "chapter17_1",
+      "target": "chapter18_0",
+      "value": 547
+    },
+    {
+      "source": "chapter17_3",
+      "target": "chapter18_0",
+      "value": 285
+    },
+    {
+      "source": "chapter17_7",
+      "target": "chapter18_1",
+      "value": 163
+    },
+    {
+      "source": "chapter17_2",
+      "target": "chapter18_2",
+      "value": 294
+    },
+    {
+      "source": "chapter17_1",
+      "target": "chapter18_1",
+      "value": 575
+    },
+    {
+      "source": "chapter17_0",
+      "target": "chapter18_0",
+      "value": 599
+    },
+    {
+      "source": "chapter17_1",
+      "target": "chapter18_2",
+      "value": 595
+    },
+    {
+      "source": "chapter17_3",
+      "target": "chapter18_2",
+      "value": 275
+    },
+    {
+      "source": "chapter17_4",
+      "target": "chapter18_2",
+      "value": 179
+    },
+    {
+      "source": "chapter17_6",
+      "target": "chapter18_0",
+      "value": 183
+    },
+    {
+      "source": "chapter17_4",
+      "target": "chapter18_1",
+      "value": 221
+    },
+    {
+      "source": "chapter17_0",
+      "target": "chapter18_1",
+      "value": 570
+    },
+    {
+      "source": "chapter17_6",
+      "target": "chapter18_2",
+      "value": 167
+    },
+    {
+      "source": "chapter17_7",
+      "target": "chapter18_0",
+      "value": 188
+    },
+    {
+      "source": "chapter17_1",
+      "target": "chapter18_3",
+      "value": 563
+    },
+    {
+      "source": "chapter17_2",
+      "target": "chapter18_0",
+      "value": 301
+    },
+    {
+      "source": "chapter17_3",
+      "target": "chapter18_3",
+      "value": 297
+    },
+    {
+      "source": "chapter17_6",
+      "target": "chapter18_1",
+      "value": 183
+    },
+    {
+      "source": "chapter17_4",
+      "target": "chapter18_0",
+      "value": 245
+    },
+    {
+      "source": "chapter17_2",
+      "target": "chapter18_3",
+      "value": 293
+    },
+    {
+      "source": "chapter17_7",
+      "target": "chapter18_3",
+      "value": 157
+    },
+    {
+      "source": "chapter17_4",
+      "target": "chapter18_3",
+      "value": 235
+    },
+    {
+      "source": "chapter17_3",
+      "target": "chapter18_1",
+      "value": 276
+    },
+    {
+      "source": "chapter17_7",
+      "target": "chapter18_2",
+      "value": 151
+    },
+    {
+      "source": "chapter17_5",
+      "target": "chapter18_3",
+      "value": 189
+    },
+    {
+      "source": "chapter17_5",
+      "target": "chapter18_1",
+      "value": 224
+    },
+    {
+      "source": "chapter17_5",
+      "target": "chapter18_2",
+      "value": 219
+    },
+    {
+      "source": "chapter18_1",
+      "target": "notes_6",
+      "value": 181
+    },
+    {
+      "source": "chapter18_3",
+      "target": "notes_0",
+      "value": 596
+    },
+    {
+      "source": "chapter18_2",
+      "target": "notes_2",
+      "value": 464
+    },
+    {
+      "source": "chapter18_0",
+      "target": "notes_1",
+      "value": 455
+    },
+    {
+      "source": "chapter18_0",
+      "target": "notes_4",
+      "value": 251
+    },
+    {
+      "source": "chapter18_1",
+      "target": "notes_3",
+      "value": 324
+    },
+    {
+      "source": "chapter18_2",
+      "target": "notes_4",
+      "value": 236
+    },
+    {
+      "source": "chapter18_0",
+      "target": "notes_5",
+      "value": 222
+    },
+    {
+      "source": "chapter18_2",
+      "target": "notes_1",
+      "value": 436
+    },
+    {
+      "source": "chapter18_2",
+      "target": "notes_0",
+      "value": 574
+    },
+    {
+      "source": "chapter18_1",
+      "target": "notes_1",
+      "value": 462
+    },
+    {
+      "source": "chapter18_3",
+      "target": "notes_3",
+      "value": 286
+    },
+    {
+      "source": "chapter18_1",
+      "target": "notes_5",
+      "value": 219
+    },
+    {
+      "source": "chapter18_2",
+      "target": "notes_5",
+      "value": 206
+    },
+    {
+      "source": "chapter18_0",
+      "target": "notes_0",
+      "value": 636
+    },
+    {
+      "source": "chapter18_1",
+      "target": "notes_0",
+      "value": 599
+    },
+    {
+      "source": "chapter18_3",
+      "target": "notes_1",
+      "value": 450
+    },
+    {
+      "source": "chapter18_3",
+      "target": "notes_4",
+      "value": 226
+    },
+    {
+      "source": "chapter18_0",
+      "target": "notes_2",
+      "value": 420
+    },
+    {
+      "source": "chapter18_3",
+      "target": "notes_5",
+      "value": 211
+    },
+    {
+      "source": "chapter18_3",
+      "target": "notes_6",
+      "value": 175
+    },
+    {
+      "source": "chapter18_1",
+      "target": "notes_2",
+      "value": 439
+    },
+    {
+      "source": "chapter18_0",
+      "target": "notes_6",
+      "value": 165
+    },
+    {
+      "source": "chapter18_1",
+      "target": "notes_4",
+      "value": 223
+    },
+    {
+      "source": "chapter18_3",
+      "target": "notes_2",
+      "value": 443
+    },
+    {
+      "source": "chapter18_2",
+      "target": "notes_7",
+      "value": 89
+    },
+    {
+      "source": "chapter18_0",
+      "target": "notes_3",
+      "value": 317
+    },
+    {
+      "source": "chapter18_2",
+      "target": "notes_3",
+      "value": 311
+    },
+    {
+      "source": "chapter18_1",
+      "target": "notes_7",
+      "value": 70
+    },
+    {
+      "source": "chapter18_3",
+      "target": "notes_7",
+      "value": 78
+    },
+    {
+      "source": "chapter18_0",
+      "target": "notes_7",
+      "value": 77
+    },
+    {
+      "source": "chapter18_2",
+      "target": "notes_6",
+      "value": 159
+    }
+  ]
+}
