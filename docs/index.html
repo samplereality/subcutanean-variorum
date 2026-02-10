@@ -582,9 +582,17 @@
             <div class="tapestry-header">
                 <h2>Tapestry</h2>
                 <p class="tapestry-subtitle">10,000 threads converging and diverging across chapters</p>
+                <div class="tapestry-cluster-filters">
+                    <button class="tapestry-cluster-btn" id="tapestry-cluster-0" style="--cluster-color: #ff8800" title="Toggle Club intro">Club</button>
+                    <button class="tapestry-cluster-btn" id="tapestry-cluster-1" style="--cluster-color: #4fc3f7" title="Toggle Makeup intro">Makeup</button>
+                    <button class="tapestry-cluster-btn" id="tapestry-cluster-2" style="--cluster-color: #81c784" title="Toggle Noodles intro">Noodles</button>
+                </div>
                 <div class="tapestry-header-actions">
                     <button class="tapestry-header-btn" id="tapestry-info-btn" title="How to read this chart">
                         <i data-lucide="info"></i>
+                    </button>
+                    <button class="tapestry-header-btn" id="tapestry-theme-btn" title="Toggle light/dark mode">
+                        <i data-lucide="sun"></i>
                     </button>
                     <button class="tapestry-header-btn" id="tapestry-close-btn" title="Close">
                         <i data-lucide="x"></i>
@@ -612,14 +620,14 @@
                     </div>
                 </div>
                 <div class="gonzo-header-right">
-                    <button id="gonzo-about-btn" class="gonzo-header-btn" title="About">
-                        <i data-lucide="info"></i> About Gonzo Mode
+                    <button id="gonzo-about-btn" class="gonzo-header-btn" title="About Gonzo Mode">
+                        <i data-lucide="info"></i>
                     </button>
                     <button id="gonzo-theme-btn" class="gonzo-header-btn" title="Toggle light/dark mode">
                         <i data-lucide="sun"></i>
                     </button>
-                    <button id="gonzo-close-btn" class="gonzo-header-btn gonzo-close" title="Close Gonzo Mode (ESC)">
-                        <i data-lucide="x"></i> Close
+                    <button id="gonzo-close-btn" class="gonzo-header-btn gonzo-close" title="Close (ESC)">
+                        <i data-lucide="x"></i>
                     </button>
                 </div>
             </div>

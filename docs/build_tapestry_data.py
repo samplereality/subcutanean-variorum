@@ -3,14 +3,16 @@
 Build tapestry visualization data from 10,000 Subcutanean text variants.
 
 For each variant at each chapter, computes a "distance from consensus" score
-based on average paragraph rarity. Variants are then bundled by prologue
-cluster and quantized distance trajectory, producing grouped thread paths
-for the browser to render as a tapestry diagram.
+based on average paragraph rarity, then converts to per-chapter percentile
+ranks so values are comparable across chapters of different lengths.
+Variants are bundled by Ch1 intro cluster and quantized percentile trajectory,
+producing grouped thread paths for the browser to render as a tapestry diagram.
 
 Usage:
     python build_tapestry_data.py
 """
 
+import bisect
 import json
 import math
 import os
@@ -27,9 +29,18 @@ from build_rarity_scores import (
 
 RARITY_FILE = os.path.join(os.path.dirname(__file__), 'extracted_text', 'rarity_scores.json')
 ALLUVIAL_FILE = os.path.join(os.path.dirname(__file__), 'extracted_text', 'alluvial_data.json')
+ALL_VERSIONS_FILE = os.path.join(os.path.dirname(__file__), 'extracted_text', 'all_versions.json')
 OUTPUT_FILE = os.path.join(os.path.dirname(__file__), 'extracted_text', 'tapestry_data.json')
 
-NUM_BINS = 5  # Bins per discriminating chapter (coarse for effective bundling)
+# Chapter 1 intro detection patterns (from ch01.txt line 15: [DEFINE @clubintro|@makeupintro|@noodlesintro])
+INTRO_PATTERNS = {
+    'club': "I hadn't wanted to go to the club",
+    'makeup': 'I was on the back porch',
+    'noodles': 'I was in the kitchen making ramen',
+}
+INTRO_NAMES = ['club', 'makeup', 'noodles']  # Index order for cluster assignment
+
+NUM_BINS = 3  # Bins per discriminating chapter (fewer needed with percentile values)
 NUM_KEY_CHAPTERS = 4  # Number of most-discriminating chapters to use for bundling
 
 CHAPTER_ORDER = [
@@ -107,6 +118,19 @@ def compute_prologue_fingerprint(paragraphs, feature_hashes):
     return ''.join(bits)
 
 
+def detect_ch1_intro(chapters):
+    """Detect which Chapter 1 intro variant a copy contains.
+
+    Returns cluster index: 0=club, 1=makeup, 2=noodles.
+    Based on [DEFINE @clubintro|@makeupintro|@noodlesintro] in ch01.txt.
+    """
+    ch1_text = ' '.join(chapters.get('chapter1', []))
+    for idx, name in enumerate(INTRO_NAMES):
+        if INTRO_PATTERNS[name] in ch1_text:
+            return idx
+    return 0  # Default to club if detection fails
+
+
 def compute_chapter_distance(paragraphs, rarity_lookup, total):
     """Compute distance from consensus for a variant's chapter.
 
@@ -148,11 +172,6 @@ def main():
         print("Run build_rarity_scores.py first.")
         sys.exit(1)
 
-    if not os.path.isfile(ALLUVIAL_FILE):
-        print(f"Error: Alluvial data not found: {ALLUVIAL_FILE}")
-        print("Run build_alluvial_data.py first.")
-        sys.exit(1)
-
     txt_files = sorted([
         f for f in os.listdir(VARIANTS_DIR)
         if f.endswith('.txt') and f[:-4].isdigit()
@@ -169,12 +188,7 @@ def main():
     print(f"\nPhase 0 - Loading reference data...")
     rarity_lookup, rarity_total = load_rarity_lookup(RARITY_FILE)
     print(f"  Rarity data: {rarity_total} variants, {len(rarity_lookup)} chapters")
-
-    feature_hashes, cluster_fps = load_prologue_clusters(ALLUVIAL_FILE)
-    print(f"  Prologue features: {len(feature_hashes)} hashes")
-    print(f"  Prologue clusters: {len(cluster_fps)} fingerprints")
-    for fp, idx in sorted(cluster_fps.items(), key=lambda x: x[1]):
-        print(f"    Cluster {idx}: fingerprint '{fp}'")
+    print(f"  Ch1 intro clusters: {', '.join(INTRO_NAMES)}")
 
     # Phase 1: Compute distances and cluster assignments
     print(f"\nPhase 1 - Computing distances for {total_files} variants...")
@@ -191,10 +205,8 @@ def main():
         try:
             chapters = parse_txt_file(filepath)
 
-            # Compute prologue cluster
-            prologue_paras = chapters.get('prologue', [])
-            fp = compute_prologue_fingerprint(prologue_paras, feature_hashes)
-            cluster = cluster_fps.get(fp, 0)
+            # Detect Chapter 1 intro type (club/makeup/noodles)
+            cluster = detect_ch1_intro(chapters)
 
             # Compute distance per chapter
             distances = []
@@ -225,53 +237,85 @@ def main():
         mx = max(dists) if dists else 0
         print(f"    {chapter_id:12s}: avg={avg:.3f}, min={mn:.3f}, max={mx:.3f}")
 
+    # Phase 1b: Convert raw distances to per-chapter percentile ranks
+    # This makes values comparable across chapters of different lengths
+    # (short sections like prologue/part headers no longer dominate)
+    print(f"\n  Converting to per-chapter percentile ranks...")
+    chapter_sorted_dists = []
+    for ci in range(len(CHAPTER_ORDER)):
+        sorted_d = sorted(v['distances'][ci] for v in variant_data.values())
+        chapter_sorted_dists.append(sorted_d)
+
+    def to_percentile(raw_dist, ci):
+        """Convert raw distance to percentile rank [0, 1] within chapter distribution."""
+        sorted_d = chapter_sorted_dists[ci]
+        n = len(sorted_d)
+        if n <= 1:
+            return 0.5
+        pos = bisect.bisect_right(sorted_d, raw_dist)
+        return pos / n
+
+    for vid, vdata in variant_data.items():
+        vdata['percentiles'] = []
+        for ci in range(len(CHAPTER_ORDER)):
+            p = to_percentile(vdata['distances'][ci], ci)
+            vdata['percentiles'].append(p)
+
+    # Show percentile stats to verify normalization
+    print(f"\n  Percentile statistics per chapter:")
+    for ci, chapter_id in enumerate(CHAPTER_ORDER):
+        pcts = [v['percentiles'][ci] for v in variant_data.values()]
+        avg = sum(pcts) / len(pcts)
+        mn = min(pcts)
+        mx = max(pcts)
+        num_distinct = len(set(round(p, 4) for p in pcts))
+        print(f"    {chapter_id:12s}: avg={avg:.3f}, min={mn:.3f}, max={mx:.3f}, distinct={num_distinct}")
+
     # Phase 2: Identify most discriminating chapters and bundle
     print(f"\nPhase 2 - Selecting {NUM_KEY_CHAPTERS} most discriminating chapters for bundling...")
 
-    # Find chapters with widest distance ranges (most discriminating)
-    chapter_ranges = []
+    # Find chapters with highest percentile variance (most discriminating)
+    # This naturally excludes degenerate short sections (part2, part3) that have
+    # very few distinct percentile values and near-zero variance
+    chapter_scores = []
     for ci, chapter_id in enumerate(CHAPTER_ORDER):
-        dists = [v['distances'][ci] for v in variant_data.values()]
-        dist_range = max(dists) - min(dists) if dists else 0
-        chapter_ranges.append((dist_range, ci, chapter_id))
+        pcts = [v['percentiles'][ci] for v in variant_data.values()]
+        mean_p = sum(pcts) / len(pcts)
+        variance = sum((p - mean_p) ** 2 for p in pcts) / len(pcts)
+        chapter_scores.append((variance, ci, chapter_id))
 
-    chapter_ranges.sort(reverse=True)
-    key_chapters = chapter_ranges[:NUM_KEY_CHAPTERS]
+    chapter_scores.sort(reverse=True)
+    key_chapters = chapter_scores[:NUM_KEY_CHAPTERS]
     key_indices = [ci for _, ci, _ in key_chapters]
 
-    print(f"  Key chapters (by distance range):")
-    for rng, ci, ch in key_chapters:
-        print(f"    {ch:12s}: range={rng:.3f}")
+    print(f"  Key chapters (by percentile variance):")
+    for var, ci, ch in key_chapters:
+        print(f"    {ch:12s}: variance={var:.4f}")
 
-    # Bundle by: (prologue_cluster, bin_at_key_ch1, bin_at_key_ch2, ...)
-    # Then compute mean distances for the full 22-chapter path
-    print(f"\n  Bundling by prologue cluster + {NUM_BINS} bins at {NUM_KEY_CHAPTERS} key chapters...")
+    # Bundle by: (intro_cluster, bin_at_key_ch1, bin_at_key_ch2, ...)
+    # Then compute mean percentiles for the full 22-chapter path
+    print(f"\n  Bundling by Ch1 intro cluster + {NUM_BINS} bins at {NUM_KEY_CHAPTERS} key chapters...")
 
     bundle_groups = defaultdict(list)
 
     for variant_id, vdata in variant_data.items():
         key_bins = []
         for ci in key_indices:
-            # Normalize to chapter's own range for binning
-            dists_at_ch = [v['distances'][ci] for v in variant_data.values()]
-            ch_min = min(dists_at_ch)
-            ch_max = max(dists_at_ch)
-            ch_range = ch_max - ch_min if ch_max > ch_min else 1.0
-            normalized = (vdata['distances'][ci] - ch_min) / ch_range
-            bin_idx = min(int(normalized * NUM_BINS), NUM_BINS - 1)
+            # Percentiles are already [0, 1], bin directly
+            bin_idx = min(int(vdata['percentiles'][ci] * NUM_BINS), NUM_BINS - 1)
             key_bins.append(bin_idx)
 
         key = (vdata['cluster'], tuple(key_bins))
         bundle_groups[key].append(variant_id)
 
-    # Convert to bundle list using mean distances across variants in each bundle
+    # Convert to bundle list using mean percentiles across variants in each bundle
     bundles = []
     for (cluster, key_bins), variant_ids in bundle_groups.items():
-        # Compute mean distance at each chapter across all variants in this bundle
+        # Compute mean percentile at each chapter across all variants in this bundle
         path = []
         for ci in range(len(CHAPTER_ORDER)):
-            mean_dist = sum(variant_data[vid]['distances'][ci] for vid in variant_ids) / len(variant_ids)
-            path.append(round(mean_dist, 4))
+            mean_pct = sum(variant_data[vid]['percentiles'][ci] for vid in variant_ids) / len(variant_ids)
+            path.append(round(mean_pct, 4))
         bundles.append({
             'count': len(variant_ids),
             'cluster': cluster,
@@ -294,17 +338,41 @@ def main():
     for cl in sorted(cluster_counts.keys()):
         print(f"    Cluster {cl}: {cluster_counts[cl]} variants")
 
+    # Phase 3: Compute distance profiles for built-in browser versions
+    # Only include versions from all_versions.json (the seeds actually loaded in the browser)
+    print(f"\nPhase 3 - Computing distance profiles for built-in browser versions...")
+    built_in_profiles = {}
+    if os.path.isfile(ALL_VERSIONS_FILE):
+        with open(ALL_VERSIONS_FILE, 'r', encoding='utf-8') as f:
+            all_versions = json.load(f)
+        for vid in sorted(all_versions.keys()):
+            vdata = all_versions[vid]
+            profile = []
+            intro = detect_ch1_intro(vdata)
+            for chapter_id in CHAPTER_ORDER:
+                paras = vdata.get(chapter_id, [])
+                chapter_rarity = rarity_lookup.get(chapter_id, {})
+                dist = compute_chapter_distance(paras, chapter_rarity, rarity_total)
+                profile.append(round(dist, 4))
+            built_in_profiles[vid] = profile
+            print(f"  {vid} ({INTRO_NAMES[intro]}): avg distance = {sum(profile)/len(profile):.3f}")
+        print(f"  Computed profiles for {len(built_in_profiles)} built-in versions")
+    else:
+        print(f"  Warning: {ALL_VERSIONS_FILE} not found, skipping built-in profiles")
+
     # Build output
     output = {
         'meta': {
             'total_variants': total_files,
             'chapters': CHAPTER_ORDER,
             'chapter_labels': CHAPTER_LABELS,
+            'cluster_names': INTRO_NAMES,
             'num_bins': NUM_BINS,
             'num_bundles': len(bundles),
             'generated': datetime.now().isoformat(),
         },
         'bundles': bundles,
+        'built_in_profiles': built_in_profiles,
     }
 
     os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)

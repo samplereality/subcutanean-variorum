@@ -4995,16 +4995,14 @@ main {
 .gonzo-header-btn {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
+    justify-content: center;
+    padding: 0.4rem;
     background: transparent;
-    border: none;
-    color: var(--text-color);
-    font-size: 0.9rem;
+    border: 1px solid rgba(255, 136, 0, 0.3);
+    color: #e8e8e8;
     cursor: pointer;
     border-radius: 4px;
     transition: all 0.2s ease;
-    text-decoration: none;
 }
 
 .gonzo-header-btn:hover {
@@ -5384,7 +5382,51 @@ main {
 }
 
 .tapestry-thread {
-    transition: stroke-opacity 0.15s;
+    transition: stroke-opacity 0.1s ease;
+}
+
+/* CSS-driven hover dimming: when parent group has .t-hover, dim all non-active threads */
+.tapestry-threads.t-hover .tapestry-thread {
+    stroke-opacity: 0.05;
+}
+.tapestry-threads.t-hover .tapestry-thread.t-active {
+    stroke-opacity: 0.9;
+}
+.tapestry-threads.t-hover .tapestry-thread.t-locked:not(.t-active) {
+    stroke-opacity: 0.7;
+}
+
+/* CSS-driven lock state */
+.tapestry-threads.t-lock .tapestry-thread {
+    stroke-opacity: 0.03;
+}
+.tapestry-threads.t-lock .tapestry-thread.t-locked {
+    stroke-opacity: 0.9;
+}
+
+/* CSS-driven brush state */
+.tapestry-threads.t-brush .tapestry-thread {
+    stroke-opacity: 0.05;
+}
+.tapestry-threads.t-brush .tapestry-thread.t-brushed {
+    stroke-opacity: 0.7;
+}
+
+/* Hover while locked: both hovered and locked visible */
+.tapestry-threads.t-hover.t-lock .tapestry-thread {
+    stroke-opacity: 0.05;
+}
+.tapestry-threads.t-hover.t-lock .tapestry-thread.t-active {
+    stroke-opacity: 0.9;
+}
+.tapestry-threads.t-hover.t-lock .tapestry-thread.t-locked:not(.t-active) {
+    stroke-opacity: 0.7;
+}
+
+/* Hidden threads (cluster filter) override all states */
+.tapestry-thread.t-hidden {
+    stroke-opacity: 0 !important;
+    pointer-events: none !important;
 }
 
 .tapestry-label {
@@ -5495,6 +5537,170 @@ main {
     border: 1px solid rgba(217, 104, 0, 0.3);
 }
 
+/* Cluster filter buttons */
+.tapestry-cluster-filters {
+    display: flex;
+    gap: 0.35rem;
+    margin-left: 1rem;
+}
+
+.tapestry-cluster-btn {
+    height: 28px;
+    padding: 0 10px;
+    border-radius: 4px;
+    border: 2px solid var(--cluster-color);
+    background: var(--cluster-color);
+    color: #000;
+    font-weight: 700;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: opacity 0.2s, background 0.2s;
+    font-family: system-ui, -apple-system, sans-serif;
+    white-space: nowrap;
+}
+
+.tapestry-cluster-btn.inactive {
+    background: transparent;
+    color: var(--cluster-color);
+    opacity: 0.4;
+}
+
+.tapestry-cluster-btn:hover {
+    opacity: 1;
+}
+
+/* Chapter brush highlight */
+.tapestry-brush-highlight {
+    pointer-events: none;
+}
+
+/* Chapter click zones */
+.tapestry-chapter-zone {
+    fill: transparent;
+    cursor: crosshair;
+}
+
+.tapestry-chapter-zone:hover {
+    fill: rgba(255, 136, 0, 0.04);
+}
+
+/* Detail panel */
+.tapestry-detail-panel {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    background: rgba(10, 18, 32, 0.95);
+    border: 1px solid rgba(255, 136, 0, 0.3);
+    border-radius: 6px;
+    padding: 0;
+    color: #ccc;
+    font-size: 0.8rem;
+    line-height: 1.6;
+    max-width: 320px;
+    min-width: 240px;
+    z-index: 10;
+    font-family: system-ui, -apple-system, sans-serif;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.tapestry-detail-panel.hidden {
+    display: none;
+}
+
+.tapestry-detail-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid rgba(255, 136, 0, 0.15);
+}
+
+.tapestry-detail-title {
+    color: #ff8800;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.tapestry-detail-close {
+    background: transparent;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    padding: 2px;
+    display: flex;
+}
+
+.tapestry-detail-close:hover {
+    color: #e8e8e8;
+}
+
+.tapestry-detail-close svg {
+    width: 14px;
+    height: 14px;
+}
+
+.tapestry-detail-body {
+    padding: 0.5rem 0.75rem;
+}
+
+.tapestry-detail-body hr {
+    border: none;
+    border-top: 1px solid rgba(255, 136, 0, 0.1);
+    margin: 0.5rem 0;
+}
+
+.tapestry-view-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+    padding: 0.35rem 0.6rem;
+    background: rgba(255, 136, 0, 0.15);
+    border: 1px solid rgba(255, 136, 0, 0.4);
+    border-radius: 4px;
+    color: #ff8800;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.tapestry-view-btn:hover {
+    background: rgba(255, 136, 0, 0.3);
+}
+
+.tapestry-view-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* Light mode overrides for new tapestry elements */
+[data-theme="light"] .tapestry-detail-panel {
+    background: rgba(245, 245, 245, 0.97);
+    color: #444;
+    border: 1px solid rgba(217, 104, 0, 0.3);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] .tapestry-detail-title {
+    color: #d96800;
+}
+
+[data-theme="light"] .tapestry-detail-close:hover {
+    color: #333;
+}
+
+[data-theme="light"] .tapestry-view-btn {
+    color: #d96800;
+    background: rgba(217, 104, 0, 0.1);
+    border-color: rgba(217, 104, 0, 0.3);
+}
+
+[data-theme="light"] .tapestry-view-btn:hover {
+    background: rgba(217, 104, 0, 0.2);
+}
+
 @media (max-width: 640px) {
     .tapestry-header {
         padding: 0.5rem 0.75rem;
@@ -5503,8 +5709,16 @@ main {
     .tapestry-subtitle {
         display: none;
     }
+    .tapestry-cluster-filters {
+        display: none;
+    }
     .tapestry-label {
         font-size: 8px;
+    }
+    .tapestry-detail-panel {
+        left: 8px;
+        right: 8px;
+        max-width: none;
     }
 }
 
