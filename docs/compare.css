@@ -4735,6 +4735,7 @@ main {
     color: var(--accent-color);
     font-style: italic;
     font-weight: 600;
+    font-family: var(--ui-font);
 }
 
 .rare-passage {
@@ -4975,7 +4976,7 @@ main {
 
 .gonzo-header h2 {
     margin: 0;
-    color: var(--accent-color);
+    color: #e8e8e8;;
     font-size: 1.1rem;
     font-weight: bold;
 }
@@ -5314,7 +5315,7 @@ main {
 .tapestry-header h2 {
     margin: 0;
     font-size: 1.1rem;
-    color: #e8e8e8;
+    color: #e8e8e8;;
     white-space: nowrap;
 }
 
@@ -5405,14 +5406,6 @@ main {
     stroke-opacity: 0.9;
 }
 
-/* CSS-driven brush state */
-.tapestry-threads.t-brush .tapestry-thread {
-    stroke-opacity: 0.05;
-}
-.tapestry-threads.t-brush .tapestry-thread.t-brushed {
-    stroke-opacity: 0.7;
-}
-
 /* Hover while locked: both hovered and locked visible */
 .tapestry-threads.t-hover.t-lock .tapestry-thread {
     stroke-opacity: 0.05;
@@ -5455,6 +5448,8 @@ main {
     font-size: 0.8rem;
     line-height: 1.6;
     max-width: 340px;
+    max-height: calc(100% - 24px);
+    overflow-y: auto;
     z-index: 5;
     font-family: system-ui, -apple-system, sans-serif;
 }
@@ -5570,42 +5565,66 @@ main {
     opacity: 1;
 }
 
-/* Chapter brush highlight */
-.tapestry-brush-highlight {
+/* Detail panel wrapper (bottom bar with up to 3 panels) */
+.tapestry-detail-wrapper {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    z-index: 10;
     pointer-events: none;
 }
 
-/* Chapter click zones */
-.tapestry-chapter-zone {
-    fill: transparent;
-    cursor: crosshair;
+.tapestry-detail-wrapper > * {
+    pointer-events: auto;
 }
 
-.tapestry-chapter-zone:hover {
-    fill: rgba(255, 136, 0, 0.04);
-}
-
-/* Detail panel */
+/* Individual detail panel */
 .tapestry-detail-panel {
-    position: absolute;
-    bottom: 16px;
-    left: 16px;
     background: rgba(10, 18, 32, 0.95);
-    border: 1px solid rgba(255, 136, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-left: 3px solid #ff8800;
     border-radius: 6px;
     padding: 0;
     color: #ccc;
-    font-size: 0.8rem;
-    line-height: 1.6;
-    max-width: 320px;
-    min-width: 240px;
-    z-index: 10;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    min-width: 200px;
+    max-width: 280px;
+    flex: 1;
     font-family: system-ui, -apple-system, sans-serif;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
-.tapestry-detail-panel.hidden {
-    display: none;
+/* Clear all button */
+.tapestry-clear-all-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.3rem 0.6rem;
+    background: rgba(10, 18, 32, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    color: #aaa;
+    font-size: 0.72rem;
+    cursor: pointer;
+    font-family: system-ui, -apple-system, sans-serif;
+    white-space: nowrap;
+    align-self: flex-end;
+    transition: background 0.15s, color 0.15s;
+}
+
+.tapestry-clear-all-btn:hover {
+    background: rgba(30, 40, 60, 0.95);
+    color: #e8e8e8;
+}
+
+.tapestry-clear-all-btn svg {
+    width: 12px;
+    height: 12px;
 }
 
 .tapestry-detail-header {
@@ -5652,11 +5671,21 @@ main {
     margin: 0.5rem 0;
 }
 
+.tapestry-detail-nearest {
+    font-size: 0.72rem;
+    color: #888;
+    margin-top: 0.3rem;
+}
+
+[data-theme="light"] .tapestry-detail-nearest {
+    color: #777;
+}
+
 .tapestry-view-btn {
     display: flex;
     align-items: center;
     gap: 0.4rem;
-    margin-top: 0.5rem;
+    margin-top: 0.3rem;
     padding: 0.35rem 0.6rem;
     background: rgba(255, 136, 0, 0.15);
     border: 1px solid rgba(255, 136, 0, 0.4);
@@ -5776,16 +5805,12 @@ main {
     background: rgba(217, 104, 0, 0.2);
 }
 
-/* Light mode overrides for new tapestry elements */
+/* Light mode overrides for tapestry detail panels */
 [data-theme="light"] .tapestry-detail-panel {
     background: rgba(245, 245, 245, 0.97);
     color: #444;
-    border: 1px solid rgba(217, 104, 0, 0.3);
+    border-color: rgba(0, 0, 0, 0.1);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-}
-
-[data-theme="light"] .tapestry-detail-title {
-    color: #d96800;
 }
 
 [data-theme="light"] .tapestry-detail-close:hover {
@@ -5802,6 +5827,17 @@ main {
     background: rgba(217, 104, 0, 0.2);
 }
 
+[data-theme="light"] .tapestry-clear-all-btn {
+    background: rgba(245, 245, 245, 0.95);
+    border-color: rgba(0, 0, 0, 0.12);
+    color: #666;
+}
+
+[data-theme="light"] .tapestry-clear-all-btn:hover {
+    background: rgba(230, 230, 230, 0.98);
+    color: #333;
+}
+
 @media (max-width: 640px) {
     .tapestry-header {
         padding: 0.5rem 0.75rem;
@@ -5816,10 +5852,16 @@ main {
     .tapestry-label {
         font-size: 8px;
     }
+    .tapestry-detail-wrapper {
+        left: 6px;
+        right: 6px;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
     .tapestry-detail-panel {
-        left: 8px;
-        right: 8px;
+        min-width: 160px;
         max-width: none;
+        font-size: 0.72rem;
     }
 }
 

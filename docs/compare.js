@@ -8184,7 +8184,7 @@ function annotateRarityScores() {
     const paragraphs = container.querySelectorAll('p[data-paragraph-index]');
 
     const total = rarityData.meta.total_variants;
-    const threshold = total * 0.01; // <1% = rare
+    const threshold = total * 0.05; // <5% = rare
 
     paragraphs.forEach(p => {
         const rawText = p.innerHTML;
@@ -9781,8 +9781,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Tapestry interaction state
     let tapestryClusterFilter = [true, true, true];
-    let tapestryLockedBundle = null;
-    let tapestryBrushState = null;
+    let tapestrySelectedBundles = []; // Array of up to 3 selected bundle indices
     let tapestryResizeTimer = null;
 
     // Closure variables set by renderTapestryDiagram, used by update functions
@@ -9880,14 +9879,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function resetTapestryState() {
         tapestryClusterFilter = [true, true, true];
-        tapestryLockedBundle = null;
-        tapestryBrushState = null;
-        hideTapestryDetailPanel();
+        tapestrySelectedBundles = [];
+        hideTapestryDetailPanels();
         updateClusterFilterButtons();
         // Clear CSS state classes
         const groupEl = document.querySelector('#tapestry-svg-container .tapestry-threads');
         if (groupEl) {
-            groupEl.classList.remove('t-hover', 't-lock', 't-brush');
+            groupEl.classList.remove('t-hover', 't-lock');
         }
         // Reset cached tooltip DOM refs (modal may be recreated)
         tapestryTooltipEl = null;
@@ -9903,17 +9901,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleTapestryKeydown(e) {
         if (e.key === 'Escape') {
-            // Progressive de-escalation: welcome → lock → brush → close
+            // Progressive de-escalation: welcome → selections → close
             const welcome = document.getElementById('tapestry-welcome');
             if (welcome && !welcome.classList.contains('hidden')) {
                 dismissTapestryWelcome();
-            } else if (tapestryLockedBundle !== null) {
-                tapestryLockedBundle = null;
-                hideTapestryDetailPanel();
-                updateTapestryThreadAppearance();
-            } else if (tapestryBrushState) {
-                tapestryBrushState = null;
-                clearChapterHighlight();
+            } else if (tapestrySelectedBundles.length > 0) {
+                tapestrySelectedBundles = [];
+                hideTapestryDetailPanels();
                 updateTapestryThreadAppearance();
             } else {
                 closeTapestryModal();
@@ -9924,17 +9918,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Core appearance update — uses CSS classes for O(1) dimming instead of per-element attr updates.
-    // CSS rules in compare.css handle opacity based on group-level state classes (.t-hover, .t-lock, .t-brush)
-    // and per-element classes (.t-active, .t-locked, .t-brushed, .t-hidden).
+    // CSS rules in compare.css handle opacity based on group-level state classes (.t-hover, .t-lock)
+    // and per-element classes (.t-active, .t-locked, .t-hidden).
     function updateTapestryThreadAppearance() {
         const groupEl = document.querySelector('#tapestry-svg-container .tapestry-threads');
         if (!groupEl || !tapestryScale) return;
 
-        const s = tapestryScale;
-
         // Set group-level state classes (CSS handles the dimming)
-        groupEl.classList.toggle('t-lock', tapestryLockedBundle !== null);
-        groupEl.classList.toggle('t-brush', tapestryBrushState !== null);
+        groupEl.classList.toggle('t-lock', tapestrySelectedBundles.length > 0);
 
         // Set per-element classes — only iterates when state changes, not on every hover
         const threads = groupEl.querySelectorAll('.tapestry-thread');
@@ -9946,24 +9937,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const hidden = !tapestryClusterFilter[d.cluster];
             el.classList.toggle('t-hidden', hidden);
 
-            // Locked thread
-            el.classList.toggle('t-locked', tapestryLockedBundle === idx);
+            // Selected threads (up to 3)
+            const isSelected = tapestrySelectedBundles.includes(idx);
+            el.classList.toggle('t-locked', isSelected);
 
-            // Brushed threads
-            if (tapestryBrushState && !hidden) {
-                const ci = tapestryBrushState.chapterIndex;
-                const val = s.normalizedY(d.path[ci], ci);
-                const [yMin, yMax] = tapestryBrushState.yRange;
-                el.classList.toggle('t-brushed', val >= yMin && val <= yMax);
-            } else {
-                el.classList.remove('t-brushed');
-            }
-
-            // Stroke-width only needs explicit update for locked/brushed elements
-            if (tapestryLockedBundle === idx) {
+            // Stroke-width: selected threads are thicker
+            if (isSelected) {
                 el.setAttribute('stroke-width', Math.max(2, Math.sqrt(d.count) * 1.2));
-            } else if (el.classList.contains('t-brushed')) {
-                el.setAttribute('stroke-width', Math.max(1, Math.sqrt(d.count) * 0.8));
             } else {
                 el.setAttribute('stroke-width', Math.max(0.5, Math.sqrt(d.count) * 0.6));
             }
@@ -9974,13 +9954,16 @@ document.addEventListener('DOMContentLoaded', () => {
     function toggleTapestryCluster(clusterIndex) {
         tapestryClusterFilter[clusterIndex] = !tapestryClusterFilter[clusterIndex];
         updateClusterFilterButtons();
-        // If locked bundle belongs to hidden cluster, unlock
-        if (tapestryLockedBundle !== null) {
-            const lockedBundle = tapestryData.bundles[tapestryLockedBundle];
-            if (lockedBundle && !tapestryClusterFilter[lockedBundle.cluster]) {
-                tapestryLockedBundle = null;
-                hideTapestryDetailPanel();
-            }
+        // Remove any selected bundles that belong to a hidden cluster
+        let changed = false;
+        tapestrySelectedBundles = tapestrySelectedBundles.filter(idx => {
+            const b = tapestryData.bundles[idx];
+            if (b && !tapestryClusterFilter[b.cluster]) { changed = true; return false; }
+            return true;
+        });
+        if (changed) {
+            hideTapestryDetailPanels();
+            showTapestryDetailPanels();
         }
         updateTapestryThreadAppearance();
     }
@@ -9994,143 +9977,108 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Chapter brushing
-    function handleTapestryChapterClick(chapterIndex, clickY) {
-        if (!tapestryScale) return;
-        const s = tapestryScale;
-        const plotTop = s.margin.top;
-        const plotBottom = s.height - s.margin.bottom;
-
-        // If clicking same chapter, toggle off
-        if (tapestryBrushState && tapestryBrushState.chapterIndex === chapterIndex) {
-            tapestryBrushState = null;
-            clearChapterHighlight();
-            updateTapestryThreadAppearance();
-            return;
-        }
-
-        // Determine which of 5 bands was clicked
-        const bandHeight = (plotBottom - plotTop) / 5;
-        const bandIndex = Math.min(4, Math.max(0, Math.floor((clickY - plotTop) / bandHeight)));
-        // bandIndex 0 = top (high distance), 4 = bottom (low distance)
-        // yScale is inverted, so band 0 maps to normalized [0.8, 1.0] and band 4 to [0.0, 0.2]
-        const yMax = 1 - (bandIndex / 5);
-        const yMin = 1 - ((bandIndex + 1) / 5);
-
-        tapestryBrushState = { chapterIndex, yRange: [yMin, yMax] };
-
-        // Clear any locked bundle
-        tapestryLockedBundle = null;
-        hideTapestryDetailPanel();
-
-        highlightChapterBand(chapterIndex, yMin, yMax);
-        updateTapestryThreadAppearance();
-    }
-
-    function highlightChapterBand(chapterIndex, yMin, yMax) {
-        clearChapterHighlight();
-        if (!tapestryScale) return;
-        const s = tapestryScale;
-        const svg = d3.select('#tapestry-svg-container svg');
-        if (svg.empty()) return;
-
-        const pixelTop = s.yScale(yMax);
-        const pixelBottom = s.yScale(yMin);
-        const xPos = s.xScale(s.chapters[chapterIndex]);
-        const step = s.xScale.step ? s.xScale.step() : 30;
-
-        svg.append('rect')
-            .attr('class', 'tapestry-brush-highlight')
-            .attr('x', xPos - step / 2)
-            .attr('y', pixelTop)
-            .attr('width', step)
-            .attr('height', pixelBottom - pixelTop)
-            .attr('fill', 'rgba(255, 136, 0, 0.15)')
-            .attr('stroke', 'rgba(255, 136, 0, 0.5)')
-            .attr('stroke-width', 1)
-            .attr('pointer-events', 'none');
-    }
-
-    function clearChapterHighlight() {
-        d3.selectAll('#tapestry-svg-container .tapestry-brush-highlight').remove();
-    }
-
-    // Click-to-inspect: detail panel
-    function showTapestryDetailPanel(bundleIndex) {
-        const bundle = tapestryData.bundles[bundleIndex];
-        if (!bundle) return;
-        const total = tapestryData.meta.total_variants;
-        const minPct = Math.round(Math.min(...bundle.path) * 100);
-        const maxPct = Math.round(Math.max(...bundle.path) * 100);
-        const avgPct = Math.round((bundle.path.reduce((s, v) => s + v, 0) / bundle.path.length) * 100);
-
-        // Find most-variable chapter for this bundle (highest percentile)
-        const maxChIdx = bundle.path.indexOf(Math.max(...bundle.path));
-        const maxChapter = tapestryData.meta.chapter_labels[tapestryData.meta.chapters[maxChIdx]];
-
-        // Find nearest built-in version
-        const nearest = findNearestBuiltInVersion(bundle.path);
-
+    // Multi-select detail panels (up to 3 bundles)
+    function showTapestryDetailPanels() {
         const container = document.getElementById('tapestry-svg-container');
-        if (!container) return;
+        if (!container || !tapestryData) return;
 
-        let panel = document.getElementById('tapestry-detail-panel');
-        if (!panel) {
-            panel = document.createElement('div');
-            panel.id = 'tapestry-detail-panel';
-            panel.className = 'tapestry-detail-panel';
-            container.appendChild(panel);
+        // Clear existing panels
+        container.querySelectorAll('.tapestry-detail-panel').forEach(p => p.remove());
+
+        if (tapestrySelectedBundles.length === 0) return;
+
+        // Create wrapper for all panels
+        let wrapper = container.querySelector('.tapestry-detail-wrapper');
+        if (!wrapper) {
+            wrapper = document.createElement('div');
+            wrapper.className = 'tapestry-detail-wrapper';
+            container.appendChild(wrapper);
         }
+        wrapper.innerHTML = '';
 
-        panel.innerHTML = `
-            <div class="tapestry-detail-header">
-                <span class="tapestry-detail-title">Bundle Details</span>
-                <button class="tapestry-detail-close" id="tapestry-detail-close-btn">
-                    <i data-lucide="x"></i>
-                </button>
-            </div>
-            <div class="tapestry-detail-body">
-                <div><strong>${bundle.count.toLocaleString()} copies</strong> (${((bundle.count / total) * 100).toFixed(1)}%)</div>
-                <div>Ch 1 intro: <span style="color:${TAPESTRY_COLORS[bundle.cluster]}">${TAPESTRY_CLUSTER_NAMES[bundle.cluster]}</span></div>
-                <div>Rarity: ${minPct}% \u2013 ${maxPct}% (avg ${avgPct}%)</div>
-                <div>Most unique chapter: ${maxChapter}</div>
-                ${nearest ? `
-                    <hr>
-                    <div style="font-size:0.75rem;color:#888;">Nearest built-in version: Seed ${nearest.id}</div>
-                    <button class="tapestry-view-btn" id="tapestry-view-browser-btn" data-version="${nearest.id}" data-chapter="${tapestryData.meta.chapters[maxChIdx]}">
-                        <i data-lucide="external-link"></i> View Seed ${nearest.id}
+        const total = tapestryData.meta.total_variants;
+
+        tapestrySelectedBundles.forEach((bundleIndex) => {
+            const bundle = tapestryData.bundles[bundleIndex];
+            if (!bundle) return;
+
+            const minPct = Math.round(Math.min(...bundle.path) * 100);
+            const maxPct = Math.round(Math.max(...bundle.path) * 100);
+            const avgPct = Math.round((bundle.path.reduce((s, v) => s + v, 0) / bundle.path.length) * 100);
+            const maxChIdx = bundle.path.indexOf(Math.max(...bundle.path));
+            const maxChapter = tapestryData.meta.chapter_labels[tapestryData.meta.chapters[maxChIdx]];
+            const nearest = findNearestBuiltInVersion(bundle.path);
+            const color = TAPESTRY_COLORS[bundle.cluster % TAPESTRY_COLORS.length];
+
+            const panel = document.createElement('div');
+            panel.className = 'tapestry-detail-panel';
+            panel.style.borderLeftColor = color;
+
+            panel.innerHTML = `
+                <div class="tapestry-detail-header">
+                    <span class="tapestry-detail-title" style="color:${color}">${TAPESTRY_CLUSTER_NAMES[bundle.cluster]} \u2014 ${bundle.count.toLocaleString()} copies</span>
+                    <button class="tapestry-detail-close" data-deselect="${bundleIndex}">
+                        <i data-lucide="x"></i>
                     </button>
-                ` : ''}
-            </div>
-        `;
-        panel.classList.remove('hidden');
+                </div>
+                <div class="tapestry-detail-body">
+                    <div>${((bundle.count / total) * 100).toFixed(1)}% of all copies</div>
+                    <div>Rarity: ${minPct}%\u2013${maxPct}% (avg ${avgPct}%)</div>
+                    <div>Most unique: ${maxChapter}</div>
+                    ${nearest ? `
+                        <div class="tapestry-detail-nearest">Most similar seed: ${nearest.id}</div>
+                        <button class="tapestry-view-btn" data-version="${nearest.id}" data-chapter="${tapestryData.meta.chapters[maxChIdx]}">
+                            <i data-lucide="external-link"></i> View Seed ${nearest.id}
+                        </button>
+                    ` : ''}
+                </div>
+            `;
 
-        // Wire up close button
-        const closeBtn = document.getElementById('tapestry-detail-close-btn');
-        if (closeBtn) {
-            closeBtn.addEventListener('click', () => {
-                tapestryLockedBundle = null;
-                hideTapestryDetailPanel();
+            wrapper.appendChild(panel);
+        });
+
+        // Clear all button (to the right of panels, only if 2+ selected)
+        if (tapestrySelectedBundles.length >= 2) {
+            const clearBtn = document.createElement('button');
+            clearBtn.className = 'tapestry-clear-all-btn';
+            clearBtn.innerHTML = '<i data-lucide="x"></i> Clear all';
+            clearBtn.addEventListener('click', () => {
+                tapestrySelectedBundles = [];
+                hideTapestryDetailPanels();
                 updateTapestryThreadAppearance();
             });
+            wrapper.appendChild(clearBtn);
         }
 
-        // Wire up view-in-browser button
-        const viewBtn = document.getElementById('tapestry-view-browser-btn');
-        if (viewBtn) {
-            viewBtn.addEventListener('click', () => {
-                tapestryOpenInBrowser(viewBtn.dataset.version, viewBtn.dataset.chapter);
+        // Wire up close buttons (deselect individual bundles)
+        wrapper.querySelectorAll('.tapestry-detail-close[data-deselect]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const idx = parseInt(btn.dataset.deselect, 10);
+                tapestrySelectedBundles = tapestrySelectedBundles.filter(i => i !== idx);
+                hideTapestryDetailPanels();
+                showTapestryDetailPanels();
+                updateTapestryThreadAppearance();
             });
-        }
+        });
+
+        // Wire up view-in-browser buttons
+        wrapper.querySelectorAll('.tapestry-view-btn[data-version]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                tapestryOpenInBrowser(btn.dataset.version, btn.dataset.chapter);
+            });
+        });
 
         if (typeof lucide !== 'undefined') {
-            lucide.createIcons({ nodes: [panel] });
+            lucide.createIcons({ nodes: [wrapper] });
         }
     }
 
-    function hideTapestryDetailPanel() {
-        const panel = document.getElementById('tapestry-detail-panel');
-        if (panel) panel.classList.add('hidden');
+    function hideTapestryDetailPanels() {
+        const container = document.getElementById('tapestry-svg-container');
+        if (!container) return;
+        const wrapper = container.querySelector('.tapestry-detail-wrapper');
+        if (wrapper) wrapper.innerHTML = '';
     }
 
     function findNearestBuiltInVersion(bundlePath) {
@@ -10191,15 +10139,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderTapestryDiagram(tapestryData);
                 updateTapestryThreadAppearance();
                 updateClusterFilterButtons();
-                if (tapestryBrushState) {
-                    highlightChapterBand(
-                        tapestryBrushState.chapterIndex,
-                        tapestryBrushState.yRange[0],
-                        tapestryBrushState.yRange[1]
-                    );
-                }
-                if (tapestryLockedBundle !== null) {
-                    showTapestryDetailPanel(tapestryLockedBundle);
+                if (tapestrySelectedBundles.length > 0) {
+                    showTapestryDetailPanels();
                 }
             }
         }, 250);
@@ -10269,25 +10210,6 @@ document.addEventListener('DOMContentLoaded', () => {
             .attr('height', height)
             .attr('viewBox', `0 0 ${width} ${height}`);
 
-        // Chapter click zones (invisible rects for brush interaction)
-        const step = xScale.step ? xScale.step() : (width - margin.left - margin.right) / (chapters.length - 1);
-        const zoneGroup = svg.append('g').attr('class', 'tapestry-zones');
-
-        zoneGroup.selectAll('rect')
-            .data(chapters)
-            .join('rect')
-            .attr('class', 'tapestry-chapter-zone')
-            .attr('x', ch => xScale(ch) - step / 2)
-            .attr('y', margin.top)
-            .attr('width', step)
-            .attr('height', height - margin.bottom - margin.top)
-            .on('click', function (event, ch) {
-                const ci = chapters.indexOf(ch);
-                const rect = this.getBoundingClientRect();
-                const clickY = event.clientY - rect.top + margin.top;
-                handleTapestryChapterClick(ci, clickY);
-            });
-
         // Pre-compute tooltip HTML for each bundle (avoids string ops + Math on every hover)
         bundles.forEach(d => {
             const minPct = Math.round(Math.min(...d.path) * 100);
@@ -10325,32 +10247,33 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .on('mousemove', function (event) { moveTapestryTooltip(event); })
             .on('mouseleave', function (_event, d) {
-                // O(1) class toggle: CSS restores lock/brush/default opacity
+                // O(1) class toggle: CSS restores lock/default opacity
                 const group = this.parentNode;
                 group.classList.remove('t-hover');
                 this.classList.remove('t-active');
                 // Restore width based on current state
-                const isLocked = this.__bundleIdx === tapestryLockedBundle;
-                const w = isLocked ? Math.max(2, Math.sqrt(d.count) * 1.2) : Math.max(0.5, Math.sqrt(d.count) * 0.6);
+                const isSelected = tapestrySelectedBundles.includes(this.__bundleIdx);
+                const w = isSelected ? Math.max(2, Math.sqrt(d.count) * 1.2) : Math.max(0.5, Math.sqrt(d.count) * 0.6);
                 this.setAttribute('stroke-width', w);
                 hideTapestryTooltip();
             })
             .on('click', function (event) {
                 event.stopPropagation();
                 const i = this.__bundleIdx;
-                // Toggle lock
-                if (tapestryLockedBundle === i) {
-                    tapestryLockedBundle = null;
-                    hideTapestryDetailPanel();
+                const alreadySelected = tapestrySelectedBundles.indexOf(i);
+                if (alreadySelected !== -1) {
+                    // Deselect this bundle
+                    tapestrySelectedBundles.splice(alreadySelected, 1);
+                } else if (tapestrySelectedBundles.length < 3) {
+                    // Select (up to 3)
+                    tapestrySelectedBundles.push(i);
                 } else {
-                    tapestryLockedBundle = i;
-                    // Clear brush when locking
-                    if (tapestryBrushState) {
-                        tapestryBrushState = null;
-                        clearChapterHighlight();
-                    }
-                    showTapestryDetailPanel(i);
+                    // At max: replace oldest selection
+                    tapestrySelectedBundles.shift();
+                    tapestrySelectedBundles.push(i);
                 }
+                hideTapestryDetailPanels();
+                showTapestryDetailPanels();
                 updateTapestryThreadAppearance();
             });
 
@@ -10423,8 +10346,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     This reveals whether copies that begin with the same opening continue to track together or scatter across different paths.
                 </div>
                 <div class="tapestry-legend-section" style="color:#888;font-size:0.75rem">
-                    <strong>Hover</strong> any thread for details. <strong>Click</strong> to lock and inspect.
-                    <strong>Click a chapter column</strong> to filter by rarity band.
+                    <strong>Hover</strong> any thread for details. <strong>Click</strong> up to 3 threads to compare.
                     Toggle intro groups with the colored buttons. Press <strong>Esc</strong> to clear, <strong>i</strong> for this legend.
                 </div>
             `;
