@@ -3308,7 +3308,8 @@ function initializeControlPanel() {
 
     function toggleSearchPanel() {
         if (!searchPanel || !searchBtn) return;
-        searchOpen = !searchOpen;
+        // Sync state with DOM (panel may have been opened externally, e.g. from Word Diff)
+        searchOpen = searchPanel.classList.contains('hidden');
         if (searchOpen) {
             searchPanel.classList.remove('hidden');
             searchBtn.classList.add('active');
@@ -3469,8 +3470,26 @@ function displayComparison() {
     // Re-apply search highlights if there was an active search
     if (hadActiveSearch && searchTerm) {
         setTimeout(() => {
-            highlightSearchMatches(searchTerm);
+            highlightSearchMatches(searchTerm, searchWholeWord);
+            updateSearchUI();
         }, 0);
+    }
+
+    // Handle pending Word Diff search — runs synchronously with DOM guaranteed ready
+    if (pendingWordDiffSearch) {
+        const pending = pendingWordDiffSearch;
+        pendingWordDiffSearch = null;
+        currentSearchTerm = pending.word;
+        searchMatchChapters = findChaptersWithMatches(pending.word, searchWholeWord);
+        highlightSearchMatches(pending.word, searchWholeWord);
+        if (pending.scrollToFirst) {
+            const highlights = document.querySelectorAll('.search-highlight');
+            if (highlights.length > 0) {
+                currentHighlightIndex = 0;
+                scrollToCurrentHighlight();
+            }
+        }
+        updateSearchUI();
     }
 
     if (pendingBookmarkScroll !== null) {
@@ -4612,12 +4631,17 @@ let currentSearchTerm = '';
 let searchMatchChapters = [];  // ordered chapter IDs that contain matches
 let currentHighlightIndex = -1;  // index into DOM .search-highlight elements in current chapter
 let searchScope = 'chapter';  // 'chapter' or 'global'
+let searchWholeWord = false;  // true when searching from Word Diff (whole-word matching)
+let pendingWordDiffSearch = null;  // { word, scrollToFirst } — set by jumpToChapterWithWord, consumed by displayComparison
 
-function highlightSearchMatches(searchTerm) {
+function highlightSearchMatches(searchTerm, wholeWord = false) {
     if (!searchTerm) return;
 
     currentSearchTerm = searchTerm.toLowerCase();
     const container = document.getElementById('comparison-display');
+    const escapedTerm = escapeRegex(searchTerm);
+    const pattern = wholeWord ? `\\b(${escapedTerm})\\b` : `(${escapedTerm})`;
+    const testRegex = new RegExp(wholeWord ? `\\b${escapedTerm}\\b` : escapedTerm, 'gi');
 
     // Get all text nodes
     const walker = document.createTreeWalker(
@@ -4637,22 +4661,23 @@ function highlightSearchMatches(searchTerm) {
             continue;
         }
 
-        const text = node.textContent.toLowerCase();
-        if (text.includes(currentSearchTerm)) {
+        const text = node.textContent;
+        if (testRegex.test(text)) {
             nodesToHighlight.push(node);
         }
+        testRegex.lastIndex = 0;
     }
 
     // Highlight each matching node
+    const splitRegex = new RegExp(pattern, 'gi');
     nodesToHighlight.forEach(node => {
         const text = node.textContent;
-        const regex = new RegExp(`(${escapeRegex(searchTerm)})`, 'gi');
-        const parts = text.split(regex);
+        const parts = text.split(splitRegex);
 
         if (parts.length > 1) {
             const fragment = document.createDocumentFragment();
             parts.forEach(part => {
-                if (part.toLowerCase() === searchTerm.toLowerCase()) {
+                if (part && part.toLowerCase() === searchTerm.toLowerCase()) {
                     const highlight = document.createElement('span');
                     highlight.className = 'search-highlight';
                     highlight.textContent = part;
@@ -4694,9 +4719,15 @@ function escapeRegex(string) {
 // Used for cross-chapter F3 navigation. The actual match count comes
 // from DOM highlights after rendering, so this just needs to know
 // which chapters to visit.
-function findChaptersWithMatches(searchTerm) {
+function findChaptersWithMatches(searchTerm, wholeWord = false) {
     const chapters = [];
     const searchLower = searchTerm.toLowerCase();
+    const wordRegex = wholeWord ? new RegExp(`\\b${escapeRegex(searchLower)}\\b`, 'i') : null;
+
+    function textMatches(text) {
+        const clean = text.replace(/<[^>]*>/g, ' ').toLowerCase();
+        return wholeWord ? wordRegex.test(clean) : clean.includes(searchLower);
+    }
 
     // Use the selected version to determine chapter list
     const refVersion = allVersions[versionA] || allVersions[versionIds[0]];
@@ -4710,7 +4741,7 @@ function findChaptersWithMatches(searchTerm) {
         // Check version A paragraphs
         const paragraphsA = getChapterParagraphs(versionA, chapterId) || [];
         for (const para of paragraphsA) {
-            if (para.replace(/<[^>]*>/g, ' ').toLowerCase().includes(searchLower)) {
+            if (textMatches(para)) {
                 hasMatch = true;
                 break;
             }
@@ -4720,7 +4751,7 @@ function findChaptersWithMatches(searchTerm) {
         if (!hasMatch && currentMode !== 'unified') {
             const paragraphsB = getChapterParagraphs(versionB, chapterId) || [];
             for (const para of paragraphsB) {
-                if (para.replace(/<[^>]*>/g, ' ').toLowerCase().includes(searchLower)) {
+                if (textMatches(para)) {
                     hasMatch = true;
                     break;
                 }
@@ -4743,9 +4774,11 @@ function performSearch() {
 
     currentSearchTerm = searchTerm;
 
+    const ww = searchWholeWord;
+
     if (searchScope === 'global') {
         // Global: find all chapters with matches, jump to first if needed
-        searchMatchChapters = findChaptersWithMatches(searchTerm);
+        searchMatchChapters = findChaptersWithMatches(searchTerm, ww);
 
         if (searchMatchChapters.length === 0) {
             currentHighlightIndex = -1;
@@ -4762,7 +4795,7 @@ function performSearch() {
 
         setTimeout(() => {
             clearSearchHighlights(false);
-            highlightSearchMatches(currentSearchTerm);
+            highlightSearchMatches(currentSearchTerm, ww);
             // Don't auto-scroll; wait for user to click next
             currentHighlightIndex = -1;
             updateSearchUI();
@@ -4772,7 +4805,7 @@ function performSearch() {
         searchMatchChapters = [currentChapter];
 
         clearSearchHighlights(false);
-        highlightSearchMatches(currentSearchTerm);
+        highlightSearchMatches(currentSearchTerm, ww);
         // Don't auto-scroll; wait for user to click next
         currentHighlightIndex = -1;
         updateSearchUI();
@@ -4805,7 +4838,7 @@ function goToPreviousOccurrence() {
 
             setTimeout(() => {
                 clearSearchHighlights(false);
-                highlightSearchMatches(currentSearchTerm);
+                highlightSearchMatches(currentSearchTerm, searchWholeWord);
                 // Go to last highlight in previous chapter
                 const highlights = document.querySelectorAll('.search-highlight');
                 currentHighlightIndex = highlights.length - 1;
@@ -4835,7 +4868,7 @@ function goToNextOccurrence() {
 
             setTimeout(() => {
                 clearSearchHighlights(false);
-                highlightSearchMatches(currentSearchTerm);
+                highlightSearchMatches(currentSearchTerm, searchWholeWord);
                 currentHighlightIndex = 0;
                 scrollToCurrentHighlight();
                 updateSearchUI();
@@ -4930,13 +4963,18 @@ let currentSortMode = 'alpha'; // 'alpha' or 'freq'
 let currentWordData = { uniqueToA: [], uniqueToB: [], uniqueToC: [], freqA: new Map(), freqB: new Map(), freqC: new Map() };
 
 function extractWords(text) {
-    // Remove HTML tags, lowercase, extract words (alphanumeric + apostrophes)
-    const cleanText = text.replace(/<[^>]*>/g, ' ').toLowerCase();
+    // Strip inline formatting tags without spaces (they can appear mid-word,
+    // e.g. w<em>alls</em> → walls), then replace any remaining tags with spaces
+    const cleanText = text
+        .replace(/<\/?(em|i|b|strong|span)(\s[^>]*)?>/gi, '')
+        .replace(/<[^>]*>/g, ' ')
+        .toLowerCase();
     const words = cleanText.match(/[a-z]+(?:'[a-z]+)?/g) || [];
 
-    // Count word frequencies
+    // Count word frequencies (skip single-letter words — usually initials)
     const frequencies = new Map();
     words.forEach(word => {
+        if (word.length < 2) return;
         frequencies.set(word, (frequencies.get(word) || 0) + 1);
     });
 
@@ -4945,7 +4983,7 @@ function extractWords(text) {
 
 function getAllTextForSeed(seedId) {
     if (isSourceVersion(seedId)) {
-        const chapters = getChaptersForVersion(seedId).filter(ch => ch !== 'notes');
+        const chapters = getChaptersForVersion(seedId).filter(ch => ch !== 'notes' && ch !== 'variables');
         let text = '';
         chapters.forEach(chapterId => {
             const paragraphs = getChapterParagraphs(seedId, chapterId);
@@ -4960,9 +4998,9 @@ function getAllTextForSeed(seedId) {
     if (!seedData) return '';
 
     let allText = '';
-    // Exclude 'notes' chapter and version_id field
+    // Exclude non-text fields (notes, variables, version_id)
     for (const [chapterId, paragraphs] of Object.entries(seedData)) {
-        if (chapterId === 'version_id' || chapterId === 'notes') continue;
+        if (chapterId === 'version_id' || chapterId === 'notes' || chapterId === 'variables') continue;
         if (Array.isArray(paragraphs)) {
             allText += ' ' + paragraphs.join(' ');
         }
@@ -5108,15 +5146,15 @@ function displayWordLists() {
         sortedB = [...currentWordData.uniqueToB].sort();
         sortedC = [...currentWordData.uniqueToC].sort();
     } else {
-        // Sort by frequency (descending)
+        // Sort by frequency (descending), then alphabetically as tiebreaker
         sortedA = [...currentWordData.uniqueToA].sort((a, b) =>
-            currentWordData.freqA.get(b) - currentWordData.freqA.get(a)
+            (currentWordData.freqA.get(b) || 0) - (currentWordData.freqA.get(a) || 0) || a.localeCompare(b)
         );
         sortedB = [...currentWordData.uniqueToB].sort((a, b) =>
-            currentWordData.freqB.get(b) - currentWordData.freqB.get(a)
+            (currentWordData.freqB.get(b) || 0) - (currentWordData.freqB.get(a) || 0) || a.localeCompare(b)
         );
         sortedC = [...currentWordData.uniqueToC].sort((a, b) =>
-            currentWordData.freqC.get(b) - currentWordData.freqC.get(a)
+            (currentWordData.freqC.get(b) || 0) - (currentWordData.freqC.get(a) || 0) || a.localeCompare(b)
         );
     }
 
@@ -5128,8 +5166,8 @@ function displayWordLists() {
     // Display unique words with frequencies if in frequency mode
     uniqueWordsA.innerHTML = '';
     sortedA.forEach(word => {
-        const freq = currentWordData.freqA.get(word);
-        const freqText = (currentSortMode === 'freq' && freq > 1) ? ` (${freq})` : '';
+        const freq = currentWordData.freqA.get(word) || 0;
+        const freqText = currentSortMode === 'freq' ? ` (${freq})` : '';
         const span = document.createElement('span');
         span.className = 'word-item';
         span.textContent = word + freqText;
@@ -5141,8 +5179,8 @@ function displayWordLists() {
 
     uniqueWordsB.innerHTML = '';
     sortedB.forEach(word => {
-        const freq = currentWordData.freqB.get(word);
-        const freqText = (currentSortMode === 'freq' && freq > 1) ? ` (${freq})` : '';
+        const freq = currentWordData.freqB.get(word) || 0;
+        const freqText = currentSortMode === 'freq' ? ` (${freq})` : '';
         const span = document.createElement('span');
         span.className = 'word-item';
         span.textContent = word + freqText;
@@ -5156,8 +5194,8 @@ function displayWordLists() {
     if (uniqueWordsC && versionC) {
         uniqueWordsC.innerHTML = '';
         sortedC.forEach(word => {
-            const freq = currentWordData.freqC.get(word);
-            const freqText = (currentSortMode === 'freq' && freq > 1) ? ` (${freq})` : '';
+            const freq = currentWordData.freqC.get(word) || 0;
+            const freqText = currentSortMode === 'freq' ? ` (${freq})` : '';
             const span = document.createElement('span');
             span.className = 'word-item';
             span.textContent = word + freqText;
@@ -5250,27 +5288,37 @@ function jumpToChapterWithWord(chapterId, word) {
     closeWordPopup();
     closeModal();
 
-    // Update current chapter
+    // Clear current search state so displayComparison doesn't re-highlight old search
+    currentSearchTerm = '';
+
+    // Set up search configuration
+    searchWholeWord = true;
+    searchScope = 'global';
+
+    // Open search panel with navigation
+    const searchPanel = document.getElementById('search-panel');
+    const searchInput = document.getElementById('search-input');
+    const searchBtn = document.getElementById('search-toggle-btn');
+    const searchNav = document.getElementById('search-navigation');
+    if (searchPanel) searchPanel.classList.remove('hidden');
+    if (searchBtn) searchBtn.classList.add('active');
+    if (searchNav) searchNav.classList.remove('hidden');
+    if (searchInput) searchInput.value = word;
+
+    // Update search panel height CSS variable (inline since updateSearchPanelHeight is scoped to initializeControlPanel)
+    if (searchPanel && !searchPanel.classList.contains('hidden')) {
+        const height = searchPanel.offsetHeight;
+        document.documentElement.style.setProperty('--search-panel-height', `${height}px`);
+    }
+
+    // Queue the search to execute synchronously at the end of displayComparison()
+    // This eliminates all timing/setTimeout issues — the search runs after DOM is built
+    pendingWordDiffSearch = { word: word, scrollToFirst: true };
+
+    // Switch chapter and render — the pending search executes inside displayComparison
     currentChapter = chapterId;
-
-    // Update chapter dropdown
     updateChapterSelect();
-
-    // Display the chapter
     displayComparison();
-
-    // Wait a moment for rendering, then highlight the word
-    setTimeout(() => {
-        // Start a new search for this word
-        currentSearchTerm = word;
-        searchMatchChapters = findChaptersWithMatches(word);
-
-        clearSearchHighlights(false);
-        highlightSearchMatches(word);
-        currentHighlightIndex = 0;
-        scrollToCurrentHighlight();
-        updateSearchUI();
-    }, 100);
 }
 
 function closeWordPopup() {
@@ -9080,14 +9128,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('search-input');
 
     searchChapterBtn.addEventListener('click', () => {
+        searchWholeWord = false;
         searchScope = 'chapter';
         performSearch();
     });
     searchAllBtn.addEventListener('click', () => {
+        searchWholeWord = false;
         searchScope = 'global';
         performSearch();
     });
     clearSearchBtn.addEventListener('click', () => {
+        searchWholeWord = false;
         clearSearchHighlights();
         searchInput.value = '';
     });
@@ -9096,6 +9147,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Enter') {
             performSearch();
         }
+    });
+
+    // Reset whole-word mode when user types (they're doing a manual search now)
+    searchInput.addEventListener('input', () => {
+        searchWholeWord = false;
     });
 
     // Search navigation event listeners
