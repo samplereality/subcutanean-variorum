@@ -9809,18 +9809,50 @@ document.addEventListener('DOMContentLoaded', () => {
         closeAllNavDropdowns();
         resetTapestryState();
 
+        // Start with only Club cluster visible (less overwhelming)
+        tapestryClusterFilter = [true, false, false];
+        updateClusterFilterButtons();
+
         const modal = document.getElementById('tapestry-modal');
         if (!modal) return;
 
         modal.classList.remove('hidden');
         renderTapestryDiagram(tapestryData);
+        updateTapestryThreadAppearance();
         updateTapestryThemeIcon();
 
         if (typeof lucide !== 'undefined') {
             lucide.createIcons({ nodes: [modal] });
         }
 
+        // Show welcome overlay on first visit
+        const hasSeenTapestry = localStorage.getItem('subcutanean_tapestry_seen');
+        if (!hasSeenTapestry) {
+            showTapestryWelcome();
+        }
+
         document.addEventListener('keydown', handleTapestryKeydown);
+    }
+
+    function showTapestryWelcome() {
+        const welcome = document.getElementById('tapestry-welcome');
+        if (!welcome) return;
+        welcome.classList.remove('hidden');
+
+        const dismissBtn = document.getElementById('tapestry-welcome-dismiss');
+        if (dismissBtn) {
+            dismissBtn.addEventListener('click', dismissTapestryWelcome, { once: true });
+        }
+        // Also dismiss on click outside the content box
+        welcome.addEventListener('click', function (e) {
+            if (e.target === welcome) dismissTapestryWelcome();
+        }, { once: true });
+    }
+
+    function dismissTapestryWelcome() {
+        const welcome = document.getElementById('tapestry-welcome');
+        if (welcome) welcome.classList.add('hidden');
+        localStorage.setItem('subcutanean_tapestry_seen', '1');
     }
 
     function closeTapestryModal() {
@@ -9828,6 +9860,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (modal) {
             modal.classList.add('hidden');
         }
+        // Hide welcome overlay if still showing
+        const welcome = document.getElementById('tapestry-welcome');
+        if (welcome) welcome.classList.add('hidden');
         document.removeEventListener('keydown', handleTapestryKeydown);
         resetTapestryState();
     }
@@ -9868,8 +9903,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleTapestryKeydown(e) {
         if (e.key === 'Escape') {
-            // Progressive de-escalation: lock → brush → close
-            if (tapestryLockedBundle !== null) {
+            // Progressive de-escalation: welcome → lock → brush → close
+            const welcome = document.getElementById('tapestry-welcome');
+            if (welcome && !welcome.classList.contains('hidden')) {
+                dismissTapestryWelcome();
+            } else if (tapestryLockedBundle !== null) {
                 tapestryLockedBundle = null;
                 hideTapestryDetailPanel();
                 updateTapestryThreadAppearance();
