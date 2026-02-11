@@ -8,6 +8,7 @@ let versionA = null;
 let versionB = null;
 let versionC = null; // Optional third version for three-way comparison
 let unifiedViewVersion = 'A'; // Which version to display in unified view (A, B, or C)
+let mobileSideBySideTab = 'A'; // Which version panel to show on mobile side-by-side
 let customVersions = {}; // Store uploaded versions
 let mostRecentUploadId = null; // Track most recently uploaded version for Jaccard analysis
 let bookmarks = [];
@@ -330,10 +331,13 @@ function initializeNavigation() {
         }
     });
 
-    // Close mobile nav on window resize
+    // Close mobile nav on window resize + update mobile side-by-side tabs
     window.addEventListener('resize', () => {
         if (window.innerWidth > 640 && mobileNavOpen) {
             closeMobileNav();
+        }
+        if (currentMode === 'sidebyside') {
+            applyMobileSideBySideTabs();
         }
     });
 }
@@ -3436,6 +3440,7 @@ function displayComparison() {
         clearSourceMappingCache();
         clearChapterLocalVarCache();
         closeAllNotePanels();
+        mobileSideBySideTab = 'A';
         lastDisplayedChapter = currentChapter;
     }
 
@@ -3462,6 +3467,11 @@ function displayComparison() {
         displayDiff(display, chapterDataA, chapterDataB, chapterDataC);
     } else if (currentMode === 'comparison') {
         displayParagraphComparison(display, chapterDataA, chapterDataB, chapterDataC);
+    }
+
+    // Reset mobile tabs height when not in side-by-side mode
+    if (currentMode !== 'sidebyside') {
+        document.documentElement.style.setProperty('--mobile-tabs-height', '0px');
     }
 
     // Add source code toggle icons if Source Code Mode is enabled
@@ -3600,9 +3610,36 @@ function displaySideBySide(container, dataA, dataB, dataC = null) {
     container.innerHTML = '';
     container.className = dataC ? 'side-by-side three-column' : 'side-by-side';
 
+    // Mobile version tabs (hidden on desktop via CSS, shown at ≤968px)
+    const tabBar = document.createElement('div');
+    tabBar.className = 'mobile-version-tabs';
+
+    const tabVersions = [
+        { key: 'A', version: versionA },
+        { key: 'B', version: versionB },
+    ];
+    if (dataC) {
+        tabVersions.push({ key: 'C', version: versionC });
+    }
+
+    tabVersions.forEach(({ key, version }) => {
+        const tab = document.createElement('button');
+        tab.className = `mobile-version-tab ${mobileSideBySideTab === key ? 'active' : ''}`;
+        tab.textContent = formatVersionLabel(version);
+        tab.dataset.panelKey = key;
+        tab.addEventListener('click', () => {
+            mobileSideBySideTab = key;
+            applyMobileSideBySideTabs();
+        });
+        tabBar.appendChild(tab);
+    });
+
+    container.appendChild(tabBar);
+
     // Version A panel
     const panelA = document.createElement('div');
     panelA.className = 'version-panel';
+    panelA.dataset.panelKey = 'A';
 
     const headingA = document.createElement('h2');
     headingA.textContent = `${formatVersionLabel(versionA)} – ${formatChapterLabel(currentChapter)}`;
@@ -3613,6 +3650,7 @@ function displaySideBySide(container, dataA, dataB, dataC = null) {
     // Version B panel
     const panelB = document.createElement('div');
     panelB.className = 'version-panel';
+    panelB.dataset.panelKey = 'B';
 
     const headingB = document.createElement('h2');
     headingB.textContent = `${formatVersionLabel(versionB)} – ${formatChapterLabel(currentChapter)}`;
@@ -3628,6 +3666,7 @@ function displaySideBySide(container, dataA, dataB, dataC = null) {
         const { paragraphs: paragraphsC, isSource: isSourceC } = dataC;
         const panelC = document.createElement('div');
         panelC.className = 'version-panel';
+        panelC.dataset.panelKey = 'C';
 
         const headingC = document.createElement('h2');
         headingC.textContent = `${formatVersionLabel(versionC)} – ${formatChapterLabel(currentChapter)}`;
@@ -3638,12 +3677,51 @@ function displaySideBySide(container, dataA, dataB, dataC = null) {
         container.appendChild(panelC);
     }
 
+    // Apply mobile tab visibility
+    applyMobileSideBySideTabs();
+
     initializeSourceSync({
         panelA,
         panelB,
         dataA,
         dataB
     });
+}
+
+function applyMobileSideBySideTabs() {
+    const container = document.getElementById('comparison-display');
+    if (!container) return;
+
+    // Update tab active state
+    const tabs = container.querySelectorAll('.mobile-version-tab');
+    tabs.forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.panelKey === mobileSideBySideTab);
+    });
+
+    // On mobile (≤968px), show only selected panel; on desktop, show all
+    const isMobile = window.innerWidth <= 968;
+    const panels = container.querySelectorAll('.version-panel[data-panel-key]');
+    panels.forEach(panel => {
+        if (isMobile) {
+            panel.classList.toggle('mobile-hidden', panel.dataset.panelKey !== mobileSideBySideTab);
+        } else {
+            panel.classList.remove('mobile-hidden');
+        }
+    });
+
+    // Update CSS variable for mobile tabs height so sticky h2 stacks below tabs
+    const tabBar = container.querySelector('.mobile-version-tabs');
+    if (tabBar && isMobile) {
+        const tabsHeight = tabBar.offsetHeight;
+        document.documentElement.style.setProperty('--mobile-tabs-height', `${tabsHeight}px`);
+    } else {
+        document.documentElement.style.setProperty('--mobile-tabs-height', '0px');
+    }
+
+    // Update leader lines if any are active
+    if (typeof updateAllNoteLines === 'function') {
+        setTimeout(() => updateAllNoteLines(), 50);
+    }
 }
 
 function displayDiff(container, dataA, dataB, dataC = null) {
@@ -4817,8 +4895,17 @@ function scrollToCurrentHighlight() {
     highlights.forEach(h => h.classList.remove('current'));
 
     if (currentHighlightIndex >= 0 && currentHighlightIndex < highlights.length) {
-        highlights[currentHighlightIndex].classList.add('current');
-        highlights[currentHighlightIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const target = highlights[currentHighlightIndex];
+
+        // If the match is in a hidden mobile panel, auto-switch to that panel's tab
+        const hiddenPanel = target.closest('.version-panel.mobile-hidden');
+        if (hiddenPanel && hiddenPanel.dataset.panelKey) {
+            mobileSideBySideTab = hiddenPanel.dataset.panelKey;
+            applyMobileSideBySideTabs();
+        }
+
+        target.classList.add('current');
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 }
 
