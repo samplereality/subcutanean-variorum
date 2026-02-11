@@ -789,10 +789,15 @@ function buildSourceMatchIndex(sourceData) {
 
     for (let i = 0; i < rawBlocks.length; i++) {
         const block = rawBlocks[i];
-        const trimmed = block.trim();
+        let trimmed = block.trim();
 
-        // Skip comments
-        if (trimmed.startsWith('#')) continue;
+        // Strip comment lines from the block (but keep any content lines that follow)
+        // In Quant source, a comment like "# Second light" on its own line may be
+        // followed by actual content in the same block (separated by a single newline)
+        const lines = trimmed.split('\n');
+        const contentLines = lines.filter(l => !l.trim().startsWith('#'));
+        if (contentLines.length === 0) continue;  // Entire block is comments
+        trimmed = contentLines.join('\n').trim();
 
         // Note: We no longer skip DEFINE blocks here because some blocks have
         // [DEFINE @var] followed by actual content on the next line within the same block.
@@ -807,7 +812,8 @@ function buildSourceMatchIndex(sourceData) {
         if (formattingOnlyPattern.test(trimmed)) continue;
 
         // Strip markup and extract words (3+ chars for meaningful matching)
-        const plainText = stripQuantMarkup(block);
+        // Use comment-stripped content so comment words don't pollute matching
+        const plainText = stripQuantMarkup(contentLines.join('\n'));
         const words = new Set(plainText.split(/\s+/).filter(w => w.length >= 3));
 
         // Skip blocks with too few matchable words
@@ -850,31 +856,30 @@ function findBestSourceMatch(renderedText, matchIndex, startHint) {
 
     let bestScore = 0;
     let bestBlockIndex = -1;
+    let bestRawScore = 0;
 
     // First pass: match against single blocks
     for (const entry of matchIndex) {
         const score = computeOverlap(entry.words);
+        if (score < 0.2) continue;  // Skip very poor matches early
 
-        // Use score, with sequential proximity as tiebreaker
-        if (score > bestScore + 0.01) {
-            bestScore = score;
+        // Proximity bonus: blocks near the expected position get a boost.
+        // Decays with distance so a nearby 0.6 beats a distant 0.65,
+        // but a distant 0.8 still beats a nearby 0.6.
+        const distance = Math.abs(entry.blockIndex - (startHint || 0));
+        const proximityBonus = 0.15 / (1 + distance * 0.1);
+        const adjustedScore = score + proximityBonus;
+
+        if (adjustedScore > bestScore) {
+            bestScore = adjustedScore;
             bestBlockIndex = entry.blockIndex;
-        } else if (Math.abs(score - bestScore) <= 0.01 && score > 0.3) {
-            // Tiebreaker: prefer blocks closer to the expected position (startHint)
-            if (startHint !== undefined) {
-                const currentDist = Math.abs(entry.blockIndex - startHint);
-                const bestDist = Math.abs(bestBlockIndex - startHint);
-                if (currentDist < bestDist) {
-                    bestScore = score;
-                    bestBlockIndex = entry.blockIndex;
-                }
-            }
+            bestRawScore = score;
         }
     }
 
     // Second pass: if best score is low, try matching against consecutive block pairs
     // This helps when source paragraphs are split across blocks due to blank lines
-    if (bestScore < 0.5 && matchIndex.length > 1) {
+    if (bestRawScore < 0.5 && matchIndex.length > 1) {
         for (let i = 0; i < matchIndex.length - 1; i++) {
             const entry1 = matchIndex[i];
             const entry2 = matchIndex[i + 1];
@@ -886,17 +891,23 @@ function findBestSourceMatch(renderedText, matchIndex, startHint) {
             const mergedWords = new Set([...entry1.words, ...entry2.words]);
             const mergedScore = computeOverlap(mergedWords);
 
+            // Apply same proximity bonus for merged blocks
+            const distance = Math.abs(entry1.blockIndex - (startHint || 0));
+            const proximityBonus = 0.15 / (1 + distance * 0.1);
+            const adjustedMergedScore = mergedScore + proximityBonus;
+
             // Use merged match if it's significantly better
-            if (mergedScore > bestScore + 0.1) {
-                bestScore = mergedScore;
+            if (adjustedMergedScore > bestScore + 0.05) {
+                bestScore = adjustedMergedScore;
+                bestRawScore = mergedScore;
                 // Return the first block of the pair (the start of the paragraph)
                 bestBlockIndex = entry1.blockIndex;
             }
         }
     }
 
-    // Require a minimum match score
-    return bestScore >= 0.25 ? bestBlockIndex : -1;
+    // Require a minimum raw match score (proximity bonus can't rescue a poor match)
+    return bestRawScore >= 0.25 ? bestBlockIndex : -1;
 }
 
 // Pre-compute the full source mapping for a chapter

@@ -15,12 +15,12 @@ A web-based variorum browser for exploring textual variations across 25 versions
    - Upload additional EPUB or TXT versions
 
 2. **Navigation & UI**
-   - Persistent navigation bar with dropdowns for Bookmarks, Files, Source, and Generate
+   - Persistent navigation bar with dropdowns for Bookmarks, Notes, Files, and Generate
    - View dropdown menu: 5 view modes (Unified, Side-by-side, Track Changes, Collation, Gonzo)
-   - Analyze dropdown menu: 4 tools (Source Code, Variables, Word Diff, Heatmap)
+   - Analyze dropdown menu: 5 tools (Source Code, Variables, Word Diff, Heatmap, Tapestry)
    - Dropdowns auto-close after selection (150ms delay)
-   - Mobile-responsive with hamburger toggle on small screens
-   - Modal dialogs for About, Generate Copy, Jaccard Distance, and Macro Inspector
+   - Hamburger menu at ≤968px (tablet/phone); mobile version tabs for side-by-side at ≤968px
+   - Modal dialogs for About, Generate Copy, Jaccard Distance, Word Diff, and Macro Inspector
 
 3. **Search**
    - Two search modes: "Chapter" (current chapter only) and "All" (cross-chapter)
@@ -244,8 +244,9 @@ docs/
 - **View Modes**: `.unified-view`, `.side-by-side-view`, `.track-changes-view`, `.collation-view`
 - **Gonzo Mode**: `.gonzo-fullscreen` (z-index: 6000), `.gonzo-header`, `.gonzo-header-btn`, `.gonzo-grid`, `.gonzo-cell`, `.gonzo-cell-header-clickable`, `.gonzo-about-overlay` (z-index: 7000)
 - **Source Code Mode**: `.source-toggle-btn`, `.source-code-panel`, `.source-highlight`
-- **CSS Variables**: `--search-panel-height` (set by JS, used by sticky seed headers)
-- **Responsive**: Media queries at 900px, 768px, 640px breakpoints
+- **CSS Variables**: `--search-panel-height`, `--mobile-tabs-height` (set by JS, used by sticky headers)
+- **Responsive**: Media queries at 968px (tablet/hamburger), 640px (mobile) breakpoints
+- **Mobile Version Tabs**: `.mobile-version-tabs`, `.mobile-version-tab`, `.mobile-hidden`
 
 ### Generate Copy Form
 
@@ -524,12 +525,67 @@ Replaced the old View/Analyze panels (which competed for space) with dropdown me
 - Removed: `findAllOccurrences()`, `goToOccurrence()`, floating search nav
 
 **Sticky Seed Headers:**
-- `.version-panel h2` uses `top: calc(50px + var(--search-panel-height, 0px))`
+- `.version-panel h2` uses `top: calc(50px + var(--search-panel-height, 0px) + var(--mobile-tabs-height, 0px))`
 - JS function `updateSearchPanelHeight()` updates `--search-panel-height` CSS variable when search panel shows/hides
+- `--mobile-tabs-height` set by `applyMobileSideBySideTabs()` when mobile version tabs are visible
 
 **Removed:**
 - Floating search nav (HTML, CSS, JS) — replaced by sticky search bar
 - Feature toast calls from analyze tool handlers (`showFeatureToast()` no longer called)
+
+### Word Diff → Search Integration
+
+Clicking a word in Word Diff results now auto-opens search, runs a global whole-word search in the selected chapter, and scrolls to the first match.
+
+**Implementation: Pending search pattern**
+- State variable `pendingWordDiffSearch` set by `jumpToChapterWithWord()` before calling `displayComparison()`
+- `displayComparison()` checks and executes the pending search synchronously after DOM render
+- Avoids fragile `setTimeout` chains between render and search
+
+**Key fix:** `updateSearchPanelHeight()` was defined inside `initializeControlPanel()` closure, making it inaccessible from global functions. Replaced with inline `document.documentElement.style.setProperty('--search-panel-height', ...)`.
+
+**Word Diff bug fixes:**
+- Sort tiebreaker: Added `|| a.localeCompare(b)` for deterministic alphabetical ordering when frequencies are equal
+- Frequency display: Always shows count in freq mode (removed `freq > 1` gate)
+- Modal z-index: `.modal` bumped to 5100 (above search panel at 4999), `.word-popup` to 5200
+
+### Mobile Responsive Design
+
+**Feature A: Mobile Version Tabs (≤968px side-by-side)**
+- Tab bar appears above content in side-by-side mode, letting users switch between Version A/B/C panels
+- CSS class `.mobile-hidden` hides non-selected panels; `.mobile-version-tab.active` highlights current tab
+- `applyMobileSideBySideTabs()` manages tab state, panel visibility, and `--mobile-tabs-height` CSS variable
+- Tab state resets to 'A' on chapter change; search auto-switches tabs when navigating to a match in a hidden panel
+- Sticky tab bar uses `top: calc(50px + var(--search-panel-height, 0px))`; sticky h2 headers stack below via `--mobile-tabs-height`
+
+**Feature B: Compact Mobile Toolbar (≤640px)**
+- Version selectors side-by-side with labels hidden (CSS-only, no JS changes)
+- View/Analyze/Search buttons share one horizontal row via `flex: 1`
+- `.essential-controls` uses `flex-direction: row; flex-wrap: wrap` with version selectors and chapter nav forced to `width: 100%`
+
+**Feature C: Tablet Layout (≤968px)**
+- Essential controls fit in 2 rows: version selectors + chapter nav on row 1, View/Analyze/Search on row 2
+- Version selector labels hidden; `align-items: flex-start` for flush-top alignment
+- Header and comparison-display vertical spacing tightened
+- Dropdown menus use `left: 0` instead of `right: 0` to prevent off-screen overflow
+
+**Navigation Bar:**
+- Hamburger menu now activates at 968px (was 640px) — covers tablet/iPad portrait widths
+- Labels hidden at 768px breakpoint removed (hamburger handles it)
+
+**Key CSS variables:**
+- `--search-panel-height`: Height of sticky search panel (set by JS)
+- `--mobile-tabs-height`: Height of mobile version tab bar (set by `applyMobileSideBySideTabs()`, reset to `0px` when not in side-by-side mode)
+
+**Key JS functions:**
+- `applyMobileSideBySideTabs()` — Manages tab active state, panel visibility, and CSS variable
+- `jumpToChapterWithWord(chapterId, word)` — Rewritten to use pending search pattern
+
+**Responsive breakpoints:**
+| Breakpoint | What changes |
+|-----------|-------------|
+| ≤968px | Hamburger nav, side-by-side collapses to tabs, 2-row toolbar, dropdown menus left-aligned |
+| ≤640px | Tighter spacing, version selectors horizontal with labels hidden, View/Analyze/Search share one row |
 
 ## Earlier Changes (January 2026)
 
