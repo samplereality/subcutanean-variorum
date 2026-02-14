@@ -117,13 +117,7 @@ footer {
     font-family: var(--ui-font);
 }
 
-/* Content-presenting modal bodies use serif for prose */
-.about-modal-body,
-.generate-modal-body,
-.welcome-modal-body,
-.welcome-subtitle {
-    font-family: var(--content-font);
-}
+/* All modals use sans-serif (UI font) throughout */
 
 /* But headings within all modals stay sans-serif */
 .modal h2,
@@ -1852,6 +1846,8 @@ header {
 
 .modal-body {
     padding: 2rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
 }
 
 /* Globals modal */
