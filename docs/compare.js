@@ -1165,6 +1165,20 @@ function getSourceChapterRawParagraphs(chapterId) {
     return sourceParagraphCache[key].raw;
 }
 
+function normalizeVerseParagraphs(paragraphs) {
+    // Convert legacy verse content (\n line breaks) to <span class="verse-inline"> markup.
+    // New extractions produce the span wrapper directly; this handles existing JSON data.
+    return paragraphs.map(text => {
+        if (text.includes('<span class="verse-inline">')) return text; // already wrapped
+        if (text.includes('\n')) {
+            // Embedded newlines indicate verse/poetry content from blockquotes
+            const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+            return `<span class="verse-inline">${lines.join('<br>')}</span>`;
+        }
+        return text;
+    });
+}
+
 function getChapterContent(versionId, chapterId) {
     if (!versionId) {
         return { paragraphs: [], isSource: false };
@@ -1180,7 +1194,7 @@ function getChapterContent(versionId, chapterId) {
     }
     const versionData = allVersions[versionId];
     return {
-        paragraphs: (versionData && versionData[chapterId]) || [],
+        paragraphs: normalizeVerseParagraphs((versionData && versionData[chapterId]) || []),
         isSource: false
     };
 }
@@ -3764,6 +3778,11 @@ function displayDiff(container, dataA, dataB, dataC = null) {
     container.appendChild(div);
 }
 
+function stripHtmlForDiff(text) {
+    // Strip all inline formatting and verse markup for plain-text diff comparison
+    return text.replace(/<span class="verse-inline">|<\/span>|<br\s*\/?>|<\/?(?:em|strong|i|b)>/g, '');
+}
+
 function displayDiffTwoWay(div, paragraphsA, paragraphsB) {
     const alignments = alignParagraphs(paragraphsA, paragraphsB);
 
@@ -3788,8 +3807,8 @@ function displayDiffTwoWay(div, paragraphsA, paragraphsB) {
             const formattedB = textB;
 
             // Remove HTML tags for diff comparison
-            const cleanA = formattedA.replace(/<\/?(?:em|strong)>/g, '');
-            const cleanB = formattedB.replace(/<\/?(?:em|strong)>/g, '');
+            const cleanA = stripHtmlForDiff(formattedA);
+            const cleanB = stripHtmlForDiff(formattedB);
 
             const diff = Diff.diffWords(cleanA, cleanB);
 
@@ -3815,6 +3834,136 @@ function displayDiffTwoWay(div, paragraphsA, paragraphsB) {
     });
 }
 
+function renderWordDiffSpans(parentEl, textOld, textNew, addedClass, removedClass) {
+    // Word-level diff between two texts, appending styled spans to parentEl
+    const cleanOld = stripHtmlForDiff(textOld);
+    const cleanNew = stripHtmlForDiff(textNew);
+    const diff = Diff.diffWords(cleanOld, cleanNew);
+    diff.forEach(part => {
+        const span = document.createElement('span');
+        if (part.added) {
+            span.className = addedClass;
+        } else if (part.removed) {
+            span.className = removedClass;
+        }
+        span.innerHTML = part.value;
+        parentEl.appendChild(span);
+    });
+}
+
+function renderMergedThreeWayDiff(parentEl, textA, textB, textC) {
+    // Merges word-level diffs from A→B and A→C into a single inline paragraph.
+    // Both diffs are mapped to character positions in A, then walked together so
+    // B's changes (green) and C's changes (purple) appear inline in one paragraph.
+    const cleanA = stripHtmlForDiff(textA);
+    const cleanB = textB ? stripHtmlForDiff(textB) : null;
+    const cleanC = textC ? stripHtmlForDiff(textC) : null;
+
+    // Degenerate cases: only one version to diff against
+    if (!cleanB && !cleanC) { parentEl.innerHTML = cleanA; return; }
+    if (!cleanB) { renderWordDiffSpans(parentEl, textA, textC, 'diff-added-c', 'diff-removed-c'); return; }
+    if (!cleanC) { renderWordDiffSpans(parentEl, textA, textB, 'diff-added-b', 'diff-removed-b'); return; }
+
+    const diffAB = Diff.diffWords(cleanA, cleanB);
+    const diffAC = Diff.diffWords(cleanA, cleanC);
+
+    // Convert a diff result to position-based operations on A's character indices
+    function diffToOps(diff) {
+        const removes = [], adds = [];
+        let pos = 0;
+        for (const part of diff) {
+            if (part.removed) {
+                removes.push({ start: pos, end: pos + part.value.length });
+                pos += part.value.length;
+            } else if (part.added) {
+                adds.push({ pos, text: part.value });
+            } else {
+                pos += part.value.length;
+            }
+        }
+        return { removes, adds };
+    }
+
+    const opsAB = diffToOps(diffAB);
+    const opsAC = diffToOps(diffAC);
+
+    // Build character-level removal flags for A's text
+    const aLen = cleanA.length;
+    const removedByB = new Uint8Array(aLen);
+    const removedByC = new Uint8Array(aLen);
+
+    for (const r of opsAB.removes) {
+        for (let i = r.start; i < r.end; i++) removedByB[i] = 1;
+    }
+    for (const r of opsAC.removes) {
+        for (let i = r.start; i < r.end; i++) removedByC[i] = 1;
+    }
+
+    // Index additions by their position in A
+    const addsB = new Map();
+    const addsC = new Map();
+    for (const a of opsAB.adds) addsB.set(a.pos, (addsB.get(a.pos) || '') + a.text);
+    for (const a of opsAC.adds) addsC.set(a.pos, (addsC.get(a.pos) || '') + a.text);
+
+    // Collect all boundary positions (where removal status changes or additions exist)
+    const boundaries = new Set([0, aLen]);
+    for (let i = 1; i < aLen; i++) {
+        if (removedByB[i] !== removedByB[i - 1] || removedByC[i] !== removedByC[i - 1]) {
+            boundaries.add(i);
+        }
+    }
+    for (const pos of addsB.keys()) boundaries.add(pos);
+    for (const pos of addsC.keys()) boundaries.add(pos);
+
+    const sorted = [...boundaries].sort((a, b) => a - b);
+
+    for (let idx = 0; idx < sorted.length; idx++) {
+        const pos = sorted[idx];
+
+        // Emit additions from B and C at this position
+        if (addsB.has(pos)) {
+            const span = document.createElement('span');
+            span.className = 'diff-added-b';
+            span.innerHTML = addsB.get(pos);
+            parentEl.appendChild(span);
+        }
+        if (addsC.has(pos)) {
+            const span = document.createElement('span');
+            span.className = 'diff-added-c';
+            span.innerHTML = addsC.get(pos);
+            parentEl.appendChild(span);
+        }
+
+        // Emit base text segment from pos to next boundary
+        if (idx < sorted.length - 1) {
+            const nextPos = sorted[idx + 1];
+            const text = cleanA.substring(pos, nextPos);
+            if (text) {
+                const byB = removedByB[pos];
+                const byC = removedByC[pos];
+
+                if (!byB && !byC) {
+                    // Kept by both - plain text
+                    const span = document.createElement('span');
+                    span.innerHTML = text;
+                    parentEl.appendChild(span);
+                } else {
+                    const span = document.createElement('span');
+                    if (byB && byC) {
+                        span.className = 'diff-removed';       // removed by both
+                    } else if (byB) {
+                        span.className = 'diff-removed-b';     // removed only by B
+                    } else {
+                        span.className = 'diff-removed-c';     // removed only by C
+                    }
+                    span.innerHTML = text;
+                    parentEl.appendChild(span);
+                }
+            }
+        }
+    }
+}
+
 function displayDiffThreeWay(div, paragraphsA, paragraphsB, paragraphsC) {
     // Use three-way alignment with A as anchor
     const alignments = alignThreeParagraphs(paragraphsA, paragraphsB, paragraphsC);
@@ -3823,9 +3972,11 @@ function displayDiffThreeWay(div, paragraphsA, paragraphsB, paragraphsC) {
     const legend = document.createElement('div');
     legend.className = 'diff-legend';
     legend.innerHTML = `
-        <span class="legend-item"><span class="legend-swatch diff-added-b"></span> Only in ${formatVersionLabel(versionB)}</span>
-        <span class="legend-item"><span class="legend-swatch diff-added-c"></span> Only in ${formatVersionLabel(versionC)}</span>
-        <span class="legend-item"><span class="legend-swatch diff-removed"></span> Removed from ${formatVersionLabel(versionA)}</span>
+        <span class="legend-item"><span class="legend-swatch diff-added-b"></span> ${formatVersionLabel(versionB)} additions</span>
+        <span class="legend-item"><span class="legend-swatch diff-removed-b-swatch"></span> ${formatVersionLabel(versionB)} removals</span>
+        <span class="legend-item"><span class="legend-swatch diff-added-c"></span> ${formatVersionLabel(versionC)} additions</span>
+        <span class="legend-item"><span class="legend-swatch diff-removed-c-swatch"></span> ${formatVersionLabel(versionC)} removals</span>
+        <span class="legend-item"><span class="legend-swatch diff-removed"></span> Removed by both</span>
     `;
     div.appendChild(legend);
 
@@ -3847,62 +3998,15 @@ function displayDiffThreeWay(div, paragraphsA, paragraphsB, paragraphsC) {
         } else if (type === 'unique-c') {
             // Only in C (added in C only)
             p.innerHTML = `<span class="diff-added-c">${textC}</span>`;
-        } else if (type === 'ab-match') {
-            // A and B match, C differs or missing
-            if (textC) {
-                // C has different text
-                p.innerHTML = textA + ` <span class="diff-added-c">[C: ${textC}]</span>`;
-            } else {
-                // C doesn't have this paragraph
-                p.innerHTML = textA;
-            }
-        } else if (type === 'ac-match') {
-            // A and C match, B differs or missing
-            if (textB) {
-                // B has different text
-                p.innerHTML = textA + ` <span class="diff-added-b">[B: ${textB}]</span>`;
-            } else {
-                // B doesn't have this paragraph
-                p.innerHTML = textA;
-            }
+        } else if (type === 'ab-match' || type === 'ac-match' || type === 'all-different') {
+            // Merged inline diff: A as base, B and C changes shown with version-specific colors
+            renderMergedThreeWayDiff(p, textA, textB, textC);
         } else if (type === 'bc-match') {
-            // B and C match, A differs or missing - A is base so show B/C as additions
+            // B and C agree, A differs — simple two-way diff A→B/C
             if (textA) {
-                // Show A as removed, B/C as what remains
-                const cleanA = textA.replace(/<\/?(?:em|strong)>/g, '');
-                const cleanBC = textB.replace(/<\/?(?:em|strong)>/g, '');
-                const diff = Diff.diffWords(cleanA, cleanBC);
-                diff.forEach(part => {
-                    const span = document.createElement('span');
-                    if (part.added) {
-                        span.className = 'diff-added';
-                        span.innerHTML = part.value;
-                    } else if (part.removed) {
-                        span.className = 'diff-removed';
-                        span.innerHTML = part.value;
-                    } else {
-                        span.innerHTML = part.value;
-                    }
-                    p.appendChild(span);
-                });
+                renderWordDiffSpans(p, textA, textB, 'diff-added', 'diff-removed');
             } else {
-                // A doesn't exist, B=C added
                 p.innerHTML = `<span class="diff-added">${textB}</span>`;
-            }
-        } else if (type === 'all-different') {
-            // All three differ - show A as base with B and C variants
-            p.innerHTML = textA;
-            if (textB) {
-                const bSpan = document.createElement('span');
-                bSpan.className = 'diff-variant-b';
-                bSpan.innerHTML = ` [B: ${textB}]`;
-                p.appendChild(bSpan);
-            }
-            if (textC) {
-                const cSpan = document.createElement('span');
-                cSpan.className = 'diff-variant-c';
-                cSpan.innerHTML = ` [C: ${textC}]`;
-                p.appendChild(cSpan);
             }
         }
 
@@ -3913,8 +4017,8 @@ function displayDiffThreeWay(div, paragraphsA, paragraphsB, paragraphsC) {
 // Collation View (intelligent paragraph alignment)
 function calculateSimilarity(textA, textB) {
     // Remove HTML tags for comparison
-    const cleanA = textA.replace(/<\/?em>/g, '').toLowerCase().trim();
-    const cleanB = textB.replace(/<\/?em>/g, '').toLowerCase().trim();
+    const cleanA = stripHtmlForDiff(textA).toLowerCase().trim();
+    const cleanB = stripHtmlForDiff(textB).toLowerCase().trim();
 
     // Exact match
     if (cleanA === cleanB) return 1.0;
@@ -3933,7 +4037,7 @@ function calculateSimilarity(textA, textB) {
 }
 
 function normalizeText(text) {
-    return text.replace(/<\/?em>/g, '').toLowerCase().trim();
+    return stripHtmlForDiff(text).toLowerCase().trim();
 }
 
 
@@ -8486,9 +8590,14 @@ class HTMLTextExtractor {
         // Extract paragraphs (including those in blockquotes)
         const paragraphElements = doc.querySelectorAll('p');
         paragraphElements.forEach(p => {
+            const inBlockquote = p.closest('blockquote') !== null;
             const paraText = this.extractParagraphWithEm(p);
             if (paraText) {
-                this.paragraphs.push(paraText);
+                if (inBlockquote) {
+                    this.paragraphs.push(`<span class="verse-inline">${paraText}</span>`);
+                } else {
+                    this.paragraphs.push(paraText);
+                }
             }
         });
 
@@ -8504,6 +8613,9 @@ class HTMLTextExtractor {
         element.childNodes.forEach(node => {
             if (node.nodeType === Node.TEXT_NODE) {
                 result += node.textContent;
+            } else if (node.nodeName === 'BR') {
+                // Preserve line breaks (used in verse/blockquote content)
+                result += '<br>';
             } else if (node.nodeName === 'EM' || node.nodeName === 'I') {
                 // Handle italics - check for nested bold
                 const innerContent = this.extractParagraphWithFormatting(node);

@@ -11,7 +11,7 @@ A web-based variorum browser for exploring textual variations across 25 versions
 1. **Two-Version Comparison Mode**
    - Compare any two versions side-by-side
    - Four view modes: Unified, Side-by-side, Track Changes, and Collation
-   - 25 pre-loaded versions (seeds 45443-45467)
+   - 25 pre-loaded versions (seeds 60001-60025)
    - Upload additional EPUB or TXT versions
 
 2. **Navigation & UI**
@@ -120,6 +120,17 @@ docs/
 - `loadAllVersions()` - Loads version list and populates selectors
 - `loadComparison()` - Main comparison renderer
 - `renderUnifiedView()` / `renderSideBySideView()` / `renderTrackChangesView()` / `renderCollationView()`
+- `normalizeVerseParagraphs()` - Converts `\n`-containing paragraphs to verse-inline markup (in `getChapterContent()`)
+
+**Track Changes (Diff):**
+- `displayDiffTwoWay()` - Two-version word-level diff using `Diff.diffWords()`
+- `displayDiffThreeWay()` - Three-version merged inline diff
+- `renderWordDiffSpans()` - Simple two-text word diff with configurable CSS classes
+- `renderMergedThreeWayDiff()` - Position-based merge of A→B and A→C diffs into single paragraph
+- `stripHtmlForDiff()` - Strips all formatting/verse tags for plain-text comparison
+- `alignParagraphs()` - Anchor-based paragraph alignment (Jaccard similarity, 0.3 threshold, 20-para window)
+- `alignThreeParagraphs()` - Pairwise alignment merge with A as anchor
+- `classifyThreeWay()` - Categorizes aligned triples (abc-identical, ab-match, ac-match, bc-match, all-different, unique-*)
 
 **Search:**
 - `performSearch()` - Runs search in current scope (chapter or global)
@@ -431,6 +442,8 @@ The extraction preserves inline HTML formatting:
 - `<em>` and `<i>` tags for italics
 - `<strong>` and `<b>` tags for bold
 - Nested formatting is supported
+- `<blockquote>` content wrapped in `<span class="verse-inline">` with `<br>` for line breaks
+- Verse/poetry content rendered with indentation and italics (CSS `.verse-inline`)
 
 ### Version JSON Structure
 
@@ -502,6 +515,57 @@ Source files (in `origin_text/`) map to browser chapter IDs:
 This mapping is defined in `build_variable_info.py` as `CHAPTER_MAPPING`.
 
 ## Recent Changes (February 2026)
+
+### Three-Way Track Changes: Merged Inline Diff
+
+Rewrote the three-version Track Changes mode to show fine-grained, word-level diffs merged into single paragraphs, matching the quality of two-version diffs.
+
+**Problem:** When three versions differed (even by a single word), the entire paragraph text for each variant was shown as a separate labeled block (`Seed X: [whole paragraph]`), instead of highlighting individual word changes inline.
+
+**Solution: Position-based merged diff (`renderMergedThreeWayDiff()`)**
+1. Runs `Diff.diffWords(A, B)` and `Diff.diffWords(A, C)` independently
+2. Maps both diffs to character positions in A's text via `diffToOps()`
+3. Builds character-level removal flags (`removedByB[]`, `removedByC[]`)
+4. Walks through A once, emitting: B additions (green), C additions (purple), and base text styled by who removed it
+
+**Version-specific colors:**
+- `.diff-added-b` / `.diff-removed-b` — green highlights/strikethrough for B's changes
+- `.diff-added-c` / `.diff-removed-c` — purple highlights/strikethrough for C's changes
+- `.diff-removed` — red strikethrough when both B and C remove the same text
+
+**Cases unified:** `ab-match`, `ac-match`, and `all-different` all go through `renderMergedThreeWayDiff()`. The `bc-match` case (B=C, A differs) uses simple two-way diff.
+
+**Tag stripping:** New `stripHtmlForDiff()` utility strips all formatting tags (`em`, `strong`, `i`, `b`, `span.verse-inline`, `br`) for diff comparison. Replaces 6 separate inline regex patterns.
+
+**Legend:** Updated to show five items — B additions, B removals, C additions, C removals, removed by both — with strikethrough-styled swatches for removal colors.
+
+### Verse/Poetry Formatting (`{verse_inline/...}`)
+
+Quant's `{verse_inline/...}` markup generates `<blockquote>` elements in EPUBs for poetry and verse content. Previously these were extracted as flat paragraphs with no visual distinction.
+
+**Extraction changes (Python `extract_text_all.py`):**
+- Added `handle_startendtag()` for self-closing `<br />` tags
+- `<br>` tags inside blockquotes preserved as `<br>` in extracted text
+- Paragraph text from `<blockquote>` elements wrapped in `<span class="verse-inline">...</span>`
+- Cleanup: leading/trailing `<br>` stripped, whitespace around `<br>` collapsed
+
+**Extraction changes (JavaScript `HTMLTextExtractor`):**
+- `extractParagraphWithFormatting()` handles `BR` nodes
+- Paragraphs with `p.closest('blockquote')` get the `verse-inline` span wrapper
+
+**Render-time fallback (`normalizeVerseParagraphs()`):**
+- In `getChapterContent()`, detects paragraphs with `\n` characters (legacy data) and converts to `<span class="verse-inline">line1<br>line2</span>`
+- Skips paragraphs already wrapped with `verse-inline`
+
+**CSS (`.verse-inline`):**
+- `display: block`, left margin + padding, italic, left-aligned
+- No border (removed orange left border to keep verse feeling like part of the narrative)
+
+**Verse examples in the novel:**
+- Single-line: `"something"`, `"for making it real"` (Ch 3)
+- Multi-line with `<br>`: `"Hey, it's us.<br>Can we have a key?<br>We'd like a way back."` (Ch 5)
+- Poetry epigraphs at chapter openings
+- `{verse_inline_sc/...}` variant for small-caps verse (uppercase text)
 
 ### Control Panel UI Overhaul
 

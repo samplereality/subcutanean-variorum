@@ -2335,6 +2335,17 @@ main {
     text-align: justify;
 }
 
+/* Verse/poetry content (from Quant {verse_inline/...} markup) */
+.verse-inline {
+    display: block;
+    margin-left: 2rem;
+    padding-left: 1rem;
+    /* border-left: 2px solid var(--accent-color, #ff8800); */
+    opacity: 0.9;
+    font-style: italic;
+    text-align: left;
+}
+
 .source-paragraph.active-source-snippet {
     box-shadow: 0 0 0 2px var(--accent-color);
     border-radius: 6px;
@@ -2612,20 +2623,50 @@ main {
     border-radius: 2px;
 }
 
-.diff-variant-b {
-    background-color: rgba(129, 199, 132, 0.25);
+/* Version-specific removal strikethrough (three-way diff) */
+.diff-removed-b {
+    background-color: rgba(129, 199, 132, 0.2);
     color: #a5d6a7;
-    font-size: 0.9em;
-    padding: 0.1rem 0.3rem;
+    text-decoration: line-through;
+    padding: 0.1rem 0.2rem;
     border-radius: 2px;
 }
 
-.diff-variant-c {
-    background-color: rgba(186, 104, 200, 0.25);
+.diff-removed-c {
+    background-color: rgba(186, 104, 200, 0.2);
     color: #ce93d8;
-    font-size: 0.9em;
-    padding: 0.1rem 0.3rem;
+    text-decoration: line-through;
+    padding: 0.1rem 0.2rem;
     border-radius: 2px;
+}
+
+/* Legend swatches for version-specific removals */
+.diff-legend .legend-swatch.diff-removed-b-swatch {
+    background-color: rgba(129, 199, 132, 0.5);
+    position: relative;
+}
+.diff-legend .legend-swatch.diff-removed-b-swatch::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #a5d6a7;
+}
+
+.diff-legend .legend-swatch.diff-removed-c-swatch {
+    background-color: rgba(186, 104, 200, 0.5);
+    position: relative;
+}
+.diff-legend .legend-swatch.diff-removed-c-swatch::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #ce93d8;
 }
 
 /* Diff legend for three-way comparison */
@@ -4512,6 +4553,17 @@ main {
     background-color: rgba(0,0,0,0.1);
 }
 
+/* Light mode: remove version C button */
+[data-theme="light"] .remove-version-btn {
+    background: rgba(244, 67, 54, 0.15);
+    color: #c62828;
+}
+
+[data-theme="light"] .remove-version-btn:hover {
+    background: rgba(244, 67, 54, 0.3);
+    color: #b71c1c;
+}
+
 /* Light mode: panel toggle buttons */
 [data-theme="light"] .panel-toggle-btn {
     background-color: var(--control-bg);
@@ -4908,18 +4960,28 @@ main {
     color: #6a1b9a;
 }
 
-[data-theme="light"] .diff-variant-b {
+[data-theme="light"] .diff-removed-b {
     background-color: rgba(76, 175, 80, 0.2);
     color: #2e7d32;
 }
 
-[data-theme="light"] .diff-variant-c {
+[data-theme="light"] .diff-removed-c {
     background-color: rgba(156, 39, 176, 0.2);
     color: #7b1fa2;
 }
 
-[data-theme="light"] .diff-legend {
-    background: rgba(0, 0, 0, 0.05);
+[data-theme="light"] .diff-legend .legend-swatch.diff-removed-b-swatch {
+    background-color: rgba(76, 175, 80, 0.4);
+}
+[data-theme="light"] .diff-legend .legend-swatch.diff-removed-b-swatch::after {
+    background: #2e7d32;
+}
+
+[data-theme="light"] .diff-legend .legend-swatch.diff-removed-c-swatch {
+    background-color: rgba(156, 39, 176, 0.4);
+}
+[data-theme="light"] .diff-legend .legend-swatch.diff-removed-c-swatch::after {
+    background: #7b1fa2;
 }
 
 [data-theme="light"] .diff-legend .legend-swatch.diff-added-b {

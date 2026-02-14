@@ -38,12 +38,28 @@ class TextExtractor(HTMLParser):
         elif tag == 'h1':
             self.in_h1 = True
             self.current_paragraph = []
+        elif tag == 'br':
+            # Preserve line breaks inside blockquotes (verse content)
+            if self.in_paragraph and self.in_blockquote:
+                self.current_paragraph.append('<br>')
+
+    def handle_startendtag(self, tag, attrs):
+        # Handle self-closing tags like <br />
+        if tag == 'br':
+            if self.in_paragraph and self.in_blockquote:
+                self.current_paragraph.append('<br>')
 
     def handle_endtag(self, tag):
         if tag == 'p':
             if self.current_paragraph:
                 para_text = ''.join(self.current_paragraph).strip()
                 if para_text:
+                    # Wrap blockquote content for verse-style rendering
+                    if self.in_blockquote:
+                        # Clean up: remove leading/trailing <br> and collapse whitespace around <br>
+                        para_text = re.sub(r'\s*<br>\s*', '<br>', para_text)
+                        para_text = re.sub(r'^(<br>)+|(<br>)+$', '', para_text)
+                        para_text = f'<span class="verse-inline">{para_text}</span>'
                     self.text_parts.append(para_text)
             self.in_paragraph = False
             self.current_paragraph = []
