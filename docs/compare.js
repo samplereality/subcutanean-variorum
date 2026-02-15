@@ -1306,6 +1306,32 @@ async function loadAllVersions() {
         // Set default versions (first and last)
         versionA = versionIds[0];
         versionB = versionIds[versionIds.length - 1];
+
+        // Check URL parameters for deep linking (e.g., ?versionA=60005&chapter=chapter14&mode=unified)
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('versionA')) {
+            const paramA = urlParams.get('versionA');
+            if (allVersions[paramA] || customVersions[paramA]) {
+                versionA = paramA;
+            }
+        }
+        if (urlParams.has('versionB')) {
+            const paramB = urlParams.get('versionB');
+            if (allVersions[paramB] || customVersions[paramB]) {
+                versionB = paramB;
+            }
+        }
+        if (urlParams.has('chapter')) {
+            const paramCh = urlParams.get('chapter');
+            currentChapter = paramCh;
+        }
+        if (urlParams.has('mode')) {
+            const paramMode = urlParams.get('mode');
+            if (['unified', 'sidebyside', 'comparison', 'diff', 'collation'].includes(paramMode)) {
+                currentMode = paramMode;
+            }
+        }
+
         document.getElementById('version-a-select').value = versionA;
         document.getElementById('version-b-select').value = versionB;
 
@@ -1314,6 +1340,11 @@ async function loadAllVersions() {
 
         // Display initial comparison
         displayComparison();
+
+        // Clear URL params after applying so refreshes don't re-apply stale state
+        if (urlParams.toString()) {
+            window.history.replaceState({}, '', window.location.pathname);
+        }
         refreshBookmarkUI();
 
     } catch (error) {
@@ -11153,6 +11184,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.target === tapestryModal) {
                 closeTapestryModal();
             }
+        });
+    }
+
+    // Final Fight button — opens the final_fight.html visualization
+    const finalFightBtn = document.getElementById('final-fight-btn');
+    if (finalFightBtn) {
+        finalFightBtn.addEventListener('click', () => {
+            window.location.href = 'final_fight.html';
         });
     }
 

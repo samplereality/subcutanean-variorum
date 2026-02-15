@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Final Fight — 10,000 Arenas</title>
+<script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0f1a2a;
+    --bg-rgb: 15, 26, 42;
+    --text: #e8e8e8;
+    --text-muted: #8a9aaa;
+    --text-dim: #4a5a6a;
+    --text-faint: #2a3a4a;
+    --accent: #ff8800;
+    --accent-muted: rgba(255, 136, 0, 0.22);
+    --accent-hover: rgba(255, 136, 0, 0.35);
+    --accent-border: rgba(255, 136, 0, 0.3);
+    --accent-border-hover: rgba(255, 136, 0, 0.6);
+    --card-bg: rgba(15, 26, 42, 0.88);
+    --card-border: rgba(255, 136, 0, 0.1);
+    --divider: rgba(255, 136, 0, 0.08);
+    --passage-border: rgba(255, 136, 0, 0.2);
+  }
+
+  [data-theme="light"] {
+    --bg: #f5f5f5;
+    --bg-rgb: 245, 245, 245;
+    --text: #2c2c2c;
+    --text-muted: #5a5a5a;
+    --text-dim: #888888;
+    --text-faint: #bbbbbb;
+    --accent: #d96800;
+    --accent-muted: rgba(217, 104, 0, 0.1);
+    --accent-hover: rgba(217, 104, 0, 0.18);
+    --accent-border: rgba(217, 104, 0, 0.2);
+    --accent-border-hover: rgba(217, 104, 0, 0.5);
+    --card-bg: rgba(255, 255, 255, 0.92);
+    --card-border: rgba(217, 104, 0, 0.12);
+    --divider: rgba(217, 104, 0, 0.1);
+    --passage-border: rgba(217, 104, 0, 0.25);
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+    height: 100vh;
+  }
+
+  canvas { display: block; position: fixed; top: 0; left: 0; z-index: 0; }
+
+  /* ── Overlay UI ── */
+  #overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 10;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Breadcrumbs */
+  #breadcrumbs {
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    pointer-events: auto;
+    min-height: 48px;
+  }
+
+  .crumb {
+    font-size: 0.72rem;
+    font-weight: 400;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: color 0.2s;
+    text-decoration: none;
+  }
+  .crumb:hover { color: var(--accent); }
+  .crumb.active { color: var(--text-muted); cursor: default; }
+  .crumb-sep { font-size: 0.6rem; color: var(--text-faint); }
+
+  #back-link {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: color 0.2s;
+    margin-right: 20px;
+  }
+  #back-link:hover { color: var(--accent); }
+
+  #theme-toggle {
+    margin-left: auto;
+    background: none;
+    border: 1px solid var(--accent-border);
+    border-radius: 6px;
+    color: var(--text-dim);
+    cursor: pointer;
+    padding: 4px 8px;
+    font-size: 0.72rem;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  #theme-toggle:hover { color: var(--accent); border-color: var(--accent-border-hover); }
+  #theme-toggle svg { width: 14px; height: 14px; }
+
+  /* Center card */
+  #card {
+    position: absolute;
+    bottom: 5%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 600px;
+    pointer-events: auto;
+    transition: opacity 0.5s;
+  }
+
+  #card.fading { opacity: 0; }
+
+  #card-inner {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 28px 32px;
+    backdrop-filter: blur(12px);
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+
+  #card-inner::-webkit-scrollbar { width: 4px; }
+  #card-inner::-webkit-scrollbar-track { background: transparent; }
+  #card-inner::-webkit-scrollbar-thumb { background: var(--accent-border); border-radius: 2px; }
+
+  .step-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 6px;
+  }
+
+  .card-title {
+    font-size: 1.3rem;
+    font-weight: 300;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+
+  .card-body {
+    font-size: 0.82rem;
+    font-weight: 300;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .card-passage {
+    font-size: 0.78rem;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--text-dim);
+    line-height: 1.6;
+    padding-left: 16px;
+    border-left: 2px solid var(--passage-border);
+    margin: 12px 0 16px;
+  }
+
+  .card-stat {
+    font-size: 0.7rem;
+    font-weight: 400;
+    color: var(--text-dim);
+    margin-top: 8px;
+  }
+
+  /* Choice buttons */
+  .choices {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  .choice-btn {
+    flex: 1;
+    min-width: 140px;
+    padding: 14px 16px;
+    background: var(--accent-muted);
+    border: 1px solid var(--accent-border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.25s;
+    text-align: left;
+  }
+  .choice-btn:hover {
+    background: var(--accent-hover);
+    border-color: var(--accent-border-hover);
+    transform: translateY(-1px);
+  }
+
+  .choice-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+
+  .choice-desc {
+    font-size: 0.7rem;
+    font-weight: 300;
+    color: #c8c8c8;
+    line-height: 1.4;
+  }
+  [data-theme="light"] .choice-desc {
+    color: var(--text-dim);
+  }
+
+  /* Begin button */
+  .begin-btn {
+    display: inline-block;
+    padding: 10px 28px;
+    background: var(--accent-muted);
+    border: 1px solid var(--accent-border);
+    border-radius: 6px;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 400;
+    cursor: pointer;
+    transition: all 0.25s;
+    margin-top: 8px;
+  }
+  .begin-btn:hover {
+    background: var(--accent-hover);
+    border-color: var(--accent-border-hover);
+  }
+
+  /* Result seed buttons */
+  .result-seeds {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .seed-btn {
+    padding: 8px 14px;
+    background: var(--accent-muted);
+    border: 1px solid var(--accent-border);
+    border-radius: 6px;
+    color: var(--accent);
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .seed-btn:hover {
+    background: var(--accent-hover);
+    border-color: var(--accent-border-hover);
+  }
+  .seed-btn.uploaded {
+    border-style: dashed;
+    font-style: italic;
+  }
+
+  /* Hover tooltip */
+  #tooltip {
+    position: fixed;
+    padding: 6px 12px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 6px;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 20;
+    white-space: nowrap;
+    backdrop-filter: blur(8px);
+  }
+  #tooltip.visible { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div id="overlay">
+  <div id="breadcrumbs">
+    <a id="back-link" href="index.html">&larr; Browser</a>
+    <button id="theme-toggle" onclick="toggleTheme()">
+      <svg id="theme-icon-sun" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+  <div id="card">
+    <div id="card-inner"></div>
+  </div>
+</div>
+
+<div id="tooltip"></div>
+
+<script>
+// ══════════════════════════════════════
+//  THEME
+// ══════════════════════════════════════
+
+let isDarkMode = true;
+
+function initTheme() {
+  const saved = localStorage.getItem('subcutanean_theme');
+  isDarkMode = saved !== 'light';
+  applyTheme();
+}
+
+function toggleTheme() {
+  isDarkMode = !isDarkMode;
+  localStorage.setItem('subcutanean_theme', isDarkMode ? 'dark' : 'light');
+  applyTheme();
+}
+
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+  document.getElementById('theme-icon-sun').style.display = isDarkMode ? 'none' : 'block';
+  document.getElementById('theme-icon-moon').style.display = isDarkMode ? 'block' : 'none';
+
+  // Update dust colors on theme change
+  dustSeeds = null;
+}
+
+
+// ══════════════════════════════════════
+//  NARRATIVE CONTENT
+// ══════════════════════════════════════
+
+const CONTENT = {
+  ffdropoff: {
+    label: 'Endless Dropoff',
+    short: 'The floor drops away into blackness',
+    passage: 'The door opened onto nothing. Past the frame, the floor dropped away into blackness. It made slow, lazy curves as it went, like an immense statue of a snake slithering through grass.',
+    detail: 'The arena is a vast void. Suspended pathways curve through emptiness, the abyss below pulling at every instinct to hold on tight.',
+  },
+  ffthewalls: {
+    label: 'The Walls',
+    short: 'Endless walls of pink insulation foam stretch into the gloom',
+    passage: 'Perspectives change. Architecture gets stretched to breaking. Endless walls of pink insulation foam surround you in every direction.',
+    detail: 'The arena is claustrophobic. Walls of pink insulation foam close in, an oppressive tunnel where every direction looks the same.',
+  },
+  fftubeweird: {
+    label: 'Broken Physics',
+    short: 'Gravity breaks down \u2014 furniture shifts at impossible angles',
+    passage: 'I was at a forty-five-degree angle. Getting back on top of the cylinder had been a problem of broken physics.',
+    detail: 'The laws of physics refuse to cooperate. Furniture drifts at impossible angles, and every movement is a negotiation with gravity that has lost interest in the rules.',
+  },
+  fftube: {
+    label: 'Climbing Gym',
+    short: 'A surreal climbing gym \u2014 Niko maps parkour routes',
+    passage: 'I\'d never skydived or bungee jumped before. Getting back on top of the cylinder had been like navigating an especially surreal and challenging climbing gym.',
+    detail: 'The environment behaves like an enormous climbing wall. Niko works out parkour routes from perch to bookshelf, each handhold calculated, each leap earned.',
+  },
+  ffset: {
+    label: 'Suspended Set',
+    short: 'A giant bedroom set floating on a platform in the void',
+    passage: 'I dangled thirty or forty feet below the underside of the bedroom platform. Wedged in between two dressers, so as not to roll off the edge.',
+    detail: 'The arena is a theatrical stage set suspended in darkness \u2014 a giant bedroom floating on a platform over nothing, dressers and nightstands becoming stepping stones across the abyss.',
+  },
+  ffchandelier: {
+    label: 'Chandelier',
+    short: 'A massive crystal chandelier \u2014 anchor and salvation',
+    passage: 'A filigreed structure I couldn\'t at first identify. From there it was simply a matter of detaching the chandelier net from its anchor point.',
+    detail: 'A vast web of crystal and wire stretches overhead \u2014 a chandelier of impossible scale, its glass baubles catching light that has no source. It becomes the characters\u2019 only anchor point.',
+  },
+  ffbookshelves: {
+    label: 'Bookshelves',
+    short: 'A mountain of cascading books \u2014 avalanche and pathway',
+    passage: 'I crashed into the mountain of books. A rain of paperbacks, face battered by the landslide of books only now starting to peter out.',
+    detail: 'Towering shelves spill their contents in slow-motion avalanches. The books are both the danger and the pathway \u2014 chaos that can be climbed, if you move fast enough.',
+  },
+};
+
+const GROUPS = [
+  { key: 'setting',  stepLabel: '1. The Setting',  question: 'What does the arena look like?', vars: ['ffdropoff', 'ffthewalls'] },
+  { key: 'physics',  stepLabel: '2. The Physics',   question: 'How does this space behave?',     vars: ['fftubeweird', 'fftube', 'ffset'] },
+  { key: 'obstacle', stepLabel: '3. The Obstacle',  question: 'What dominates the space?',       vars: ['ffchandelier', 'ffbookshelves'] },
+];
+
+// ── Signal text for scanning uploaded versions ──
+
+const FF_SIGNALS = {
+  ffdropoff: 'The door opened onto nothing', ffthewalls: 'Perspectives change. Architecture gets stretched',
+  fftubeweird: 'forty-five-degree angle', fftube: 'skydived or bungee', ffset: 'dangled thirty or forty',
+  ffchandelier: 'a filigreed structure', ffbookshelves: 'mountain of books',
+};
+const FF_CHAPTERS = {
+  ffdropoff: 'chapter14', ffthewalls: 'chapter14',
+  fftubeweird: 'chapter15', fftube: 'chapter15', ffset: 'chapter15',
+  ffchandelier: 'chapter14', ffbookshelves: 'chapter14',
+};
+
+// ── Particle color palette ──
+
+const PARTICLE_COLORS = [
+  [220, 130, 90],   // coral
+  [95, 175, 165],   // teal
+  [160, 130, 200],  // lavender
+  [135, 185, 105],  // sage
+  [225, 170, 70],   // amber
+  [190, 115, 150],  // dusty rose
+  [105, 155, 210],  // sky blue
+  [200, 160, 90],   // gold
+  [170, 100, 100],  // brick
+  [120, 190, 180],  // seafoam
+];
+
+
+// ══════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════
+
+let ffData = null;
+let allSeeds = [];
+let particles = [];
+let currentStep = 'loading'; // loading, intro, setting, physics, obstacle, result
+let choices = { setting: null, physics: null, obstacle: null };
+let hoveredParticle = null;
+let dustSeeds = null;
+
+// Initialize theme now that all variables are declared
+initTheme();
+
+
+// ══════════════════════════════════════
+//  PARTICLE CLASS
+// ══════════════════════════════════════
+
+class Particle {
+  constructor(seed, index) {
+    this.seed = seed;
+    this.index = index;
+    this.x = 0;
+    this.y = 0;
+    this.vx = 0;
+    this.vy = 0;
+    this.targetX = null;
+    this.targetY = null;
+    this.generic = !!seed.generic;
+    this.baseSize = this.generic ? 24 : 38;
+    this.size = 0; // start at 0, animate in
+    this.targetSize = this.baseSize;
+    this.alpha = 0; // start invisible
+    this.targetAlpha = 255;
+    this.noiseOffX = random(10000);
+    this.noiseOffY = random(10000);
+    this.active = true;
+    this.uploaded = !!seed.uploaded;
+
+    if (this.generic) {
+      // Shades of gray for generic seeds
+      const gray = Math.floor(random(90, 160));
+      this.r = gray; this.g = gray; this.b = gray;
+    } else {
+      // Random color from palette for real seeds
+      const c = PARTICLE_COLORS[Math.floor(Math.random() * PARTICLE_COLORS.length)];
+      this.r = c[0]; this.g = c[1]; this.b = c[2];
+    }
+  }
+
+  spawn(x, y) {
+    this.x = x;
+    this.y = y;
+    this.targetAlpha = 255;
+    this.targetSize = this.baseSize;
+  }
+
+  update() {
+    // Noise-based drift — always present, even when clustered
+    this.vx += (noise(this.noiseOffX) - 0.5) * 0.15;
+    this.vy += (noise(this.noiseOffY) - 0.5) * 0.15;
+    this.noiseOffX += 0.005;
+    this.noiseOffY += 0.005;
+
+    // Spring toward target (gentle enough to allow visible drift)
+    if (this.targetX !== null) {
+      this.vx += (this.targetX - this.x) * 0.012;
+      this.vy += (this.targetY - this.y) * 0.012;
+    }
+
+    // Damping
+    this.vx *= 0.92;
+    this.vy *= 0.92;
+
+    this.x += this.vx;
+    this.y += this.vy;
+
+    // Soft boundary
+    const margin = 30;
+    if (this.x < margin) this.vx += 0.5;
+    if (this.x > width - margin) this.vx -= 0.5;
+    if (this.y < margin) this.vy += 0.5;
+    if (this.y > height * 0.55) this.vy -= 0.5;
+
+    // Smooth transitions
+    this.size = lerp(this.size, this.targetSize, 0.06);
+    this.alpha = lerp(this.alpha, this.targetAlpha, 0.06);
+  }
+
+  draw() {
+    if (this.alpha < 1) return;
+
+    const a = this.alpha;
+
+    noStroke();
+
+    if (this.uploaded) {
+      // Diamond for uploaded
+      push();
+      translate(this.x, this.y);
+      rotate(PI / 4);
+      fill(this.r, this.g, this.b, a * 0.85);
+      rectMode(CENTER);
+      rect(0, 0, this.size * 0.7, this.size * 0.7, 3);
+      pop();
+    } else {
+      // Single filled circle
+      fill(this.r, this.g, this.b, a * 0.85);
+      ellipse(this.x, this.y, this.size);
+    }
+
+    // Label (skip for generic seeds)
+    if (!this.generic && a > 60 && this.size > 14) {
+      noStroke();
+      const labelAlpha = a * 0.9;
+      if (isDarkMode) {
+        fill(255, 255, 255, labelAlpha);
+      } else {
+        fill(30, 30, 30, labelAlpha);
+      }
+      textAlign(CENTER, CENTER);
+      textSize(max(8, this.size * 0.28));
+      const label = this.uploaded ? this.seed.name : String(this.seed.seed);
+      const display = label.length > 6 ? label.slice(0, 6) : label;
+      text(display, this.x, this.y);
+    }
+  }
+
+  setTarget(x, y) { this.targetX = x; this.targetY = y; }
+  clearTarget() { this.targetX = null; this.targetY = null; }
+
+  activate() {
+    this.active = true;
+    this.targetAlpha = 255;
+    this.targetSize = this.baseSize;
+  }
+
+  dim() {
+    this.active = false;
+    this.targetAlpha = 20;
+    this.targetSize = 8;
+    this.clearTarget();
+    // Drift to edges
+    this.targetX = this.x < width / 2 ? random(20, 60) : random(width - 60, width - 20);
+    this.targetY = random(20, height * 0.4);
+  }
+
+  contains(mx, my) {
+    return dist(mx, my, this.x, this.y) < this.size * 0.55;
+  }
+
+  matchesChoices() {
+    for (const [key, val] of Object.entries(choices)) {
+      if (val && this.seed[key] !== val) return false;
+    }
+    return true;
+  }
+}
+
+
+// ══════════════════════════════════════
+//  p5.js LIFECYCLE
+// ══════════════════════════════════════
+
+function preload() {
+  ffData = loadJSON('extracted_text/ff_combinations.json');
+}
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  textFont('Inter');
+
+  // Build seed list: built-in + uploaded
+  allSeeds = [...ffData.builtin_seeds];
+  const uploaded = scanUploadedVersions();
+  allSeeds.push(...uploaded);
+
+  // Generate generic seeds to reach 100 total, distributed by 10K proportions
+  const TARGET_TOTAL = 100;
+  const genericCount = Math.max(0, TARGET_TOTAL - allSeeds.length);
+  const genericSeeds = generateGenericSeeds(genericCount);
+  allSeeds.push(...genericSeeds);
+
+  // Create particles
+  particles = allSeeds.map((seed, i) => {
+    const p = new Particle(seed, i);
+    p.spawn(
+      random(width * 0.15, width * 0.85),
+      random(height * 0.08, height * 0.45)
+    );
+    return p;
+  });
+
+  currentStep = 'intro';
+  renderCard();
+}
+
+function generateGenericSeeds(count) {
+  if (count <= 0) return [];
+
+  // Use the combination percentages from the 10K analysis
+  const combos = ffData.combinations;
+  const totalPct = combos.reduce((s, c) => s + c.percentage, 0);
+
+  // Build distribution: how many generic seeds per combination
+  const seeds = [];
+  let assigned = 0;
+
+  for (let ci = 0; ci < combos.length; ci++) {
+    const combo = combos[ci];
+    let n;
+    if (ci === combos.length - 1) {
+      n = count - assigned; // last combo gets remainder
+    } else {
+      n = Math.round((combo.percentage / totalPct) * count);
+    }
+    for (let j = 0; j < n; j++) {
+      seeds.push({
+        seed: `g${assigned + j}`,
+        setting: combo.setting,
+        physics: combo.physics,
+        obstacle: combo.obstacle,
+        generic: true,
+      });
+    }
+    assigned += n;
+  }
+
+  return seeds;
+}
+
+function resolveCollisions() {
+  for (let i = 0; i < particles.length; i++) {
+    const a = particles[i];
+    if (a.alpha < 1) continue;
+    for (let j = i + 1; j < particles.length; j++) {
+      const b = particles[j];
+      if (b.alpha < 1) continue;
+
+      const dx = b.x - a.x;
+      const dy = b.y - a.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const minDist = (a.size + b.size) * 0.5;
+
+      if (dist < minDist && dist > 0.001) {
+        // Normalized collision axis
+        const nx = dx / dist;
+        const ny = dy / dist;
+
+        // Push apart so they no longer overlap (split evenly)
+        const overlap = minDist - dist;
+        a.x -= nx * overlap * 0.5;
+        a.y -= ny * overlap * 0.5;
+        b.x += nx * overlap * 0.5;
+        b.y += ny * overlap * 0.5;
+
+        // Elastic velocity exchange along collision axis
+        const relVn = (b.vx - a.vx) * nx + (b.vy - a.vy) * ny;
+        if (relVn < 0) {
+          a.vx += relVn * 0.5 * nx;
+          a.vy += relVn * 0.5 * ny;
+          b.vx -= relVn * 0.5 * nx;
+          b.vy -= relVn * 0.5 * ny;
+        }
+      }
+    }
+  }
+}
+
+function draw() {
+  // Theme-aware background
+  if (isDarkMode) {
+    background(15, 26, 42);
+  } else {
+    background(245, 245, 245);
+  }
+
+  // Ambient background dust
+  drawAmbientDust();
+
+  // Update particles
+  for (const p of particles) {
+    p.update();
+  }
+
+  // Resolve collisions — particles act as solid bodies
+  resolveCollisions();
+
+  // Draw particles
+  for (const p of particles) {
+    p.draw();
+  }
+
+  // Hover detection (skip generic particles)
+  hoveredParticle = null;
+  for (const p of particles) {
+    if (!p.generic && p.active && p.alpha > 60 && p.contains(mouseX, mouseY)) {
+      hoveredParticle = p;
+      break;
+    }
+  }
+  updateTooltip();
+}
+
+// Faint drifting dust motes for atmosphere
+function drawAmbientDust() {
+  if (!dustSeeds) {
+    dustSeeds = [];
+    for (let i = 0; i < 60; i++) {
+      dustSeeds.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        s: Math.random() * 1.5 + 0.5,
+        noX: Math.random() * 10000,
+        noY: Math.random() * 10000,
+      });
+    }
+  }
+
+  noStroke();
+  for (const d of dustSeeds) {
+    d.x += (noise(d.noX) - 0.5) * 0.3;
+    d.y += (noise(d.noY) - 0.5) * 0.3;
+    d.noX += 0.002;
+    d.noY += 0.002;
+
+    // Wrap around
+    if (d.x < 0) d.x = width;
+    if (d.x > width) d.x = 0;
+    if (d.y < 0) d.y = height;
+    if (d.y > height) d.y = 0;
+
+    if (isDarkMode) {
+      fill(192, 160, 96, 12);
+    } else {
+      fill(180, 140, 60, 18);
+    }
+    ellipse(d.x, d.y, d.s);
+  }
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  repositionActiveParticles();
+}
+
+
+// ══════════════════════════════════════
+//  STATE TRANSITIONS
+// ══════════════════════════════════════
+
+function goToStep(step) {
+  // Fade card, then switch
+  const card = document.getElementById('card');
+  card.classList.add('fading');
+
+  setTimeout(() => {
+    currentStep = step;
+
+    // Reset choices from this step onward
+    const stepKeys = ['setting', 'physics', 'obstacle'];
+    const idx = stepKeys.indexOf(step);
+    if (idx >= 0) {
+      for (let i = idx; i < stepKeys.length; i++) {
+        choices[stepKeys[i]] = null;
+      }
+    }
+
+    // Reactivate all matching particles
+    for (const p of particles) {
+      if (p.matchesChoices()) {
+        p.activate();
+        p.clearTarget();
+      } else {
+        p.dim();
+      }
+    }
+
+    repositionActiveParticles();
+    renderCard();
+    updateBreadcrumbs();
+
+    card.classList.remove('fading');
+  }, 300);
+}
+
+function makeChoice(groupKey, varName) {
+  choices[groupKey] = varName;
+
+  // Animate particles
+  for (const p of particles) {
+    if (p.matchesChoices()) {
+      p.activate();
+    } else {
+      p.dim();
+    }
+  }
+
+  // Determine next step
+  const stepKeys = ['setting', 'physics', 'obstacle'];
+  const idx = stepKeys.indexOf(groupKey);
+  if (idx < stepKeys.length - 1) {
+    currentStep = stepKeys[idx + 1];
+  } else {
+    currentStep = 'result';
+  }
+
+  repositionActiveParticles();
+
+  // Fade and update card
+  const card = document.getElementById('card');
+  card.classList.add('fading');
+  setTimeout(() => {
+    renderCard();
+    updateBreadcrumbs();
+    card.classList.remove('fading');
+  }, 400);
+}
+
+function repositionActiveParticles() {
+  const active = particles.filter(p => p.active);
+  const n = active.length;
+  if (n === 0) return;
+
+  // Shuffle so real and generic seeds are intermingled
+  for (let i = n - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [active[i], active[j]] = [active[j], active[i]];
+  }
+
+  // Dynamic grid sizing based on particle count
+  const cols = Math.min(14, Math.ceil(Math.sqrt(n * 1.8)));
+  const maxH = height * 0.48; // don't push into card area
+  const spacing = Math.min(48, (width * 0.8) / (cols + 1), maxH / (Math.ceil(n / cols) + 1));
+  const centerX = width / 2;
+  const startY = height * 0.06;
+
+  active.forEach((p, i) => {
+    const row = Math.floor(i / cols);
+    const col = i % cols;
+    const rowCount = Math.min(cols, n - row * cols);
+    const rowStartX = centerX - (spacing * (rowCount - 1)) / 2;
+
+    p.setTarget(
+      rowStartX + col * spacing + random(-3, 3),
+      startY + row * spacing * 0.85 + random(-3, 3)
+    );
+  });
+}
+
+
+// ══════════════════════════════════════
+//  UI RENDERING
+// ══════════════════════════════════════
+
+function renderCard() {
+  const inner = document.getElementById('card-inner');
+
+  switch (currentStep) {
+    case 'intro':
+      inner.innerHTML = `
+        <div class="card-title">The Final Fight</div>
+        <div class="card-body">
+          In the climax of <em>Subcutanean</em>, Ryan and Niko confront their doubles in a surreal underground arena.
+          But no two arenas are alike. Seven variables combine to create twelve possible battlegrounds &mdash;
+          shaping the setting, the physics, and the obstacles the characters face.
+        </div>
+        <div class="card-body" style="opacity: 0.65;">
+          The colored particles above are your ${allSeeds.filter(s => !s.generic).length} loaded copies. The gray particles
+          represent the wider population of all variants, distributed according to actual proportions from 10,000 generated copies.
+        </div>
+        <button class="begin-btn" onclick="goToStep('setting')">Begin &rarr;</button>
+      `;
+      break;
+
+    case 'setting':
+    case 'physics':
+    case 'obstacle':
+      renderChoiceStep();
+      break;
+
+    case 'result':
+      renderResult();
+      break;
+  }
+}
+
+function renderChoiceStep() {
+  const inner = document.getElementById('card-inner');
+  const groupIdx = ['setting', 'physics', 'obstacle'].indexOf(currentStep);
+  const group = GROUPS[groupIdx];
+  const prevChoice = groupIdx > 0 ? choices[GROUPS[groupIdx - 1].key] : null;
+  const realActiveCount = particles.filter(p => p.active && !p.generic).length;
+
+  // If a previous choice was just made, show its details first
+  let prevSection = '';
+  if (prevChoice) {
+    const prevContent = CONTENT[prevChoice];
+    const prevGroup = GROUPS[groupIdx - 1];
+
+    // Count for this choice in 10K data
+    const pct = ffData.groups[prevGroup.key].variables[prevChoice].percentage;
+    prevSection = `
+      <div class="card-passage">${prevContent.passage}</div>
+      <div class="card-body">${prevContent.detail}</div>
+      <div class="card-stat">${realActiveCount} of your seeds &middot; ${pct}% of all 10,000 variants</div>
+      <hr style="border: none; border-top: 1px solid var(--divider); margin: 16px 0;">
+    `;
+  }
+
+  let choicesHtml = group.vars.map(v => `
+    <div class="choice-btn" onclick="makeChoice('${group.key}', '${v}')">
+      <div class="choice-name">${CONTENT[v].label}</div>
+      <div class="choice-desc">${CONTENT[v].short}</div>
+    </div>
+  `).join('');
+
+  inner.innerHTML = `
+    ${prevSection}
+    <div class="step-label">${group.stepLabel}</div>
+    <div class="card-title">${group.question}</div>
+    <div class="choices">${choicesHtml}</div>
+  `;
+}
+
+function renderResult() {
+  const inner = document.getElementById('card-inner');
+  const active = particles.filter(p => p.active);
+  const s = choices.setting, ph = choices.physics, ob = choices.obstacle;
+
+  // Find 10K combo data
+  const combo = ffData.combinations.find(c =>
+    c.setting === s && c.physics === ph && c.obstacle === ob
+  );
+  const pct = combo ? combo.percentage : '?';
+  const count = combo ? combo.count : '?';
+
+  // Build seed buttons (real seeds only)
+  const realActive = active.filter(p => !p.generic);
+  let seedButtons = '';
+  if (realActive.length > 0) {
+    seedButtons = realActive.map(p => {
+      const label = p.uploaded ? p.seed.name : String(p.seed.seed);
+      const cls = p.uploaded ? 'seed-btn uploaded' : 'seed-btn';
+      return `<button class="${cls}" onclick="navigateToSeed('${p.seed.seed}')">${label} &rarr;</button>`;
+    }).join('');
+  } else {
+    seedButtons = '<div class="card-body" style="opacity: 0.65;">None of your loaded seeds have this exact combination.</div>';
+  }
+
+  inner.innerHTML = `
+    <div class="step-label">Your Arena</div>
+    <div class="card-title">${CONTENT[s].label} + ${CONTENT[ph].label} + ${CONTENT[ob].label}</div>
+    <div class="card-passage">${CONTENT[s].passage}</div>
+    <div class="card-passage">${CONTENT[ph].passage}</div>
+    <div class="card-passage">${CONTENT[ob].passage}</div>
+    <div class="card-stat">${pct}% of all 10,000 variants (${Number(count).toLocaleString()} copies)</div>
+    <div class="result-seeds">${seedButtons}</div>
+  `;
+}
+
+function goToIntro() {
+  const card = document.getElementById('card');
+  card.classList.add('fading');
+
+  setTimeout(() => {
+    currentStep = 'intro';
+    choices.setting = null;
+    choices.physics = null;
+    choices.obstacle = null;
+
+    for (const p of particles) {
+      p.activate();
+      p.clearTarget();
+    }
+    repositionActiveParticles();
+    renderCard();
+    updateBreadcrumbs();
+
+    card.classList.remove('fading');
+  }, 300);
+}
+
+function updateBreadcrumbs() {
+  const bc = document.getElementById('breadcrumbs');
+  const steps = [
+    { key: 'intro', label: 'Start' },
+  ];
+
+  if (choices.setting) {
+    steps.push({ key: 'setting', label: CONTENT[choices.setting].label });
+  }
+  if (choices.physics) {
+    steps.push({ key: 'physics', label: CONTENT[choices.physics].label });
+  }
+  if (choices.obstacle) {
+    steps.push({ key: 'obstacle', label: CONTENT[choices.obstacle].label });
+    if (currentStep === 'result') {
+      steps.push({ key: 'result', label: 'Arena' });
+    }
+  }
+
+  let html = '<a id="back-link" href="index.html">&larr; Browser</a>';
+
+  steps.forEach((step, i) => {
+    if (i > 0) html += '<span class="crumb-sep">&rsaquo;</span>';
+    const isActive = i === steps.length - 1 && currentStep !== 'result';
+    const cls = isActive ? 'crumb active' : 'crumb';
+
+    if (step.key === 'intro') {
+      html += `<span class="${cls}" onclick="goToIntro()">${step.label}</span>`;
+    } else {
+      html += `<span class="${cls}" onclick="goToStep('${step.key}')">${step.label}</span>`;
+    }
+  });
+
+  // Re-append theme toggle (breadcrumbs innerHTML replaces everything after back-link)
+  html += `
+    <button id="theme-toggle" onclick="toggleTheme()">
+      <svg id="theme-icon-sun" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:${isDarkMode ? 'none' : 'block'}"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:${isDarkMode ? 'block' : 'none'}"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>`;
+
+  bc.innerHTML = html;
+}
+
+function updateTooltip() {
+  const tooltip = document.getElementById('tooltip');
+  if (hoveredParticle) {
+    const p = hoveredParticle;
+    const s = p.seed;
+    const label = p.uploaded ? s.name : String(s.seed);
+
+    // Progressive reveal: only show variables for groups the user has already chosen
+    const revealedParts = [];
+    if (choices.setting && s.setting) {
+      revealedParts.push(CONTENT[s.setting].label);
+    }
+    if (choices.physics && s.physics) {
+      revealedParts.push(CONTENT[s.physics].label);
+    }
+    if (choices.obstacle && s.obstacle) {
+      revealedParts.push(CONTENT[s.obstacle].label);
+    }
+
+    if (revealedParts.length > 0) {
+      tooltip.textContent = `${label}: ${revealedParts.join(' + ')}`;
+    } else {
+      tooltip.textContent = label;
+    }
+
+    tooltip.style.left = (mouseX + 16) + 'px';
+    tooltip.style.top = (mouseY - 10) + 'px';
+    tooltip.classList.add('visible');
+    cursor(currentStep === 'result' ? HAND : ARROW);
+  } else {
+    tooltip.classList.remove('visible');
+    cursor(ARROW);
+  }
+}
+
+function mousePressed() {
+  if (hoveredParticle && currentStep === 'result') {
+    navigateToSeed(hoveredParticle.seed.seed);
+  }
+}
+
+function navigateToSeed(seed) {
+  window.location.href = `index.html?versionA=${seed}&chapter=chapter14&mode=unified`;
+}
+
+
+// ══════════════════════════════════════
+//  UPLOADED VERSION SCANNING
+// ══════════════════════════════════════
+
+function scanUploadedVersions() {
+  try {
+    const stored = localStorage.getItem('subcutanean_custom_versions');
+    if (!stored) return [];
+    const custom = JSON.parse(stored);
+    const results = [];
+
+    for (const [vid, entry] of Object.entries(custom)) {
+      const vData = entry.data;
+      if (!vData) continue;
+      const rawName = entry.name || vid;
+      const result = { seed: vid, name: rawName.replace(/^Seed\s+/i, ''), uploaded: true };
+
+      for (const [groupKey, group] of Object.entries({ setting: ['ffdropoff','ffthewalls'], physics: ['fftubeweird','fftube','ffset'], obstacle: ['ffchandelier','ffbookshelves'] })) {
+        for (const varName of group) {
+          const ch = FF_CHAPTERS[varName];
+          const paras = vData[ch];
+          if (!paras) continue;
+          if (paras.join(' ').toLowerCase().includes(FF_SIGNALS[varName].toLowerCase())) {
+            result[groupKey] = varName;
+            break;
+          }
+        }
+      }
+
+      if (result.setting && result.physics && result.obstacle) {
+        results.push(result);
+      }
+    }
+    return results;
+  } catch (e) {
+    return [];
+  }
+}
+</script>
+</body>
+</html>
