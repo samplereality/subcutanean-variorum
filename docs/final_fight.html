@@ -75,6 +75,7 @@
     gap: 6px;
     pointer-events: auto;
     min-height: 48px;
+    background: linear-gradient(to bottom, rgba(var(--bg-rgb), 0.95), rgba(var(--bg-rgb), 0));
   }
 
   .crumb {
@@ -298,7 +299,7 @@
 
 <div id="overlay">
   <div id="breadcrumbs">
-    <a id="back-link" href="index.html">&larr; Browser</a>
+    <a id="back-link" href="index.html">&larr; Variorum</a>
     <button id="theme-toggle" onclick="toggleTheme()">
       <svg id="theme-icon-sun" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
       <svg id="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -614,7 +615,7 @@ function setup() {
     const p = new Particle(seed, i);
     p.spawn(
       random(width * 0.15, width * 0.85),
-      random(height * 0.08, height * 0.45)
+      random(height * 0.12, height * 0.42)
     );
     return p;
   });
@@ -858,10 +859,18 @@ function repositionActiveParticles() {
 
   // Dynamic grid sizing based on particle count
   const cols = Math.min(14, Math.ceil(Math.sqrt(n * 1.8)));
-  const maxH = height * 0.48; // don't push into card area
-  const spacing = Math.min(48, (width * 0.8) / (cols + 1), maxH / (Math.ceil(n / cols) + 1));
+  const rows = Math.ceil(n / cols);
+  const availableH = height * 0.48; // don't push into card area
+  const spacing = Math.min(48, (width * 0.8) / (cols + 1), availableH / (rows + 1));
+  const gridH = rows * spacing * 0.85;
+
+  // Center the grid vertically in the space above the card
+  const topMargin = 56; // breadcrumb bar height
+  const bottomLimit = height * 0.48; // leave room for the card
+  const centerY = topMargin + (bottomLimit - topMargin) / 2;
+  const startY = centerY - gridH / 2;
+
   const centerX = width / 2;
-  const startY = height * 0.06;
 
   active.forEach((p, i) => {
     const row = Math.floor(i / cols);
