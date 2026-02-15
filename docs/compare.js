@@ -2317,6 +2317,18 @@ function highlightVariableText(varName, targetVersion = null, isChapterLocal = f
     });
 
     if (matchCount > 0) {
+        // If on mobile with version tabs, switch to the correct tab for the target version
+        if (targetVersion && window.innerWidth <= 968 && currentMode === 'sidebyside') {
+            let panelKey = null;
+            if (targetVersion === versionA) panelKey = 'A';
+            else if (targetVersion === versionB) panelKey = 'B';
+            else if (targetVersion === versionC) panelKey = 'C';
+            if (panelKey && panelKey !== mobileSideBySideTab) {
+                mobileSideBySideTab = panelKey;
+                applyMobileSideBySideTabs();
+            }
+        }
+
         // Scroll directly to first match without showing a notification
         if (firstMatch) {
             firstMatch.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -10030,7 +10042,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="heatmap-row" data-chapter="${ch.id}">
                     <span class="heatmap-label">${ch.label}</span>
                     <div class="heatmap-bar-container" onclick="navigateToChapter('${ch.id}'); closeHeatmapModal();" title="${tooltipText}">
-                        <div class="heatmap-bar" style="width: ${barWidth}%; background-color: ${color};">
+                        <div class="heatmap-bar" style="width: 0%; background-color: ${color};" data-target-width="${barWidth}">
                             ${stats.variation >= 10 ? `<span class="heatmap-bar-value">${stats.variation.toFixed(0)}%</span>` : ''}
                         </div>
                     </div>
@@ -10039,6 +10051,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         container.innerHTML = html;
+
+        // Animate bars in with staggered delays
+        requestAnimationFrame(() => {
+            const bars = container.querySelectorAll('.heatmap-bar');
+            bars.forEach((bar, i) => {
+                setTimeout(() => {
+                    bar.style.width = bar.dataset.targetWidth + '%';
+                }, i * 40);
+            });
+        });
 
         // Summary - different wording for two-way vs three-way comparison
         if (versionC) {

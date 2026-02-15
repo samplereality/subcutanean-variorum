@@ -295,19 +295,18 @@
     <!-- Word Differential Modal -->
     <div id="word-diff-modal" class="modal hidden">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2>Word Differential Analysis</h2>
-                <p id="word-diff-description" class="modal-description"></p>
+            <div class="modal-header word-diff-modal-header">
+                <h2>Word Diff</h2>
+                <div class="word-diff-header-controls">
+                    <div class="sort-buttons">
+                        <button id="sort-alpha-btn" class="sort-btn active" title="Sort words alphabetically">A-Z</button>
+                        <button id="sort-freq-btn" class="sort-btn" title="Sort words by frequency (most common first)">Freq</button>
+                    </div>
+                    <span class="word-diff-instruction">Click a word to see it in context</span>
+                </div>
                 <button id="close-modal-btn" class="close-btn"><i data-lucide="x"></i></button>
             </div>
-            <div class="modal-controls">
-                <label>Sort by:</label>
-                <div class="sort-buttons">
-                    <button id="sort-alpha-btn" class="sort-btn active" title="Sort words alphabetically">Alphabetical</button>
-                    <button id="sort-freq-btn" class="sort-btn" title="Sort words by frequency (most common first)">Frequency</button>
-                </div>
-                <p class="word-diff-instruction">Click any word to see it in context</p>
-            </div>
+            <p id="word-diff-description" style="display: none;"></p>
             <div class="modal-body">
                 <div class="diff-results" id="diff-results">
                     <div class="unique-words-panel">
@@ -557,15 +556,11 @@
     <!-- Chapter Heatmap Modal -->
     <div id="heatmap-modal" class="modal hidden">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2>Chapter Variation</h2>
-                <p class="modal-description" style="padding-right: 40px;">Shows where textual differences are concentrated across chapters. Darker colors indicate more variation between the two selected versions.</p>
+            <div class="modal-header heatmap-modal-header">
+                <h2>Chapter Variation: <span id="heatmap-version-a"></span> vs <span id="heatmap-version-b"></span><span id="heatmap-version-c-separator" style="display: none;"> vs </span><span id="heatmap-version-c" style="display: none;"></span></h2>
                 <button id="close-heatmap-modal-btn" class="close-btn"><i data-lucide="x"></i></button>
             </div>
             <div class="modal-body">
-                <div class="heatmap-versions">
-                    <span>Comparing: <strong id="heatmap-version-a"></strong> vs <strong id="heatmap-version-b"></strong><span id="heatmap-version-c-separator" style="display: none;"> vs </span><strong id="heatmap-version-c" style="display: none;"></strong></span>
-                </div>
                 <div id="heatmap-container" class="heatmap-container">
                     <!-- Heatmap bars will be generated here -->
                 </div>
