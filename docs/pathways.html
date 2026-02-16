@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Story Pathways — Subcutanean Variorum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1a2a;
+    --bg-rgb: 15, 26, 42;
+    --text: #e8e8e8;
+    --text-muted: #8a9aaa;
+    --text-dim: #4a5a6a;
+    --text-faint: #2a3a4a;
+    --accent: #ff8800;
+    --accent-muted: rgba(255, 136, 0, 0.22);
+    --accent-hover: rgba(255, 136, 0, 0.35);
+    --accent-border: rgba(255, 136, 0, 0.3);
+    --accent-border-hover: rgba(255, 136, 0, 0.6);
+    --card-bg: rgba(15, 26, 42, 0.92);
+    --card-border: rgba(255, 136, 0, 0.1);
+    --node-fill: rgba(255, 136, 0, 0.35);
+    --node-stroke: rgba(255, 136, 0, 0.85);
+    --col-band: rgba(255, 255, 255, 0.03);
+  }
+
+  [data-theme="light"] {
+    --bg: #f5f5f5;
+    --bg-rgb: 245, 245, 245;
+    --text: #2c2c2c;
+    --text-muted: #666;
+    --text-dim: #999;
+    --text-faint: #ccc;
+    --accent: #d96800;
+    --card-bg: rgba(255, 255, 255, 0.92);
+    --card-border: rgba(217, 104, 0, 0.15);
+    --node-fill: rgba(217, 104, 0, 0.3);
+    --node-stroke: rgba(217, 104, 0, 0.85);
+    --col-band: rgba(0, 0, 0, 0.04);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: auto;
+    overflow-y: hidden;
+    height: 100vh;
+  }
+
+  /* Breadcrumbs */
+  #breadcrumbs {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(to bottom, rgba(var(--bg-rgb), 0.95), rgba(var(--bg-rgb), 0));
+    pointer-events: auto;
+    min-height: 44px;
+  }
+
+  #breadcrumbs a {
+    font-size: 0.72rem;
+    font-weight: 400;
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  #breadcrumbs a:hover { color: var(--accent); }
+
+  #theme-toggle {
+    margin-left: auto;
+    background: none;
+    border: 1px solid var(--text-faint);
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-dim);
+    transition: border-color 0.2s, color 0.2s;
+  }
+  #theme-toggle:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* SVG container */
+  #viz-container {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #viz-container svg {
+    display: block;
+  }
+
+  /* Tooltip */
+  #tooltip {
+    position: fixed;
+    pointer-events: none;
+    background: var(--card-bg);
+    border: 1px solid var(--accent-border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 0.75rem;
+    color: var(--text);
+    backdrop-filter: blur(8px);
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 200;
+    max-width: 280px;
+    line-height: 1.4;
+  }
+  #tooltip.visible { opacity: 1; }
+  #tooltip .tt-label {
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 2px;
+  }
+  #tooltip .tt-desc {
+    color: var(--text-muted);
+    font-size: 0.7rem;
+  }
+  #tooltip .tt-stat {
+    color: var(--text-dim);
+    font-size: 0.65rem;
+    margin-top: 4px;
+  }
+
+  /* Seed legend panel */
+  #legend {
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 8px 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    align-items: center;
+    backdrop-filter: blur(8px);
+    z-index: 100;
+    max-width: 90vw;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+  }
+  .legend-seed {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    opacity: 0.5;
+  }
+  .legend-seed:hover { opacity: 0.85 !important; }
+  .legend-seed.revealed { opacity: 1; }
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: transform 0.2s;
+  }
+  .legend-seed:hover .legend-dot { transform: scale(1.3); }
+  .legend-seed.revealed .legend-dot {
+    box-shadow: 0 0 4px 1px currentColor;
+  }
+  .legend-uploaded .legend-dot {
+    border-radius: 2px;
+  }
+  .legend-action {
+    cursor: pointer;
+    color: var(--text-dim);
+    font-size: 0.6rem;
+    padding: 2px 8px;
+    border: 1px solid var(--text-faint);
+    border-radius: 4px;
+    background: none;
+    transition: color 0.2s, border-color 0.2s;
+    font-family: inherit;
+  }
+  .legend-action:hover {
+    color: var(--accent);
+    border-color: var(--accent-border);
+  }
+
+  /* Tour panel */
+  #tour-panel {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 300;
+    width: 560px;
+    max-width: 94vw;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-bottom: none;
+    border-radius: 12px 12px 0 0;
+    padding: 20px 24px 16px;
+    backdrop-filter: blur(12px);
+    transition: opacity 0.4s, transform 0.4s;
+  }
+  #tour-panel.hidden {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+    pointer-events: none;
+  }
+  #tour-content {
+    margin-bottom: 14px;
+    transition: opacity 0.15s;
+  }
+  #tour-step-label {
+    font-size: 0.65rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  #tour-narrative {
+    font-size: 0.85rem;
+    font-weight: 300;
+    color: var(--text-muted);
+    line-height: 1.6;
+    min-height: 3.2em;
+  }
+  #tour-narrative em { color: var(--text); font-style: italic; }
+  #tour-narrative strong { color: var(--accent); font-weight: 500; }
+  #tour-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  #tour-progress { display: flex; gap: 6px; align-items: center; }
+  .tour-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--text-faint);
+    transition: background 0.3s, transform 0.3s;
+  }
+  .tour-dot.active { background: var(--accent); transform: scale(1.3); }
+  .tour-dot.completed { background: var(--text-dim); }
+  #tour-buttons { display: flex; gap: 8px; align-items: center; }
+  .tour-btn {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 7px 16px; border-radius: 5px;
+    font-size: 0.78rem; font-weight: 400; font-family: inherit;
+    cursor: pointer; transition: all 0.2s;
+    border: 1px solid var(--text-faint); background: none; color: var(--text-dim);
+  }
+  .tour-btn:hover { border-color: var(--accent-border); color: var(--text-muted); }
+  .tour-btn:disabled { opacity: 0.3; cursor: default; }
+  .tour-btn-primary {
+    background: var(--accent-muted); border-color: var(--accent-border); color: var(--accent);
+  }
+  .tour-btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-border-hover); }
+  .tour-btn-skip {
+    font-size: 0.7rem; padding: 7px 12px; border: none; color: var(--text-dim);
+  }
+  .tour-btn-skip:hover { color: var(--text-muted); }
+
+  /* Tour node glow */
+  .tour-glow {
+    fill: none; stroke: var(--accent); stroke-width: 2; opacity: 0;
+  }
+  .tour-glow.active {
+    opacity: 1;
+    animation: tour-pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes tour-pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+  }
+  /* Dim nodes during tour */
+  .nodes.tour-dimmed circle,
+  .nodes.tour-dimmed text { opacity: 0.2; transition: opacity 0.4s; }
+  .nodes.tour-dimmed .tour-active { opacity: 1 !important; }
+
+  /* Loading */
+  #loading {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-dim);
+    font-size: 0.85rem;
+  }
+
+  /* SVG text styling */
+  .group-label {
+    fill: var(--text);
+    font-size: 9px;
+    font-weight: 500;
+    text-anchor: middle;
+  }
+  .node-label {
+    fill: var(--text);
+    font-size: 10px;
+    font-weight: 400;
+  }
+  .node-pct {
+    fill: var(--text-muted);
+    font-size: 8.5px;
+  }
+</style>
+</head>
+<body>
+
+<div id="breadcrumbs">
+  <a href="index.html">&larr; Variorum</a>
+  <button id="theme-toggle" onclick="toggleTheme()">
+    <svg id="theme-icon-sun" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    <svg id="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+</div>
+
+<div id="loading">Loading pathway data...</div>
+<div id="viz-container" style="display:none;"></div>
+<div id="tooltip"></div>
+<div id="legend" style="display:none;"></div>
+
+<div id="tour-panel" class="hidden">
+  <div id="tour-content">
+    <div id="tour-step-label"></div>
+    <div id="tour-narrative"></div>
+  </div>
+  <div id="tour-controls">
+    <div id="tour-progress"></div>
+    <div id="tour-buttons">
+      <button id="tour-back" class="tour-btn" onclick="tourBack()" disabled>
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Back
+      </button>
+      <button id="tour-skip" class="tour-btn tour-btn-skip" onclick="tourSkip()">Skip</button>
+      <button id="tour-next" class="tour-btn tour-btn-primary" onclick="tourNext()">
+        Next
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+// ══════════════════════════════════════
+//  THEME
+// ══════════════════════════════════════
+
+let isDarkMode = true;
+
+function initTheme() {
+  const saved = localStorage.getItem('subcutanean_theme');
+  isDarkMode = saved !== 'light';
+  applyTheme();
+}
+
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+  document.getElementById('theme-icon-sun').style.display = isDarkMode ? 'none' : 'block';
+  document.getElementById('theme-icon-moon').style.display = isDarkMode ? 'block' : 'none';
+}
+
+function toggleTheme() {
+  isDarkMode = !isDarkMode;
+  localStorage.setItem('subcutanean_theme', isDarkMode ? 'dark' : 'light');
+  applyTheme();
+  if (vizData) {
+    render();
+    rebuildTourAfterRender();
+  }
+}
+
+initTheme();
+
+
+// ══════════════════════════════════════
+//  SIGNAL TEXTS (for uploaded version scanning)
+// ══════════════════════════════════════
+
+const PATHWAY_SIGNALS = {
+  intro: {
+    clubintro:    { signal: "I hadn't wanted to go to the club",               chapter: "chapter1" },
+    makeupintro:  { signal: "I was on the back porch, looking over the dying", chapter: "chapter1" },
+    noodlesintro: { signal: "I was in the kitchen making ramen",               chapter: "chapter1" },
+  },
+  phone: {
+    dadphone:  { signal: "Do you want to talk to your father", chapter: "chapter10" },
+    bradphone: { signal: "Do you want to talk to Bradley",     chapter: "chapter10" },
+  },
+  rooms: {
+    empty:     { signal: "Some of the rooms seemed like bedrooms",  chapter: "chapter2" },
+    furnished: { signal: "a piece or two of abandoned furniture",    chapter: "chapter1" },
+  },
+  fridge: {
+    fridgetrapped: { signal: "checked my pockets",          chapter: "chapter4" },
+    fridgetunnel:  { signal: "pad of yellow sticky notes",   chapter: "chapter5" },
+  },
+  memory: {
+    cdrom:   { signal: "a CD-ROM adventure set on a space station",        chapter: "chapter4" },
+    gorilla: { signal: "I remembered something from a neurobiology class", chapter: "chapter9" },
+  },
+  attraction: {
+    vortex:   { signal: "THE VORTEX",                          chapter: "chapter6" },
+    gardens:  { signal: "THE ENDLESS GARDENS",                 chapter: "chapter6" },
+    snakeoil: { signal: "HENNESON'S MAGICAL TINCTURES",        chapter: "chapter6" },
+    caves:    { signal: "gotten lost in an underground cave",   chapter: "chapter6" },
+  },
+  hall: {
+    spiralhall: { signal: "one long hall that started leaning left",        chapter: "chapter8" },
+    nikofalls:  { signal: "the grappling hook ripped through the molding",  chapter: "chapter8" },
+  },
+  place: {
+    TheCity:     { signal: "ten million houses",                   chapter: "chapter11" },
+    TheBasement: { signal: "they open up into black empty spaces", chapter: "chapter11" },
+  },
+  ff_setting: {
+    ffdropoff:  { signal: "The door opened onto nothing",                    chapter: "chapter14" },
+    ffthewalls: { signal: "Perspectives change. Architecture gets stretched", chapter: "chapter14" },
+  },
+  ending: {
+    gayniko:      { signal: "I sometimes saw him looking at me, out of the corner of my eye", chapter: "chapter16" },
+    firmniko:     { signal: "dropped his arms to his sides. Fixed me with a look",            chapter: "chapter16" },
+    originalniko: { signal: "I lost my grip on the flashlight",                               chapter: "chapter4" },
+  },
+};
+
+
+// ══════════════════════════════════════
+//  SEED COLORS
+// ══════════════════════════════════════
+
+// Short narrative framing for each group column header
+const GROUP_DESCRIPTIONS = {
+  intro:      "How do Ryan and Niko reconnect?",
+  phone:      "Who does Ryan's mom ask about?",
+  rooms:      "What fills the underground rooms?",
+  fridge:     "What happens at the fridge?",
+  memory:     "What memory haunts Ryan?",
+  attraction: "What's in the old newspaper?",
+  hall:       "What happens in the tilting hall?",
+  place:      "What is Elder Niko's domain?",
+  ff_setting: "What defines the final arena?",
+  ending:     "How does it end for Ryan and Niko?",
+};
+
+const SEED_COLORS = [
+  [255, 107, 107], [78, 205, 196], [255, 195, 113], [110, 142, 251],
+  [162, 217, 134], [255, 154, 162], [128, 203, 232], [255, 218, 121],
+  [186, 146, 252], [103, 224, 169], [255, 138, 101], [100, 181, 246],
+  [255, 213, 79],  [149, 175, 255], [220, 198, 130], [130, 220, 198],
+  [220, 130, 198], [198, 220, 130], [130, 198, 220], [198, 130, 220],
+  [180, 180, 100], [100, 180, 180], [180, 100, 180], [140, 200, 140],
+  [200, 140, 200],
+];
+
+
+// ══════════════════════════════════════
+//  DATA & LAYOUT
+// ══════════════════════════════════════
+
+let vizData = null;
+let layout = null;
+let highlightedSeed = null;
+let highlightedNode = null;
+let revealedSeeds = new Set();  // indices into allSeedPaths
+let allSeedPaths = [];          // computed once per render
+
+// Layout constants
+const PAD_TOP = 120;
+const PAD_BOTTOM = 50;
+const PAD_LEFT = 60;
+const PAD_RIGHT = 60;
+const NODE_WIDTH = 10;
+const NODE_GAP = 28;
+const TRACE_DURATION = 1800;  // ms for path trace animation
+
+function computeLayout(data, svgW, svgH) {
+  const groups = data.groups;
+  const numCols = groups.length;
+  const colSpacing = (svgW - PAD_LEFT - PAD_RIGHT - NODE_WIDTH) / (numCols - 1);
+  const availH = svgH - PAD_TOP - PAD_BOTTOM;
+
+  // Build node map
+  const nodes = {};
+  for (let gi = 0; gi < groups.length; gi++) {
+    const group = groups[gi];
+    const vars = group.variables;
+    const maxGaps = vars.length - 1;
+    const nodeAreaH = availH - maxGaps * NODE_GAP;
+    const totalCount = vars.reduce((s, v) => s + v.count, 0);
+    let y = PAD_TOP;
+
+    for (const v of vars) {
+      const id = `${group.key}:${v.name}`;
+      const h = Math.max(10, (v.count / totalCount) * nodeAreaH);
+      nodes[id] = {
+        id, groupKey: group.key, groupIndex: gi,
+        name: v.name, label: v.label, description: v.description,
+        count: v.count, percentage: v.percentage,
+        x: PAD_LEFT + gi * colSpacing,
+        y, height: h, width: NODE_WIDTH,
+      };
+      y += h + NODE_GAP;
+    }
+  }
+
+  return { nodes, groups };
+}
+
+function seedPathD(points) {
+  if (points.length < 2) return '';
+  let path = `M${points[0].x},${points[0].y}`;
+  for (let i = 0; i < points.length - 1; i += 2) {
+    // Horizontal line through node (entry -> exit)
+    path += ` L${points[i + 1].x},${points[i + 1].y}`;
+    // S-curve to next node entry
+    if (i + 2 < points.length) {
+      const exit = points[i + 1];
+      const nextEntry = points[i + 2];
+      const gap = nextEntry.x - exit.x;
+      const cp1x = exit.x + gap * 0.2;
+      const cp2x = nextEntry.x - gap * 0.2;
+      path += ` C${cp1x},${exit.y} ${cp2x},${nextEntry.y} ${nextEntry.x},${nextEntry.y}`;
+    }
+  }
+  return path;
+}
+
+
+// ══════════════════════════════════════
+//  SEED PATH COMPUTATION
+// ══════════════════════════════════════
+
+function computeSeedPaths(seeds, layout) {
+  const groupKeys = layout.groups.map(g => g.key);
+
+  return seeds.map((seed, si) => {
+    const points = [];
+    const dots = [];
+    for (const gk of groupKeys) {
+      const varName = seed[gk];
+      if (!varName) continue;
+      const nodeId = `${gk}:${varName}`;
+      const node = layout.nodes[nodeId];
+      if (!node) continue;
+
+      // All seeds converge to the node center
+      const yPos = node.y + node.height / 2;
+
+      // Entry point (left edge) and exit point (right edge)
+      points.push({ x: node.x, y: yPos, nodeId });
+      points.push({ x: node.x + node.width, y: yPos, nodeId });
+      // Dot at center
+      dots.push({ x: node.x + node.width / 2, y: yPos, nodeId });
+    }
+    return { seed, points, dots, colorIndex: si };
+  });
+}
+
+
+// ══════════════════════════════════════
+//  RENDERING
+// ══════════════════════════════════════
+
+function render() {
+  const container = document.getElementById('viz-container');
+  container.innerHTML = '';
+  container.style.display = 'flex';
+  document.getElementById('loading').style.display = 'none';
+
+  const W = Math.max(1200, window.innerWidth);
+  const H = window.innerHeight;
+
+  layout = computeLayout(vizData, W, H);
+  allSeedPaths = computeSeedPaths(allSeeds, layout);
+
+  const svg = d3.select(container).append('svg')
+    .attr('width', W)
+    .attr('height', H)
+    .style('font-family', "'Inter', system-ui, sans-serif");
+
+  // ── Column bands (alternating, behind everything) ──
+  const colCenters = layout.groups.map(g => {
+    const firstVar = g.variables[0];
+    const node = layout.nodes[`${g.key}:${firstVar.name}`];
+    return node.x + node.width / 2;
+  });
+  for (let gi = 0; gi < colCenters.length; gi++) {
+    if (gi % 2 !== 0) continue;  // only shade every other column
+    const cx = colCenters[gi];
+    const leftEdge = gi === 0 ? 0 : (colCenters[gi - 1] + cx) / 2;
+    const rightEdge = gi === colCenters.length - 1 ? W : (cx + colCenters[gi + 1]) / 2;
+    svg.append('rect')
+      .attr('x', leftEdge)
+      .attr('y', 0)
+      .attr('width', rightEdge - leftEdge)
+      .attr('height', H)
+      .attr('fill', 'var(--col-band)')
+      .style('pointer-events', 'none');
+  }
+
+  // ── Group labels + descriptions ──
+  for (let gi = 0; gi < layout.groups.length; gi++) {
+    const group = layout.groups[gi];
+    const vars = group.variables;
+    const firstNode = layout.nodes[`${group.key}:${vars[0].name}`];
+    const cx = colCenters[gi];
+
+    // Column width: from midpoint to prev column through midpoint to next
+    const leftEdge = gi === 0 ? 0 : (colCenters[gi - 1] + cx) / 2;
+    const rightEdge = gi === colCenters.length - 1 ? W : (cx + colCenters[gi + 1]) / 2;
+    const colW = rightEdge - leftEdge;
+
+    // Group label (SVG text)
+    svg.append('text')
+      .attr('class', 'group-label')
+      .attr('x', cx)
+      .attr('y', 56)
+      .text(group.label);
+
+    // Description (foreignObject for word wrap)
+    const desc = GROUP_DESCRIPTIONS[group.key];
+    if (desc) {
+      const fo = svg.append('foreignObject')
+        .attr('x', leftEdge)
+        .attr('y', 60)
+        .attr('width', colW)
+        .attr('height', PAD_TOP - 64)
+        .style('pointer-events', 'none');
+      fo.append('xhtml:div')
+        .style('font-family', "'Inter', system-ui, sans-serif")
+        .style('font-size', '10px')
+        .style('font-weight', '300')
+        .style('font-style', 'italic')
+        .style('color', 'var(--text-muted)')
+        .style('text-align', 'center')
+        .style('line-height', '1.3')
+        .style('padding', '0 4px')
+        .style('overflow', 'hidden')
+        .text(desc);
+    }
+  }
+
+  // ── Nodes ──
+  const nodesGroup = svg.append('g').attr('class', 'nodes');
+  const nodeData = Object.values(layout.nodes);
+
+  nodesGroup.selectAll('circle')
+    .data(nodeData)
+    .join('circle')
+    .attr('cx', d => d.x + d.width / 2)
+    .attr('cy', d => d.y + d.height / 2)
+    .attr('r', 10)
+    .attr('fill', 'var(--node-fill)')
+    .attr('stroke', 'var(--node-stroke)')
+    .attr('stroke-width', 2)
+    .attr('data-node-id', d => d.id)
+    .style('pointer-events', 'none');  // visual only; hit targets are on top
+
+  // Node labels
+  nodesGroup.selectAll('.node-label-text')
+    .data(nodeData)
+    .join('text')
+    .attr('class', 'node-label')
+    .attr('data-node-id', d => d.id)
+    .attr('x', d => {
+      const isLast = d.groupIndex === layout.groups.length - 1;
+      const cx = d.x + d.width / 2;
+      return isLast ? cx - 14 : cx + 14;
+    })
+    .attr('y', d => d.y + d.height / 2)
+    .attr('dy', '0.35em')
+    .attr('text-anchor', d => d.groupIndex === layout.groups.length - 1 ? 'end' : 'start')
+    .text(d => d.label)
+    .style('pointer-events', 'none');
+
+  // Percentage below label
+  nodesGroup.selectAll('.node-pct-text')
+    .data(nodeData)
+    .join('text')
+    .attr('class', 'node-pct')
+    .attr('data-node-id', d => d.id)
+    .attr('x', d => {
+      const isLast = d.groupIndex === layout.groups.length - 1;
+      const cx = d.x + d.width / 2;
+      return isLast ? cx - 14 : cx + 14;
+    })
+    .attr('y', d => d.y + d.height / 2 + 13)
+    .attr('text-anchor', d => d.groupIndex === layout.groups.length - 1 ? 'end' : 'start')
+    .text(d => `${d.percentage}%`)
+    .style('pointer-events', 'none');
+
+  // ── Seed paths group (empty initially) ──
+  svg.append('g').attr('class', 'seed-paths');
+
+  // Rebuild any previously revealed seeds (e.g. after resize/theme change)
+  for (const idx of revealedSeeds) {
+    addSeedPath(idx, false);  // no animation on rebuild
+  }
+
+  // ── Node hit targets (rendered ABOVE seed paths for hover precedence) ──
+  const hitTargets = svg.append('g').attr('class', 'node-hit-targets');
+  hitTargets.selectAll('circle')
+    .data(nodeData)
+    .join('circle')
+    .attr('cx', d => d.x + d.width / 2)
+    .attr('cy', d => d.y + d.height / 2)
+    .attr('r', 16)
+    .attr('fill', 'transparent')
+    .style('cursor', 'pointer')
+    .on('mouseenter', function(event, d) {
+      highlightedNode = d.id;
+      updateHighlights();
+      showTooltip(event, d.label, d.description,
+        `${d.count.toLocaleString()} / ${vizData.total_variants.toLocaleString()} (${d.percentage}%)`);
+    })
+    .on('mousemove', moveTooltip)
+    .on('mouseleave', function() {
+      highlightedNode = null;
+      updateHighlights();
+      hideTooltip();
+    })
+    .on('click', function(event, d) {
+      revealSeedsThroughNode(d.id);
+    });
+
+  // Build legend
+  buildLegend();
+  if (tourActive) {
+    document.getElementById('legend').style.display = 'none';
+  }
+}
+
+
+// ══════════════════════════════════════
+//  SEED REVEAL
+// ══════════════════════════════════════
+
+function revealSeed(seedIndex) {
+  if (revealedSeeds.has(seedIndex)) {
+    // Already revealed — toggle it off
+    removeSeedPath(seedIndex);
+    revealedSeeds.delete(seedIndex);
+    updateLegendState();
+    return;
+  }
+
+  revealedSeeds.add(seedIndex);
+  addSeedPath(seedIndex, true);  // animate
+  updateLegendState();
+}
+
+function addSeedPath(seedIndex, animate) {
+  const sp = allSeedPaths[seedIndex];
+  if (!sp || sp.points.length < 2) return;
+
+  const svg = d3.select('#viz-container svg');
+  const seedGroup = svg.select('.seed-paths');
+  const c = SEED_COLORS[sp.colorIndex % SEED_COLORS.length];
+  const colorStr = `rgb(${c[0]},${c[1]},${c[2]})`;
+  const seedId = String(sp.seed.seed);
+
+  // Draw the path
+  const pathEl = seedGroup.append('path')
+    .attr('d', seedPathD(sp.points))
+    .attr('fill', 'none')
+    .attr('stroke', colorStr)
+    .attr('stroke-width', 2.5)
+    .attr('stroke-linecap', 'round')
+    .attr('class', `seed-path seed-${seedId}`)
+    .style('cursor', 'pointer')
+    .on('mouseenter', function(event) {
+      highlightedSeed = seedId;
+      updateHighlights();
+      const label = sp.seed.uploaded ? sp.seed.name : `Seed ${sp.seed.seed}`;
+      const groupKeys = layout.groups.map(g => g.key);
+      const pathDesc = groupKeys
+        .map(gk => sp.seed[gk] ? vizData.labels[sp.seed[gk]] : '?')
+        .join(' \u2192 ');
+      showTooltip(event, label, pathDesc, '');
+    })
+    .on('mousemove', moveTooltip)
+    .on('mouseleave', function() {
+      highlightedSeed = null;
+      updateHighlights();
+      hideTooltip();
+    })
+    .on('click', function() {
+      navigateToSeed(sp.seed.seed);
+    });
+
+  if (animate) {
+    // Animate: stroke-dasharray trace from left to right
+    const totalLen = pathEl.node().getTotalLength();
+    pathEl
+      .attr('stroke-dasharray', totalLen)
+      .attr('stroke-dashoffset', totalLen)
+      .attr('stroke-opacity', 0.85)
+      .transition()
+      .duration(TRACE_DURATION)
+      .ease(d3.easeQuadOut)
+      .attr('stroke-dashoffset', 0)
+      .on('end', function() {
+        // Clean up dasharray so hover highlighting works normally
+        d3.select(this)
+          .attr('stroke-dasharray', null)
+          .attr('stroke-dashoffset', null);
+      });
+
+    // Animate dots appearing sequentially along the path
+    sp.dots.forEach((dot, di) => {
+      const delay = (di / sp.dots.length) * TRACE_DURATION;
+      seedGroup.append('circle')
+        .attr('cx', dot.x)
+        .attr('cy', dot.y)
+        .attr('r', 0)
+        .attr('fill', colorStr)
+        .attr('stroke', 'var(--bg)')
+        .attr('stroke-width', 1.5)
+        .attr('class', `seed-dot seed-${seedId}`)
+        .style('pointer-events', 'none')
+        .transition()
+        .delay(delay)
+        .duration(300)
+        .ease(d3.easeBackOut)
+        .attr('r', 5);
+    });
+  } else {
+    // No animation — just show immediately
+    pathEl.attr('stroke-opacity', 0.7);
+
+    for (const dot of sp.dots) {
+      seedGroup.append('circle')
+        .attr('cx', dot.x)
+        .attr('cy', dot.y)
+        .attr('r', 5)
+        .attr('fill', colorStr)
+        .attr('stroke', 'var(--bg)')
+        .attr('stroke-width', 1.5)
+        .attr('class', `seed-dot seed-${seedId}`)
+        .style('pointer-events', 'none');
+    }
+  }
+}
+
+function removeSeedPath(seedIndex) {
+  const sp = allSeedPaths[seedIndex];
+  if (!sp) return;
+  const seedId = String(sp.seed.seed);
+  const svg = d3.select('#viz-container svg');
+
+  svg.selectAll(`.seed-${seedId}`)
+    .transition()
+    .duration(300)
+    .attr('stroke-opacity', 0)
+    .attr('opacity', 0)
+    .remove();
+}
+
+function revealAll() {
+  for (let i = 0; i < allSeedPaths.length; i++) {
+    if (!revealedSeeds.has(i)) {
+      revealedSeeds.add(i);
+      addSeedPath(i, false);
+    }
+  }
+  updateLegendState();
+}
+
+function clearAll() {
+  for (const idx of revealedSeeds) {
+    removeSeedPath(idx);
+  }
+  revealedSeeds.clear();
+  updateLegendState();
+}
+
+function revealSeedsThroughNode(nodeId) {
+  // Find all seed indices that pass through this node
+  const [groupKey, varName] = nodeId.split(':');
+  let newlyRevealed = 0;
+
+  allSeedPaths.forEach((sp, idx) => {
+    if (sp.seed[groupKey] === varName && !revealedSeeds.has(idx)) {
+      revealedSeeds.add(idx);
+      // Stagger the animations slightly for visual effect
+      setTimeout(() => addSeedPath(idx, true), newlyRevealed * 80);
+      newlyRevealed++;
+    }
+  });
+
+  if (newlyRevealed > 0) {
+    updateLegendState();
+  }
+}
+
+
+// ══════════════════════════════════════
+//  HIGHLIGHTS
+// ══════════════════════════════════════
+
+function updateHighlights() {
+  const svg = d3.select('#viz-container svg');
+
+  svg.selectAll('.seed-path')
+    .attr('stroke-opacity', function() {
+      const cls = d3.select(this).attr('class');
+      if (highlightedSeed !== null) {
+        return cls.includes(`seed-${highlightedSeed}`) ? 1 : 0.15;
+      }
+      if (highlightedNode !== null) {
+        // Check if this seed passes through the highlighted node
+        const seedId = cls.match(/seed-(\S+)/)?.[1];
+        const sp = allSeedPaths.find(s => String(s.seed.seed) === seedId);
+        if (sp) {
+          const groupKeys = layout.groups.map(g => g.key);
+          for (const gk of groupKeys) {
+            if (`${gk}:${sp.seed[gk]}` === highlightedNode) return 1;
+          }
+        }
+        return 0.15;
+      }
+      return 0.7;
+    })
+    .attr('stroke-width', function() {
+      const cls = d3.select(this).attr('class');
+      if (highlightedSeed !== null && cls.includes(`seed-${highlightedSeed}`)) return 4;
+      return 2.5;
+    });
+
+  svg.selectAll('.seed-dot')
+    .attr('opacity', function() {
+      const cls = d3.select(this).attr('class');
+      if (highlightedSeed !== null) {
+        return cls.includes(`seed-${highlightedSeed}`) ? 1 : 0.15;
+      }
+      return highlightedNode !== null ? 0.5 : 1;
+    });
+}
+
+
+// ══════════════════════════════════════
+//  TOOLTIP
+// ══════════════════════════════════════
+
+function showTooltip(event, label, desc, stat) {
+  const tt = document.getElementById('tooltip');
+  tt.innerHTML = `<div class="tt-label">${label}</div>` +
+    (desc ? `<div class="tt-desc">${desc}</div>` : '') +
+    (stat ? `<div class="tt-stat">${stat}</div>` : '');
+  tt.classList.add('visible');
+  moveTooltip(event);
+}
+
+function moveTooltip(event) {
+  const tt = document.getElementById('tooltip');
+  const x = event.clientX + 16;
+  const y = event.clientY - 10;
+  tt.style.left = Math.min(x, window.innerWidth - 300) + 'px';
+  tt.style.top = Math.max(y, 10) + 'px';
+}
+
+function hideTooltip() {
+  document.getElementById('tooltip').classList.remove('visible');
+}
+
+
+// ══════════════════════════════════════
+//  LEGEND
+// ══════════════════════════════════════
+
+function buildLegend() {
+  const legend = document.getElementById('legend');
+  legend.style.display = 'flex';
+
+  let html = '';
+
+  // Action buttons
+  html += `<button class="legend-action" onclick="revealAll()">Show All</button>`;
+  html += `<button class="legend-action" onclick="clearAll()">Clear</button>`;
+
+  // Seed items
+  allSeedPaths.forEach((sp, idx) => {
+    const c = SEED_COLORS[sp.colorIndex % SEED_COLORS.length];
+    const label = sp.seed.uploaded ? sp.seed.name : sp.seed.seed;
+    const cls = sp.seed.uploaded ? 'legend-seed legend-uploaded' : 'legend-seed';
+    const revealed = revealedSeeds.has(idx) ? ' revealed' : '';
+    html += `<span class="${cls}${revealed}" data-seed-index="${idx}"
+      onclick="revealSeed(${idx})"
+      onmouseenter="previewSeed(${idx})"
+      onmouseleave="unpreviewSeed()">
+      <span class="legend-dot" style="background:rgb(${c[0]},${c[1]},${c[2]}); color:rgb(${c[0]},${c[1]},${c[2]})"></span>
+      ${label}
+    </span>`;
+  });
+
+  legend.innerHTML = html;
+}
+
+function updateLegendState() {
+  document.querySelectorAll('.legend-seed').forEach(el => {
+    const idx = parseInt(el.dataset.seedIndex);
+    if (revealedSeeds.has(idx)) {
+      el.classList.add('revealed');
+    } else {
+      el.classList.remove('revealed');
+    }
+  });
+}
+
+function previewSeed(seedIndex) {
+  if (revealedSeeds.has(seedIndex)) {
+    // If already revealed, highlight it
+    highlightedSeed = String(allSeedPaths[seedIndex].seed.seed);
+    updateHighlights();
+  }
+}
+
+function unpreviewSeed() {
+  highlightedSeed = null;
+  updateHighlights();
+}
+
+
+// ══════════════════════════════════════
+//  UPLOADED VERSION SCANNING
+// ══════════════════════════════════════
+
+function scanUploadedVersions() {
+  try {
+    const stored = localStorage.getItem('subcutanean_custom_versions');
+    if (!stored) return [];
+    const custom = JSON.parse(stored);
+    const results = [];
+
+    for (const [vid, entry] of Object.entries(custom)) {
+      const vData = entry.data;
+      if (!vData) continue;
+      const rawName = entry.name || vid;
+      const result = { seed: vid, name: rawName.replace(/^Seed\s+/i, ''), uploaded: true };
+
+      for (const [groupKey, vars] of Object.entries(PATHWAY_SIGNALS)) {
+        for (const [varName, info] of Object.entries(vars)) {
+          const paras = vData[info.chapter];
+          if (!paras) continue;
+          if (paras.join(' ').toLowerCase().includes(info.signal.toLowerCase())) {
+            result[groupKey] = varName;
+            break;
+          }
+        }
+      }
+      results.push(result);
+    }
+    return results;
+  } catch (e) {
+    console.warn('Error scanning uploaded versions:', e);
+    return [];
+  }
+}
+
+
+// ══════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════
+
+function navigateToSeed(seed) {
+  window.location.href = `index.html?versionA=${seed}&chapter=chapter1&mode=unified`;
+}
+
+
+// ══════════════════════════════════════
+//  GUIDED TOUR
+// ══════════════════════════════════════
+
+const TOUR_SEED_INDEX = 0;  // Seed 60001 is the first builtin seed
+
+const TOUR_STEPS = [
+  {
+    label: 'Story Pathways',
+    narrative: `Every copy of <em>Subcutanean</em> is unique. Ten decision points
+      branch the narrative into hundreds of distinct combinations. Let\u2019s follow
+      <strong>Seed 60001</strong> through each fork to see what one reader\u2019s
+      novel looks like.`,
+    nodeIndex: -1
+  },
+  {
+    label: 'Chapter 1 Intro',
+    narrative: `The story begins. In Seed 60001, Ryan and Niko reconnect at
+      <strong>a club</strong> \u2014 a reluctant night out that sets the tone.
+      About 38% of all copies start this way. Others open on a back porch
+      or over a pot of ramen.`,
+    nodeIndex: 0
+  },
+  {
+    label: 'The Phone Call',
+    narrative: `Ryan\u2019s mother calls. She asks: <em>\u201CDo you want to talk to your
+      father?\u201D</em> In this copy, Ryan\u2019s <strong>father is dead</strong> \u2014
+      yet impossibly, his voice comes on the line. Half of all copies carry
+      this wound; the other half ask about an ex named Bradley, who\u2019s at
+      Mom\u2019s house acting like nothing ever happened.`,
+    nodeIndex: 1
+  },
+  {
+    label: 'The Rooms',
+    narrative: `Underground, the house unfolds. The rooms in Seed 60001 are
+      <strong>empty</strong> \u2014 no furniture, just carpet stains, wall gouges,
+      and a musty smell of long vacancy. In half the copies, dusty pieces
+      of abandoned furniture fill these spaces instead, decades out of date.`,
+    nodeIndex: 2
+  },
+  {
+    label: 'The Fridge',
+    narrative: `The fridge conceals a passage. Niko brings <strong>a pad of
+      yellow sticky notes</strong>, nervously flipping the edges \u2014
+      <em>\u201Cin case we need to mark our way.\u201D</em>
+      In other copies, the key vanishes from Ryan\u2019s pocket and
+      he\u2019s trapped, with no way back but forward.`,
+    nodeIndex: 3
+  },
+  {
+    label: 'The Memory',
+    narrative: `Something stirs in Ryan\u2019s past. He remembers <strong>a CD-ROM
+      adventure</strong> set on a space station \u2014 hypnotic but frustrating,
+      its puzzles gloriously baffling. This is the most common memory,
+      appearing in 57% of copies. The alternative: the famous invisible
+      gorilla experiment from a neurobiology class.`,
+    nodeIndex: 4
+  },
+  {
+    label: 'The Attraction',
+    narrative: `An old newspaper clipping surfaces. The ad reads:
+      <strong>\u201CTHE ENDLESS GARDENS\u201D</strong> \u2014 a long-closed
+      attraction built over an underground spring, where visitors
+      vanished among the overgrown paths. Only 26% of copies feature
+      the Gardens. Others find a Vortex, a Snake Oil show, or a story
+      about boys lost in caves.`,
+    nodeIndex: 5
+  },
+  {
+    label: 'The Hall',
+    narrative: `The architecture turns impossible. Seed 60001 enters
+      <strong>the Spiral Hall</strong> \u2014 one long corridor that leans
+      steadily left until you\u2019re walking on the ceiling. The majority
+      path. In the other version, a grappling hook fails and Niko falls.`,
+    nodeIndex: 6
+  },
+  {
+    label: 'Elder Niko\u2019s Place',
+    narrative: `Deep in the house, they find an older version of Niko.
+      Elder Niko describes his domain: <strong>an endless basement</strong>
+      where rooms open into black empty spaces. 43% of copies lead here.
+      The alternative is a City \u2014 ten million recursive houses stretching
+      to infinity.`,
+    nodeIndex: 7
+  },
+  {
+    label: 'The Final Arena',
+    narrative: `The climax. The door opens onto <strong>nothing</strong>.
+      The floor drops away into blackness \u2014 an endless dropoff,
+      with tiny clusters of lights miles below. In other copies,
+      the walls are endless pink insulation foam \u2014 they\u2019re
+      termites in the walls of a giant\u2019s house.`,
+    nodeIndex: 8
+  },
+  {
+    label: 'The Ending',
+    narrative: `And at last, the ending. In Seed 60001, there is
+      <strong>romantic tension</strong> \u2014 Niko looks at Ryan from the
+      corner of his eye, something hot and desperate in his gaze.
+      One-third of copies end this way. Others get a firm, platonic Niko,
+      or the loneliest version: Ryan survives but wakes in the wrong
+      universe entirely.`,
+    nodeIndex: 9
+  },
+  {
+    label: 'Your Turn',
+    narrative: `That\u2019s one path through <em>Subcutanean</em>.
+      <strong>Click any seed</strong> in the legend below to trace another.
+      <strong>Click a node</strong> to reveal every seed that passes through it.
+      No two paths are quite alike.`,
+    nodeIndex: -1
+  },
+];
+
+let tourActive = false;
+let tourStep = 0;
+let tourSegmentLengths = [];
+let tourTotalLength = 0;
+let tourPathEl = null;
+let tourGlowEls = [];
+
+function computeTourSegmentLengths() {
+  const sp = allSeedPaths[TOUR_SEED_INDEX];
+  if (!sp || sp.points.length < 2) return [];
+
+  const svg = d3.select('#viz-container svg');
+  const tempPath = svg.append('path')
+    .attr('fill', 'none').attr('stroke', 'none')
+    .style('pointer-events', 'none');
+
+  const lengths = [];
+  for (let ni = 0; ni < sp.dots.length; ni++) {
+    const partialPoints = sp.points.slice(0, (ni + 1) * 2);
+    tempPath.attr('d', seedPathD(partialPoints));
+    lengths.push(tempPath.node().getTotalLength());
+  }
+
+  tempPath.remove();
+  return lengths;
+}
+
+function initTour() {
+  tourActive = true;
+  tourStep = 0;
+
+  document.getElementById('legend').style.display = 'none';
+
+  tourSegmentLengths = computeTourSegmentLengths();
+
+  const sp = allSeedPaths[TOUR_SEED_INDEX];
+  tourTotalLength = 0;
+  if (sp && sp.points.length >= 2) {
+    const svg = d3.select('#viz-container svg');
+    const temp = svg.append('path')
+      .attr('d', seedPathD(sp.points))
+      .attr('fill', 'none').attr('stroke', 'none');
+    tourTotalLength = temp.node().getTotalLength();
+    temp.remove();
+  }
+
+  drawTourPath();
+  createTourGlows();
+  buildTourProgress();
+
+  document.getElementById('tour-panel').classList.remove('hidden');
+  renderTourStep();
+}
+
+function drawTourPath() {
+  const sp = allSeedPaths[TOUR_SEED_INDEX];
+  if (!sp || sp.points.length < 2) return;
+
+  const svg = d3.select('#viz-container svg');
+  const seedGroup = svg.select('.seed-paths');
+  const c = SEED_COLORS[0];
+  const colorStr = `rgb(${c[0]},${c[1]},${c[2]})`;
+
+  tourPathEl = seedGroup.append('path')
+    .attr('d', seedPathD(sp.points))
+    .attr('fill', 'none')
+    .attr('stroke', colorStr)
+    .attr('stroke-width', 3)
+    .attr('stroke-linecap', 'round')
+    .attr('class', 'seed-path tour-path')
+    .attr('stroke-dasharray', tourTotalLength)
+    .attr('stroke-dashoffset', tourTotalLength)
+    .attr('stroke-opacity', 0.9)
+    .style('pointer-events', 'none');
+}
+
+function createTourGlows() {
+  const sp = allSeedPaths[TOUR_SEED_INDEX];
+  if (!sp) return;
+
+  const svg = d3.select('#viz-container svg');
+  const glowGroup = svg.insert('g', '.node-hit-targets').attr('class', 'tour-glows');
+
+  tourGlowEls = sp.dots.map(dot => {
+    return glowGroup.append('circle')
+      .attr('cx', dot.x).attr('cy', dot.y)
+      .attr('r', 18)
+      .attr('class', 'tour-glow');
+  });
+}
+
+function buildTourProgress() {
+  const container = document.getElementById('tour-progress');
+  let html = '';
+  for (let i = 0; i < TOUR_STEPS.length; i++) {
+    html += `<span class="tour-dot" data-step="${i}"></span>`;
+  }
+  container.innerHTML = html;
+}
+
+function renderTourStep() {
+  const step = TOUR_STEPS[tourStep];
+
+  // Crossfade text
+  const contentEl = document.getElementById('tour-content');
+  contentEl.style.opacity = '0';
+  setTimeout(() => {
+    document.getElementById('tour-step-label').textContent = step.label;
+    document.getElementById('tour-narrative').innerHTML = step.narrative;
+    contentEl.style.opacity = '1';
+  }, 150);
+
+  // Progress dots
+  document.querySelectorAll('.tour-dot').forEach((dot, i) => {
+    dot.classList.toggle('active', i === tourStep);
+    dot.classList.toggle('completed', i < tourStep);
+  });
+
+  // Button states
+  document.getElementById('tour-back').disabled = (tourStep === 0);
+  const nextBtn = document.getElementById('tour-next');
+  const skipBtn = document.getElementById('tour-skip');
+  if (tourStep === TOUR_STEPS.length - 1) {
+    nextBtn.innerHTML = 'Explore <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+    skipBtn.style.display = 'none';
+  } else {
+    nextBtn.innerHTML = 'Next <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+    skipBtn.style.display = '';
+  }
+
+  // Animate path reveal
+  animatePathToStep(tourStep);
+
+  // Glow on current node
+  tourGlowEls.forEach((el, i) => el.classed('active', i === step.nodeIndex));
+
+  // Pop dot at current node
+  if (step.nodeIndex >= 0) animateTourDot(step.nodeIndex);
+
+  // Dim/undim nodes
+  updateTourNodeDimming(step.nodeIndex);
+}
+
+function animatePathToStep(stepIndex) {
+  if (!tourPathEl) return;
+
+  if (stepIndex === 0) {
+    tourPathEl.transition().duration(400)
+      .attr('stroke-dashoffset', tourTotalLength);
+    return;
+  }
+
+  const nodeIdx = TOUR_STEPS[stepIndex].nodeIndex;
+  let targetLength;
+
+  if (stepIndex === TOUR_STEPS.length - 1) {
+    targetLength = tourTotalLength;
+  } else {
+    targetLength = tourSegmentLengths[nodeIdx] || 0;
+  }
+
+  const targetOffset = tourTotalLength - targetLength;
+  tourPathEl.transition().duration(800).ease(d3.easeQuadOut)
+    .attr('stroke-dashoffset', targetOffset);
+}
+
+function animateTourDot(nodeIndex) {
+  const sp = allSeedPaths[TOUR_SEED_INDEX];
+  if (!sp) return;
+  const dot = sp.dots[nodeIndex];
+  if (!dot) return;
+
+  const svg = d3.select('#viz-container svg');
+  const seedGroup = svg.select('.seed-paths');
+
+  // Don't duplicate
+  if (!seedGroup.select(`.tour-dot-${nodeIndex}`).empty()) return;
+
+  const c = SEED_COLORS[0];
+  const colorStr = `rgb(${c[0]},${c[1]},${c[2]})`;
+
+  seedGroup.append('circle')
+    .attr('cx', dot.x).attr('cy', dot.y)
+    .attr('r', 0)
+    .attr('fill', colorStr)
+    .attr('stroke', 'var(--bg)')
+    .attr('stroke-width', 1.5)
+    .attr('class', `seed-dot tour-dot-${nodeIndex}`)
+    .style('pointer-events', 'none')
+    .transition().duration(300).ease(d3.easeBackOut)
+    .attr('r', 5);
+}
+
+function removeTourDot(nodeIndex) {
+  d3.select('#viz-container svg').selectAll(`.tour-dot-${nodeIndex}`)
+    .transition().duration(200).attr('r', 0).remove();
+}
+
+function updateTourNodeDimming(activeNodeIndex) {
+  const svg = d3.select('#viz-container svg');
+  const nodesGroup = svg.select('.nodes');
+
+  if (activeNodeIndex === -1) {
+    nodesGroup.classed('tour-dimmed', false);
+    nodesGroup.selectAll('.tour-active').classed('tour-active', false);
+    return;
+  }
+
+  nodesGroup.classed('tour-dimmed', true);
+
+  const sp = allSeedPaths[TOUR_SEED_INDEX];
+  const activeNodeId = sp.dots[activeNodeIndex].nodeId;
+
+  nodesGroup.selectAll('[data-node-id]').each(function() {
+    const el = d3.select(this);
+    el.classed('tour-active', el.attr('data-node-id') === activeNodeId);
+  });
+}
+
+function tourNext() {
+  if (!tourActive) return;
+  if (tourStep === TOUR_STEPS.length - 1) { finishTour(); return; }
+  tourStep++;
+  renderTourStep();
+}
+
+function tourBack() {
+  if (!tourActive || tourStep === 0) return;
+  if (TOUR_STEPS[tourStep].nodeIndex >= 0) {
+    removeTourDot(TOUR_STEPS[tourStep].nodeIndex);
+  }
+  tourStep--;
+  renderTourStep();
+}
+
+function tourSkip() {
+  if (!tourActive) return;
+  cleanupTourVisuals();
+  tourActive = false;
+  document.getElementById('tour-panel').classList.add('hidden');
+  document.getElementById('legend').style.display = 'flex';
+}
+
+function finishTour() {
+  tourActive = false;
+
+  const svg = d3.select('#viz-container svg');
+  svg.selectAll('.tour-glow').remove();
+  svg.select('.tour-glows').remove();
+  svg.select('.nodes').classed('tour-dimmed', false);
+  svg.selectAll('.tour-active').classed('tour-active', false);
+
+  // Remove tour path and dots
+  svg.selectAll('.tour-path').remove();
+  for (let i = 0; i < 10; i++) svg.selectAll(`.tour-dot-${i}`).remove();
+
+  // Add seed 60001 as a properly revealed seed
+  revealedSeeds.add(TOUR_SEED_INDEX);
+  addSeedPath(TOUR_SEED_INDEX, false);
+  updateLegendState();
+
+  document.getElementById('tour-panel').classList.add('hidden');
+  setTimeout(() => { document.getElementById('tour-panel').style.display = 'none'; }, 400);
+  document.getElementById('legend').style.display = 'flex';
+}
+
+function cleanupTourVisuals() {
+  const svg = d3.select('#viz-container svg');
+  svg.selectAll('.tour-path').remove();
+  for (let i = 0; i < 10; i++) svg.selectAll(`.tour-dot-${i}`).remove();
+  svg.selectAll('.tour-glow').remove();
+  svg.select('.tour-glows').remove();
+  svg.select('.nodes').classed('tour-dimmed', false);
+  svg.selectAll('.tour-active').classed('tour-active', false);
+  tourPathEl = null;
+  tourGlowEls = [];
+  tourSegmentLengths = [];
+}
+
+function rebuildTourAfterRender() {
+  if (!tourActive) return;
+  document.getElementById('legend').style.display = 'none';
+  tourSegmentLengths = computeTourSegmentLengths();
+  const sp = allSeedPaths[TOUR_SEED_INDEX];
+  const svg = d3.select('#viz-container svg');
+  const temp = svg.append('path')
+    .attr('d', seedPathD(sp.points))
+    .attr('fill', 'none').attr('stroke', 'none');
+  tourTotalLength = temp.node().getTotalLength();
+  temp.remove();
+  drawTourPath();
+  createTourGlows();
+  // Jump path to current position instantly
+  if (tourStep > 0 && tourStep < TOUR_STEPS.length - 1) {
+    const nodeIdx = TOUR_STEPS[tourStep].nodeIndex;
+    const targetOffset = tourTotalLength - (tourSegmentLengths[nodeIdx] || 0);
+    tourPathEl.attr('stroke-dashoffset', targetOffset);
+  } else if (tourStep === TOUR_STEPS.length - 1) {
+    tourPathEl.attr('stroke-dashoffset', 0);
+  }
+  // Re-place dots for all visited nodes
+  for (let s = 1; s <= tourStep && s < TOUR_STEPS.length - 1; s++) {
+    const ni = TOUR_STEPS[s].nodeIndex;
+    if (ni >= 0) animateTourDot(ni);
+  }
+  // Re-apply glow and dimming
+  tourGlowEls.forEach((el, i) => el.classed('active', i === TOUR_STEPS[tourStep].nodeIndex));
+  updateTourNodeDimming(TOUR_STEPS[tourStep].nodeIndex);
+}
+
+// Keyboard navigation for tour
+document.addEventListener('keydown', (e) => {
+  if (!tourActive) return;
+  if (e.key === 'ArrowRight' || e.key === 'Enter') { e.preventDefault(); tourNext(); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); tourBack(); }
+  else if (e.key === 'Escape') { e.preventDefault(); tourSkip(); }
+});
+
+
+// ══════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════
+
+let allSeeds = [];
+
+fetch('extracted_text/pathway_viz.json')
+  .then(r => r.json())
+  .then(data => {
+    vizData = data;
+
+    // Build seed list: built-in + uploaded
+    allSeeds = [...data.builtin_seeds];
+    const uploaded = scanUploadedVersions();
+    allSeeds.push(...uploaded);
+
+    render();
+    initTour();
+
+    // Re-render on resize (preserves revealed set and tour state)
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        render();
+        rebuildTourAfterRender();
+      }, 200);
+    });
+  })
+  .catch(err => {
+    document.getElementById('loading').textContent = 'Error loading data: ' + err.message;
+  });
+</script>
+</body>
+</html>

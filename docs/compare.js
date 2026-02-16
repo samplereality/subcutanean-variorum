@@ -11217,6 +11217,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Pathways button — opens the pathways.html visualization
+    const pathwaysBtn = document.getElementById('pathways-btn');
+    if (pathwaysBtn) {
+        pathwaysBtn.addEventListener('click', () => {
+            window.location.href = 'pathways.html';
+        });
+    }
+
     // Cluster filter button click handlers
     [0, 1, 2].forEach(i => {
         const btn = document.getElementById(`tapestry-cluster-${i}`);

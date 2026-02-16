@@ -1,0 +1,883 @@
+{
+  "total_variants": 10000,
+  "seed_range": [
+    50000,
+    59999
+  ],
+  "groups": [
+    {
+      "key": "intro",
+      "label": "Chapter 1 Intro",
+      "variables": [
+        {
+          "name": "clubintro",
+          "label": "Club",
+          "description": "Ryan reluctantly goes to a club with Niko",
+          "chapter": "chapter1",
+          "count": 3757,
+          "percentage": 37.57
+        },
+        {
+          "name": "makeupintro",
+          "label": "Makeup",
+          "description": "Niko apologizes to Ryan on the back porch after an argument",
+          "chapter": "chapter1",
+          "count": 3389,
+          "percentage": 33.89
+        },
+        {
+          "name": "noodlesintro",
+          "label": "Noodles",
+          "description": "Ryan is making ramen when Niko arrives",
+          "chapter": "chapter1",
+          "count": 2854,
+          "percentage": 28.54
+        }
+      ]
+    },
+    {
+      "key": "phone",
+      "label": "The Phone Call",
+      "variables": [
+        {
+          "name": "dadphone",
+          "label": "Dad",
+          "description": "Ryan's dead father impossibly speaks on the phone",
+          "chapter": "chapter10",
+          "count": 5008,
+          "percentage": 50.08
+        },
+        {
+          "name": "bradphone",
+          "label": "Brad",
+          "description": "Ryan's ex Bradley is at Mom's house, acting like nothing happened",
+          "chapter": "chapter10",
+          "count": 4992,
+          "percentage": 49.92
+        }
+      ]
+    },
+    {
+      "key": "rooms",
+      "label": "The Rooms",
+      "variables": [
+        {
+          "name": "empty",
+          "label": "Empty",
+          "description": "The underground rooms are all empty",
+          "chapter": "chapter2",
+          "count": 4991,
+          "percentage": 49.91
+        },
+        {
+          "name": "furnished",
+          "label": "Furnished",
+          "description": "A piece or two of dusty, decades-old abandoned furniture",
+          "chapter": "chapter1",
+          "count": 5009,
+          "percentage": 50.09
+        }
+      ]
+    },
+    {
+      "key": "fridge",
+      "label": "The Fridge",
+      "variables": [
+        {
+          "name": "fridgetrapped",
+          "label": "Trapped",
+          "description": "Ryan is trapped \u2014 the key is gone",
+          "chapter": "chapter4",
+          "count": 5085,
+          "percentage": 50.85
+        },
+        {
+          "name": "fridgetunnel",
+          "label": "Tunnel",
+          "description": "Niko brings sticky notes to mark their way through the tunnel",
+          "chapter": "chapter5",
+          "count": 4915,
+          "percentage": 49.15
+        }
+      ]
+    },
+    {
+      "key": "memory",
+      "label": "The Memory",
+      "variables": [
+        {
+          "name": "cdrom",
+          "label": "CD-ROM",
+          "description": "A hypnotic CD-ROM adventure set on a space station",
+          "chapter": "chapter4",
+          "count": 5689,
+          "percentage": 56.89
+        },
+        {
+          "name": "gorilla",
+          "label": "Gorilla",
+          "description": "The invisible gorilla \u2014 an attention experiment from class",
+          "chapter": "chapter9",
+          "count": 4311,
+          "percentage": 43.11
+        }
+      ]
+    },
+    {
+      "key": "attraction",
+      "label": "The Attraction",
+      "variables": [
+        {
+          "name": "vortex",
+          "label": "Vortex",
+          "description": "A newspaper ad for 'THE VORTEX' attraction",
+          "chapter": "chapter6",
+          "count": 2823,
+          "percentage": 28.23
+        },
+        {
+          "name": "gardens",
+          "label": "Gardens",
+          "description": "A newspaper ad for 'THE ENDLESS GARDENS'",
+          "chapter": "chapter6",
+          "count": 2631,
+          "percentage": 26.31
+        },
+        {
+          "name": "snakeoil",
+          "label": "Snake Oil",
+          "description": "A newspaper ad for Dr. Henneson's Magical Tinctures",
+          "chapter": "chapter6",
+          "count": 2369,
+          "percentage": 23.69
+        },
+        {
+          "name": "caves",
+          "label": "Caves",
+          "description": "A newspaper story about boys lost in an underground cave",
+          "chapter": "chapter6",
+          "count": 2177,
+          "percentage": 21.77
+        }
+      ]
+    },
+    {
+      "key": "hall",
+      "label": "The Hall",
+      "variables": [
+        {
+          "name": "spiralhall",
+          "label": "Spiral Hall",
+          "description": "One long hall that leans left \u2014 walking on the ceiling",
+          "chapter": "chapter8",
+          "count": 5700,
+          "percentage": 57.0
+        },
+        {
+          "name": "nikofalls",
+          "label": "Niko Falls",
+          "description": "The grappling hook fails \u2014 Niko falls",
+          "chapter": "chapter8",
+          "count": 4300,
+          "percentage": 43.0
+        }
+      ]
+    },
+    {
+      "key": "place",
+      "label": "Elder Niko's Place",
+      "variables": [
+        {
+          "name": "TheCity",
+          "label": "The City",
+          "description": "Elder Niko describes a city of ten million recursive houses",
+          "chapter": "chapter11",
+          "count": 5742,
+          "percentage": 57.42
+        },
+        {
+          "name": "TheBasement",
+          "label": "The Basement",
+          "description": "Elder Niko describes an endless empty basement",
+          "chapter": "chapter11",
+          "count": 4258,
+          "percentage": 42.58
+        }
+      ]
+    },
+    {
+      "key": "ff_setting",
+      "label": "Final Fight: Setting",
+      "variables": [
+        {
+          "name": "ffdropoff",
+          "label": "Endless Dropoff",
+          "description": "The floor drops away into blackness",
+          "chapter": "chapter14",
+          "count": 4937,
+          "percentage": 49.37
+        },
+        {
+          "name": "ffthewalls",
+          "label": "The Walls",
+          "description": "Endless walls of pink insulation foam",
+          "chapter": "chapter14",
+          "count": 5063,
+          "percentage": 50.63
+        }
+      ]
+    },
+    {
+      "key": "ending",
+      "label": "The Ending",
+      "variables": [
+        {
+          "name": "gayniko",
+          "label": "Gay Niko",
+          "description": "Romantic tension \u2014 Niko looks at Ryan from the corner of his eye",
+          "chapter": "chapter16",
+          "count": 3328,
+          "percentage": 33.28
+        },
+        {
+          "name": "firmniko",
+          "label": "Firm Niko",
+          "description": "Firm, platonic Niko \u2014 drops his arms, fixes Ryan with a look",
+          "chapter": "chapter16",
+          "count": 3376,
+          "percentage": 33.76
+        },
+        {
+          "name": "originalniko",
+          "label": "Original Niko",
+          "description": "Ryan survives but wakes in the wrong universe, alone",
+          "chapter": "chapter4",
+          "count": 3296,
+          "percentage": 32.96
+        }
+      ]
+    }
+  ],
+  "flow_links": [
+    {
+      "source": "hall:spiralhall",
+      "target": "place:TheCity",
+      "value": 3232
+    },
+    {
+      "source": "place:TheCity",
+      "target": "ff_setting:ffthewalls",
+      "value": 2922
+    },
+    {
+      "source": "fridge:fridgetrapped",
+      "target": "memory:cdrom",
+      "value": 2906
+    },
+    {
+      "source": "place:TheCity",
+      "target": "ff_setting:ffdropoff",
+      "value": 2820
+    },
+    {
+      "source": "fridge:fridgetunnel",
+      "target": "memory:cdrom",
+      "value": 2783
+    },
+    {
+      "source": "rooms:empty",
+      "target": "fridge:fridgetrapped",
+      "value": 2600
+    },
+    {
+      "source": "phone:dadphone",
+      "target": "rooms:furnished",
+      "value": 2541
+    },
+    {
+      "source": "phone:bradphone",
+      "target": "rooms:empty",
+      "value": 2524
+    },
+    {
+      "source": "rooms:furnished",
+      "target": "fridge:fridgetunnel",
+      "value": 2524
+    },
+    {
+      "source": "hall:nikofalls",
+      "target": "place:TheCity",
+      "value": 2510
+    },
+    {
+      "source": "rooms:furnished",
+      "target": "fridge:fridgetrapped",
+      "value": 2485
+    },
+    {
+      "source": "phone:bradphone",
+      "target": "rooms:furnished",
+      "value": 2468
+    },
+    {
+      "source": "hall:spiralhall",
+      "target": "place:TheBasement",
+      "value": 2468
+    },
+    {
+      "source": "phone:dadphone",
+      "target": "rooms:empty",
+      "value": 2467
+    },
+    {
+      "source": "rooms:empty",
+      "target": "fridge:fridgetunnel",
+      "value": 2391
+    },
+    {
+      "source": "fridge:fridgetrapped",
+      "target": "memory:gorilla",
+      "value": 2179
+    },
+    {
+      "source": "place:TheBasement",
+      "target": "ff_setting:ffthewalls",
+      "value": 2141
+    },
+    {
+      "source": "fridge:fridgetunnel",
+      "target": "memory:gorilla",
+      "value": 2132
+    },
+    {
+      "source": "place:TheBasement",
+      "target": "ff_setting:ffdropoff",
+      "value": 2117
+    },
+    {
+      "source": "intro:clubintro",
+      "target": "phone:dadphone",
+      "value": 1896
+    },
+    {
+      "source": "intro:clubintro",
+      "target": "phone:bradphone",
+      "value": 1861
+    },
+    {
+      "source": "hall:nikofalls",
+      "target": "place:TheBasement",
+      "value": 1790
+    },
+    {
+      "source": "ff_setting:ffthewalls",
+      "target": "ending:firmniko",
+      "value": 1719
+    },
+    {
+      "source": "intro:makeupintro",
+      "target": "phone:bradphone",
+      "value": 1713
+    },
+    {
+      "source": "intro:makeupintro",
+      "target": "phone:dadphone",
+      "value": 1676
+    },
+    {
+      "source": "ff_setting:ffthewalls",
+      "target": "ending:gayniko",
+      "value": 1673
+    },
+    {
+      "source": "ff_setting:ffthewalls",
+      "target": "ending:originalniko",
+      "value": 1671
+    },
+    {
+      "source": "ff_setting:ffdropoff",
+      "target": "ending:firmniko",
+      "value": 1657
+    },
+    {
+      "source": "ff_setting:ffdropoff",
+      "target": "ending:gayniko",
+      "value": 1655
+    },
+    {
+      "source": "ff_setting:ffdropoff",
+      "target": "ending:originalniko",
+      "value": 1625
+    },
+    {
+      "source": "attraction:vortex",
+      "target": "hall:spiralhall",
+      "value": 1591
+    },
+    {
+      "source": "memory:cdrom",
+      "target": "attraction:vortex",
+      "value": 1563
+    },
+    {
+      "source": "memory:cdrom",
+      "target": "attraction:gardens",
+      "value": 1507
+    },
+    {
+      "source": "attraction:gardens",
+      "target": "hall:spiralhall",
+      "value": 1500
+    },
+    {
+      "source": "intro:noodlesintro",
+      "target": "phone:dadphone",
+      "value": 1436
+    },
+    {
+      "source": "intro:noodlesintro",
+      "target": "phone:bradphone",
+      "value": 1418
+    },
+    {
+      "source": "attraction:snakeoil",
+      "target": "hall:spiralhall",
+      "value": 1389
+    },
+    {
+      "source": "memory:cdrom",
+      "target": "attraction:snakeoil",
+      "value": 1365
+    },
+    {
+      "source": "memory:gorilla",
+      "target": "attraction:vortex",
+      "value": 1260
+    },
+    {
+      "source": "memory:cdrom",
+      "target": "attraction:caves",
+      "value": 1254
+    },
+    {
+      "source": "attraction:vortex",
+      "target": "hall:nikofalls",
+      "value": 1232
+    },
+    {
+      "source": "attraction:caves",
+      "target": "hall:spiralhall",
+      "value": 1220
+    },
+    {
+      "source": "attraction:gardens",
+      "target": "hall:nikofalls",
+      "value": 1131
+    },
+    {
+      "source": "memory:gorilla",
+      "target": "attraction:gardens",
+      "value": 1124
+    },
+    {
+      "source": "memory:gorilla",
+      "target": "attraction:snakeoil",
+      "value": 1004
+    },
+    {
+      "source": "attraction:snakeoil",
+      "target": "hall:nikofalls",
+      "value": 980
+    },
+    {
+      "source": "attraction:caves",
+      "target": "hall:nikofalls",
+      "value": 957
+    },
+    {
+      "source": "memory:gorilla",
+      "target": "attraction:caves",
+      "value": 923
+    }
+  ],
+  "builtin_seeds": [
+    {
+      "seed": 60001,
+      "intro": "clubintro",
+      "phone": "dadphone",
+      "rooms": "empty",
+      "fridge": "fridgetunnel",
+      "memory": "cdrom",
+      "attraction": "gardens",
+      "hall": "spiralhall",
+      "place": "TheBasement",
+      "ff_setting": "ffdropoff",
+      "ending": "gayniko"
+    },
+    {
+      "seed": 60002,
+      "intro": "clubintro",
+      "phone": "bradphone",
+      "rooms": "furnished",
+      "fridge": "fridgetunnel",
+      "memory": "gorilla",
+      "attraction": "vortex",
+      "hall": "spiralhall",
+      "place": "TheCity",
+      "ff_setting": "ffdropoff",
+      "ending": "gayniko"
+    },
+    {
+      "seed": 60003,
+      "intro": "makeupintro",
+      "phone": "dadphone",
+      "rooms": "empty",
+      "fridge": "fridgetrapped",
+      "memory": "gorilla",
+      "attraction": "gardens",
+      "hall": "nikofalls",
+      "place": "TheBasement",
+      "ff_setting": "ffthewalls",
+      "ending": "gayniko"
+    },
+    {
+      "seed": 60004,
+      "intro": "makeupintro",
+      "phone": "bradphone",
+      "rooms": "empty",
+      "fridge": "fridgetrapped",
+      "memory": "cdrom",
+      "attraction": "gardens",
+      "hall": "nikofalls",
+      "place": "TheCity",
+      "ff_setting": "ffdropoff",
+      "ending": "gayniko"
+    },
+    {
+      "seed": 60005,
+      "intro": "makeupintro",
+      "phone": "dadphone",
+      "rooms": "furnished",
+      "fridge": "fridgetrapped",
+      "memory": "gorilla",
+      "attraction": "vortex",
+      "hall": "spiralhall",
+      "place": "TheBasement",
+      "ff_setting": "ffdropoff",
+      "ending": "gayniko"
+    },
+    {
+      "seed": 60006,
+      "intro": "clubintro",
+      "phone": "bradphone",
+      "rooms": "empty",
+      "fridge": "fridgetunnel",
+      "memory": "cdrom",
+      "attraction": "snakeoil",
+      "hall": "nikofalls",
+      "place": "TheCity",
+      "ff_setting": "ffdropoff",
+      "ending": "firmniko"
+    },
+    {
+      "seed": 60007,
+      "intro": "clubintro",
+      "phone": "dadphone",
+      "rooms": "empty",
+      "fridge": "fridgetrapped",
+      "memory": "cdrom",
+      "attraction": "snakeoil",
+      "hall": "nikofalls",
+      "place": "TheCity",
+      "ff_setting": "ffthewalls",
+      "ending": "firmniko"
+    },
+    {
+      "seed": 60008,
+      "intro": "clubintro",
+      "phone": "dadphone",
+      "rooms": "empty",
+      "fridge": "fridgetrapped",
+      "memory": "cdrom",
+      "attraction": "gardens",
+      "hall": "nikofalls",
+      "place": "TheBasement",
+      "ff_setting": "ffthewalls",
+      "ending": "firmniko"
+    },
+    {
+      "seed": 60009,
+      "intro": "clubintro",
+      "phone": "bradphone",
+      "rooms": "empty",
+      "fridge": "fridgetrapped",
+      "memory": "gorilla",
+      "attraction": "vortex",
+      "hall": "nikofalls",
+      "place": "TheCity",
+      "ff_setting": "ffthewalls",
+      "ending": "gayniko"
+    },
+    {
+      "seed": 60010,
+      "intro": "noodlesintro",
+      "phone": "dadphone",
+      "rooms": "empty",
+      "fridge": "fridgetunnel",
+      "memory": "gorilla",
+      "attraction": "caves",
+      "hall": "nikofalls",
+      "place": "TheBasement",
+      "ff_setting": "ffthewalls",
+      "ending": "originalniko"
+    },
+    {
+      "seed": 60011,
+      "intro": "makeupintro",
+      "phone": "bradphone",
+      "rooms": "empty",
+      "fridge": "fridgetunnel",
+      "memory": "cdrom",
+      "attraction": "gardens",
+      "hall": "spiralhall",
+      "place": "TheBasement",
+      "ff_setting": "ffthewalls",
+      "ending": "firmniko"
+    },
+    {
+      "seed": 60012,
+      "intro": "clubintro",
+      "phone": "dadphone",
+      "rooms": "furnished",
+      "fridge": "fridgetrapped",
+      "memory": "cdrom",
+      "attraction": "caves",
+      "hall": "nikofalls",
+      "place": "TheBasement",
+      "ff_setting": "ffdropoff",
+      "ending": "originalniko"
+    },
+    {
+      "seed": 60013,
+      "intro": "noodlesintro",
+      "phone": "dadphone",
+      "rooms": "furnished",
+      "fridge": "fridgetrapped",
+      "memory": "cdrom",
+      "attraction": "snakeoil",
+      "hall": "nikofalls",
+      "place": "TheCity",
+      "ff_setting": "ffdropoff",
+      "ending": "firmniko"
+    },
+    {
+      "seed": 60014,
+      "intro": "makeupintro",
+      "phone": "bradphone",
+      "rooms": "empty",
+      "fridge": "fridgetrapped",
+      "memory": "gorilla",
+      "attraction": "gardens",
+      "hall": "nikofalls",
+      "place": "TheCity",
+      "ff_setting": "ffthewalls",
+      "ending": "firmniko"
+    },
+    {
+      "seed": 60015,
+      "intro": "clubintro",
+      "phone": "bradphone",
+      "rooms": "empty",
+      "fridge": "fridgetunnel",
+      "memory": "gorilla",
+      "attraction": "vortex",
+      "hall": "spiralhall",
+      "place": "TheBasement",
+      "ff_setting": "ffdropoff",
+      "ending": "gayniko"
+    },
+    {
+      "seed": 60016,
+      "intro": "clubintro",
+      "phone": "dadphone",
+      "rooms": "empty",
+      "fridge": "fridgetunnel",
+      "memory": "cdrom",
+      "attraction": "snakeoil",
+      "hall": "nikofalls",
+      "place": "TheBasement",
+      "ff_setting": "ffthewalls",
+      "ending": "originalniko"
+    },
+    {
+      "seed": 60017,
+      "intro": "makeupintro",
+      "phone": "bradphone",
+      "rooms": "empty",
+      "fridge": "fridgetrapped",
+      "memory": "gorilla",
+      "attraction": "snakeoil",
+      "hall": "spiralhall",
+      "place": "TheBasement",
+      "ff_setting": "ffdropoff",
+      "ending": "firmniko"
+    },
+    {
+      "seed": 60018,
+      "intro": "noodlesintro",
+      "phone": "bradphone",
+      "rooms": "empty",
+      "fridge": "fridgetunnel",
+      "memory": "gorilla",
+      "attraction": "vortex",
+      "hall": "spiralhall",
+      "place": "TheBasement",
+      "ff_setting": "ffthewalls",
+      "ending": "firmniko"
+    },
+    {
+      "seed": 60019,
+      "intro": "noodlesintro",
+      "phone": "bradphone",
+      "rooms": "furnished",
+      "fridge": "fridgetrapped",
+      "memory": "gorilla",
+      "attraction": "vortex",
+      "hall": "spiralhall",
+      "place": "TheBasement",
+      "ff_setting": "ffthewalls",
+      "ending": "gayniko"
+    },
+    {
+      "seed": 60020,
+      "intro": "clubintro",
+      "phone": "dadphone",
+      "rooms": "empty",
+      "fridge": "fridgetrapped",
+      "memory": "cdrom",
+      "attraction": "gardens",
+      "hall": "nikofalls",
+      "place": "TheBasement",
+      "ff_setting": "ffdropoff",
+      "ending": "originalniko"
+    },
+    {
+      "seed": 60021,
+      "intro": "noodlesintro",
+      "phone": "dadphone",
+      "rooms": "furnished",
+      "fridge": "fridgetrapped",
+      "memory": "gorilla",
+      "attraction": "snakeoil",
+      "hall": "spiralhall",
+      "place": "TheBasement",
+      "ff_setting": "ffdropoff",
+      "ending": "originalniko"
+    },
+    {
+      "seed": 60022,
+      "intro": "clubintro",
+      "phone": "dadphone",
+      "rooms": "furnished",
+      "fridge": "fridgetunnel",
+      "memory": "cdrom",
+      "attraction": "caves",
+      "hall": "nikofalls",
+      "place": "TheCity",
+      "ff_setting": "ffthewalls",
+      "ending": "gayniko"
+    },
+    {
+      "seed": 60023,
+      "intro": "noodlesintro",
+      "phone": "bradphone",
+      "rooms": "empty",
+      "fridge": "fridgetrapped",
+      "memory": "cdrom",
+      "attraction": "caves",
+      "hall": "nikofalls",
+      "place": "TheCity",
+      "ff_setting": "ffdropoff",
+      "ending": "originalniko"
+    },
+    {
+      "seed": 60024,
+      "intro": "clubintro",
+      "phone": "bradphone",
+      "rooms": "furnished",
+      "fridge": "fridgetunnel",
+      "memory": "gorilla",
+      "attraction": "snakeoil",
+      "hall": "nikofalls",
+      "place": "TheBasement",
+      "ff_setting": "ffthewalls",
+      "ending": "firmniko"
+    },
+    {
+      "seed": 60025,
+      "intro": "clubintro",
+      "phone": "bradphone",
+      "rooms": "furnished",
+      "fridge": "fridgetrapped",
+      "memory": "cdrom",
+      "attraction": "snakeoil",
+      "hall": "nikofalls",
+      "place": "TheCity",
+      "ff_setting": "ffthewalls",
+      "ending": "gayniko"
+    }
+  ],
+  "errors": [],
+  "labels": {
+    "clubintro": "Club",
+    "makeupintro": "Makeup",
+    "noodlesintro": "Noodles",
+    "dadphone": "Dad",
+    "bradphone": "Brad",
+    "empty": "Empty",
+    "furnished": "Furnished",
+    "fridgetrapped": "Trapped",
+    "fridgetunnel": "Tunnel",
+    "cdrom": "CD-ROM",
+    "gorilla": "Gorilla",
+    "vortex": "Vortex",
+    "gardens": "Gardens",
+    "snakeoil": "Snake Oil",
+    "caves": "Caves",
+    "spiralhall": "Spiral Hall",
+    "nikofalls": "Niko Falls",
+    "TheCity": "The City",
+    "TheBasement": "The Basement",
+    "ffdropoff": "Endless Dropoff",
+    "ffthewalls": "The Walls",
+    "gayniko": "Gay Niko",
+    "firmniko": "Firm Niko",
+    "originalniko": "Original Niko"
+  },
+  "descriptions": {
+    "clubintro": "Ryan reluctantly goes to a club with Niko",
+    "makeupintro": "Niko apologizes to Ryan on the back porch after an argument",
+    "noodlesintro": "Ryan is making ramen when Niko arrives",
+    "dadphone": "Ryan's dead father impossibly speaks on the phone",
+    "bradphone": "Ryan's ex Bradley is at Mom's house, acting like nothing happened",
+    "empty": "The underground rooms are all empty",
+    "furnished": "A piece or two of dusty, decades-old abandoned furniture",
+    "fridgetrapped": "Ryan is trapped \u2014 the key is gone",
+    "fridgetunnel": "Niko brings sticky notes to mark their way through the tunnel",
+    "cdrom": "A hypnotic CD-ROM adventure set on a space station",
+    "gorilla": "The invisible gorilla \u2014 an attention experiment from class",
+    "vortex": "A newspaper ad for 'THE VORTEX' attraction",
+    "gardens": "A newspaper ad for 'THE ENDLESS GARDENS'",
+    "snakeoil": "A newspaper ad for Dr. Henneson's Magical Tinctures",
+    "caves": "A newspaper story about boys lost in an underground cave",
+    "spiralhall": "One long hall that leans left \u2014 walking on the ceiling",
+    "nikofalls": "The grappling hook fails \u2014 Niko falls",
+    "TheCity": "Elder Niko describes a city of ten million recursive houses",
+    "TheBasement": "Elder Niko describes an endless empty basement",
+    "ffdropoff": "The floor drops away into blackness",
+    "ffthewalls": "Endless walls of pink insulation foam",
+    "gayniko": "Romantic tension \u2014 Niko looks at Ryan from the corner of his eye",
+    "firmniko": "Firm, platonic Niko \u2014 drops his arms, fixes Ryan with a look",
+    "originalniko": "Ryan survives but wakes in the wrong universe, alone"
+  }
+}
