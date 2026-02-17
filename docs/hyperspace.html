@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Textual Hyperspace — Subcutanean Variorum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #020810;
+    --bg-rgb: 2, 8, 16;
+    --text: #e8e8e8;
+    --text-muted: #8a9aaa;
+    --text-dim: #4a5a6a;
+    --text-faint: #2a3a4a;
+    --accent: #ff8800;
+    --accent-glow: rgba(255, 136, 0, 0.4);
+    --card-bg: rgba(8, 16, 32, 0.88);
+    --card-border: rgba(255, 136, 0, 0.12);
+  }
+
+  [data-theme="light"] {
+    --bg: #e8e8e8;
+    --bg-rgb: 232, 232, 232;
+    --text: #2c2c2c;
+    --text-muted: #666;
+    --text-dim: #999;
+    --text-faint: #ccc;
+    --accent: #d96800;
+    --accent-glow: rgba(217, 104, 0, 0.3);
+    --card-bg: rgba(255, 255, 255, 0.9);
+    --card-border: rgba(217, 104, 0, 0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  canvas { display: block; }
+
+  /* Breadcrumbs */
+  #breadcrumbs {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(to bottom, rgba(var(--bg-rgb), 0.95), rgba(var(--bg-rgb), 0));
+    pointer-events: auto;
+  }
+
+  #breadcrumbs a {
+    font-size: 0.7rem;
+    font-weight: 400;
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  #breadcrumbs a:hover { color: var(--accent); }
+  .breadcrumb-sep { color: var(--text-faint); font-size: 0.6rem; }
+
+  #theme-toggle {
+    margin-left: auto;
+    background: none;
+    border: 1px solid var(--text-faint);
+    border-radius: 50%;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-dim);
+    transition: border-color 0.2s, color 0.2s;
+  }
+  #theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Loading */
+  #loading {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    z-index: 300;
+  }
+
+  /* Center-track text */
+  #center-text {
+    position: fixed;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--accent);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+    text-align: center;
+    max-width: 50vw;
+    line-height: 1.6;
+    text-shadow: 0 0 20px var(--accent-glow);
+    opacity: 0;
+    transition: opacity 0.4s ease-in-out;
+    pointer-events: none;
+    z-index: 50;
+    /* Subtle shaded box */
+    padding: 16px 24px;
+    background: rgba(var(--bg-rgb), 0.7);
+    border: 1px solid rgba(255, 136, 0, 0.12);
+    border-radius: 6px;
+    backdrop-filter: blur(6px);
+  }
+
+  #center-text.significant {
+    font-size: 1.15rem;
+    font-weight: 500;
+    border-color: rgba(255, 136, 0, 0.25);
+  }
+
+  /* Chapter indicator */
+  #chapter-indicator {
+    position: fixed;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    opacity: 0;
+    transition: opacity 0.4s;
+    pointer-events: none;
+  }
+
+  /* Transport controls */
+  #transport {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    backdrop-filter: blur(8px);
+  }
+
+  #transport button {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s;
+  }
+  #transport button:hover { color: var(--accent); }
+
+  #scrub-bar {
+    width: 280px;
+    height: 4px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: var(--text-faint);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+  #scrub-bar::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+  }
+
+  #speed-display {
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    cursor: pointer;
+    min-width: 24px;
+    text-align: center;
+    user-select: none;
+  }
+  #speed-display:hover { color: var(--accent); }
+
+  /* Seed picker */
+  #seed-picker {
+    position: fixed;
+    top: 10px;
+    right: 60px;
+    z-index: 200;
+  }
+
+  #seed-select {
+    background: var(--card-bg);
+    color: var(--text);
+    border: 1px solid var(--card-border);
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-family: inherit;
+    font-size: 0.7rem;
+    cursor: pointer;
+    outline: none;
+    backdrop-filter: blur(8px);
+  }
+  #seed-select:focus { border-color: var(--accent); }
+
+  /* Info panel */
+  #star-info {
+    position: fixed;
+    bottom: 80px;
+    right: 16px;
+    z-index: 200;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    backdrop-filter: blur(8px);
+    max-width: 300px;
+    font-size: 0.72rem;
+    line-height: 1.5;
+    display: none;
+  }
+
+  #star-info .info-title {
+    font-weight: 600;
+    color: var(--accent);
+    font-size: 0.75rem;
+    margin-bottom: 4px;
+  }
+
+  #star-info .info-text {
+    color: var(--text);
+    font-style: italic;
+    margin-bottom: 6px;
+    line-height: 1.4;
+  }
+
+  #star-info .info-detail {
+    color: var(--text-dim);
+    font-size: 0.65rem;
+  }
+
+  /* Stats */
+  #stats {
+    position: fixed;
+    bottom: 60px;
+    left: 16px;
+    z-index: 100;
+    font-size: 0.6rem;
+    color: var(--text-dim);
+  }
+
+  /* CSS2D floating word labels — the primary visual */
+  .word-label {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: 400;
+    pointer-events: none;
+    white-space: normal;
+    overflow: hidden;
+    line-height: 1.3;
+    /* Clamp to 2 lines */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    text-overflow: ellipsis;
+    /* Per-label max-width and rotation set via JS */
+  }
+
+  .chapter-ring-label {
+    color: var(--text-dim);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    pointer-events: none;
+    white-space: nowrap;
+    opacity: 0.6;
+  }
+
+  /* Help hint */
+  #help-hint {
+    position: fixed;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    font-size: 0.6rem;
+    color: var(--text-dim);
+    opacity: 0.7;
+    pointer-events: none;
+    transition: opacity 1s;
+    white-space: nowrap;
+  }
+
+  /* Crosshair (visible when pointer locked) */
+  #crosshair {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
+    z-index: 50;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  #crosshair::before, #crosshair::after {
+    content: '';
+    position: absolute;
+    background: rgba(255, 255, 255, 0.35);
+  }
+  #crosshair::before {
+    width: 1px;
+    height: 100%;
+    left: 50%;
+  }
+  #crosshair::after {
+    width: 100%;
+    height: 1px;
+    top: 50%;
+  }
+
+  /* Click-to-explore prompt */
+  #click-prompt {
+    position: fixed;
+    top: 55%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 100;
+    color: var(--text-dim);
+    font-size: 0.8rem;
+    text-align: center;
+    pointer-events: none;
+    opacity: 0.5;
+    transition: opacity 0.3s;
+  }
+</style>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+
+<div id="breadcrumbs">
+  <a href="index.html">&larr; Variorum</a>
+  <span class="breadcrumb-sep">/</span>
+  <a href="hyperspace.html" style="color: var(--text-muted);">Hyperspace</a>
+  <button id="theme-toggle" onclick="toggleTheme()">
+    <svg id="theme-icon-sun" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    <svg id="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+</div>
+
+<div id="loading">Entering hyperspace...</div>
+
+<div id="center-text"></div>
+<div id="chapter-indicator"></div>
+
+<div id="transport" style="display:none;">
+  <button id="rewind-btn" title="Previous variation point (Left arrow)">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/></svg>
+  </button>
+  <button id="play-pause-btn" title="Auto-fly forward (Space)">
+    <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+    <svg id="pause-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="display:none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+  </button>
+  <button id="forward-btn" title="Next variation point (Right arrow)">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+  </button>
+  <input type="range" id="scrub-bar" min="0" max="1" step="0.0001" value="0">
+  <span id="speed-display" title="Click to change speed">1x</span>
+</div>
+
+<div id="seed-picker" style="display:none;">
+  <select id="seed-select"></select>
+</div>
+
+<div id="star-info"></div>
+<div id="stats"></div>
+<div id="crosshair"></div>
+<div id="click-prompt">Click to look around</div>
+<div id="help-hint">WASD: move &middot; Space: auto-fly &middot; Arrows: jump &middot; ESC: release cursor</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+
+// ══════════════════════════════════════
+//  GLOBALS
+// ══════════════════════════════════════
+
+let hyperspaceData = null;
+let renderer, scene, camera, labelRenderer, clock;
+let ambientStars;     // background starfield Points
+let wordStarMesh;     // InstancedMesh for variation word-stars
+// (star positions stored in starPositions[], populated by updateVisibleStars)
+
+// Camera rotation (Euler YXZ)
+let yaw = Math.PI;    // start facing +Z (into the narrative)
+let pitch = 0;
+const MOUSE_SENSITIVITY = 0.003;
+
+// Pointer lock (primary FPS mode)
+let isPointerLocked = false;
+
+// Camera look state (right-click drag fallback when not locked)
+let isLookDragging = false;
+let lookDragButton = -1;
+let lastMouseX = 0, lastMouseY = 0;
+
+// Movement
+const MOVE_SPEED = 50;  // world units per second
+const moveState = { forward: false, backward: false, left: false, right: false };
+
+// Narrative position
+let currentSeedIndex = 0;
+let currentPosition = 0.0;  // 0 to 1 (derived from camera.position.z)
+let isPlaying = false;
+let playbackSpeed = 1.0;
+const AUTO_FLY_SPEED = 8;  // world units/second at 1x speed
+const WORLD_DEPTH = 2000;
+
+// Text label pool (words in space — the primary visual)
+const LABEL_POOL_SIZE = 250;
+const LABEL_RANGE = 500;
+let labelPool = [];       // pre-created CSS2DObjects
+let starPositions = [];   // populated each frame by updateVisibleStars
+let lastLabelUpdatePos = new THREE.Vector3(0, 0, -9999);
+const LABEL_UPDATE_THRESHOLD = 5;
+
+// CSS color strings matching VARIANT_COLORS
+const VARIANT_CSS_COLORS = [
+  '#ff8800', '#4ecdc4', '#c678dd', '#ff6b6b', '#51cf66',
+  '#5b9bd5', '#ffa94d', '#69db7c', '#e74c3c', '#74b9ff',
+];
+
+// Chapter tracking
+let lastChapterIdx = -1;
+
+// Star instances
+const MAX_INSTANCES = 5000;
+let mouseScreenX = 0, mouseScreenY = 0;
+
+// Hover state
+let hoveredStarIdx = -1;
+
+// Star color palette
+const VARIANT_COLORS = [
+  new THREE.Color('#ff8800'),  // variant 0 (reference) — orange
+  new THREE.Color('#4ecdc4'),  // variant 1 — teal
+  new THREE.Color('#c678dd'),  // variant 2 — purple
+  new THREE.Color('#ff6b6b'),  // variant 3 — coral
+  new THREE.Color('#51cf66'),  // variant 4 — green
+  new THREE.Color('#5b9bd5'),  // variant 5 — blue
+  new THREE.Color('#ffa94d'),  // variant 6 — amber
+  new THREE.Color('#69db7c'),  // variant 7 — mint
+  new THREE.Color('#e74c3c'),  // variant 8 — red
+  new THREE.Color('#74b9ff'),  // variant 9 — sky
+];
+
+// Reusable temp objects (avoid allocation in hot loops)
+const _dummy = new THREE.Object3D();
+const _vec3 = new THREE.Vector3();
+const _matrix = new THREE.Matrix4();
+const _forward = new THREE.Vector3();
+const _right = new THREE.Vector3();
+const _moveDir = new THREE.Vector3();
+
+
+// ══════════════════════════════════════
+//  THEME
+// ══════════════════════════════════════
+
+let isDarkMode = true;
+
+function initTheme() {
+  const saved = localStorage.getItem('subcutanean_theme');
+  isDarkMode = saved !== 'light';
+  applyTheme();
+}
+
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+  document.getElementById('theme-icon-sun').style.display = isDarkMode ? 'none' : 'block';
+  document.getElementById('theme-icon-moon').style.display = isDarkMode ? 'block' : 'none';
+  if (renderer) {
+    renderer.setClearColor(isDarkMode ? 0x020810 : 0xe8e8e8);
+  }
+  if (scene && scene.fog) {
+    scene.fog.color.set(isDarkMode ? 0x020810 : 0xe8e8e8);
+  }
+}
+
+window.toggleTheme = function() {
+  isDarkMode = !isDarkMode;
+  localStorage.setItem('subcutanean_theme', isDarkMode ? 'dark' : 'light');
+  applyTheme();
+};
+
+initTheme();
+
+
+// ══════════════════════════════════════
+//  SCENE SETUP
+// ══════════════════════════════════════
+
+function initScene() {
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setClearColor(isDarkMode ? 0x020810 : 0xe8e8e8);
+  document.body.appendChild(renderer.domElement);
+
+  // Prevent context menu on right-click (needed for right-drag look)
+  renderer.domElement.addEventListener('contextmenu', (e) => e.preventDefault());
+
+  labelRenderer = new CSS2DRenderer();
+  labelRenderer.setSize(window.innerWidth, window.innerHeight);
+  labelRenderer.domElement.style.position = 'absolute';
+  labelRenderer.domElement.style.top = '0';
+  labelRenderer.domElement.style.left = '0';
+  labelRenderer.domElement.style.pointerEvents = 'none';
+  document.body.appendChild(labelRenderer.domElement);
+
+  scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(isDarkMode ? 0x020810 : 0xe8e8e8, 0.0009);
+
+  camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000);
+  camera.position.set(0, 3, -10);
+  camera.rotation.order = 'YXZ';
+
+  clock = new THREE.Clock();
+
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    labelRenderer.setSize(window.innerWidth, window.innerHeight);
+  });
+}
+
+
+// ══════════════════════════════════════
+//  AMBIENT STARFIELD
+// ══════════════════════════════════════
+
+function createAmbientStars() {
+  const count = 5000;
+  const geometry = new THREE.BufferGeometry();
+  const positions = new Float32Array(count * 3);
+
+  for (let i = 0; i < count; i++) {
+    // Uniform spherical shell distribution (visible from all angles)
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(1 - 2 * Math.random());
+    const radius = 40 + Math.random() * 120;
+    // Spread along Z across the full narrative depth
+    const baseZ = Math.random() * WORLD_DEPTH;
+    positions[i * 3]     = Math.sin(phi) * Math.cos(theta) * radius;
+    positions[i * 3 + 1] = Math.sin(phi) * Math.sin(theta) * radius;
+    positions[i * 3 + 2] = baseZ + Math.cos(phi) * radius * 0.3;
+  }
+
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+  const material = new THREE.PointsMaterial({
+    color: isDarkMode ? 0x334466 : 0xaaaacc,
+    size: 1.5,
+    transparent: true,
+    opacity: 0.35,
+    sizeAttenuation: true,
+    depthWrite: false,
+  });
+
+  ambientStars = new THREE.Points(geometry, material);
+  scene.add(ambientStars);
+}
+
+
+// ══════════════════════════════════════
+//  POINT TEXTURE
+// ══════════════════════════════════════
+
+function createPointTexture() {
+  const size = 64;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+
+  const center = size / 2;
+  const gradient = ctx.createRadialGradient(center, center, 0, center, center, center);
+  gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+  gradient.addColorStop(0.15, 'rgba(255, 255, 255, 0.9)');
+  gradient.addColorStop(0.4, 'rgba(255, 255, 255, 0.35)');
+  gradient.addColorStop(0.7, 'rgba(255, 255, 255, 0.1)');
+  gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, size, size);
+
+  return new THREE.CanvasTexture(canvas);
+}
+
+
+// ══════════════════════════════════════
+//  WORD-STAR INSTANCED MESH
+// ══════════════════════════════════════
+
+function createWordStarMesh() {
+  const geometry = new THREE.PlaneGeometry(1, 1);
+
+  const material = new THREE.MeshBasicMaterial({
+    map: createPointTexture(),
+    transparent: true,
+    opacity: 0.9,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    side: THREE.DoubleSide,
+  });
+
+  wordStarMesh = new THREE.InstancedMesh(geometry, material, MAX_INSTANCES);
+  wordStarMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+  wordStarMesh.count = 0;
+  scene.add(wordStarMesh);
+}
+
+
+// ══════════════════════════════════════
+//  CHAPTER RINGS
+// ══════════════════════════════════════
+
+function createChapterRings() {
+  const chapters = hyperspaceData.chapters;
+
+  for (const chapter of chapters) {
+    const z = chapter.position * WORLD_DEPTH;
+
+    // Wider ring
+    const ringGeometry = new THREE.RingGeometry(30, 55, 64);
+    const ringMaterial = new THREE.MeshBasicMaterial({
+      color: isDarkMode ? 0xff8800 : 0xd96800,
+      transparent: true,
+      opacity: 0.04,
+      side: THREE.DoubleSide,
+    });
+    const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+    ring.position.set(0, 0, z);
+    scene.add(ring);
+
+    // Chapter label
+    const div = document.createElement('div');
+    div.className = 'chapter-ring-label';
+    div.textContent = chapter.label;
+    const label = new CSS2DObject(div);
+    label.position.set(0, 32, z);
+    scene.add(label);
+  }
+}
+
+
+// ══════════════════════════════════════
+//  DYNAMIC PROXIMITY
+// ══════════════════════════════════════
+
+function computeProximity(vpIndex, seedIdx) {
+  const windowSize = 20;
+  const vps = hyperspaceData.variation_points;
+  const start = Math.max(0, vpIndex - windowSize);
+  const end = vpIndex + 1;
+
+  let agree = 0;
+  let total = 0;
+
+  for (let i = start; i < end; i++) {
+    const assignments = vps[i].a;
+    if (assignments[currentSeedIndex] === assignments[seedIdx]) {
+      agree++;
+    }
+    total++;
+  }
+
+  return total > 0 ? agree / total : 0;
+}
+
+function computeStarSphere(vpIndex, variantIdx) {
+  const vp = hyperspaceData.variation_points[vpIndex];
+  const variantChar = String.fromCharCode(97 + variantIdx);
+
+  // Average proximity of seeds that chose this variant
+  let totalProximity = 0;
+  let seedCount = 0;
+
+  const assignments = vp.a;
+  for (let i = 0; i < assignments.length && seedCount < 20; i++) {
+    if (assignments[i] === variantChar && i !== currentSeedIndex) {
+      totalProximity += computeProximity(vpIndex, i);
+      seedCount++;
+    }
+  }
+
+  const avgProximity = seedCount > 0 ? totalProximity / seedCount : 0;
+
+  // Spherical radius: high proximity → close shell, low → far shell
+  const innerR = 8;
+  const outerR = 70;
+  const r = outerR - avgProximity * (outerR - innerR);
+
+  // Deterministic spherical angles (uniform distribution on sphere)
+  const theta = ((variantIdx * 137.508 + vpIndex * 47.31) % 360) * Math.PI / 180;
+  const phiSeed = ((variantIdx * 73.7 + vpIndex * 113.9) % 100) / 100;
+  const phi = Math.acos(1 - 2 * phiSeed);  // uniform on sphere
+
+  return {
+    x: r * Math.sin(phi) * Math.cos(theta),
+    y: r * Math.sin(phi) * Math.sin(theta),
+    zOffset: r * Math.cos(phi),
+  };
+}
+
+
+// ══════════════════════════════════════
+//  UPDATE VISIBLE STARS (tiny dots + position storage)
+// ══════════════════════════════════════
+
+function updateVisibleStars() {
+  if (!wordStarMesh || !hyperspaceData) return;
+
+  const cameraPos = camera.position;
+  const vps = hyperspaceData.variation_points;
+
+  let instanceIdx = 0;
+  starPositions = [];
+
+  for (let vpIdx = 0; vpIdx < vps.length; vpIdx++) {
+    const vp = vps[vpIdx];
+    const starZ = vp.pos * WORLD_DEPTH;
+
+    const currentVariantChar = vp.a[currentSeedIndex];
+    const currentVariantIdx = currentVariantChar.charCodeAt(0) - 97;
+
+    for (let vi = 0; vi < vp.variants.length; vi++) {
+      if (instanceIdx >= MAX_INSTANCES) break;
+
+      const isCurrentVariant = (vi === currentVariantIdx);
+
+      let x, y, z;
+      if (isCurrentVariant) {
+        // Current seed's variant stays very near center with small offset
+        const offsetAngle = (vpIdx * 73.7 % 360) * Math.PI / 180;
+        const offsetR = 1.5 + (vpIdx % 3);
+        x = Math.cos(offsetAngle) * offsetR;
+        y = Math.sin(offsetAngle) * offsetR;
+        z = starZ;
+      } else {
+        // Spherical placement around the VP center
+        const sphere = computeStarSphere(vpIdx, vi);
+        x = sphere.x;
+        y = sphere.y;
+        z = starZ + sphere.zOffset;
+      }
+
+      // Store position for label pool to use
+      starPositions.push({ vpIdx, vi, x, y, z, isCurrentVariant });
+
+      // Tiny subtle dot behind each word (ambient sparkle)
+      const dist = Math.sqrt(
+        (cameraPos.x - x) ** 2 +
+        (cameraPos.y - y) ** 2 +
+        (cameraPos.z - z) ** 2
+      );
+      const scale = Math.max(0.15, Math.min(0.6, 15 / Math.max(dist, 1)));
+
+      _dummy.position.set(x, y, z);
+      _dummy.scale.set(scale, scale, scale);
+      _dummy.lookAt(cameraPos);
+      _dummy.updateMatrix();
+      wordStarMesh.setMatrixAt(instanceIdx, _dummy.matrix);
+
+      const color = isCurrentVariant
+        ? VARIANT_COLORS[0]
+        : VARIANT_COLORS[vi % VARIANT_COLORS.length];
+      wordStarMesh.setColorAt(instanceIdx, color);
+
+      instanceIdx++;
+    }
+  }
+
+  wordStarMesh.count = instanceIdx;
+  wordStarMesh.instanceMatrix.needsUpdate = true;
+  if (wordStarMesh.instanceColor) wordStarMesh.instanceColor.needsUpdate = true;
+}
+
+
+// ══════════════════════════════════════
+//  TEXT LABEL POOL (words in space)
+// ══════════════════════════════════════
+
+function createLabelPool() {
+  for (let i = 0; i < LABEL_POOL_SIZE; i++) {
+    const div = document.createElement('div');
+    div.className = 'word-label';
+    div.style.display = 'none';
+    const css2d = new CSS2DObject(div);
+    scene.add(css2d);
+    labelPool.push({ css2d, div, active: false, vpIdx: -1, vi: -1 });
+  }
+}
+
+function updateTextLabels() {
+  if (!hyperspaceData || starPositions.length === 0) return;
+
+  const cameraPos = camera.position;
+  const vps = hyperspaceData.variation_points;
+
+  // Compute distances and filter to range
+  const items = [];
+  for (const sp of starPositions) {
+    const dx = cameraPos.x - sp.x;
+    const dy = cameraPos.y - sp.y;
+    const dz = cameraPos.z - sp.z;
+    const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+    if (dist < LABEL_RANGE) {
+      items.push({ ...sp, dist });
+    }
+  }
+
+  // Sort by distance (nearest first)
+  items.sort((a, b) => a.dist - b.dist);
+
+  // Assign nearest items to pool
+  let poolIdx = 0;
+  let itemIdx = 0;
+
+  while (poolIdx < LABEL_POOL_SIZE && itemIdx < items.length) {
+    const item = items[itemIdx];
+    itemIdx++;
+
+    const vp = vps[item.vpIdx];
+    const text = vp.variants[item.vi]?.text || '';
+    if (!text) continue;
+
+    const poolItem = labelPool[poolIdx];
+    poolIdx++;
+
+    // Distance-based text truncation (longer now — 2-line wrap handles display)
+    let truncLen;
+    if (item.dist < 40) truncLen = 180;
+    else if (item.dist < 100) truncLen = 120;
+    else if (item.dist < 250) truncLen = 70;
+    else truncLen = 40;
+    const displayText = text.length > truncLen ? text.substring(0, truncLen) + '\u2026' : text;
+
+    // Distance-based font size
+    let fontSize;
+    if (item.dist < 40) fontSize = 14;
+    else if (item.dist < 80) fontSize = 12;
+    else if (item.dist < 150) fontSize = 10;
+    else if (item.dist < 300) fontSize = 8.5;
+    else fontSize = 7;
+
+    // Distance-based max-width for 2-line wrapping
+    let maxWidth;
+    if (item.dist < 60) maxWidth = 260;
+    else if (item.dist < 150) maxWidth = 200;
+    else if (item.dist < 300) maxWidth = 150;
+    else maxWidth = 110;
+
+    // Distance-based opacity
+    let opacity;
+    if (item.dist < 80) opacity = 1.0;
+    else if (item.dist < 200) opacity = 0.7;
+    else if (item.dist < 400) opacity = 0.4;
+    else opacity = 0.2;
+
+    // Glow radius
+    const glowRadius = item.dist < 100 ? 10 : item.dist < 300 ? 6 : 3;
+
+    // Color
+    const cssColor = item.isCurrentVariant
+      ? VARIANT_CSS_COLORS[0]
+      : VARIANT_CSS_COLORS[item.vi % VARIANT_CSS_COLORS.length];
+
+    // Deterministic per-label rotation for visual variety (-5° to +5°)
+    const rotateDeg = (((item.vpIdx * 17 + item.vi * 53) % 11) - 5);
+
+    // Update pool item
+    poolItem.css2d.position.set(item.x, item.y + 1.5, item.z);
+    poolItem.div.textContent = displayText;
+    poolItem.div.style.fontSize = fontSize + 'px';
+    poolItem.div.style.maxWidth = maxWidth + 'px';
+    poolItem.div.style.color = cssColor;
+    poolItem.div.style.opacity = opacity;
+    poolItem.div.style.textShadow = `0 0 ${glowRadius}px ${cssColor}`;
+    poolItem.div.style.fontWeight = item.isCurrentVariant ? '600' : '400';
+    poolItem.div.style.transform = `rotate(${rotateDeg}deg)`;
+    poolItem.div.style.display = '';
+    poolItem.active = true;
+    poolItem.vpIdx = item.vpIdx;
+    poolItem.vi = item.vi;
+  }
+
+  // Hide remaining unused pool items
+  for (let i = poolIdx; i < LABEL_POOL_SIZE; i++) {
+    labelPool[i].div.style.display = 'none';
+    labelPool[i].active = false;
+    labelPool[i].vpIdx = -1;
+    labelPool[i].vi = -1;
+  }
+
+  lastLabelUpdatePos.copy(cameraPos);
+}
+
+// Per-frame: hide labels that overlap the center text box
+function enforceExclusion() {
+  const centerEl = document.getElementById('center-text');
+  const centerOpacity = parseFloat(centerEl.style.opacity || '0');
+
+  if (centerOpacity < 0.05) {
+    // Center text hidden — restore all suppressed labels
+    for (const poolItem of labelPool) {
+      if (poolItem.active && poolItem._excluded) {
+        poolItem.div.style.visibility = '';
+        poolItem._excluded = false;
+      }
+    }
+    return;
+  }
+
+  const rect = centerEl.getBoundingClientRect();
+  const pad = 24;
+  const exLeft = rect.left - pad;
+  const exRight = rect.right + pad;
+  const exTop = rect.top - pad;
+  const exBottom = rect.bottom + pad;
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+
+  for (const poolItem of labelPool) {
+    if (!poolItem.active) continue;
+
+    _vec3.copy(poolItem.css2d.position);
+    _vec3.project(camera);
+
+    if (_vec3.z > 1 || _vec3.z < -1) continue;
+
+    const sx = (_vec3.x * 0.5 + 0.5) * w;
+    const sy = (-_vec3.y * 0.5 + 0.5) * h;
+
+    const overlaps = sx > exLeft && sx < exRight && sy > exTop && sy < exBottom;
+
+    if (overlaps && !poolItem._excluded) {
+      poolItem.div.style.visibility = 'hidden';
+      poolItem._excluded = true;
+    } else if (!overlaps && poolItem._excluded) {
+      poolItem.div.style.visibility = '';
+      poolItem._excluded = false;
+    }
+  }
+}
+
+
+// ══════════════════════════════════════
+//  CENTER-TRACK TEXT
+// ══════════════════════════════════════
+
+function updateCenterText() {
+  if (!hyperspaceData) return;
+
+  const cameraPos = camera.position;
+  const centerEl = document.getElementById('center-text');
+  const vps = hyperspaceData.variation_points;
+
+  // Find closest variation point by 3D distance
+  let closest = null;
+  let closestDist = Infinity;
+
+  for (const vp of vps) {
+    const starZ = vp.pos * WORLD_DEPTH;
+    // VPs are at the center (0, 0, z), so distance is from camera to that line
+    const dz = starZ - cameraPos.z;
+    const dist = Math.sqrt(cameraPos.x ** 2 + cameraPos.y ** 2 + dz ** 2);
+
+    if (dist < closestDist) {
+      closest = vp;
+      closestDist = dist;
+    }
+  }
+
+  const SHOW_RANGE = 50;
+
+  if (closest && closestDist < SHOW_RANGE) {
+    const variantChar = closest.a[currentSeedIndex];
+    const variantIdx = variantChar.charCodeAt(0) - 97;
+    const variantText = closest.variants[variantIdx]?.text || '';
+
+    if (variantText) {
+      centerEl.textContent = variantText;
+      centerEl.className = closest.sig > 0.6 ? 'significant' : '';
+      // Smooth fade based on distance
+      const opacity = Math.max(0, 1 - closestDist / SHOW_RANGE);
+      centerEl.style.opacity = String(opacity.toFixed(2));
+    }
+  } else {
+    centerEl.style.opacity = '0';
+  }
+}
+
+
+// ══════════════════════════════════════
+//  CHAPTER INDICATOR
+// ══════════════════════════════════════
+
+function updateChapterIndicator() {
+  const chapters = hyperspaceData.chapters;
+  const el = document.getElementById('chapter-indicator');
+
+  let currentChapterIdx = 0;
+  for (let i = chapters.length - 1; i >= 0; i--) {
+    if (currentPosition >= chapters[i].position) {
+      currentChapterIdx = i;
+      break;
+    }
+  }
+
+  if (currentChapterIdx !== lastChapterIdx) {
+    lastChapterIdx = currentChapterIdx;
+    el.textContent = chapters[currentChapterIdx].label;
+    el.style.opacity = '1';
+    setTimeout(() => { el.style.opacity = '0'; }, 3000);
+  }
+}
+
+
+// ══════════════════════════════════════
+//  CONTROLS
+// ══════════════════════════════════════
+
+function initControls() {
+  const playPauseBtn = document.getElementById('play-pause-btn');
+  const rewindBtn = document.getElementById('rewind-btn');
+  const forwardBtn = document.getElementById('forward-btn');
+  const scrubBar = document.getElementById('scrub-bar');
+  const speedDisplay = document.getElementById('speed-display');
+
+  // ── Play/Pause ──
+  playPauseBtn.addEventListener('click', togglePlayPause);
+
+  // ── Rewind: jump to previous variation point ──
+  rewindBtn.addEventListener('click', () => {
+    const vps = hyperspaceData.variation_points;
+    for (let i = vps.length - 1; i >= 0; i--) {
+      if (vps[i].pos < currentPosition - 0.001) {
+        camera.position.z = vps[i].pos * WORLD_DEPTH;
+        scrubBar.value = vps[i].pos;
+        return;
+      }
+    }
+    camera.position.z = 0;
+    scrubBar.value = 0;
+  });
+
+  // ── Forward: jump to next variation point ──
+  forwardBtn.addEventListener('click', () => {
+    const vps = hyperspaceData.variation_points;
+    for (const vp of vps) {
+      if (vp.pos > currentPosition + 0.001) {
+        camera.position.z = vp.pos * WORLD_DEPTH;
+        scrubBar.value = vp.pos;
+        return;
+      }
+    }
+    camera.position.z = WORLD_DEPTH;
+    scrubBar.value = 1;
+  });
+
+  // ── Scrub bar: teleport camera Z ──
+  scrubBar.addEventListener('input', () => {
+    camera.position.z = parseFloat(scrubBar.value) * WORLD_DEPTH;
+    if (isPlaying) togglePlayPause();
+  });
+
+  // ── Speed cycle ──
+  const speeds = [0.5, 1, 2, 4];
+  speedDisplay.addEventListener('click', () => {
+    const idx = speeds.indexOf(playbackSpeed);
+    playbackSpeed = speeds[(idx + 1) % speeds.length];
+    speedDisplay.textContent = `${playbackSpeed}x`;
+  });
+
+  // ── WASD keyboard movement ──
+  window.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT') return;
+
+    switch (e.code) {
+      case 'KeyW': moveState.forward = true; break;
+      case 'KeyS': moveState.backward = true; break;
+      case 'KeyA': moveState.left = true; break;
+      case 'KeyD': moveState.right = true; break;
+      case 'Space':
+        e.preventDefault();
+        togglePlayPause();
+        break;
+      case 'ArrowLeft':
+        rewindBtn.click();
+        break;
+      case 'ArrowRight':
+        forwardBtn.click();
+        break;
+    }
+
+    // Speed controls
+    if (e.key === '=' || e.key === '+') {
+      const idx = speeds.indexOf(playbackSpeed);
+      if (idx < speeds.length - 1) {
+        playbackSpeed = speeds[idx + 1];
+        speedDisplay.textContent = `${playbackSpeed}x`;
+      }
+    } else if (e.key === '-' || e.key === '_') {
+      const idx = speeds.indexOf(playbackSpeed);
+      if (idx > 0) {
+        playbackSpeed = speeds[idx - 1];
+        speedDisplay.textContent = `${playbackSpeed}x`;
+      }
+    }
+  });
+
+  window.addEventListener('keyup', (e) => {
+    switch (e.code) {
+      case 'KeyW': moveState.forward = false; break;
+      case 'KeyS': moveState.backward = false; break;
+      case 'KeyA': moveState.left = false; break;
+      case 'KeyD': moveState.right = false; break;
+    }
+  });
+
+  // ── Pointer lock for FPS mouse look ──
+  const canvas = renderer.domElement;
+
+  document.addEventListener('pointerlockchange', () => {
+    isPointerLocked = (document.pointerLockElement === canvas);
+    const crosshair = document.getElementById('crosshair');
+    const clickPrompt = document.getElementById('click-prompt');
+    if (isPointerLocked) {
+      crosshair.style.opacity = '1';
+      clickPrompt.style.opacity = '0';
+      document.body.style.cursor = 'none';
+    } else {
+      crosshair.style.opacity = '0';
+      clickPrompt.style.opacity = '0.5';
+      document.body.style.cursor = '';
+    }
+  });
+
+  // Right-click drag as fallback (when not pointer-locked)
+  canvas.addEventListener('mousedown', (e) => {
+    if (!isPointerLocked && (e.button === 2 || (e.button === 0 && e.altKey))) {
+      isLookDragging = true;
+      lookDragButton = e.button;
+      lastMouseX = e.clientX;
+      lastMouseY = e.clientY;
+      document.body.style.cursor = 'grabbing';
+      e.preventDefault();
+    }
+  });
+
+  window.addEventListener('mouseup', (e) => {
+    if (isLookDragging && e.button === lookDragButton) {
+      isLookDragging = false;
+      lookDragButton = -1;
+      document.body.style.cursor = '';
+    }
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    mouseScreenX = e.clientX;
+    mouseScreenY = e.clientY;
+
+    if (isPointerLocked) {
+      // Pointer lock: use movementX/Y deltas
+      yaw -= e.movementX * MOUSE_SENSITIVITY;
+      pitch -= e.movementY * MOUSE_SENSITIVITY;
+      pitch = Math.max(-Math.PI * 0.85, Math.min(Math.PI * 0.85, pitch));
+    } else if (isLookDragging) {
+      // Fallback right-click drag
+      const dx = e.clientX - lastMouseX;
+      const dy = e.clientY - lastMouseY;
+      yaw -= dx * MOUSE_SENSITIVITY;
+      pitch -= dy * MOUSE_SENSITIVITY;
+      pitch = Math.max(-Math.PI * 0.85, Math.min(Math.PI * 0.85, pitch));
+      lastMouseX = e.clientX;
+      lastMouseY = e.clientY;
+    }
+  });
+
+  // ── Click: pointer lock or star picking ──
+  canvas.addEventListener('click', (e) => {
+    if (e.target.closest('#transport, #seed-picker, #breadcrumbs, #star-info')) return;
+
+    if (isPointerLocked) {
+      // Pick word at crosshair (screen center)
+      onStarClick({
+        clientX: window.innerWidth / 2,
+        clientY: window.innerHeight / 2,
+        target: canvas,
+        altKey: false,
+      });
+    } else {
+      // Try picking a word at mouse position first
+      const found = findNearestWordToScreen(e.clientX, e.clientY);
+      if (found && found.vpIdx >= 0) {
+        onStarClick(e);
+      } else {
+        // No word nearby — request pointer lock
+        canvas.requestPointerLock();
+      }
+    }
+  });
+
+  // ── Click outside info panel to dismiss ──
+  document.getElementById('star-info').addEventListener('click', (e) => {
+    e.stopPropagation();
+  });
+
+  // ── Seed picker ──
+  buildSeedPicker();
+
+  // Show controls
+  document.getElementById('transport').style.display = '';
+  document.getElementById('seed-picker').style.display = '';
+
+  // Hide help after 10 seconds
+  setTimeout(() => {
+    const hint = document.getElementById('help-hint');
+    if (hint) hint.style.opacity = '0';
+  }, 10000);
+}
+
+function togglePlayPause() {
+  isPlaying = !isPlaying;
+  document.getElementById('play-icon').style.display = isPlaying ? 'none' : '';
+  document.getElementById('pause-icon').style.display = isPlaying ? '' : 'none';
+
+  const hint = document.getElementById('help-hint');
+  if (hint) hint.style.opacity = '0';
+}
+
+function buildSeedPicker() {
+  const select = document.getElementById('seed-select');
+  const seeds = hyperspaceData.seeds;
+  const builtinSet = new Set(hyperspaceData.builtin_indices);
+
+  // Built-in seeds group
+  const builtinGroup = document.createElement('optgroup');
+  builtinGroup.label = 'Built-in Seeds';
+  for (const idx of hyperspaceData.builtin_indices) {
+    const opt = document.createElement('option');
+    opt.value = idx;
+    opt.textContent = `Seed ${seeds[idx]}`;
+    builtinGroup.appendChild(opt);
+  }
+  select.appendChild(builtinGroup);
+
+  // All sampled seeds group
+  const sampledGroup = document.createElement('optgroup');
+  sampledGroup.label = 'Sampled Variants';
+  for (let i = 0; i < seeds.length; i++) {
+    if (builtinSet.has(i)) continue;
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = `Seed ${seeds[i]}`;
+    sampledGroup.appendChild(opt);
+  }
+  select.appendChild(sampledGroup);
+
+  select.value = currentSeedIndex;
+  select.addEventListener('change', () => {
+    currentSeedIndex = parseInt(select.value);
+    lastLabelUpdatePos.set(0, 0, -9999); // force label refresh
+    updateVisibleStars();
+    updateTextLabels();
+  });
+}
+
+
+// ══════════════════════════════════════
+//  WORD PICKING (screen-space on label pool)
+// ══════════════════════════════════════
+
+function findNearestWordToScreen(screenX, screenY) {
+  let bestDist = Infinity;
+  let bestItem = null;
+
+  for (const poolItem of labelPool) {
+    if (!poolItem.active) continue;
+
+    _vec3.copy(poolItem.css2d.position);
+    _vec3.project(camera);
+
+    // Behind camera
+    if (_vec3.z > 1 || _vec3.z < -1) continue;
+
+    const sx = (_vec3.x * 0.5 + 0.5) * window.innerWidth;
+    const sy = (-_vec3.y * 0.5 + 0.5) * window.innerHeight;
+
+    const dx = sx - screenX;
+    const dy = sy - screenY;
+    const dist = dx * dx + dy * dy;
+
+    if (dist < bestDist) {
+      bestDist = dist;
+      bestItem = poolItem;
+    }
+  }
+
+  // Threshold: 50px radius (2500 squared)
+  return bestDist < 2500 ? bestItem : null;
+}
+
+function onStarClick(event) {
+  const infoPanel = document.getElementById('star-info');
+  const found = findNearestWordToScreen(event.clientX, event.clientY);
+
+  if (found && found.vpIdx >= 0) {
+    const vp = hyperspaceData.variation_points[found.vpIdx];
+    const variant = vp.variants[found.vi];
+    const chapter = hyperspaceData.chapters[vp.ch];
+
+    const variantChar = String.fromCharCode(97 + found.vi);
+    let seedCount = 0;
+    for (const ch of vp.a) {
+      if (ch === variantChar) seedCount++;
+    }
+
+    const currentVariantChar = vp.a[currentSeedIndex];
+    const currentVariantIdx = currentVariantChar.charCodeAt(0) - 97;
+    const isCurrent = found.vi === currentVariantIdx;
+
+    infoPanel.innerHTML = `
+      <div class="info-title">${chapter.label} — Variant ${found.vi + 1} of ${vp.variants.length}${isCurrent ? ' (your seed)' : ''}</div>
+      <div class="info-text">"${variant.text}"</div>
+      <div class="info-detail">
+        Shared by ${seedCount} of ${hyperspaceData.seeds.length} seeds<br>
+        Significance: ${Math.round(vp.sig * 100)}%
+      </div>
+    `;
+    infoPanel.style.display = '';
+  } else {
+    infoPanel.style.display = 'none';
+  }
+}
+
+function updateHoverCursor() {
+  if (isPointerLocked || isLookDragging) return;
+  const found = findNearestWordToScreen(mouseScreenX, mouseScreenY);
+  hoveredStarIdx = found ? 0 : -1;
+  document.body.style.cursor = found ? 'pointer' : '';
+}
+
+
+// ══════════════════════════════════════
+//  ANIMATION LOOP
+// ══════════════════════════════════════
+
+let hoverFrameCount = 0;
+
+function animate() {
+  requestAnimationFrame(animate);
+
+  const delta = clock.getDelta();
+
+  // ── Apply camera rotation ──
+  camera.rotation.set(pitch, yaw, 0);
+
+  // ── Compute movement directions (horizontal XZ plane) ──
+  camera.getWorldDirection(_forward);
+  _forward.y = 0;
+  _forward.normalize();
+
+  _right.crossVectors(_forward, camera.up).normalize();
+
+  // ── WASD movement ──
+  _moveDir.set(0, 0, 0);
+  if (moveState.forward)  _moveDir.add(_forward);
+  if (moveState.backward) _moveDir.sub(_forward);
+  if (moveState.right)    _moveDir.add(_right);
+  if (moveState.left)     _moveDir.sub(_right);
+
+  if (_moveDir.lengthSq() > 0) {
+    _moveDir.normalize().multiplyScalar(MOVE_SPEED * delta);
+    camera.position.add(_moveDir);
+  }
+
+  // ── Auto-fly forward along +Z (narrative direction) ──
+  if (isPlaying) {
+    camera.position.z += AUTO_FLY_SPEED * playbackSpeed * delta;
+    if (camera.position.z >= WORLD_DEPTH) {
+      camera.position.z = WORLD_DEPTH;
+      isPlaying = false;
+      document.getElementById('play-icon').style.display = '';
+      document.getElementById('pause-icon').style.display = 'none';
+    }
+  }
+
+  // ── Update narrative position from camera Z ──
+  currentPosition = Math.max(0, Math.min(1, camera.position.z / WORLD_DEPTH));
+  document.getElementById('scrub-bar').value = currentPosition;
+
+  // ── Update visible stars (tiny dots + position storage) ──
+  updateVisibleStars();
+
+  // ── Update floating text labels (throttled) ──
+  if (camera.position.distanceTo(lastLabelUpdatePos) > LABEL_UPDATE_THRESHOLD) {
+    updateTextLabels();
+  }
+
+  // ── Update center text ──
+  updateCenterText();
+
+  // ── Hide labels overlapping center text box ──
+  enforceExclusion();
+
+  // ── Update chapter indicator ──
+  updateChapterIndicator();
+
+  // ── Hover cursor (every 3 frames) ──
+  if (++hoverFrameCount % 3 === 0) {
+    updateHoverCursor();
+  }
+
+  // ── Update stats ──
+  const statsEl = document.getElementById('stats');
+  statsEl.textContent = `${Math.round(currentPosition * 100)}% · ${wordStarMesh?.count || 0} stars`;
+
+  // ── Render ──
+  renderer.render(scene, camera);
+  labelRenderer.render(scene, camera);
+}
+
+
+// ══════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════
+
+initScene();
+
+fetch('extracted_text/hyperspace_data.json')
+  .then(r => r.json())
+  .then(data => {
+    hyperspaceData = data;
+    document.getElementById('loading').style.display = 'none';
+
+    console.log(`Hyperspace data loaded: ${data.seeds.length} seeds, ${data.variation_points.length} variation points`);
+
+    createAmbientStars();
+    createWordStarMesh();
+    createLabelPool();
+    createChapterRings();
+    initControls();
+    animate();
+  })
+  .catch(err => {
+    document.getElementById('loading').textContent = 'Error loading data: ' + err.message;
+    console.error(err);
+  });
+
+</script>
+</body>
+</html>

@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Variant Constellation — Subcutanean Variorum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1a2a;
+    --bg-rgb: 15, 26, 42;
+    --text: #e8e8e8;
+    --text-muted: #8a9aaa;
+    --text-dim: #4a5a6a;
+    --text-faint: #2a3a4a;
+    --accent: #ff8800;
+    --accent-muted: rgba(255, 136, 0, 0.22);
+    --accent-border: rgba(255, 136, 0, 0.3);
+    --card-bg: rgba(15, 26, 42, 0.92);
+    --card-border: rgba(255, 136, 0, 0.1);
+  }
+
+  [data-theme="light"] {
+    --bg: #f5f5f5;
+    --bg-rgb: 245, 245, 245;
+    --text: #2c2c2c;
+    --text-muted: #666;
+    --text-dim: #999;
+    --text-faint: #ccc;
+    --accent: #d96800;
+    --card-bg: rgba(255, 255, 255, 0.92);
+    --card-border: rgba(217, 104, 0, 0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  canvas { display: block; }
+
+  /* Breadcrumbs */
+  #breadcrumbs {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(to bottom, rgba(var(--bg-rgb), 0.95), rgba(var(--bg-rgb), 0));
+    pointer-events: auto;
+    min-height: 44px;
+  }
+
+  #breadcrumbs a {
+    font-size: 0.72rem;
+    font-weight: 400;
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  #breadcrumbs a:hover { color: var(--accent); }
+
+  .breadcrumb-sep {
+    color: var(--text-faint);
+    font-size: 0.65rem;
+  }
+
+  #theme-toggle {
+    margin-left: auto;
+    background: none;
+    border: 1px solid var(--text-faint);
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-dim);
+    transition: border-color 0.2s, color 0.2s;
+  }
+  #theme-toggle:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* Loading */
+  #loading {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--text-dim);
+    font-size: 0.85rem;
+  }
+
+  /* Control panel (bottom-left) */
+  #controls {
+    position: fixed;
+    bottom: 16px;
+    left: 16px;
+    z-index: 100;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    backdrop-filter: blur(8px);
+    min-width: 180px;
+    max-width: 220px;
+  }
+
+  #controls label {
+    font-size: 0.65rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  #color-select {
+    width: 100%;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--text-faint);
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-family: inherit;
+    font-size: 0.75rem;
+    cursor: pointer;
+    outline: none;
+  }
+  #color-select:focus {
+    border-color: var(--accent);
+  }
+
+  #color-legend {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .legend-item:hover { opacity: 0.7; }
+  .legend-item.no-click { cursor: default; }
+  .legend-item.no-click:hover { opacity: 1; }
+
+  .legend-swatch {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .legend-gradient {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    margin: 4px 0 2px;
+  }
+
+  .legend-gradient-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.6rem;
+    color: var(--text-dim);
+  }
+
+  /* Info panel (bottom-right) */
+  #info-panel {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    z-index: 100;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    backdrop-filter: blur(8px);
+    max-width: 260px;
+    display: none;
+    font-size: 0.72rem;
+    line-height: 1.5;
+  }
+
+  #info-panel .info-seed {
+    font-weight: 600;
+    color: var(--accent);
+    font-size: 0.8rem;
+    margin-bottom: 4px;
+  }
+
+  #info-panel .info-subtitle {
+    color: var(--text-dim);
+    font-size: 0.65rem;
+    font-style: italic;
+    margin-bottom: 6px;
+  }
+
+  #info-panel .info-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  #info-panel .info-group {
+    color: var(--text-dim);
+  }
+
+  #info-panel .info-var {
+    color: var(--text);
+    font-weight: 500;
+    text-align: right;
+  }
+
+  /* Stats overlay (top-right) */
+  #stats {
+    position: fixed;
+    top: 12px;
+    right: 70px;
+    z-index: 100;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+  }
+
+  /* CSS2D label styling */
+  .seed-label {
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 9px;
+    font-weight: 500;
+    background: rgba(var(--bg-rgb), 0.7);
+    padding: 1px 4px;
+    border-radius: 3px;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+</style>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+
+<div id="breadcrumbs">
+  <a href="index.html">&larr; Variorum</a>
+  <span class="breadcrumb-sep">/</span>
+  <a href="pathways.html">Pathways</a>
+  <span class="breadcrumb-sep">/</span>
+  <a href="constellation.html" style="color: var(--text-muted);">Constellation</a>
+  <button id="theme-toggle" onclick="toggleTheme()">
+    <svg id="theme-icon-sun" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    <svg id="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+</div>
+
+<div id="loading">Loading constellation data...</div>
+
+<div id="controls" style="display:none;">
+  <label for="color-select">Color by</label>
+  <select id="color-select"></select>
+  <div id="color-legend"></div>
+</div>
+
+<div id="info-panel"></div>
+
+<div id="stats"></div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+
+// ══════════════════════════════════════
+//  GLOBALS
+// ══════════════════════════════════════
+
+let constellationData = null;
+let renderer, scene, camera, controls;
+let labelRenderer;
+let pointCloud, pointGeometry;
+let builtinLabels = [];
+let selectedIndex = -1;
+let hoveredIndex = -1;
+let autoRotate = true;
+let colorMode = 'neighborhood';  // default: color by nearest built-in seed
+
+const raycaster = new THREE.Raycaster();
+raycaster.params.Points.threshold = 0.04;
+const mouse = new THREE.Vector2();
+
+const SCALE = 4;  // scale factor for [-1,1] coords → scene units
+
+
+// ══════════════════════════════════════
+//  THEME
+// ══════════════════════════════════════
+
+let isDarkMode = true;
+
+function initTheme() {
+  const saved = localStorage.getItem('subcutanean_theme');
+  isDarkMode = saved !== 'light';
+  applyTheme();
+}
+
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+  document.getElementById('theme-icon-sun').style.display = isDarkMode ? 'none' : 'block';
+  document.getElementById('theme-icon-moon').style.display = isDarkMode ? 'block' : 'none';
+  if (renderer) {
+    const bg = isDarkMode ? 0x0f1a2a : 0xf5f5f5;
+    renderer.setClearColor(bg);
+  }
+}
+
+window.toggleTheme = function() {
+  isDarkMode = !isDarkMode;
+  localStorage.setItem('subcutanean_theme', isDarkMode ? 'dark' : 'light');
+  applyTheme();
+  updatePointColors();
+};
+
+initTheme();
+
+
+// ══════════════════════════════════════
+//  COLOR PALETTES
+// ══════════════════════════════════════
+
+// 25 distinct colors for the built-in seeds (neighborhoods)
+const SEED_COLORS = [
+  '#ff6b6b', '#4ecdc4', '#ffe66d', '#a78bfa', '#ff8800',
+  '#51cf66', '#ff6b9d', '#5b9bd5', '#ffa94d', '#c678dd',
+  '#69db7c', '#e74c3c', '#74b9ff', '#f1c40f', '#1abc9c',
+  '#e67e22', '#9b59b6', '#3498db', '#2ecc71', '#fd7e14',
+  '#ae3ec9', '#20c997', '#fa5252', '#7950f2', '#fcc419',
+];
+
+// Categorical variable colors (kept for the secondary "Story Variables" options)
+const VAR_COLORS = {
+  clubintro:    '#ff8800', makeupintro:  '#4ecdc4', noodlesintro: '#c678dd',
+  dadphone:     '#ff6b6b', bradphone:    '#5b9bd5',
+  empty:        '#9b59b6', furnished:    '#e67e22',
+  fridgetrapped:'#e74c3c', fridgetunnel: '#2ecc71',
+  cdrom:        '#3498db', gorilla:      '#f39c12',
+  vortex:       '#e74c3c', gardens:      '#2ecc71', snakeoil: '#9b59b6', caves: '#3498db',
+  spiralhall:   '#1abc9c', nikofalls:    '#e74c3c',
+  TheCity:      '#f1c40f', TheBasement:  '#8e44ad',
+  ffdropoff:    '#e67e22', ffthewalls:   '#2980b9',
+  gayniko:      '#ff6b9d', firmniko:     '#4ecdc4', originalniko: '#a78bfa',
+};
+
+const DEFAULT_COLOR = new THREE.Color(0.6, 0.4, 0.15);
+
+
+// ══════════════════════════════════════
+//  SCENE SETUP
+// ══════════════════════════════════════
+
+function initScene() {
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setClearColor(isDarkMode ? 0x0f1a2a : 0xf5f5f5);
+  document.body.appendChild(renderer.domElement);
+
+  labelRenderer = new CSS2DRenderer();
+  labelRenderer.setSize(window.innerWidth, window.innerHeight);
+  labelRenderer.domElement.style.position = 'absolute';
+  labelRenderer.domElement.style.top = '0';
+  labelRenderer.domElement.style.left = '0';
+  labelRenderer.domElement.style.pointerEvents = 'none';
+  document.body.appendChild(labelRenderer.domElement);
+
+  scene = new THREE.Scene();
+
+  camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+  camera.position.set(6, 4, 6);
+  camera.lookAt(0, 0, 0);
+
+  controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.05;
+  controls.autoRotate = true;
+  controls.autoRotateSpeed = 0.5;
+  controls.addEventListener('start', () => { autoRotate = false; controls.autoRotate = false; });
+
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    labelRenderer.setSize(window.innerWidth, window.innerHeight);
+  });
+}
+
+
+// ══════════════════════════════════════
+//  POINT TEXTURE
+// ══════════════════════════════════════
+
+function createPointTexture() {
+  const size = 64;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+
+  const center = size / 2;
+  const gradient = ctx.createRadialGradient(center, center, 0, center, center, center);
+  gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+  gradient.addColorStop(0.3, 'rgba(255, 255, 255, 0.8)');
+  gradient.addColorStop(0.7, 'rgba(255, 255, 255, 0.15)');
+  gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, size, size);
+
+  return new THREE.CanvasTexture(canvas);
+}
+
+
+// ══════════════════════════════════════
+//  BUILD POINT CLOUD
+// ══════════════════════════════════════
+
+function buildPointCloud() {
+  const points = constellationData.points;
+  const n = points.length;
+  const builtinSet = new Set(constellationData.builtin_indices);
+
+  pointGeometry = new THREE.BufferGeometry();
+  const positions = new Float32Array(n * 3);
+  const colors = new Float32Array(n * 3);
+  const sizes = new Float32Array(n);
+
+  for (let i = 0; i < n; i++) {
+    const p = points[i];
+    positions[i * 3]     = p.x * SCALE;
+    positions[i * 3 + 1] = p.y * SCALE;
+    positions[i * 3 + 2] = p.z * SCALE;
+
+    colors[i * 3]     = DEFAULT_COLOR.r;
+    colors[i * 3 + 1] = DEFAULT_COLOR.g;
+    colors[i * 3 + 2] = DEFAULT_COLOR.b;
+
+    sizes[i] = builtinSet.has(i) ? 12.0 : 4.0;
+  }
+
+  pointGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  pointGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  pointGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+  const material = new THREE.ShaderMaterial({
+    uniforms: {
+      pointTexture: { value: createPointTexture() },
+    },
+    vertexShader: `
+      attribute float size;
+      varying vec3 vColor;
+      void main() {
+        vColor = color;
+        vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+        gl_PointSize = size * (300.0 / -mvPosition.z);
+        gl_Position = projectionMatrix * mvPosition;
+      }
+    `,
+    fragmentShader: `
+      uniform sampler2D pointTexture;
+      varying vec3 vColor;
+      void main() {
+        vec4 tex = texture2D(pointTexture, gl_PointCoord);
+        if (tex.a < 0.01) discard;
+        gl_FragColor = vec4(vColor * tex.rgb, tex.a * 0.85);
+      }
+    `,
+    vertexColors: true,
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+  });
+
+  pointCloud = new THREE.Points(pointGeometry, material);
+  scene.add(pointCloud);
+
+  // CSS2D labels for built-in seeds
+  for (const idx of constellationData.builtin_indices) {
+    const p = points[idx];
+    const div = document.createElement('div');
+    div.className = 'seed-label';
+    div.textContent = p.seed;
+    const label = new CSS2DObject(div);
+    label.position.set(p.x * SCALE, p.y * SCALE + 0.15, p.z * SCALE);
+    scene.add(label);
+    builtinLabels.push(label);
+  }
+
+  updatePointColors();
+}
+
+
+// ══════════════════════════════════════
+//  COLOR UPDATES
+// ══════════════════════════════════════
+
+function lerpColor(c1, c2, t) {
+  return new THREE.Color(
+    c1.r + (c2.r - c1.r) * t,
+    c1.g + (c2.g - c1.g) * t,
+    c1.b + (c2.b - c1.b) * t,
+  );
+}
+
+function updatePointColors() {
+  if (!pointGeometry) return;
+  const points = constellationData.points;
+  const colors = pointGeometry.attributes.color.array;
+  const n = points.length;
+  const builtinSeeds = constellationData.builtin_indices;
+
+  for (let i = 0; i < n; i++) {
+    let color;
+
+    if (colorMode === 'neighborhood') {
+      // Color by nearest built-in seed
+      const nbIdx = points[i].nearest_builtin;
+      const hex = SEED_COLORS[nbIdx % SEED_COLORS.length];
+      color = new THREE.Color(hex);
+
+    } else if (colorMode === 'isolation') {
+      // Continuous gradient: dense (cool blue) → isolated (hot orange/white)
+      const t = points[i].isolation || 0;
+      const cool = new THREE.Color(0.15, 0.35, 0.8);   // blue
+      const warm = new THREE.Color(1.0, 0.55, 0.1);     // orange
+      const hot  = new THREE.Color(1.0, 0.95, 0.8);     // near-white
+      color = t < 0.5
+        ? lerpColor(cool, warm, t * 2)
+        : lerpColor(warm, hot, (t - 0.5) * 2);
+
+    } else if (colorMode === 'depth') {
+      // Color by distance from center of mass
+      const dx = points[i].x, dy = points[i].y, dz = points[i].z;
+      const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+      const t = Math.min(dist / 1.4, 1);
+      const inner = new THREE.Color(1.0, 0.85, 0.3);   // warm gold
+      const outer = new THREE.Color(0.3, 0.15, 0.6);    // deep purple
+      color = lerpColor(inner, outer, t);
+
+    } else {
+      // Categorical variable coloring
+      const varName = points[i][colorMode];
+      const hex = VAR_COLORS[varName];
+      color = hex ? new THREE.Color(hex) : DEFAULT_COLOR;
+    }
+
+    colors[i * 3]     = color.r;
+    colors[i * 3 + 1] = color.g;
+    colors[i * 3 + 2] = color.b;
+  }
+
+  pointGeometry.attributes.color.needsUpdate = true;
+  updateLegend();
+}
+
+
+// ══════════════════════════════════════
+//  CONTROLS PANEL
+// ══════════════════════════════════════
+
+function buildControls() {
+  const select = document.getElementById('color-select');
+
+  // Primary modes (text-based)
+  const modes = [
+    { value: 'neighborhood', label: 'Neighborhood (nearest seed)' },
+    { value: 'isolation',    label: 'Isolation (textual uniqueness)' },
+    { value: 'depth',        label: 'Depth (distance from center)' },
+  ];
+  for (const m of modes) {
+    const opt = document.createElement('option');
+    opt.value = m.value;
+    opt.textContent = m.label;
+    select.appendChild(opt);
+  }
+
+  // Separator
+  const sep = document.createElement('option');
+  sep.disabled = true;
+  sep.textContent = '── Story Variables ──';
+  select.appendChild(sep);
+
+  // Categorical variable options
+  for (const group of constellationData.groups) {
+    const opt = document.createElement('option');
+    opt.value = group.key;
+    opt.textContent = group.label;
+    select.appendChild(opt);
+  }
+
+  select.value = colorMode;
+  select.addEventListener('change', () => {
+    colorMode = select.value;
+    updatePointColors();
+  });
+
+  document.getElementById('controls').style.display = '';
+}
+
+function updateLegend() {
+  const legendEl = document.getElementById('color-legend');
+  legendEl.innerHTML = '';
+
+  if (colorMode === 'neighborhood') {
+    // Show built-in seeds as legend items
+    const builtinSeeds = constellationData.builtin_indices;
+    for (let bi = 0; bi < builtinSeeds.length; bi++) {
+      const idx = builtinSeeds[bi];
+      const seed = constellationData.points[idx].seed;
+      const hex = SEED_COLORS[bi % SEED_COLORS.length];
+      const item = document.createElement('div');
+      item.className = 'legend-item';
+      item.innerHTML = `<span class="legend-swatch" style="background:${hex}"></span>Seed ${seed}`;
+      item.addEventListener('click', () => flyToPoint(idx));
+      legendEl.appendChild(item);
+    }
+
+  } else if (colorMode === 'isolation') {
+    const grad = document.createElement('div');
+    grad.className = 'legend-gradient';
+    grad.style.background = 'linear-gradient(to right, #2659cc, #ff8c1a, #fff2cc)';
+    legendEl.appendChild(grad);
+    const labels = document.createElement('div');
+    labels.className = 'legend-gradient-labels';
+    labels.innerHTML = '<span>Dense</span><span>Isolated</span>';
+    legendEl.appendChild(labels);
+
+  } else if (colorMode === 'depth') {
+    const grad = document.createElement('div');
+    grad.className = 'legend-gradient';
+    grad.style.background = 'linear-gradient(to right, #ffd94d, #4d2699)';
+    legendEl.appendChild(grad);
+    const labels = document.createElement('div');
+    labels.className = 'legend-gradient-labels';
+    labels.innerHTML = '<span>Center</span><span>Edge</span>';
+    legendEl.appendChild(labels);
+
+  } else {
+    // Categorical variable
+    const group = constellationData.groups.find(g => g.key === colorMode);
+    if (!group) return;
+    for (const varName of group.vars) {
+      const label = constellationData.labels[varName] || varName;
+      const hex = VAR_COLORS[varName] || '#888';
+      const item = document.createElement('div');
+      item.className = 'legend-item';
+      item.innerHTML = `<span class="legend-swatch" style="background:${hex}"></span>${label}`;
+      item.addEventListener('click', () => flyToCluster(colorMode, varName));
+      legendEl.appendChild(item);
+    }
+  }
+}
+
+
+// ══════════════════════════════════════
+//  CAMERA ANIMATION
+// ══════════════════════════════════════
+
+function flyToPoint(index) {
+  const p = constellationData.points[index];
+  const target = new THREE.Vector3(p.x * SCALE, p.y * SCALE, p.z * SCALE);
+  animateCameraTo(target, 3);
+}
+
+function flyToCluster(groupKey, varName) {
+  const points = constellationData.points;
+  let sumX = 0, sumY = 0, sumZ = 0, count = 0;
+  for (const p of points) {
+    if (p[groupKey] === varName) {
+      sumX += p.x * SCALE;
+      sumY += p.y * SCALE;
+      sumZ += p.z * SCALE;
+      count++;
+    }
+  }
+  if (count === 0) return;
+  const target = new THREE.Vector3(sumX / count, sumY / count, sumZ / count);
+  animateCameraTo(target, 4);
+}
+
+function animateCameraTo(target, dist) {
+  const startTarget = controls.target.clone();
+  const startPos = camera.position.clone();
+  const dir = startPos.clone().sub(startTarget).normalize();
+  const endPos = target.clone().add(dir.multiplyScalar(dist));
+
+  const duration = 800;
+  const startTime = performance.now();
+
+  function animFly(now) {
+    const t = Math.min((now - startTime) / duration, 1);
+    const ease = 1 - Math.pow(1 - t, 3);
+    controls.target.lerpVectors(startTarget, target, ease);
+    camera.position.lerpVectors(startPos, endPos, ease);
+    if (t < 1) requestAnimationFrame(animFly);
+  }
+  autoRotate = false;
+  controls.autoRotate = false;
+  requestAnimationFrame(animFly);
+}
+
+
+// ══════════════════════════════════════
+//  INTERACTION (RAYCASTER)
+// ══════════════════════════════════════
+
+function onMouseMove(event) {
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+}
+
+function onClick(event) {
+  if (!pointCloud) return;
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObject(pointCloud);
+  if (intersects.length > 0) {
+    selectedIndex = intersects[0].index;
+    showInfoPanel(selectedIndex);
+  } else {
+    selectedIndex = -1;
+    document.getElementById('info-panel').style.display = 'none';
+  }
+}
+
+function checkHover() {
+  if (!pointCloud) return;
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObject(pointCloud);
+
+  const sizes = pointGeometry.attributes.size.array;
+  const builtinSet = new Set(constellationData.builtin_indices);
+
+  if (hoveredIndex >= 0) {
+    sizes[hoveredIndex] = builtinSet.has(hoveredIndex) ? 12.0 : 4.0;
+  }
+
+  if (intersects.length > 0) {
+    hoveredIndex = intersects[0].index;
+    sizes[hoveredIndex] = builtinSet.has(hoveredIndex) ? 18.0 : 8.0;
+    renderer.domElement.style.cursor = 'pointer';
+    if (selectedIndex < 0) showInfoPanel(hoveredIndex);
+  } else {
+    hoveredIndex = -1;
+    renderer.domElement.style.cursor = 'default';
+    if (selectedIndex < 0) document.getElementById('info-panel').style.display = 'none';
+  }
+
+  pointGeometry.attributes.size.needsUpdate = true;
+}
+
+
+// ══════════════════════════════════════
+//  INFO PANEL
+// ══════════════════════════════════════
+
+function showInfoPanel(index) {
+  const panel = document.getElementById('info-panel');
+  const point = constellationData.points[index];
+  const isBuiltin = constellationData.builtin_indices.includes(index);
+
+  // Nearest built-in seed info
+  const nearestIdx = constellationData.builtin_indices[point.nearest_builtin];
+  const nearestSeed = constellationData.points[nearestIdx]?.seed;
+
+  let html = `<div class="info-seed">Seed ${point.seed}${isBuiltin ? ' (built-in)' : ''}</div>`;
+
+  if (!isBuiltin && nearestSeed) {
+    html += `<div class="info-subtitle">Nearest seed: ${nearestSeed}</div>`;
+  }
+
+  // Isolation score
+  const isolationPct = Math.round((point.isolation || 0) * 100);
+  html += `<div class="info-row"><span class="info-group">Isolation</span><span class="info-var">${isolationPct}%</span></div>`;
+
+  // Story variables
+  for (const group of constellationData.groups) {
+    const varName = point[group.key];
+    const label = constellationData.labels[varName] || varName || '—';
+    html += `<div class="info-row"><span class="info-group">${group.label}</span><span class="info-var">${label}</span></div>`;
+  }
+
+  panel.innerHTML = html;
+  panel.style.display = '';
+}
+
+
+// ══════════════════════════════════════
+//  KEYBOARD CONTROLS
+// ══════════════════════════════════════
+
+const keysDown = new Set();
+const ROTATE_SPEED = 0.03;
+const ZOOM_SPEED = 0.15;
+const PAN_SPEED = 0.08;
+
+window.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT') return;
+  keysDown.add(e.key);
+
+  if (e.key === 'r' || e.key === 'R') {
+    controls.target.set(0, 0, 0);
+    camera.position.set(6, 4, 6);
+    camera.lookAt(0, 0, 0);
+  }
+  if (e.key === 't' || e.key === 'T') {
+    autoRotate = !autoRotate;
+    controls.autoRotate = autoRotate;
+  }
+});
+
+window.addEventListener('keyup', (e) => { keysDown.delete(e.key); });
+
+function applyKeyboardControls() {
+  if (keysDown.size === 0) return;
+
+  const offset = camera.position.clone().sub(controls.target);
+  const spherical = new THREE.Spherical().setFromVector3(offset);
+
+  if (keysDown.has('ArrowLeft') || keysDown.has('a') || keysDown.has('A')) {
+    spherical.theta -= ROTATE_SPEED;
+    autoRotate = false; controls.autoRotate = false;
+  }
+  if (keysDown.has('ArrowRight') || keysDown.has('d') || keysDown.has('D')) {
+    spherical.theta += ROTATE_SPEED;
+    autoRotate = false; controls.autoRotate = false;
+  }
+  if (keysDown.has('ArrowUp') || keysDown.has('w') || keysDown.has('W')) {
+    spherical.phi = Math.max(0.1, spherical.phi - ROTATE_SPEED);
+    autoRotate = false; controls.autoRotate = false;
+  }
+  if (keysDown.has('ArrowDown') || keysDown.has('s') || keysDown.has('S')) {
+    spherical.phi = Math.min(Math.PI - 0.1, spherical.phi + ROTATE_SPEED);
+    autoRotate = false; controls.autoRotate = false;
+  }
+
+  if (keysDown.has('=') || keysDown.has('+')) {
+    spherical.radius = Math.max(1, spherical.radius - ZOOM_SPEED);
+  }
+  if (keysDown.has('-') || keysDown.has('_')) {
+    spherical.radius = Math.min(20, spherical.radius + ZOOM_SPEED);
+  }
+
+  if (keysDown.has('q') || keysDown.has('Q')) {
+    controls.target.y += PAN_SPEED;
+  }
+  if (keysDown.has('e') || keysDown.has('E')) {
+    controls.target.y -= PAN_SPEED;
+  }
+
+  camera.position.copy(controls.target).add(new THREE.Vector3().setFromSpherical(spherical));
+  camera.lookAt(controls.target);
+}
+
+
+// ══════════════════════════════════════
+//  ANIMATION LOOP
+// ══════════════════════════════════════
+
+function animate() {
+  requestAnimationFrame(animate);
+  applyKeyboardControls();
+  controls.update();
+  checkHover();
+  renderer.render(scene, camera);
+  labelRenderer.render(scene, camera);
+}
+
+
+// ══════════════════════════════════════
+//  STATS
+// ══════════════════════════════════════
+
+function updateStats() {
+  const el = document.getElementById('stats');
+  const n = constellationData.total_variants;
+  el.textContent = `${n.toLocaleString()} variants`;
+}
+
+
+// ══════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════
+
+initScene();
+
+fetch('extracted_text/constellation_data.json')
+  .then(r => r.json())
+  .then(data => {
+    constellationData = data;
+    document.getElementById('loading').style.display = 'none';
+    buildPointCloud();
+    buildControls();
+    updateStats();
+    animate();
+  })
+  .catch(err => {
+    document.getElementById('loading').textContent = 'Error loading data: ' + err.message;
+  });
+
+window.addEventListener('mousemove', onMouseMove);
+window.addEventListener('click', onClick);
+
+</script>
+</body>
+</html>

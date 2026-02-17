@@ -11225,6 +11225,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Constellation button — opens the constellation.html visualization
+    const constellationBtn = document.getElementById('constellation-btn');
+    if (constellationBtn) {
+        constellationBtn.addEventListener('click', () => {
+            window.location.href = 'constellation.html';
+        });
+    }
+
+    // Hyperspace button — opens the hyperspace.html visualization
+    const hyperspaceBtn = document.getElementById('hyperspace-btn');
+    if (hyperspaceBtn) {
+        hyperspaceBtn.addEventListener('click', () => {
+            window.location.href = 'hyperspace.html';
+        });
+    }
+
     // Cluster filter button click handlers
     [0, 1, 2].forEach(i => {
         const btn = document.getElementById(`tapestry-cluster-${i}`);
