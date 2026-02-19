@@ -86,7 +86,7 @@
         {
           "name": "fridgetrapped",
           "label": "Trapped",
-          "description": "Ryan is trapped \u2014 the key is gone",
+          "description": "Ryan is trapped on the other side of the fridge\u2014and the key is gone",
           "chapter": "chapter4",
           "count": 5085,
           "percentage": 50.85
@@ -94,7 +94,7 @@
         {
           "name": "fridgetunnel",
           "label": "Tunnel",
-          "description": "Niko brings sticky notes to mark their way through the tunnel",
+          "description": "The fridge acts as a kind of tunnel\u2014and its connection has snapped",
           "chapter": "chapter5",
           "count": 4915,
           "percentage": 49.15
@@ -103,12 +103,12 @@
     },
     {
       "key": "memory",
-      "label": "The Memory",
+      "label": "Perception",
       "variables": [
         {
           "name": "cdrom",
           "label": "CD-ROM",
-          "description": "A hypnotic CD-ROM adventure set on a space station",
+          "description": "A weird CD-ROM adventure game with puzzles Ryan cannot solve",
           "chapter": "chapter4",
           "count": 5689,
           "percentage": 56.89
@@ -116,7 +116,7 @@
         {
           "name": "gorilla",
           "label": "Gorilla",
-          "description": "The invisible gorilla \u2014 an attention experiment from class",
+          "description": "The invisible gorilla \u2014 a famous neurology experiment about perception",
           "chapter": "chapter9",
           "count": 4311,
           "percentage": 43.11
@@ -125,12 +125,12 @@
     },
     {
       "key": "attraction",
-      "label": "The Attraction",
+      "label": "The Past",
       "variables": [
         {
           "name": "vortex",
           "label": "Vortex",
-          "description": "A newspaper ad for 'THE VORTEX' attraction",
+          "description": "A roadside attraction called “The Vortex”—it cost 10 cents and was closed on Sundays",
           "chapter": "chapter6",
           "count": 2823,
           "percentage": 28.23
@@ -138,7 +138,7 @@
         {
           "name": "gardens",
           "label": "Gardens",
-          "description": "A newspaper ad for 'THE ENDLESS GARDENS'",
+          "description": "In the late 19th century “The Endless Gardens” occupied the land where the house now stands",
           "chapter": "chapter6",
           "count": 2631,
           "percentage": 26.31
@@ -146,7 +146,7 @@
         {
           "name": "snakeoil",
           "label": "Snake Oil",
-          "description": "A newspaper ad for Dr. Henneson's Magical Tinctures",
+          "description": "In the late 19th century the storefront of Dr. Henneson, who sold “Magical Tinctures” and “Restorative Elixers”",
           "chapter": "chapter6",
           "count": 2369,
           "percentage": 23.69
@@ -154,7 +154,7 @@
         {
           "name": "caves",
           "label": "Caves",
-          "description": "A newspaper story about boys lost in an underground cave",
+          "description": "The entrance to a vast cave system known as Looking-Glass Cave, which was sealed in the 1930s.",
           "chapter": "chapter6",
           "count": 2177,
           "percentage": 21.77
@@ -168,7 +168,7 @@
         {
           "name": "spiralhall",
           "label": "Spiral Hall",
-          "description": "One long hall that leans left \u2014 walking on the ceiling",
+          "description": "A long hallway spirals continuously to the left\u2014and eventually Ryan and Niko are walking on the ceiling",
           "chapter": "chapter8",
           "count": 5700,
           "percentage": 57.0
@@ -185,12 +185,12 @@
     },
     {
       "key": "place",
-      "label": "Elder Niko's Place",
+      "label": "Elder Niko's Travels",
       "variables": [
         {
           "name": "TheCity",
           "label": "The City",
-          "description": "Elder Niko describes a city of ten million recursive houses",
+          "description": "Elder Niko describes lights far below, like a city",
           "chapter": "chapter11",
           "count": 5742,
           "percentage": 57.42
@@ -198,7 +198,7 @@
         {
           "name": "TheBasement",
           "label": "The Basement",
-          "description": "Elder Niko describes an endless empty basement",
+          "description": "Elder Niko describes thousands of recursive houses—and The Basement at the bottom",
           "chapter": "chapter11",
           "count": 4258,
           "percentage": 42.58
@@ -207,7 +207,7 @@
     },
     {
       "key": "ff_setting",
-      "label": "Final Fight: Setting",
+      "label": "The Final Fight",
       "variables": [
         {
           "name": "ffdropoff",
@@ -234,7 +234,7 @@
         {
           "name": "gayniko",
           "label": "Gay Niko",
-          "description": "Romantic tension \u2014 Niko looks at Ryan from the corner of his eye",
+          "description": "Romantic tension with this version of Niko\u2014but Ryan leaves him behind",
           "chapter": "chapter16",
           "count": 3328,
           "percentage": 33.28
@@ -242,7 +242,7 @@
         {
           "name": "firmniko",
           "label": "Firm Niko",
-          "description": "Firm, platonic Niko \u2014 drops his arms, fixes Ryan with a look",
+          "description": "This version of Niko insists that Ryan return home\u2014without him",
           "chapter": "chapter16",
           "count": 3376,
           "percentage": 33.76
@@ -250,7 +250,7 @@
         {
           "name": "originalniko",
           "label": "Original Niko",
-          "description": "Ryan survives but wakes in the wrong universe, alone",
+          "description": "Ryan ends up in an alternate universe, while the original Niko makes it back to his and Ryan's own world, but alone",
           "chapter": "chapter4",
           "count": 3296,
           "percentage": 32.96
