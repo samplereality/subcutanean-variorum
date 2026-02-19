@@ -7,7 +7,7 @@
   "groups": [
     {
       "key": "intro",
-      "label": "Chapter 1 Intro",
+      "label": "Opening Scene",
       "variables": [
         {
           "name": "clubintro",
