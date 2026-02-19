@@ -1309,40 +1309,81 @@ async function loadAllVersions() {
 
         // Check URL parameters for deep linking (e.g., ?versionA=60005&chapter=chapter14&mode=unified)
         const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('versionA')) {
-            const paramA = urlParams.get('versionA');
-            if (allVersions[paramA] || customVersions[paramA]) {
-                versionA = paramA;
+        const hasUrlParams = urlParams.has('versionA') || urlParams.has('versionB') || urlParams.has('chapter') || urlParams.has('mode');
+
+        if (hasUrlParams) {
+            // URL params take priority (deep links from sub-pages like pathways)
+            if (urlParams.has('versionA')) {
+                const paramA = urlParams.get('versionA');
+                if (allVersions[paramA] || customVersions[paramA]) {
+                    versionA = paramA;
+                }
             }
-        }
-        if (urlParams.has('versionB')) {
-            const paramB = urlParams.get('versionB');
-            if (allVersions[paramB] || customVersions[paramB]) {
-                versionB = paramB;
+            if (urlParams.has('versionB')) {
+                const paramB = urlParams.get('versionB');
+                if (allVersions[paramB] || customVersions[paramB]) {
+                    versionB = paramB;
+                }
             }
-        }
-        if (urlParams.has('chapter')) {
-            const paramCh = urlParams.get('chapter');
-            currentChapter = paramCh;
-        }
-        if (urlParams.has('mode')) {
-            const paramMode = urlParams.get('mode');
-            if (['unified', 'sidebyside', 'comparison', 'diff', 'collation'].includes(paramMode)) {
-                currentMode = paramMode;
+            if (urlParams.has('chapter')) {
+                currentChapter = urlParams.get('chapter');
+            }
+            if (urlParams.has('mode')) {
+                const paramMode = urlParams.get('mode');
+                if (['unified', 'sidebyside', 'comparison', 'diff', 'collation'].includes(paramMode)) {
+                    currentMode = paramMode;
+                }
+            }
+            // Consume any saved state so it doesn't interfere later
+            consumeViewState();
+        } else {
+            // No URL params — restore saved view state if returning from a sub-page
+            const saved = consumeViewState();
+            if (saved) {
+                if (saved.versionA && (allVersions[saved.versionA] || customVersions[saved.versionA])) {
+                    versionA = saved.versionA;
+                }
+                if (saved.versionB && (allVersions[saved.versionB] || customVersions[saved.versionB])) {
+                    versionB = saved.versionB;
+                }
+                if (saved.chapter) {
+                    currentChapter = saved.chapter;
+                }
+                if (saved.mode && ['unified', 'sidebyside', 'comparison', 'diff', 'collation'].includes(saved.mode)) {
+                    currentMode = saved.mode;
+                }
+                if (saved.versionC && (allVersions[saved.versionC] || customVersions[saved.versionC])) {
+                    versionC = saved.versionC;
+                }
             }
         }
 
         document.getElementById('version-a-select').value = versionA;
         document.getElementById('version-b-select').value = versionB;
 
+        // Restore third version if it was active
+        if (versionC) {
+            const selectC = document.getElementById('version-c-select');
+            if (selectC) selectC.value = versionC;
+            toggleThirdVersion(true);
+        }
+
         // Build chapter navigation
         buildChapterNavigation();
+
+        // Sync view mode dropdown with currentMode
+        const viewMenu = document.getElementById('view-menu');
+        if (viewMenu) {
+            viewMenu.querySelectorAll('.dropdown-item[data-mode]').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.mode === currentMode);
+            });
+        }
 
         // Display initial comparison
         displayComparison();
 
         // Clear URL params after applying so refreshes don't re-apply stale state
-        if (urlParams.toString()) {
+        if (hasUrlParams) {
             window.history.replaceState({}, '', window.location.pathname);
         }
         refreshBookmarkUI();
@@ -6248,6 +6289,34 @@ function saveBookmarksToStorage() {
         localStorage.setItem('subcutanean_bookmarks', JSON.stringify(bookmarks));
     } catch (error) {
         console.error('Error saving bookmarks:', error);
+    }
+}
+
+// ── View state persistence (survives navigation to sub-pages) ──
+
+function saveViewState() {
+    try {
+        const state = {
+            versionA,
+            versionB,
+            chapter: currentChapter,
+            mode: currentMode,
+        };
+        if (versionC) state.versionC = versionC;
+        sessionStorage.setItem('subcutanean_view_state', JSON.stringify(state));
+    } catch (e) {
+        // sessionStorage unavailable — ignore
+    }
+}
+
+function consumeViewState() {
+    try {
+        const raw = sessionStorage.getItem('subcutanean_view_state');
+        if (!raw) return null;
+        sessionStorage.removeItem('subcutanean_view_state');
+        return JSON.parse(raw);
+    } catch (e) {
+        return null;
     }
 }
 
@@ -11213,6 +11282,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const finalFightBtn = document.getElementById('final-fight-btn');
     if (finalFightBtn) {
         finalFightBtn.addEventListener('click', () => {
+            saveViewState();
             window.location.href = 'final_fight.html';
         });
     }
@@ -11221,6 +11291,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const pathwaysBtn = document.getElementById('pathways-btn');
     if (pathwaysBtn) {
         pathwaysBtn.addEventListener('click', () => {
+            saveViewState();
             window.location.href = 'pathways.html';
         });
     }
