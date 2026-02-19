@@ -12,7 +12,7 @@
         {
           "name": "clubintro",
           "label": "Club",
-          "description": "Ryan reluctantly goes to a club with Niko",
+          "description": "Ryan has somewhat reluctantly joined Niko at a club",
           "chapter": "chapter1",
           "count": 3757,
           "percentage": 37.57
@@ -20,7 +20,7 @@
         {
           "name": "makeupintro",
           "label": "Makeup",
-          "description": "Niko apologizes to Ryan on the back porch after an argument",
+          "description": "Niko apologizes to Ryan on the back porch after an argument, and they head to a club",
           "chapter": "chapter1",
           "count": 3389,
           "percentage": 33.89
@@ -28,7 +28,7 @@
         {
           "name": "noodlesintro",
           "label": "Noodles",
-          "description": "Ryan is making ramen when Niko arrives",
+          "description": "Ryan makes dinner for Niko and himself, and Niko invites Ryan to a club",
           "chapter": "chapter1",
           "count": 2854,
           "percentage": 28.54
@@ -37,12 +37,12 @@
     },
     {
       "key": "phone",
-      "label": "The Phone Call",
+      "label": "Ryan's Traume",
       "variables": [
         {
           "name": "dadphone",
           "label": "Dad",
-          "description": "Ryan's dead father impossibly speaks on the phone",
+          "description": "Ryan's father died suddenly when Ryan was young",
           "chapter": "chapter10",
           "count": 5008,
           "percentage": 50.08
@@ -50,7 +50,7 @@
         {
           "name": "bradphone",
           "label": "Brad",
-          "description": "Ryan's ex Bradley is at Mom's house, acting like nothing happened",
+          "description": "Ryan's had a toxic relationship with his ex, Bradley",
           "chapter": "chapter10",
           "count": 4992,
           "percentage": 49.92
@@ -64,7 +64,7 @@
         {
           "name": "empty",
           "label": "Empty",
-          "description": "The underground rooms are all empty",
+          "description": "The underground rooms are all empty and impersonal",
           "chapter": "chapter2",
           "count": 4991,
           "percentage": 49.91
@@ -72,7 +72,7 @@
         {
           "name": "furnished",
           "label": "Furnished",
-          "description": "A piece or two of dusty, decades-old abandoned furniture",
+          "description": "Some of the underground rooms have decades-old abandoned furniture",
           "chapter": "chapter1",
           "count": 5009,
           "percentage": 50.09
