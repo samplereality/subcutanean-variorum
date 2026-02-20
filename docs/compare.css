@@ -2873,21 +2873,21 @@ main {
 
 /* Three-way comparison paragraph types */
 .comparison-paragraph.abc-identical {
+    background-color: rgba(120, 144, 156, 0.15);
+    border-color: #78909c;
+    color: #b0bec5;
+}
+
+.comparison-paragraph.ab-match {
     background-color: rgba(76, 175, 80, 0.25);
     border-color: #81c784;
     color: #c8e6c9;
 }
 
-.comparison-paragraph.ab-match {
-    background-color: rgba(129, 199, 132, 0.2);
-    border-color: #a5d6a7;
-    color: #c8e6c9;
-}
-
 .comparison-paragraph.ac-match {
-    background-color: rgba(186, 104, 200, 0.2);
-    border-color: #ce93d8;
-    color: #e1bee7;
+    background-color: rgba(240, 98, 146, 0.2);
+    border-color: #f06292;
+    color: #f8bbd0;
 }
 
 .comparison-paragraph.bc-match {
@@ -2908,20 +2908,26 @@ main {
     color: #ffe0b2;
 }
 
+.comparison-paragraph.collation-outlier {
+    background-color: rgba(255, 255, 255, 0.03);
+    border-style: dashed;
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
 /* Legend colors for three-way comparison */
 .legend-color.abc-identical {
+    background-color: rgba(120, 144, 156, 0.3);
+    border-color: #78909c;
+}
+
+.legend-color.ab-match {
     background-color: rgba(76, 175, 80, 0.4);
     border-color: #81c784;
 }
 
-.legend-color.ab-match {
-    background-color: rgba(129, 199, 132, 0.4);
-    border-color: #a5d6a7;
-}
-
 .legend-color.ac-match {
-    background-color: rgba(186, 104, 200, 0.4);
-    border-color: #ce93d8;
+    background-color: rgba(240, 98, 146, 0.4);
+    border-color: #f06292;
 }
 
 .legend-color.bc-match {
@@ -5059,21 +5065,21 @@ main {
 
 /* Light mode: Three-way comparison paragraph styles */
 [data-theme="light"] .comparison-paragraph.abc-identical {
+    background-color: rgba(120, 144, 156, 0.12);
+    border-color: #607d8b;
+    color: #37474f;
+}
+
+[data-theme="light"] .comparison-paragraph.ab-match {
     background-color: rgba(76, 175, 80, 0.2);
     border-color: #43a047;
     color: #1b5e20;
 }
 
-[data-theme="light"] .comparison-paragraph.ab-match {
-    background-color: rgba(129, 199, 132, 0.2);
-    border-color: #66bb6a;
-    color: #2e7d32;
-}
-
 [data-theme="light"] .comparison-paragraph.ac-match {
-    background-color: rgba(186, 104, 200, 0.2);
-    border-color: #ab47bc;
-    color: #6a1b9a;
+    background-color: rgba(240, 98, 146, 0.15);
+    border-color: #e91e63;
+    color: #880e4f;
 }
 
 [data-theme="light"] .comparison-paragraph.bc-match {
@@ -5094,17 +5100,23 @@ main {
     color: #e65100;
 }
 
+[data-theme="light"] .comparison-paragraph.collation-outlier {
+    background-color: rgba(0, 0, 0, 0.03);
+    border-style: dashed;
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
 /* Light mode: Legend colors for three-way */
 [data-theme="light"] .legend-color.abc-identical {
-    background-color: rgba(76, 175, 80, 0.3);
+    background-color: rgba(120, 144, 156, 0.25);
 }
 
 [data-theme="light"] .legend-color.ab-match {
-    background-color: rgba(129, 199, 132, 0.3);
+    background-color: rgba(76, 175, 80, 0.3);
 }
 
 [data-theme="light"] .legend-color.ac-match {
-    background-color: rgba(186, 104, 200, 0.3);
+    background-color: rgba(240, 98, 146, 0.3);
 }
 
 [data-theme="light"] .legend-color.bc-match {

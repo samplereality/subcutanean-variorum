@@ -4375,34 +4375,76 @@ function alignThreeParagraphs(paragraphsA, paragraphsB, paragraphsC) {
         });
     }
 
-    // Step 4: Append orphans (unique to B or C, not matched to A)
-    orphansB.forEach(orphan => {
-        threeWay.push({
-            indexA: null,
-            indexB: orphan.indexB,
-            indexC: null,
-            textA: null,
-            textB: orphan.textB,
-            textC: null,
-            similarityAB: 0,
-            similarityAC: 0,
-            type: 'unique-b'
+    // Step 4: Interleave orphans at correct narrative positions
+    // First, try to pair orphan B and orphan C paragraphs with each other
+    const usedOrphanC = new Set();
+    const orphanRows = [];
+
+    for (const ob of orphansB) {
+        let bestIdx = -1, bestSim = 0.3;
+        for (let ci = 0; ci < orphansC.length; ci++) {
+            if (usedOrphanC.has(ci)) continue;
+            const sim = calculateSimilarity(ob.textB, orphansC[ci].textC);
+            if (sim > bestSim) { bestSim = sim; bestIdx = ci; }
+        }
+        if (bestIdx >= 0) {
+            usedOrphanC.add(bestIdx);
+            orphanRows.push({
+                indexA: null, indexB: ob.indexB, indexC: orphansC[bestIdx].indexC,
+                textA: null, textB: ob.textB, textC: orphansC[bestIdx].textC,
+                similarityAB: 0, similarityAC: 0,
+                type: classifyThreeWay(null, ob.textB, orphansC[bestIdx].textC)
+            });
+        } else {
+            orphanRows.push({
+                indexA: null, indexB: ob.indexB, indexC: null,
+                textA: null, textB: ob.textB, textC: null,
+                similarityAB: 0, similarityAC: 0, type: 'unique-b'
+            });
+        }
+    }
+    for (let ci = 0; ci < orphansC.length; ci++) {
+        if (usedOrphanC.has(ci)) continue;
+        orphanRows.push({
+            indexA: null, indexB: null, indexC: orphansC[ci].indexC,
+            textA: null, textB: null, textC: orphansC[ci].textC,
+            similarityAB: 0, similarityAC: 0, type: 'unique-c'
         });
+    }
+
+    // Compute insertion position for each orphan based on where its B/C index
+    // falls relative to already-placed B/C indices in the three-way alignment
+    const insertions = orphanRows.map(orphan => {
+        let insertAfter = -1;
+        if (orphan.indexB !== null) {
+            for (let i = 0; i < threeWay.length; i++) {
+                if (threeWay[i].indexB !== null && threeWay[i].indexB < orphan.indexB) {
+                    insertAfter = i;
+                }
+            }
+        }
+        if (orphan.indexC !== null) {
+            for (let i = 0; i < threeWay.length; i++) {
+                if (threeWay[i].indexC !== null && threeWay[i].indexC < orphan.indexC) {
+                    insertAfter = Math.max(insertAfter, i);
+                }
+            }
+        }
+        return { orphan, insertAfter };
     });
 
-    orphansC.forEach(orphan => {
-        threeWay.push({
-            indexA: null,
-            indexB: null,
-            indexC: orphan.indexC,
-            textA: null,
-            textB: null,
-            textC: orphan.textC,
-            similarityAB: 0,
-            similarityAC: 0,
-            type: 'unique-c'
-        });
+    // Sort descending by insertAfter so splicing doesn't shift earlier positions.
+    // Secondary sort by source index (descending) to maintain order within same position.
+    insertions.sort((a, b) => {
+        if (b.insertAfter !== a.insertAfter) return b.insertAfter - a.insertAfter;
+        const aIdx = a.orphan.indexB ?? a.orphan.indexC ?? 0;
+        const bIdx = b.orphan.indexB ?? b.orphan.indexC ?? 0;
+        return bIdx - aIdx;
     });
+
+    for (const { orphan, insertAfter } of insertions) {
+        threeWay.splice(insertAfter + 1, 0, orphan);
+    }
 
     return threeWay;
 }
@@ -4630,14 +4672,31 @@ function displayParagraphComparisonThreeWay(div, paragraphsA, paragraphsB, parag
         const bIsPlaceholder = !textB;
         const cIsPlaceholder = !textC;
 
+        // Determine per-cell types: matching pair keeps the match color,
+        // the outlier (present but different) gets a muted dashed treatment
+        let typeA = type, typeB = type, typeC = type;
+        let simA = 0, simB = 0, simC = 0;
+        if (type === 'ab-match' && !cIsPlaceholder) {
+            typeC = 'collation-outlier';
+            simC = calculateSimilarity(textA, textC);
+        }
+        if (type === 'ac-match' && !bIsPlaceholder) {
+            typeB = 'collation-outlier';
+            simB = calculateSimilarity(textA, textB);
+        }
+        if (type === 'bc-match' && !aIsPlaceholder) {
+            typeA = 'collation-outlier';
+            simA = calculateSimilarity(textB, textA);
+        }
+
         // Create paragraph A
-        const divA = createCollationCell(textA, indexA, versionA, type, aIsPlaceholder, rowIndex);
+        const divA = createCollationCell(textA, indexA, versionA, typeA, aIsPlaceholder, rowIndex, simA);
 
         // Create paragraph B
-        const divB = createCollationCell(textB, indexB, versionB, type, bIsPlaceholder, rowIndex);
+        const divB = createCollationCell(textB, indexB, versionB, typeB, bIsPlaceholder, rowIndex, simB);
 
         // Create paragraph C
-        const divC = createCollationCell(textC, indexC, versionC, type, cIsPlaceholder, rowIndex);
+        const divC = createCollationCell(textC, indexC, versionC, typeC, cIsPlaceholder, rowIndex, simC);
 
         grid.appendChild(divA);
         grid.appendChild(divB);
@@ -4647,7 +4706,7 @@ function displayParagraphComparisonThreeWay(div, paragraphsA, paragraphsB, parag
     div.appendChild(grid);
 }
 
-function createCollationCell(text, index, version, type, isPlaceholder, rowIndex) {
+function createCollationCell(text, index, version, type, isPlaceholder, rowIndex, similarity = 0) {
     const cell = document.createElement('div');
     cell.dataset.paragraphIndex = rowIndex;
     cell.dataset.versionId = version;
@@ -4662,6 +4721,9 @@ function createCollationCell(text, index, version, type, isPlaceholder, rowIndex
         const numberDiv = document.createElement('div');
         numberDiv.className = 'comparison-paragraph-number';
         numberDiv.textContent = `${formatVersionLabel(version)} [${index + 1}]`;
+        if (type === 'collation-outlier' && similarity > 0) {
+            numberDiv.innerHTML += `<span class="similarity-score">${(similarity * 100).toFixed(0)}% similar</span>`;
+        }
         cell.appendChild(numberDiv);
 
         const contentDiv = document.createElement('div');
