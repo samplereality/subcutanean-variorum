@@ -360,33 +360,33 @@ const CONTENT = {
   },
   fftubeweird: {
     label: 'Broken Physics',
-    short: 'Gravity breaks down \u2014 furniture shifts at impossible angles',
+    short: 'Gravity breaks down\u2014everything shifts at impossible angles',
     passage: 'I was at a forty-five-degree angle. Getting back on top of the cylinder had been a problem of broken physics.',
-    detail: 'The laws of physics refuse to cooperate. Furniture drifts at impossible angles, and every movement is a negotiation with gravity that has lost interest in the rules.',
+    detail: 'The laws of physics refuse to cooperate. Furniture drifts at impossible angles, and every object seems to have its own field of gravity.',
   },
   fftube: {
     label: 'Climbing Gym',
-    short: 'A surreal climbing gym \u2014 Niko maps parkour routes',
+    short: 'A surreal climbing gym that younger Niko deftly navigates',
     passage: 'I\'d never skydived or bungee jumped before. Getting back on top of the cylinder had been like navigating an especially surreal and challenging climbing gym.',
-    detail: 'The environment behaves like an enormous climbing wall. Niko works out parkour routes from perch to bookshelf, each handhold calculated, each leap earned.',
+    detail: 'The environment behaves like an enormous climbing wall. Younger Niko works out parkour routes from perch to perch, each handhold calculated, each leap earned.',
   },
   ffset: {
     label: 'Suspended Set',
     short: 'A giant bedroom set floating on a platform in the void',
     passage: 'I dangled thirty or forty feet below the underside of the bedroom platform. Wedged in between two dressers, so as not to roll off the edge.',
-    detail: 'The arena is a theatrical stage set suspended in darkness \u2014 a giant bedroom floating on a platform over nothing, dressers and nightstands becoming stepping stones across the abyss.',
+    detail: 'The arena is a giant bedroom floating on a platform over nothing, dressers and nightstands becoming stepping stones across the abyss.',
   },
   ffchandelier: {
     label: 'Chandelier',
-    short: 'A massive crystal chandelier \u2014 anchor and salvation',
-    passage: 'A filigreed structure I couldn\'t at first identify. From there it was simply a matter of detaching the chandelier net from its anchor point.',
+    short: 'A massive crystal chandelier\u2014hanging improbably from nothing',
+    passage: 'With a tinkling smash, I crashed into the net of chandelier. It was like landing on an uncomfortably studded trampoline, sloped sharply down. ',
     detail: 'A vast web of crystal and wire stretches overhead \u2014 a chandelier of impossible scale, its glass baubles catching light that has no source. It becomes the characters\u2019 only anchor point.',
   },
   ffbookshelves: {
     label: 'Bookshelves',
     short: 'A mountain of cascading books \u2014 avalanche and pathway',
     passage: 'I crashed into the mountain of books. A rain of paperbacks, face battered by the landslide of books only now starting to peter out.',
-    detail: 'Towering shelves spill their contents in slow-motion avalanches. The books are both the danger and the pathway \u2014 chaos that can be climbed, if you move fast enough.',
+    detail: 'Old books pour out in slow-motion avalanches. The books are both the danger and the pathway\u2014chaos that can be climbed, if you move fast enough.',
   },
 };
 
@@ -898,15 +898,15 @@ function renderCard() {
       inner.innerHTML = `
         <div class="card-title">The Final Fight</div>
         <div class="card-body">
-          In the climax of <em>Subcutanean</em>, Ryan and Niko confront their doubles in a surreal underground arena.
-          But no two arenas are alike. Seven variables combine to create twelve possible battlegrounds &mdash;
+          In the climax of <em>Subcutanean</em>, Ryan and one version of Niko confront a murderous, Elder Niko in a surreal underground arena.
+          But no two arenas are alike. Seven variables combine to create twelve possible battlegrounds,
           shaping the setting, the physics, and the obstacles the characters face.
         </div>
         <div class="card-body" style="opacity: 0.65;">
           The colored particles above are your ${allSeeds.filter(s => !s.generic).length} loaded copies. The gray particles
           represent the wider population of all variants, distributed according to actual proportions from 10,000 generated copies.
         </div>
-        <button class="begin-btn" onclick="goToStep('setting')">Begin &rarr;</button>
+        <button class="begin-btn" onclick="goToStep('setting')">Start &rarr;</button>
       `;
       break;
 
@@ -940,7 +940,7 @@ function renderChoiceStep() {
     prevSection = `
       <div class="card-passage">${prevContent.passage}</div>
       <div class="card-body">${prevContent.detail}</div>
-      <div class="card-stat">${realActiveCount} of your seeds &middot; ${pct}% of all 10,000 variants</div>
+      <div class="card-stat">${realActiveCount} of your seeds &middot; ${pct}% of 10,000 sampled variants</div>
       <hr style="border: none; border-top: 1px solid var(--divider); margin: 16px 0;">
     `;
   }
@@ -1037,7 +1037,7 @@ function updateBreadcrumbs() {
     }
   }
 
-  let html = '<a id="back-link" href="index.html">&larr; Browser</a>';
+  let html = '<a id="back-link" href="index.html">&larr; Variorum</a>';
 
   steps.forEach((step, i) => {
     if (i > 0) html += '<span class="crumb-sep">&rsaquo;</span>';

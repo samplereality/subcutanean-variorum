@@ -85,7 +85,8 @@ def parse_globals():
             define_match = re.search(r'\[DEFINE\s+([^\]]+)\]', line)
             if define_match:
                 define_content = define_match.group(1)
-                var_names = re.findall(r'@(\w+)', define_content)
+                var_names_raw = re.findall(r'@(\w+)', define_content)
+                var_names = [v.lower() for v in var_names_raw]
                 description = ' '.join(current_comment) if current_comment else None
 
                 # Track if this is a group of mutually exclusive variables
@@ -97,9 +98,9 @@ def parse_globals():
                         'type': 'exclusive'  # exactly one is active
                     })
 
-                for var_name in var_names:
-                    # Check if it's optional (has ^ prefix)
-                    is_optional = f'^@{var_name}' in define_content
+                for i, var_name in enumerate(var_names):
+                    # Check if it's optional (has ^ prefix) — check against raw name
+                    is_optional = f'^@{var_names_raw[i]}' in define_content
                     variables[var_name] = {
                         'description': description,
                         'chapters': [],
@@ -119,7 +120,7 @@ def parse_globals():
                 macro_content = macro_match.group(2)
 
                 # Find all variables referenced in this macro
-                vars_in_macro = re.findall(r'@(\w+)', macro_content)
+                vars_in_macro = [v.lower() for v in re.findall(r'@(\w+)', macro_content)]
                 if vars_in_macro:
                     macros[macro_name] = list(set(vars_in_macro))
 
@@ -132,7 +133,7 @@ def parse_globals():
                 # Extract text patterns from macro definition: @varname>text
                 macro_patterns[macro_name] = {}
                 for var_match in re.finditer(r'@(\w+)>([^|\]\[]+)', macro_content):
-                    var_name = var_match.group(1)
+                    var_name = var_match.group(1).lower()
                     text_snippet = var_match.group(2).strip()
                     # Clean up the snippet (remove nested macros, keep italic text)
                     clean_snippet = re.sub(r'\{i/([^}]+)\}', r'\1', text_snippet)

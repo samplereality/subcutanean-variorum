@@ -488,7 +488,7 @@ function isSourceVersion(versionId) {
 
 function formatVersionLabel(versionId) {
     if (!versionId) return 'Version';
-    return isSourceVersion(versionId) ? SOURCE_VERSION_LABEL : `Seed ${versionId}`;
+    return isSourceVersion(versionId) ? SOURCE_VERSION_LABEL : versionId;
 }
 
 function getAvailableSourceChapters() {
@@ -2241,6 +2241,8 @@ function escapeHtml(text) {
 
 // Track the currently highlighted variable for source viewing
 let currentHighlightedVar = null;
+let currentHighlightedVarTarget = null;   // targetVersion passed to highlightVariableText
+let currentHighlightedVarLocal = false;   // isChapterLocal flag
 
 /**
  * Clear all variable highlights and source buttons.
@@ -2255,6 +2257,8 @@ function clearVariableHighlights() {
     });
     closeVariableSourcePanel();
     currentHighlightedVar = null;
+    currentHighlightedVarTarget = null;
+    currentHighlightedVarLocal = false;
 }
 
 function highlightVariableText(varName, targetVersion = null, isChapterLocal = false) {
@@ -2289,6 +2293,8 @@ function highlightVariableText(varName, targetVersion = null, isChapterLocal = f
     }
 
     currentHighlightedVar = varName;
+    currentHighlightedVarTarget = targetVersion;
+    currentHighlightedVarLocal = isChapterLocal;
 
     // Find paragraphs that contain any of the patterns
     // Match all paragraph types across different view modes:
@@ -2650,6 +2656,10 @@ function toggleVariablePanel() {
     }
 
     if (isHidden) {
+        // Close Source Code mode if it's active
+        if (sourceCodeModeEnabled) {
+            toggleSourceCodeMode();
+        }
         renderVariablesPanel();
     } else {
         clearVariableHighlights();
@@ -2698,7 +2708,16 @@ function toggleSourceCodeMode() {
         btn.classList.toggle('active', sourceCodeModeEnabled);
     }
 
-    if (!sourceCodeModeEnabled) {
+    if (sourceCodeModeEnabled) {
+        // Close Variable panel if it's open
+        const varsPanel = document.getElementById('variables-panel');
+        if (varsPanel && !varsPanel.classList.contains('hidden')) {
+            varsPanel.classList.add('hidden');
+            const varsBtn = document.getElementById('show-vars-btn');
+            if (varsBtn) varsBtn.classList.remove('active');
+            clearVariableHighlights();
+        }
+    } else {
         // When disabling, restore all toggled paragraphs and clear state
         restoreAllToggledParagraphs();
         toggledSourceParagraphs.clear();
@@ -6497,7 +6516,13 @@ function confirmBookmarkSave() {
         mode: currentMode,
         scrollPosition: pending.scrollPosition,
         notes: notes,
-        openNotePanels: pending.openPanels
+        openNotePanels: pending.openPanels,
+        sourceCodeMode: sourceCodeModeEnabled ? Array.from(toggledSourceParagraphs) : null,
+        highlightedVariable: currentHighlightedVar ? {
+            name: currentHighlightedVar,
+            targetVersion: currentHighlightedVarTarget || null,
+            isChapterLocal: currentHighlightedVarLocal || false
+        } : null
     };
 
     bookmarks.push(bookmark);
@@ -6575,6 +6600,45 @@ function applyBookmark(bookmark) {
         // Delay to allow the comparison to render first
         setTimeout(() => {
             restoreNotePanels(bookmark.openNotePanels);
+        }, 600);
+    }
+
+    // Restore Source Code mode with toggled paragraphs
+    if (bookmark.sourceCodeMode && bookmark.sourceCodeMode.length > 0) {
+        setTimeout(() => {
+            // Enable Source Code mode if not already on
+            if (!sourceCodeModeEnabled) {
+                toggleSourceCodeMode();
+            }
+            // Re-toggle each saved paragraph
+            for (const key of bookmark.sourceCodeMode) {
+                const parts = key.split('-');
+                // Key format: "versionId-chapterId-paragraphIndex"
+                const paragraphIndex = parseInt(parts[parts.length - 1], 10);
+                const chapterId = parts[parts.length - 2];
+                const vid = parts.slice(0, parts.length - 2).join('-');
+                const container = document.getElementById('comparison-display');
+                if (!container) continue;
+                const para = container.querySelector(`[data-version-id="${vid}"][data-paragraph-index="${paragraphIndex}"]`);
+                if (para) {
+                    toggleParagraphSource(para);
+                }
+            }
+        }, 400);
+    }
+
+    // Restore Variable highlight
+    if (bookmark.highlightedVariable) {
+        const varInfo = typeof bookmark.highlightedVariable === 'string'
+            ? { name: bookmark.highlightedVariable, targetVersion: null, isChapterLocal: false }
+            : bookmark.highlightedVariable;
+        setTimeout(() => {
+            // Open the variables panel if not already open
+            const varsPanel = document.getElementById('variables-panel');
+            if (varsPanel && varsPanel.classList.contains('hidden')) {
+                toggleVariablePanel();
+            }
+            highlightVariableText(varInfo.name, varInfo.targetVersion, varInfo.isChapterLocal);
         }, 600);
     }
 }
