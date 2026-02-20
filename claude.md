@@ -17,7 +17,7 @@ A web-based variorum browser for exploring textual variations across 25 versions
 2. **Navigation & UI**
    - Persistent navigation bar with dropdowns for Bookmarks, Notes, Files, and Generate
    - View dropdown menu: 5 view modes (Unified, Side-by-side, Track Changes, Collation, Gonzo)
-   - Analyze dropdown menu: 5 tools (Source Code, Variables, Word Diff, Heatmap, Tapestry)
+   - Analyze dropdown menu: 7 tools (Source Code, Variables, Word Diff, Heatmap, Tapestry, Pathways, Final Fight)
    - Dropdowns auto-close after selection (150ms delay)
    - Hamburger menu at ≤968px (tablet/phone); mobile version tabs for side-by-side at ≤968px
    - Modal dialogs for About, Generate Copy, Jaccard Distance, Word Diff, and Macro Inspector
@@ -85,7 +85,7 @@ docs/
 ├── index.html              # Main HTML structure with all modals
 ├── styles.css              # Base styling
 ├── compare.css             # Comparison UI and nav bar styles
-├── compare.js              # Main application JavaScript (~8500 lines)
+├── compare.js              # Main application JavaScript (~11500 lines)
 ├── origin_text/            # Quant source files
 │   ├── manifest.txt        # File listing in reading order
 │   ├── globals.txt         # Global variable and macro definitions
@@ -100,7 +100,11 @@ docs/
 ├── extract_text_all.py     # Convert EPUBs to JSON
 ├── calculate_levenshtein.py # Calculate similarity metrics
 ├── build_origin_sources.py # Build Quant source JSON
-└── add_variables.py        # Add variables from generation log
+├── add_variables.py        # Add variables from generation log
+├── pathways.html           # Story Pathways Sankey/alluvial visualization
+├── scan_pathways.py        # Preprocessing for pathways data
+├── final_fight.html        # Final fight arena analysis visualization
+└── build_final_fight.py    # Preprocessing for final fight data
 ```
 
 ### Key JavaScript Functions (compare.js)
@@ -156,6 +160,16 @@ docs/
 - `confirmBookmarkSave()` / `closeBookmarkNameModal()` - Modal save/cancel handlers
 - `applyBookmark()` / `deleteSelectedBookmark()`
 - `loadBookmarksFromStorage()` / `saveBookmarksToStorage()`
+- `saveViewState()` - Saves current view (seeds, chapter, mode) to sessionStorage before navigating away
+- `consumeViewState()` - Reads and removes saved view state from sessionStorage on return
+
+**Word Diff:**
+- `calculateWordDifferential()` - Computes unique vocabulary per version
+- `displayWordLists()` - Renders word items with `--i` CSS variable for staggered float animation
+- `setupWordRepulsion(listEl)` - Mouse-proximity repulsion effect on word items in a `.word-list`
+- `initWordRepulsion()` - Initializes repulsion on all `.word-list` containers
+- `showWordPopup()` - Shows chapter occurrence popup on word click
+- `jumpToChapterWithWord()` - Navigates to chapter and searches for clicked word
 
 **Source Code Mode (text similarity matching):**
 - `stripQuantMarkup(text)` - Strips Quant syntax to get comparable plain text
@@ -516,6 +530,53 @@ This mapping is defined in `build_variable_info.py` as `CHAPTER_MAPPING`.
 
 ## Recent Changes (February 2026)
 
+### View State Persistence Across Sub-Page Navigation
+
+Navigating to visualization sub-pages (Pathways, Final Fight) and back now preserves the user's current view state (selected seeds, chapter, view mode, third version if active).
+
+**Implementation:**
+- `saveViewState()` writes `{ versionA, versionB, versionC?, chapter, mode }` to `sessionStorage` before navigating away
+- `consumeViewState()` reads and removes the saved state on return (one-shot)
+- URL params (deep links from sub-pages) take priority over saved state
+- Saved state is consumed even when URL params are present, preventing stale restoration later
+- View mode dropdown active state is synced on restore
+- Third version is re-activated via `toggleThirdVersion(true)` if it was active
+
+### Story Pathways Visualization (`pathways.html`)
+
+Sankey/alluvial diagram showing how 10 key story-state variables flow across 10,000 generated variants. Built with D3.js.
+
+**Features:**
+- Nodes represent variable values; bands show how seeds flow between them
+- Click a seed in the legend to reveal its path (animated trace); click again to hide (toggle)
+- Click a node to reveal all seed paths through it; click again to hide them all (toggle)
+- Hover nodes to highlight connected bands; hover paths for seed details
+- Guided tour walks through the visualization step by step
+- "Show All" / "Clear" buttons in legend
+- Click a revealed seed path to navigate to that seed in the main variorum
+
+**Key function:** `revealSeedsThroughNode(nodeId)` — toggles: if all seeds through the node are already revealed, removes them all; otherwise reveals any not yet shown.
+
+**Preprocessing:** `scan_pathways.py` extracts pathway variables from 10K seeds → `extracted_text/pathway_data.json`
+
+### Final Fight Arena Visualization (`final_fight.html`)
+
+Interactive exploration of the 12 possible arenas for the novel's final fight scene, showing which variable combinations lead to each arena.
+
+**Preprocessing:** `build_final_fight.py` → `extracted_text/final_fight_data.json`
+
+### Word Diff: Animated Word Items
+
+Word items in the Word Diff modal now have two interactive animations:
+
+**Idle float:** Each `.word-item` gently bobs via a `word-float` CSS keyframe animation (3s cycle, 2px vertical). Staggered per-item via `--i` CSS variable set in JS (120ms offset per word), creating a wave ripple across the word cloud.
+
+**Mouse repulsion:** `setupWordRepulsion()` adds a magnetic-repulsion effect — words within 80px of the cursor push away proportionally (max 6px displacement). Uses `requestAnimationFrame`-throttled mousemove on `.word-list` containers. Words get `.repulsed` class (pauses float, enables transform transition). All resets on mouseleave.
+
+**CSS classes:**
+- `.word-item` — base style with `animation: word-float`, `--i` variable for stagger
+- `.word-item.repulsed` — `animation: none`, JS-controlled transform with 120ms ease-out transition
+
 ### Three-Way Track Changes: Merged Inline Diff
 
 Rewrote the three-version Track Changes mode to show fine-grained, word-level diffs merged into single paragraphs, matching the quality of two-version diffs.
@@ -573,7 +634,7 @@ Replaced the old View/Analyze panels (which competed for space) with dropdown me
 
 **View/Analyze Dropdowns:**
 - Click "View" button → dropdown with 5 modes (Unified, Side-by-side, Track Changes, Collation, Gonzo)
-- Click "Analyze" button → dropdown with 4 tools (Source Code, Variables, Word Diff, Heatmap)
+- Click "Analyze" button → dropdown with 7 tools (Source Code, Variables, Word Diff, Heatmap, Tapestry, Pathways, Final Fight)
 - Dropdowns auto-close after selection (150ms delay)
 - Click-outside-to-close behavior
 - CSS classes: `.control-dropdown`, `.dropdown-menu`, `.dropdown-item`
@@ -1000,6 +1061,35 @@ Exported: January 18, 2026
 - Text: "The door creaked..."
 - Notes: Compare with seed 45450...
 ```
+
+## Experimental Branch: `experimental-visualization`
+
+The `experimental-visualization` branch contains in-progress visualization work not yet merged to master:
+
+### Textual Hyperspace (`hyperspace.html`)
+
+A Three.js first-person fly-through of the novel's textual variation space. You ride one seed's version forward through the narrative while unchosen alternatives float around you as readable text fragments.
+
+**Architecture:**
+- `build_hyperspace.py` — Python preprocessing: stratified sampling of 1000 seeds from 10K, paragraph alignment via `difflib.SequenceMatcher`, variant extraction (max 10 per variation point), significance scoring
+- `hyperspace_data.json` — Generated data (~420KB, 212 variation points, 1000 seeds)
+- `hyperspace.html` — Three.js 0.170.0 visualization with CSS2DRenderer for floating text
+
+**Key features:**
+- **FPS controls**: Pointer lock mouse look (click to engage, ESC to release), WASD movement, right-click drag fallback
+- **360° spherical layout**: Variants distributed on spheres around each variation point using `acos(1-2*seed)` for uniform coverage; proximity-based radius (similar seeds closer, divergent seeds farther)
+- **CSS2D label pool**: 250 pre-created DOM elements recycled each frame, with distance-based font size (14px–7px), opacity (1.0–0.2), truncation, and 2-line wrapping (`-webkit-line-clamp: 2`)
+- **Center text box**: Current seed's text shown in a styled box at screen center with collision detection (`enforceExclusion()` runs per-frame, hides labels overlapping the box via `visibility: hidden`)
+- **Per-label rotation**: Deterministic `rotate()` transforms (-5° to +5°) for visual variety
+- **InstancedMesh dots**: Tiny ambient sparkle behind each text label
+- **Transport controls**: Play/pause auto-fly, scrub bar, speed cycle, prev/next variation point jump
+- **Seed picker**: Dropdown grouped by built-in seeds and sampled variants; changing seed recalculates all positions
+
+**Preprocessing utilities** imported from `build_rarity_scores.py`: `VARIANTS_DIR`, `parse_txt_file`, `normalize_paragraph`, `hash_paragraph`
+
+### Constellation Map (`constellation.html`)
+
+3D point cloud of 10K variants positioned by variable similarity. Built with Three.js + OrbitControls. Aesthetically interesting but not analytically revealing — led to the Hyperspace concept.
 
 ## Credits
 
