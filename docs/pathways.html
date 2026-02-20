@@ -898,16 +898,33 @@ function clearAll() {
 function revealSeedsThroughNode(nodeId) {
   // Find all seed indices that pass through this node
   const [groupKey, varName] = nodeId.split(':');
-  let newlyRevealed = 0;
-
+  const matchingIndices = [];
   allSeedPaths.forEach((sp, idx) => {
-    if (sp.seed[groupKey] === varName && !revealedSeeds.has(idx)) {
+    if (sp.seed[groupKey] === varName) matchingIndices.push(idx);
+  });
+
+  // Toggle: if all matching seeds are already revealed, remove them
+  const allRevealed = matchingIndices.length > 0 &&
+    matchingIndices.every(idx => revealedSeeds.has(idx));
+
+  if (allRevealed) {
+    for (const idx of matchingIndices) {
+      removeSeedPath(idx);
+      revealedSeeds.delete(idx);
+    }
+    updateLegendState();
+    return;
+  }
+
+  // Otherwise reveal any that aren't showing yet
+  let newlyRevealed = 0;
+  for (const idx of matchingIndices) {
+    if (!revealedSeeds.has(idx)) {
       revealedSeeds.add(idx);
-      // Stagger the animations slightly for visual effect
       setTimeout(() => addSeedPath(idx, true), newlyRevealed * 80);
       newlyRevealed++;
     }
-  });
+  }
 
   if (newlyRevealed > 0) {
     updateLegendState();
@@ -1097,32 +1114,27 @@ const TOUR_SEED_INDEX = 0;  // Seed 60001 is the first builtin seed
 const TOUR_STEPS = [
   {
     label: 'Story Pathways',
-    narrative: `Every copy of <em>Subcutanean</em> is unique. Ten decision points
-      branch the narrative into hundreds of distinct combinations. Let\u2019s follow
-      <strong>Seed 60001</strong> through each fork to see what one reader\u2019s
-      novel looks like.`,
+    narrative: `Every copy of <em>Subcutanean</em> is unique. Multiple variables
+      branch the novel into hundreds of distinct combinations. Let\u2019s follow
+      <strong>Seed 60001</strong> through 10 key moments to see what one version of the novel looks like.`,
     nodeIndex: -1
   },
   {
-    label: 'Opening Interaction',
+    label: 'Opening Scene',
     narrative: `The story begins. In Seed 60001, Ryan and Niko party at
       <strong>a club</strong>\u2014a reluctant night out that sets the tone.
       About 38% of all copies start this way. Others open with Ryan on the back porch
-      or Ryan making ramen.`,
+      or Ryan making ramen—though all eventually do end up at the club.`,
     nodeIndex: 0
   },
   {
-    label: 'The Phone Call',
-    narrative: `Ryan\u2019s mother calls. She asks: <em>\u201CDo you want to talk to your
-      father?\u201D</em> In this copy, Ryan\u2019s <strong>father is dead</strong> \u2014
-      yet impossibly, his voice comes on the line. Half of all copies carry
-      this wound; the other half ask about an ex named Bradley, who\u2019s at
-      Mom\u2019s house acting like nothing ever happened.`,
+    label: 'The Trauma',
+    narrative: `In this version, Ryan\u2019s <strong>father is dead</strong>, though Ryan later talks to another version of his father in one of the alternate worlds. Half of all copies carry this traumatic wound; the other half introduce the painful memory of a toxic relationship, Ryan's ex-boyfriend Bradley.`,
     nodeIndex: 1
   },
   {
     label: 'The Rooms',
-    narrative: `Underground, the house unfolds. The rooms in Seed 60001 are
+    narrative: `Downstairs, the house unfolds. The rooms in Seed 60001 are
       <strong>empty</strong> \u2014 no furniture, just carpet stains, wall gouges,
       and a musty smell of long vacancy. In half the copies, dusty pieces
       of abandoned furniture fill these spaces instead, decades out of date.`,
@@ -1130,26 +1142,23 @@ const TOUR_STEPS = [
   },
   {
     label: 'The Fridge',
-    narrative: `The fridge conceals a passage. Niko brings <strong>a pad of
-      yellow sticky notes</strong>, nervously flipping the edges \u2014
-      <em>\u201Cin case we need to mark our way.\u201D</em>
-      In other copies, the key vanishes from Ryan\u2019s pocket and
+    narrative: `The fridge conceals <strong>a tunnel</strong> between alternate worlds, but the passage seems to have snapped.
+      In other copies, Ryan loses the key to the passage, and
       he\u2019s trapped, with no way back but forward.`,
     nodeIndex: 3
   },
   {
-    label: 'The Memory',
-    narrative: `Something stirs in Ryan\u2019s past. He remembers <strong>a CD-ROM
-      adventure</strong> set on a space station \u2014 hypnotic but frustrating,
-      its puzzles gloriously baffling. This is the most common memory,
-      appearing in 57% of copies. The alternative: the famous invisible
-      gorilla experiment from a neurobiology class.`,
+    label: 'Perceptual Metaphor',
+    narrative: `Ryan remembers <strong>a CD-ROM
+      adventure</strong> set on a space station,
+      its puzzles gloriously baffling. This memory becomes a metaphor for perception and sense-making in the novel. The alternative metaphor: the famous invisible
+      gorilla experiment that shows just how much people do not see what is right in front of them.`,
     nodeIndex: 4
   },
   {
-    label: 'The Attraction',
-    narrative: `An old newspaper clipping surfaces. The ad reads:
-      <strong>\u201CTHE ENDLESS GARDENS\u201D</strong> \u2014 a long-closed
+    label: 'The Past',
+    narrative: `An old newspaper clipping surfaces. It’s a story about 
+      <strong>\u201CTHE ENDLESS GARDENS\u201D</strong>\u2014a long-closed
       attraction built over an underground spring, where visitors
       vanished among the overgrown paths. Only 26% of copies feature
       the Gardens. Others find a Vortex, a Snake Oil show, or a story
@@ -1159,36 +1168,29 @@ const TOUR_STEPS = [
   {
     label: 'The Hall',
     narrative: `The architecture turns impossible. Seed 60001 enters
-      <strong>the Spiral Hall</strong> \u2014 one long corridor that leans
-      steadily left until you\u2019re walking on the ceiling. The majority
-      path. In the other version, a grappling hook fails and Niko falls.`,
+      <strong>the Spiral Hall</strong>\u2014a long corridor that leans
+      steadily left until Niko and Ryan re walking on the ceiling. In the other version, a grappling hook fails and Niko falls.`,
     nodeIndex: 6
   },
   {
     label: 'Elder Niko\u2019s Travels',
-    narrative: `Deep in the house, they find an older version of Niko.
-      Elder Niko describes his domain: <strong>an endless basement</strong>
+    narrative: `Deep in the Downstairs, Ryan finds an older version of Niko.
+      Elder Niko describes his discoveries: <strong>an endless basement</strong>
       where rooms open into black empty spaces. 43% of copies lead here.
-      The alternative is a City \u2014 ten million recursive houses stretching
-      to infinity.`,
+      The alternative is what the Elder Niko describes as the City.`,
     nodeIndex: 7
   },
   {
-    label: 'The Final Arena',
-    narrative: `The climax. The door opens onto <strong>nothing</strong>.
-      The floor drops away into blackness \u2014 an endless dropoff,
-      with tiny clusters of lights miles below. In other copies,
-      the walls are endless pink insulation foam \u2014 they\u2019re
-      termites in the walls of a giant\u2019s house.`,
+    label: 'The Final Fight',
+    narrative: `The climax. The battle between Ryan and Elder Niko takes place in a void. The floor drops away into blackness\u2014<strong>an endless dropoff</strong>. In other copies,
+      the walls are endless pink insulation foam\u2014Ryan thinks of termites in the walls of a giant\u2019s house.`,
     nodeIndex: 8
   },
   {
     label: 'The Ending',
     narrative: `And at last, the ending. In Seed 60001, there is
-      <strong>romantic tension</strong> \u2014 Niko looks at Ryan from the
-      corner of his eye, something hot and desperate in his gaze.
-      One-third of copies end this way. Others get a firm, platonic Niko,
-      or the loneliest version: Ryan survives but wakes in the wrong
+      <strong>romantic tension</strong> between Ryan and one of the Niko’s\u2014but not <em>his</em> Niko. One-third of copies end this way. Others get a firm, platonic Niko,
+      or the loneliest version: Ryan survives but winds up in the wrong
       universe entirely.`,
     nodeIndex: 9
   },

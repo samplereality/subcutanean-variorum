@@ -1970,11 +1970,25 @@ header {
     margin: 0.2rem 0.3rem 0.2rem 0;
     color: var(--text-color);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
     padding: 0.25rem 0.6rem;
     border-radius: 12px;
     background-color: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 136, 0, 0.35);
+    animation: word-float 3s ease-in-out infinite;
+    animation-delay: calc(var(--i, 0) * 0.12s);
+}
+
+/* When repulsion is active, pause the float and let JS control transform directly */
+.word-list .word-item.repulsed {
+    animation: none;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease,
+                transform 0.12s ease-out;
+}
+
+@keyframes word-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-2px); }
 }
 
 .word-list .word-item:hover {

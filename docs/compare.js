@@ -5451,11 +5451,12 @@ function displayWordLists() {
 
     // Display unique words with frequencies if in frequency mode
     uniqueWordsA.innerHTML = '';
-    sortedA.forEach(word => {
+    sortedA.forEach((word, i) => {
         const freq = currentWordData.freqA.get(word) || 0;
         const freqText = currentSortMode === 'freq' ? ` (${freq})` : '';
         const span = document.createElement('span');
         span.className = 'word-item';
+        span.style.setProperty('--i', i);
         span.textContent = word + freqText;
         span.dataset.word = word;
         span.dataset.seed = versionA;
@@ -5464,11 +5465,12 @@ function displayWordLists() {
     });
 
     uniqueWordsB.innerHTML = '';
-    sortedB.forEach(word => {
+    sortedB.forEach((word, i) => {
         const freq = currentWordData.freqB.get(word) || 0;
         const freqText = currentSortMode === 'freq' ? ` (${freq})` : '';
         const span = document.createElement('span');
         span.className = 'word-item';
+        span.style.setProperty('--i', i);
         span.textContent = word + freqText;
         span.dataset.word = word;
         span.dataset.seed = versionB;
@@ -5479,11 +5481,12 @@ function displayWordLists() {
     // Display version C words if available
     if (uniqueWordsC && versionC) {
         uniqueWordsC.innerHTML = '';
-        sortedC.forEach(word => {
+        sortedC.forEach((word, i) => {
             const freq = currentWordData.freqC.get(word) || 0;
             const freqText = currentSortMode === 'freq' ? ` (${freq})` : '';
             const span = document.createElement('span');
             span.className = 'word-item';
+            span.style.setProperty('--i', i);
             span.textContent = word + freqText;
             span.dataset.word = word;
             span.dataset.seed = versionC;
@@ -5491,6 +5494,68 @@ function displayWordLists() {
             uniqueWordsC.appendChild(span);
         });
     }
+
+    // Set up mouse repulsion on the word lists
+    initWordRepulsion();
+}
+
+// ── Word repulsion effect: words push away from the mouse cursor ──
+
+function setupWordRepulsion(listEl) {
+    const RADIUS = 80;         // influence radius in px
+    const MAX_PUSH = 6;        // max displacement in px
+    let rafId = null;
+    let mouseX = 0, mouseY = 0;
+    let active = false;
+
+    function applyRepulsion() {
+        const items = listEl.querySelectorAll('.word-item');
+        const listRect = listEl.getBoundingClientRect();
+        // Mouse position relative to the list's viewport rect
+        const mx = mouseX;
+        const my = mouseY;
+
+        for (const item of items) {
+            const rect = item.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+            const dx = cx - mx;
+            const dy = cy - my;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < RADIUS && dist > 0) {
+                const strength = (1 - dist / RADIUS) * MAX_PUSH;
+                const pushX = (dx / dist) * strength;
+                const pushY = (dy / dist) * strength;
+                item.classList.add('repulsed');
+                item.style.transform = `translate(${pushX.toFixed(1)}px, ${pushY.toFixed(1)}px)`;
+            } else if (item.classList.contains('repulsed')) {
+                item.style.transform = '';
+                item.classList.remove('repulsed');
+            }
+        }
+        rafId = null;
+    }
+
+    listEl.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        active = true;
+        if (!rafId) rafId = requestAnimationFrame(applyRepulsion);
+    });
+
+    listEl.addEventListener('mouseleave', () => {
+        active = false;
+        if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+        for (const item of listEl.querySelectorAll('.word-item.repulsed')) {
+            item.style.transform = '';
+            item.classList.remove('repulsed');
+        }
+    });
+}
+
+function initWordRepulsion() {
+    document.querySelectorAll('.word-list').forEach(setupWordRepulsion);
 }
 
 function setSortMode(mode) {
