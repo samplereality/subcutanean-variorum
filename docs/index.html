@@ -200,22 +200,22 @@
                     <i data-lucide="layout-grid"></i> <span class="btn-label">View</span>
                 </button>
                 <div class="dropdown-menu hidden" id="view-menu">
-                    <button class="dropdown-item" data-mode="unified" title="Read a single version without comparison">
+                    <button class="dropdown-item" data-mode="unified" data-desc="Read a single version without comparison">
                         <i data-lucide="file-text"></i> Unified
                     </button>
-                    <button class="dropdown-item active" data-mode="sidebyside" title="View two versions in parallel columns">
+                    <button class="dropdown-item active" data-mode="sidebyside" data-desc="Two versions in parallel columns">
                         <i data-lucide="columns-2"></i> Side-by-side
                     </button>
-                    <button class="dropdown-item" data-mode="diff" title="Highlight additions and deletions between versions">
+                    <button class="dropdown-item" data-mode="diff" data-desc="Word-level additions and deletions between versions">
                         <i data-lucide="git-compare"></i> Track Changes
                     </button>
-                    <button class="dropdown-item" data-mode="comparison" title="Compare variations across multiple witnesses">
+                    <button class="dropdown-item" data-mode="comparison" data-desc="Table of aligned paragraphs across witnesses">
                         <i data-lucide="table"></i> Collation
                     </button>
-                    <button class="dropdown-item" data-mode="gonzo" title="View same paragraphs across all 25 versions in a 5x5 grid">
+                    <button class="dropdown-item" data-mode="gonzo" data-desc="Same paragraphs across all 25 versions in a 5x5 grid">
                         <i data-lucide="grid-3x3"></i> Gonzo
                     </button>
-                    <button class="dropdown-item hidden" id="syntax-toggle-btn" title="Toggle Quant syntax highlighting">
+                    <button class="dropdown-item hidden" id="syntax-toggle-btn" data-desc="Toggle Quant syntax highlighting">
                         <i data-lucide="highlighter"></i> Syntax Highlighting
                     </button>
                 </div>
@@ -227,28 +227,27 @@
                     <i data-lucide="bar-chart-2"></i> <span class="btn-label">Analyze</span>
                 </button>
                 <div class="dropdown-menu hidden" id="analyze-menu">
-                    <button class="dropdown-item" id="source-code-mode-btn" title="Enable Source Code Mode - click any paragraph to view its Quant source">
+                    <button class="dropdown-item" id="source-code-mode-btn" data-desc="Click any paragraph to view its underlying Quant source">
                         <i data-lucide="code"></i> Source Code
                     </button>
-                    <button class="dropdown-item" id="show-vars-btn" title="Show variable differences between versions">
+                    <button class="dropdown-item" id="show-vars-btn" data-desc="Show which Quant variables differ between versions">
                         <i data-lucide="variable"></i> Variables
                     </button>
-                    <button class="dropdown-item" id="word-diff-btn" title="Compare unique vocabulary between two versions">
+                    <button class="dropdown-item" id="word-diff-btn" data-desc="Unique vocabulary in each version, click to find in context">
                         <i data-lucide="split"></i> Word Diff
                     </button>
-                    <button class="dropdown-item" id="heatmap-btn" title="View chapter-by-chapter variation density">
+                    <button class="dropdown-item" id="heatmap-btn" data-desc="Chapter-by-chapter variation density between versions">
                         <i data-lucide="flame"></i> Heatmap
                     </button>
-                    <button class="dropdown-item" id="tapestry-btn" title="Tapestry showing 10,000 variant threads converging and diverging">
+                    <button class="dropdown-item" id="tapestry-btn" data-desc="10,000 variant threads converging and diverging">
                         <i data-lucide="layers"></i> Tapestry
                     </button>
-                    <button class="dropdown-item" id="pathways-btn" title="Plot of key story-state variables across multiple seeds">
-                    <i data-lucide="git-branch"></i> Pathways
+                    <button class="dropdown-item" id="pathways-btn" data-desc="Key story-state variables plotted across multiple seeds">
+                        <i data-lucide="git-branch"></i> Pathways
                     </button>
-                    <button class="dropdown-item" id="final-fight-btn" title="Explore the 12 possible arenas of the final fight scene">
+                    <button class="dropdown-item" id="final-fight-btn" data-desc="The 12 possible arenas of the final confrontation">
                         <i data-lucide="swords"></i> Final Fight
                     </button>
-
                 </div>
             </div>
 
@@ -729,39 +728,26 @@
         <div class="modal-content welcome-modal-content">
             <div class="welcome-title-area">
                 <h1 class="welcome-title">Subcutanean Variorum</h1>
-                <p class="welcome-subtitle">Compare multiple versions of Aaron Reed’s variable novel</p>
+                <p class="welcome-subtitle">Study multiple versions of Aaron Reed’s variable novel</p>
             </div>
             <div class="modal-body welcome-modal-body">
-                <p>Every copy of <em>Subcutanean</em> is unique. Explore multiple versions and generate new variants with the Subcutanean Variorum.</p>
+                <p>Every copy of <em>Subcutanean</em> is unique. Explore 25 unique versions with the Subcutanean Variorum.</p>
 
-                <!-- <h4>Quick Start</h4>
+                <h4>Overview</h4>
                 <ul>
-                    <li><strong>Compare</strong> and <strong>With</strong> dropdowns select which two seeds to compare</li>
+                    <li><strong>Compare</strong> and <strong>With</strong> dropdowns select seeds to compare</li>
                     <li>The <strong>chapter dropdown</strong> navigates between chapters</li>
-                    <li><strong>View</strong> switches display modes, and <strong>Analyze</strong> shows source code, global variables, and other tools</li>
+                    <li><strong>View</strong> switches display modes, including Track Changes and Collation</li>
+                    <li><strong>Analyze</strong> shows source code, variables, word diff, and other tools</li>
                     <li><strong>Search</strong> a chapter or the entire novel for a word or phrase</li>
-                </ul> -->
-
-                <h4>View Modes</h4>
-                <ul>
-                    <li><strong>Unified</strong> — Single version view</li>
-                    <li><strong>Side-by-side</strong> — Two or three versions in parallel columns</li>
-                    <li><strong>Track Changes</strong> — Additions and deletions highlighted</li>
-                    <li><strong>Collation</strong> — Paragraph-level changes</li>
-                    <li><strong>Gonzo Mode</strong> — View 25 versions simultaneously in a 5x5 grid</li>
-                </ul>
-
-                <h4>Analysis Tools</h4>
-                <ul>
-                    <li><strong>Source Mode</strong> — Click any paragraph to view its Quant source code</li>
-                    <li><strong>Variables</strong> — See which variables differ between versions</li>
-                    <li><strong>Word Differential</strong> — Explore words unique to each variant</li>
-                    <li><strong>Chapter Heatmap</strong> — Calculate which chapters are most unique</li>
-                    <li><strong>Tapestry</strong> — Visualize 10,000 variant threads converging and diverging across chapters</li>
+                    <li><strong>Bookmarks</strong> save specific views for later</li>
+                    <li><strong>Notes</strong> saves your own annotations on the text</li>
+                    <li><strong>Files</strong> lets you upload additional seeds for comparison</li>
+                    <li><strong>Generate</strong> your own one-of-a-kind variant of the novel</li>
                 </ul>
 
                 <div class="welcome-footer">
-                    <button id="welcome-close-btn" class="welcome-dismiss-btn">Get Started</button>
+                    <button id="welcome-close-btn" class="welcome-dismiss-btn">Start</button>
                 </div>
             </div>
         </div>
