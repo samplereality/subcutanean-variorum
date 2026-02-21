@@ -399,17 +399,21 @@ def extract_chapter_patterns(variables, macros, macro_patterns, chapter_macros=N
                         variables[var_name]['patterns'][chapter_id].append(mt)
 
                 # Add each substantial text segment as a pattern
+                # Split on paragraph boundaries first so multi-paragraph
+                # conditionals produce one pattern per rendered paragraph
                 for segment in segments:
-                    # Normalize whitespace
-                    segment = re.sub(r'\s+', ' ', segment).strip()
-                    # Strip leading ^ (Quant paragraph break marker)
-                    if segment.startswith('^'):
-                        segment = segment[1:].strip()
-                    if segment and len(segment) > 15:  # Higher threshold for segments
-                        if segment[:100] not in variables[var_name]['patterns'][chapter_id]:
-                            variables[var_name]['patterns'][chapter_id].append(
-                                segment[:100]
-                            )
+                    paragraphs = re.split(r'\n\s*\n', segment)
+                    for para in paragraphs:
+                        # Normalize whitespace within the paragraph
+                        para = re.sub(r'\s+', ' ', para).strip()
+                        # Strip leading ^ (Quant paragraph break marker)
+                        if para.startswith('^'):
+                            para = para[1:].strip()
+                        if para and len(para) > 15:  # Higher threshold for segments
+                            if para[:100] not in variables[var_name]['patterns'][chapter_id]:
+                                variables[var_name]['patterns'][chapter_id].append(
+                                    para[:100]
+                                )
 
         # Find macro usage and add patterns from macro definitions
         # For macros, we need to track position too for cross-chapter assignment
@@ -495,17 +499,21 @@ def extract_patterns_for_chapter_variable(var_name, content):
 
         has_long_segment = False
         for segment in segments:
-            # Normalize whitespace
-            segment = re.sub(r'\s+', ' ', segment).strip()
-            # Strip leading ^ (Quant paragraph break marker)
-            if segment.startswith('^'):
-                segment = segment[1:].strip()
-            # Use same threshold as global variables for direct patterns
-            if segment and len(segment) >= MIN_INFERENCE_PATTERN_LENGTH:
-                truncated = segment[:100]
-                if truncated not in patterns:
-                    patterns.append(truncated)
-                has_long_segment = True
+            # Split on paragraph boundaries first so multi-paragraph
+            # conditionals produce one pattern per rendered paragraph
+            paragraphs = re.split(r'\n\s*\n', segment)
+            for para in paragraphs:
+                # Normalize whitespace within the paragraph
+                para = re.sub(r'\s+', ' ', para).strip()
+                # Strip leading ^ (Quant paragraph break marker)
+                if para.startswith('^'):
+                    para = para[1:].strip()
+                # Use same threshold as global variables for direct patterns
+                if para and len(para) >= MIN_INFERENCE_PATTERN_LENGTH:
+                    truncated = para[:100]
+                    if truncated not in patterns:
+                        patterns.append(truncated)
+                    has_long_segment = True
 
         # For short conditionals, extract the full line as context
         if not has_long_segment:
@@ -655,16 +663,19 @@ def extract_chapter_variables(global_variables):
                             segments = re.split(r'\{[^}]+\}', clean)
                             has_long_segment = False
                             for seg in segments:
-                                seg = re.sub(r'\s+', ' ', seg).strip()
-                                if seg.startswith('^'):
-                                    seg = seg[1:].strip()
-                                if seg and len(seg) >= MIN_INFERENCE_PATTERN_LENGTH:
-                                    if var_name not in cross_patterns:
-                                        cross_patterns[var_name] = []
-                                    truncated = seg[:100]
-                                    if truncated not in cross_patterns[var_name]:
-                                        cross_patterns[var_name].append(truncated)
-                                    has_long_segment = True
+                                # Split on paragraph boundaries first
+                                paragraphs = re.split(r'\n\s*\n', seg)
+                                for para in paragraphs:
+                                    para = re.sub(r'\s+', ' ', para).strip()
+                                    if para.startswith('^'):
+                                        para = para[1:].strip()
+                                    if para and len(para) >= MIN_INFERENCE_PATTERN_LENGTH:
+                                        if var_name not in cross_patterns:
+                                            cross_patterns[var_name] = []
+                                        truncated = para[:100]
+                                        if truncated not in cross_patterns[var_name]:
+                                            cross_patterns[var_name].append(truncated)
+                                        has_long_segment = True
 
                             # For short conditionals, use full-line context
                             if not has_long_segment:
