@@ -16,7 +16,7 @@ A web-based variorum browser for exploring textual variations across 25 versions
 
 2. **Navigation & UI**
    - Persistent navigation bar with dropdowns for Bookmarks, Notes, Files, and Generate
-   - View dropdown menu: 5 view modes (Unified, Side-by-side, Track Changes, Collation, Gonzo)
+   - View dropdown menu: 6 view modes (Unified, Side-by-side, Track Changes, Collation, Gonzo, Gonzo CAVE)
    - Analyze dropdown menu: 7 tools (Source Code, Variables, Word Diff, Heatmap, Tapestry, Pathways, Final Fight)
    - Dropdowns auto-close after selection (150ms delay)
    - Hamburger menu at ≤968px (tablet/phone); mobile version tabs for side-by-side at ≤968px
@@ -56,14 +56,29 @@ A web-based variorum browser for exploring textual variations across 25 versions
    - Scroll position preserved when reopening Gonzo Mode
    - Empty cells for versions with fewer paragraphs than others
 
-7. **Source Code Mode** (enhanced)
+7. **Gonzo CAVE** (standalone page)
+   - FPS-style immersive reading room using Three.js CSS3DRenderer
+   - Inside-out cube: 4 walls + ceiling display 25 seeds (5 per face) in newspaper columns
+   - Floor displays project info/about text
+   - PointerLock mouselook with full 360° rotation in all directions
+   - WASD 3D movement following camera gaze (look up + W = move toward ceiling)
+   - Momentum-based scroll wheel text advancement with friction and chapter boundary resistance
+   - Q/E chapter navigation with transition flash overlay
+   - Chapter headers at paragraph index 0
+   - HUD: crosshair, controls hint, click-to-enter prompt with styled box
+   - About modal with CAVE history, layout diagram, and control reference
+   - Light/dark theme toggle (walls switch between dark bg + glowing text and light bg + dark text)
+   - Breadcrumb nav bar with chapter/paragraph indicator
+   - Standalone `gonzo_cave.html` page, accessed via View dropdown or direct URL
+
+8. **Source Code Mode** (enhanced)
    - Click code icon on any paragraph to view underlying Quant source
    - Text similarity matching replaces position-based paragraph-to-source mapping
    - Handles multi-paragraph conditionals, variable-driven content, and macro expansions
    - Pre-computed mapping cached per chapter/version for performance
    - Macro reference and definition lookup for cross-file source viewing
 
-8. **Passage-level Annotations** (enhanced)
+9. **Passage-level Annotations** (enhanced)
    - Double-click any paragraph to add research notes tied to specific text
    - Floating draggable note panels with orange glow styling (position: absolute, scroll with page)
    - Leader lines (via leader-line-new) connect note panels to their annotated paragraphs
@@ -104,7 +119,8 @@ docs/
 ├── pathways.html           # Story Pathways Sankey/alluvial visualization
 ├── scan_pathways.py        # Preprocessing for pathways data
 ├── final_fight.html        # Final fight arena analysis visualization
-└── build_final_fight.py    # Preprocessing for final fight data
+├── build_final_fight.py    # Preprocessing for final fight data
+└── gonzo_cave.html         # FPS immersive CAVE reading room (Three.js CSS3DRenderer)
 ```
 
 ### Key JavaScript Functions (compare.js)
@@ -843,6 +859,97 @@ A fullscreen 5x5 grid showing all 25 versions simultaneously for comparative rea
 **State variables:**
 - `gonzoHasBeenOpened` — tracks if Gonzo has been opened before (for scroll position preservation)
 - `savedScrollPosition` — stores scroll position when entering Gonzo Mode
+
+### Gonzo CAVE (FPS Immersive Reading Room)
+
+A standalone page (`docs/gonzo_cave.html`) providing an FPS-style immersive reading experience inside a 3D cube, inspired by CAVE (Cave Automatic Virtual Environment) installations.
+
+**Technology: Three.js CSS3DRenderer**
+- CSS3DRenderer positions real DOM elements in 3D space — text is always pixel-perfect
+- Supports inline HTML (`<em>`, `<span class="verse-inline">`) and CSS styling
+- Three.js 0.170.0 via CDN importmap (no build step required)
+- All CSS/JS inline in the standalone HTML file
+
+**Room Geometry:**
+- Cube half-size: 500 units (each face = 1000×1000px CSS3DObject)
+- Camera at center (0, 0, 0), FOV 75
+- 6 CSS3DObject faces, visible side facing inward:
+
+| Face | Position | Rotation | Content |
+|------|----------|----------|---------|
+| Front | (0, 0, -500) | (0, 0, 0) | Seeds 60001-60005 |
+| Right | (500, 0, 0) | (0, -π/2, 0) | Seeds 60006-60010 |
+| Back | (0, 0, 500) | (0, π, 0) | Seeds 60011-60015 |
+| Left | (-500, 0, 0) | (0, π/2, 0) | Seeds 60016-60020 |
+| Ceiling | (0, 500, 0) | (π/2, 0, 0) | Seeds 60021-60025 |
+| Floor | (0, -500, 0) | (-π/2, 0, 0) | About/Info |
+
+**Wall Layout:**
+- Each wall has 5 newspaper-style columns (flexbox), one per seed
+- Column header: seed number (orange accent with glow)
+- Column body: paragraph text (Georgia serif, 13px, cool white-blue glow in dark mode)
+- Chapter heading shown at paragraph index 0 in each column
+- `pointer-events: none` on all face elements (interaction via PointerLock only)
+- `backface-visibility: hidden` on all faces
+
+**FPS Controls:**
+- **Click** → `requestPointerLock()` on `#cave-container`
+- **Mouse** → yaw/pitch (no clamp — full 360° in all directions)
+- **WASD** → 3D movement following camera quaternion (look up + W = move toward ceiling)
+- **Boundary** → camera clamped to ±400 on all axes
+- **Scroll wheel** → momentum-based text advancement (see below)
+- **Q/E** → previous/next chapter with flash overlay
+- **ESC** → release PointerLock
+
+**Scroll Physics (momentum-based):**
+- `scrollVelocity` accumulates from wheel events (normalized `deltaY * SCROLL_SENSITIVITY`)
+- `scrollAccumulator` integrates velocity each frame; paragraphs advance when accumulator crosses `SCROLL_THRESHOLD` (1.0)
+- `scrollVelocity *= SCROLL_FRICTION` (0.88) each frame provides momentum/drift after user stops scrolling
+- Near chapter boundaries (`±2 paragraphs`), extra friction applied (`CHAPTER_BOUNDARY_FRICTION = 0.5`)
+- At chapter transitions, momentum killed to 30% and `showChapterFlash()` displays chapter name
+- Tuning: adjust `SCROLL_SENSITIVITY` (0.15), `SCROLL_FRICTION` (0.88), `CHAPTER_BOUNDARY_FRICTION` (0.5)
+
+**Chapter Transition Flash:**
+- `#chapter-flash` div with CSS transition (0.1s fade in, 0.3s fade out)
+- Shows chapter name for 1.2s at center of viewport
+- Triggered by scroll physics crossing chapter boundary and by Q/E keypress
+
+**HUD Overlay (HTML, above 3D):**
+- Crosshair (center, shown when PointerLock active)
+- Chapter/paragraph indicator in nav bar breadcrumb: "Variorum / Gonzo CAVE / Chapter 3 — ¶ 15/132"
+- Controls hint (bottom center, subtle)
+- Click prompt ("Click to enter the CAVE") styled box when not locked
+
+**About Modal:**
+- Opened via About button in nav bar
+- Contains CAVE history, room layout with seed assignments, control reference, *Subcutanean* context
+- Click-outside-to-close, × button
+
+**Visual Style:**
+- Dark mode (default): Wall bg `#08080f`, text `#c8dce8` with `text-shadow` glow, headers orange `#ff8800` with glow
+- Light mode: Wall bg `#f0ece8`, text `#2c2c2c` with no shadow, headers `#d96800`
+- Nav bar stays dark in both modes (matches main app)
+- Theme state via `data-theme` attribute on `<html>` element
+- Icons: inline SVGs for info (About) and sun/moon (theme toggle)
+
+**Integration (compare.js):**
+- `setupViewModeButtons()` handles `gonzo-cave` mode: calls `saveViewState()` then navigates to `gonzo_cave.html`
+- View dropdown button in `index.html` with `data-mode="gonzo-cave"`, Lucide `box` icon
+
+**Key Constants:**
+- `HALF = 500` — cube half-size
+- `BOUNDARY = 400` — movement boundary
+- `MOVE_SPEED = 3` — movement speed per frame
+- `PARAGRAPHS_PER_COLUMN = 8` — paragraphs shown per column
+- `SEED_IDS` — array of 25 seed IDs (60001-60025)
+- `CHAPTERS` — ordered array of chapter IDs for navigation
+- `CHAPTER_NAMES` — display names for each chapter
+- `FACE_SEEDS` — 5 arrays mapping seeds to each wall face
+
+**Data Loading:**
+- Fetches `extracted_text/all_versions.json` on init
+- Versions keyed by seed ID directly (e.g., `allVersions['60001']`), NOT `version_60001`
+- Replicates `normalizeVerseParagraphs()` inline for verse formatting
 
 ### Source Code Mode: Text Similarity Matching
 
