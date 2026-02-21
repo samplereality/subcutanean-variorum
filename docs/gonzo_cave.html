@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gonzo CAVE — Subcutanean Variorum</title>
+    <link rel="icon" type="svg+xml" href="favicon.svg" sizes="any">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            overflow: hidden;
+            background: #08080f;
+            font-family: Georgia, 'Times New Roman', serif;
+            color: #c8dce8;
+            cursor: default;
+        }
+
+        /* ── Breadcrumb nav bar ── */
+        .cave-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: #0a1220;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            z-index: 100;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 13px;
+            border-bottom: 1px solid rgba(255, 136, 0, 0.2);
+        }
+
+        .cave-nav a {
+            color: #ff8800;
+            text-decoration: none;
+            opacity: 0.8;
+            transition: opacity 0.15s;
+        }
+        .cave-nav a:hover { opacity: 1; }
+
+        .cave-nav .separator {
+            color: rgba(255, 255, 255, 0.3);
+            margin: 0 8px;
+        }
+
+        .cave-nav .current {
+            color: #c8dce8;
+            opacity: 0.6;
+        }
+
+        .cave-nav .nav-right {
+            margin-left: auto;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .cave-nav button {
+            background: none;
+            border: 1px solid rgba(255, 136, 0, 0.3);
+            color: #ff8800;
+            padding: 3px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            font-family: inherit;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .cave-nav button:hover {
+            background: rgba(255, 136, 0, 0.1);
+            border-color: rgba(255, 136, 0, 0.6);
+        }
+
+        /* ── 3D container ── */
+        #cave-container {
+            position: fixed;
+            top: 40px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+        /* ── Cube face styling ── */
+        .cave-face {
+            width: 1000px;
+            height: 1000px;
+            background: #08080f;
+            backface-visibility: hidden;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .cave-face-content {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            padding: 20px 10px;
+            gap: 0;
+        }
+
+        .cave-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 0 8px;
+            border-right: 1px solid rgba(100, 180, 255, 0.08);
+            overflow: hidden;
+        }
+        .cave-column:last-child { border-right: none; }
+
+        .cave-column-header {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #ff8800;
+            text-shadow: 0 0 6px rgba(255, 136, 0, 0.6), 0 0 16px rgba(255, 136, 0, 0.2);
+            padding-bottom: 6px;
+            margin-bottom: 6px;
+            border-bottom: 1px solid rgba(255, 136, 0, 0.2);
+            text-align: center;
+        }
+
+        .cave-column-text {
+            font-size: 13px;
+            line-height: 1.5;
+            color: #c8dce8;
+            text-shadow: 0 0 4px rgba(100, 180, 255, 0.5), 0 0 12px rgba(100, 180, 255, 0.15);
+            overflow: hidden;
+        }
+
+        .cave-column-text p {
+            margin-bottom: 8px;
+            text-align: justify;
+            text-indent: 1em;
+        }
+        .cave-column-text p:first-child { text-indent: 0; }
+
+        .cave-chapter-heading {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: #ff8800;
+            text-shadow: 0 0 6px rgba(255, 136, 0, 0.5);
+            text-align: center;
+            text-indent: 0 !important;
+            padding: 8px 0 10px;
+            margin-bottom: 6px;
+            border-bottom: 1px solid rgba(255, 136, 0, 0.15);
+            letter-spacing: 0.5px;
+        }
+
+        .cave-column-text .verse-inline {
+            display: block;
+            margin-left: 1.5em;
+            padding: 4px 0;
+            font-style: italic;
+            text-align: left;
+            text-indent: 0;
+        }
+
+        /* ── Floor face ── */
+        .cave-face.floor-face .cave-face-content {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 60px;
+        }
+
+        .floor-title {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #ff8800;
+            text-shadow: 0 0 10px rgba(255, 136, 0, 0.5), 0 0 30px rgba(255, 136, 0, 0.15);
+            margin-bottom: 12px;
+        }
+
+        .floor-subtitle {
+            font-size: 16px;
+            color: rgba(200, 220, 232, 0.6);
+            text-shadow: 0 0 4px rgba(100, 180, 255, 0.3);
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        .floor-subtitle p {
+            margin-bottom: 10px;
+        }
+
+        /* ── HUD overlay ── */
+        .hud {
+            position: fixed;
+            z-index: 50;
+            pointer-events: none;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        /* Crosshair */
+        #crosshair {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            z-index: 50;
+            pointer-events: none;
+            display: none;
+        }
+        #crosshair::before, #crosshair::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.5);
+        }
+        #crosshair::before {
+            width: 1px;
+            height: 20px;
+            left: 50%;
+            top: 0;
+        }
+        #crosshair::after {
+            width: 20px;
+            height: 1px;
+            top: 50%;
+            left: 0;
+        }
+
+        /* Controls hint */
+        #controls-hint {
+            position: fixed;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 50;
+            font-size: 11px;
+            color: rgba(200, 220, 232, 0.35);
+            text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        /* Click prompt */
+        #click-prompt {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 60;
+            font-size: 18px;
+            color: rgba(255, 136, 0, 0.9);
+            text-shadow: 0 0 10px rgba(255, 136, 0, 0.4);
+            cursor: pointer;
+            pointer-events: auto;
+            text-align: center;
+            line-height: 1.6;
+            background: rgba(8, 8, 15, 0.92);
+            border: 1px solid rgba(255, 136, 0, 0.3);
+            border-radius: 8px;
+            padding: 28px 40px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(255, 136, 0, 0.1);
+        }
+        #click-prompt .subtitle {
+            font-size: 12px;
+            color: rgba(200, 220, 232, 0.4);
+            display: block;
+            margin-top: 8px;
+        }
+
+        /* Loading screen */
+        #loading-screen {
+            position: fixed;
+            inset: 0;
+            background: #08080f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 16px;
+            color: rgba(200, 220, 232, 0.6);
+        }
+
+        .loading-text {
+            text-shadow: 0 0 8px rgba(100, 180, 255, 0.3);
+        }
+
+        /* ── Chapter transition flash ── */
+        #chapter-flash {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 55;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #ff8800;
+            text-shadow: 0 0 20px rgba(255, 136, 0, 0.6), 0 0 50px rgba(255, 136, 0, 0.2);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-out;
+        }
+        #chapter-flash.visible {
+            opacity: 1;
+            transition: opacity 0.1s ease-in;
+        }
+
+        /* ── About modal ── */
+        .cave-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 150;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .cave-modal.hidden { display: none; }
+
+        .cave-modal-content {
+            background: #0f1a2a;
+            border: 1px solid rgba(255, 136, 0, 0.2);
+            border-radius: 8px;
+            padding: 32px 36px;
+            max-width: 560px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #c8dce8;
+        }
+
+        .cave-modal-content h2 {
+            color: #ff8800;
+            font-size: 20px;
+            margin-bottom: 14px;
+        }
+
+        .cave-modal-content h3 {
+            color: #ff8800;
+            font-size: 15px;
+            margin-top: 18px;
+            margin-bottom: 8px;
+        }
+
+        .cave-modal-content p {
+            margin-bottom: 10px;
+        }
+
+        .cave-modal-content ul {
+            margin: 0 0 10px 20px;
+        }
+
+        .cave-modal-content li {
+            margin-bottom: 4px;
+        }
+
+        .cave-modal-close {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            background: none;
+            border: none;
+            color: rgba(200, 220, 232, 0.5);
+            font-size: 22px;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .cave-modal-close:hover { color: #ff8800; }
+
+        [data-theme="light"] .cave-modal-content {
+            background: #f5f0ec;
+            color: #2c2c2c;
+            border-color: rgba(217, 104, 0, 0.25);
+        }
+
+        [data-theme="light"] .cave-modal-content h2,
+        [data-theme="light"] .cave-modal-content h3 {
+            color: #d96800;
+        }
+
+        [data-theme="light"] .cave-modal-close {
+            color: rgba(44, 44, 44, 0.4);
+        }
+        [data-theme="light"] .cave-modal-close:hover { color: #d96800; }
+
+        /* ── Light mode ── */
+        [data-theme="light"] {
+            background: #e8e4e0;
+        }
+
+        [data-theme="light"] .cave-nav {
+            background: #2d2520;
+        }
+
+        [data-theme="light"] .cave-face {
+            background: #f0ece8;
+        }
+
+        [data-theme="light"] .cave-column-header {
+            color: #d96800;
+            text-shadow: none;
+            border-bottom-color: rgba(217, 104, 0, 0.3);
+        }
+
+        [data-theme="light"] .cave-column-text {
+            color: #2c2c2c;
+            text-shadow: none;
+        }
+
+        [data-theme="light"] .cave-column {
+            border-right-color: rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="light"] .floor-title {
+            color: #d96800;
+            text-shadow: none;
+        }
+
+        [data-theme="light"] .floor-subtitle {
+            color: rgba(44, 44, 44, 0.7);
+            text-shadow: none;
+        }
+
+        [data-theme="light"] .cave-chapter-heading {
+            color: #d96800;
+            text-shadow: none;
+            border-bottom-color: rgba(217, 104, 0, 0.2);
+        }
+
+        [data-theme="light"] #chapter-flash {
+            color: #d96800;
+            text-shadow: 0 0 20px rgba(217, 104, 0, 0.4);
+        }
+
+        [data-theme="light"] #click-prompt {
+            background: rgba(240, 236, 232, 0.94);
+            color: #d96800;
+            border-color: rgba(217, 104, 0, 0.3);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.15);
+            text-shadow: none;
+        }
+
+        [data-theme="light"] #click-prompt .subtitle {
+            color: rgba(44, 44, 44, 0.5);
+        }
+
+        [data-theme="light"] #controls-hint {
+            color: rgba(44, 44, 44, 0.4);
+            text-shadow: none;
+        }
+
+        [data-theme="light"] #loading-screen {
+            background: #e8e4e0;
+            color: rgba(44, 44, 44, 0.6);
+        }
+    </style>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+        }
+    }
+    </script>
+</head>
+<body>
+
+    <!-- Breadcrumb navigation -->
+    <nav class="cave-nav">
+        <a href="index.html">Variorum</a>
+        <span class="separator">/</span>
+        <span class="current">Gonzo CAVE</span>
+        <span class="separator">/</span>
+        <span id="chapter-nav-label" class="current"></span>
+        <div class="nav-right">
+            <button id="about-btn" title="About Gonzo CAVE">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 3px;"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                About
+            </button>
+            <button id="theme-toggle" title="Toggle theme">
+                <svg id="theme-icon-sun" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 3px;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                <svg id="theme-icon-moon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 3px; display: none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                <span id="theme-label">Light</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- 3D container -->
+    <div id="cave-container"></div>
+
+    <!-- HUD -->
+    <div id="crosshair"></div>
+    <div id="chapter-flash"></div>
+    <div id="controls-hint" class="hud">WASD move &middot; Scroll advance text &middot; Q/E change chapter &middot; ESC release</div>
+    <div id="click-prompt">
+        Click to enter the CAVE
+        <span class="subtitle">Immersive reading of 25 seeds</span>
+    </div>
+
+    <!-- About modal -->
+    <div id="about-modal" class="cave-modal hidden">
+        <div class="cave-modal-content">
+            <button class="cave-modal-close" id="about-close">&times;</button>
+            <h2>Gonzo CAVE</h2>
+            <p><strong>CAVE</strong> stands for <em>Cave Automatic Virtual Environment</em>, a term coined in 1992 for room-sized immersive visualization systems where projectors display images on the walls, floor, and ceiling around the viewer.</p>
+            <p>The Gonzo CAVE reimagines this concept for literary exploration. You are standing inside a cube whose surfaces are covered with the text of Aaron Reed's novel <em>Subcutanean</em> &mdash; all 25 unique seeds at once.</p>
+            <h3>Layout</h3>
+            <p>Each of the four walls and the ceiling displays 5 seeds in newspaper-style columns, for a total of 25 simultaneous versions. The floor displays project information.</p>
+            <ul>
+                <li><strong>Front wall:</strong> Seeds 60001&ndash;60005</li>
+                <li><strong>Right wall:</strong> Seeds 60006&ndash;60010</li>
+                <li><strong>Back wall:</strong> Seeds 60011&ndash;60015</li>
+                <li><strong>Left wall:</strong> Seeds 60016&ndash;60020</li>
+                <li><strong>Ceiling:</strong> Seeds 60021&ndash;60025</li>
+            </ul>
+            <h3>Controls</h3>
+            <ul>
+                <li><strong>Click</strong> to enter the CAVE (locks your cursor)</li>
+                <li><strong>Mouse</strong> to look around (full 360&deg; in all directions)</li>
+                <li><strong>W/A/S/D</strong> to move through the space &mdash; movement follows your gaze, so looking up and pressing W moves you toward the ceiling</li>
+                <li><strong>Scroll wheel</strong> to advance or retreat through the text (all 25 seeds scroll in sync)</li>
+                <li><strong>Q/E</strong> to jump to the previous or next chapter</li>
+                <li><strong>ESC</strong> to release your cursor</li>
+            </ul>
+            <h3>About <em>Subcutanean</em></h3>
+            <p>Every copy of <em>Subcutanean</em> is unique, generated from Aaron Reed's Quant markup language. Words, sentences, and entire scenes vary between printings. The Gonzo CAVE lets you experience the full breadth of this variation simultaneously, surrounding yourself with parallel versions of the same story.</p>
+            <p style="margin-top: 16px; opacity: 0.5; font-size: 13px;">Novel &copy; Aaron Reed (CC-BY 4.0) &middot; Variorum by Mark Sample</p>
+        </div>
+    </div>
+
+    <!-- Loading screen -->
+    <div id="loading-screen">
+        <span class="loading-text">Loading text data...</span>
+    </div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { CSS3DRenderer, CSS3DObject } from 'three/addons/renderers/CSS3DRenderer.js';
+
+        // ── Constants ──
+        const HALF = 500;
+        const FACE_SIZE = HALF * 2;
+        const BOUNDARY = 400;
+        const MOVE_SPEED = 3;
+        const PARAGRAPHS_PER_COLUMN = 8;
+        const SEED_IDS = [
+            '60001','60002','60003','60004','60005',
+            '60006','60007','60008','60009','60010',
+            '60011','60012','60013','60014','60015',
+            '60016','60017','60018','60019','60020',
+            '60021','60022','60023','60024','60025'
+        ];
+        const CHAPTERS = [
+            'prologue','chapter1','chapter2','chapter3','chapter4',
+            'chapter5','chapter6','chapter7','chapter8','chapter9',
+            'chapter10','chapter11','chapter12','chapter13','chapter14',
+            'chapter15','chapter16','chapter17','chapter18'
+        ];
+        const CHAPTER_NAMES = {
+            'prologue': 'Prologue',
+            'chapter1': 'Chapter 1', 'chapter2': 'Chapter 2', 'chapter3': 'Chapter 3',
+            'chapter4': 'Chapter 4', 'chapter5': 'Chapter 5', 'chapter6': 'Chapter 6',
+            'chapter7': 'Chapter 7', 'chapter8': 'Chapter 8', 'chapter9': 'Chapter 9',
+            'chapter10': 'Chapter 10', 'chapter11': 'Chapter 11', 'chapter12': 'Chapter 12',
+            'chapter13': 'Chapter 13', 'chapter14': 'Chapter 14', 'chapter15': 'Chapter 15',
+            'chapter16': 'Chapter 16', 'chapter17': 'Chapter 17', 'chapter18': 'Chapter 18'
+        };
+
+        // Face-to-seed mapping: front=1-5, right=6-10, back=11-15, left=16-20, ceiling=21-25
+        const FACE_SEEDS = [
+            SEED_IDS.slice(0, 5),   // front
+            SEED_IDS.slice(5, 10),  // right
+            SEED_IDS.slice(10, 15), // back
+            SEED_IDS.slice(15, 20), // left
+            SEED_IDS.slice(20, 25)  // ceiling
+        ];
+
+        // ── State ──
+        let allVersions = null;
+        let currentChapter = 'prologue';
+        let currentParagraphIndex = 0;
+        let isPointerLocked = false;
+        let yaw = 0;      // radians, left/right
+        let pitch = 0;    // radians, up/down
+        const keysDown = {};
+        const columnTextElements = [];  // all 25 .cave-column-text elements
+
+        // Scroll physics
+        let scrollAccumulator = 0;     // fractional paragraphs accumulated
+        let scrollVelocity = 0;        // paragraphs per frame (momentum)
+        const SCROLL_SENSITIVITY = 0.15; // how much each wheel tick contributes
+        const SCROLL_FRICTION = 0.88;    // velocity decay per frame
+        const SCROLL_THRESHOLD = 1.0;    // accumulator threshold to advance 1 paragraph
+        const CHAPTER_BOUNDARY_FRICTION = 0.5; // extra drag at chapter boundaries
+        let atChapterBoundary = false;
+        let chapterFlashTimeout = null;
+        const camera = new THREE.PerspectiveCamera(75, 1, 1, 5000);
+        camera.position.set(0, 0, 0);
+
+        // ── DOM refs ──
+        const container = document.getElementById('cave-container');
+        const crosshair = document.getElementById('crosshair');
+        const chapterNavLabel = document.getElementById('chapter-nav-label');
+        const chapterFlash = document.getElementById('chapter-flash');
+        const controlsHint = document.getElementById('controls-hint');
+        const clickPrompt = document.getElementById('click-prompt');
+        const loadingScreen = document.getElementById('loading-screen');
+
+        // ── Three.js setup ──
+        const scene = new THREE.Scene();
+        const renderer = new CSS3DRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight - 40);
+        container.appendChild(renderer.domElement);
+
+        // ── Verse paragraph normalizer ──
+        function normalizeVerseParagraphs(paragraphs) {
+            return paragraphs.map(text => {
+                if (text.includes('<span class="verse-inline">')) return text;
+                if (text.includes('\n')) {
+                    const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+                    return `<span class="verse-inline">${lines.join('<br>')}</span>`;
+                }
+                return text;
+            });
+        }
+
+        // ── Create a wall face element ──
+        function createWallFace(seeds) {
+            const face = document.createElement('div');
+            face.className = 'cave-face';
+
+            const content = document.createElement('div');
+            content.className = 'cave-face-content';
+
+            seeds.forEach(seedId => {
+                const col = document.createElement('div');
+                col.className = 'cave-column';
+
+                const header = document.createElement('div');
+                header.className = 'cave-column-header';
+                header.textContent = seedId;
+
+                const text = document.createElement('div');
+                text.className = 'cave-column-text';
+                text.dataset.seedId = seedId;
+
+                col.appendChild(header);
+                col.appendChild(text);
+                content.appendChild(col);
+
+                columnTextElements.push(text);
+            });
+
+            face.appendChild(content);
+            return face;
+        }
+
+        // ── Create floor face ──
+        function createFloorFace() {
+            const face = document.createElement('div');
+            face.className = 'cave-face floor-face';
+
+            const content = document.createElement('div');
+            content.className = 'cave-face-content';
+
+            content.innerHTML = `
+                <div class="floor-title">Subcutanean Variorum</div>
+                <div class="floor-subtitle">
+                    <p>An immersive reading room for Aaron Reed's novel <em>Subcutanean</em>.</p>
+                    <p>25 unique copies of the novel surround you. Each wall and the ceiling display 5 seeds in newspaper-style columns.</p>
+                    <p>Use WASD to move, mouse to look, scroll wheel to advance text, Q/E to change chapters.</p>
+                    <p style="margin-top: 16px; font-size: 13px; opacity: 0.5;">Novel &copy; Aaron Reed (CC-BY 4.0) &middot; Variorum by Mark Sample</p>
+                </div>
+            `;
+
+            face.appendChild(content);
+            return face;
+        }
+
+        // ── Build cube ──
+        function buildCube() {
+            // Face definitions: [position, rotation, seeds/type]
+            const faces = [
+                // Front wall (seeds 1-5)
+                { pos: [0, 0, -HALF], rot: [0, 0, 0], seeds: FACE_SEEDS[0] },
+                // Right wall (seeds 6-10)
+                { pos: [HALF, 0, 0], rot: [0, -Math.PI / 2, 0], seeds: FACE_SEEDS[1] },
+                // Back wall (seeds 11-15)
+                { pos: [0, 0, HALF], rot: [0, Math.PI, 0], seeds: FACE_SEEDS[2] },
+                // Left wall (seeds 16-20)
+                { pos: [-HALF, 0, 0], rot: [0, Math.PI / 2, 0], seeds: FACE_SEEDS[3] },
+                // Ceiling (seeds 21-25)
+                { pos: [0, HALF, 0], rot: [Math.PI / 2, 0, 0], seeds: FACE_SEEDS[4] },
+            ];
+
+            faces.forEach(({ pos, rot, seeds }) => {
+                const el = createWallFace(seeds);
+                const obj = new CSS3DObject(el);
+                obj.position.set(pos[0], pos[1], pos[2]);
+                obj.rotation.set(rot[0], rot[1], rot[2]);
+                scene.add(obj);
+            });
+
+            // Floor (info/about)
+            const floorEl = createFloorFace();
+            const floorObj = new CSS3DObject(floorEl);
+            floorObj.position.set(0, -HALF, 0);
+            floorObj.rotation.set(-Math.PI / 2, 0, 0);
+            scene.add(floorObj);
+        }
+
+        // ── Update text on all 25 columns ──
+        function updateAllFaceText() {
+            if (!allVersions) return;
+
+            columnTextElements.forEach(el => {
+                const seedId = el.dataset.seedId;
+                const version = allVersions[seedId];
+                if (!version) {
+                    el.innerHTML = '<p style="opacity:0.3">No data</p>';
+                    return;
+                }
+
+                let paragraphs = version[currentChapter];
+                if (!paragraphs || paragraphs.length === 0) {
+                    el.innerHTML = '<p style="opacity:0.3">No text in this chapter</p>';
+                    return;
+                }
+
+                paragraphs = normalizeVerseParagraphs(paragraphs);
+
+                const start = currentParagraphIndex;
+                const end = Math.min(start + PARAGRAPHS_PER_COLUMN, paragraphs.length);
+                const slice = paragraphs.slice(start, end);
+
+                if (slice.length === 0) {
+                    el.innerHTML = '<p style="opacity:0.3">&mdash;</p>';
+                    return;
+                }
+
+                let html = '';
+                if (currentParagraphIndex === 0) {
+                    const chName = CHAPTER_NAMES[currentChapter] || currentChapter;
+                    html += `<p class="cave-chapter-heading">${chName}</p>`;
+                }
+                html += slice.map(p => `<p>${p}</p>`).join('');
+                el.innerHTML = html;
+            });
+
+            updateChapterHud();
+        }
+
+        // ── Get max paragraph count for current chapter across all seeds ──
+        function getMaxParagraphCount() {
+            if (!allVersions) return 0;
+            let max = 0;
+            SEED_IDS.forEach(id => {
+                const v = allVersions[id];
+                if (v && v[currentChapter]) {
+                    max = Math.max(max, v[currentChapter].length);
+                }
+            });
+            return max;
+        }
+
+        // ── Update chapter label in nav bar ──
+        function updateChapterHud() {
+            const maxParas = getMaxParagraphCount();
+            const name = CHAPTER_NAMES[currentChapter] || currentChapter;
+            chapterNavLabel.textContent = `${name} \u2014 \u00B6 ${currentParagraphIndex + 1}/${maxParas}`;
+        }
+
+        // ── PointerLock ──
+        function requestLock() {
+            container.requestPointerLock();
+        }
+
+        document.addEventListener('pointerlockchange', () => {
+            isPointerLocked = document.pointerLockElement === container;
+            crosshair.style.display = isPointerLocked ? 'block' : 'none';
+            controlsHint.style.display = isPointerLocked ? 'block' : 'none';
+            clickPrompt.style.display = isPointerLocked ? 'none' : 'block';
+        });
+
+        clickPrompt.addEventListener('click', requestLock);
+        container.addEventListener('click', () => {
+            if (!isPointerLocked) requestLock();
+        });
+
+        // ── Mouse look ──
+        document.addEventListener('mousemove', (e) => {
+            if (!isPointerLocked) return;
+            const sensitivity = 0.002;
+            yaw -= e.movementX * sensitivity;
+            pitch -= e.movementY * sensitivity;
+        });
+
+        // ── Scroll wheel → momentum-based text advancement ──
+        document.addEventListener('wheel', (e) => {
+            if (!isPointerLocked) return;
+            e.preventDefault();
+
+            // Normalize wheel delta (different browsers give different magnitudes)
+            const delta = Math.sign(e.deltaY) * Math.min(Math.abs(e.deltaY), 100) / 100;
+            scrollVelocity += delta * SCROLL_SENSITIVITY;
+        }, { passive: false });
+
+        // ── Scroll physics update (called each frame) ──
+        function updateScrollPhysics() {
+            if (Math.abs(scrollVelocity) < 0.001) {
+                scrollVelocity = 0;
+                return;
+            }
+
+            // Apply velocity to accumulator
+            scrollAccumulator += scrollVelocity;
+
+            // Apply friction
+            let friction = SCROLL_FRICTION;
+
+            // Extra friction at chapter boundaries
+            const maxParas = getMaxParagraphCount();
+            const nearEnd = currentParagraphIndex >= maxParas - 2;
+            const nearStart = currentParagraphIndex <= 1;
+            if ((nearEnd && scrollVelocity > 0) || (nearStart && scrollVelocity < 0)) {
+                friction *= CHAPTER_BOUNDARY_FRICTION;
+                atChapterBoundary = true;
+            } else {
+                atChapterBoundary = false;
+            }
+
+            scrollVelocity *= friction;
+
+            // Advance paragraphs when accumulator crosses threshold
+            let changed = false;
+            while (Math.abs(scrollAccumulator) >= SCROLL_THRESHOLD) {
+                if (scrollAccumulator > 0) {
+                    scrollAccumulator -= SCROLL_THRESHOLD;
+                    if (currentParagraphIndex < maxParas - 1) {
+                        currentParagraphIndex++;
+                        changed = true;
+                    } else {
+                        // Chapter boundary — advance to next chapter
+                        const idx = CHAPTERS.indexOf(currentChapter);
+                        if (idx < CHAPTERS.length - 1) {
+                            const prevChapter = currentChapter;
+                            currentChapter = CHAPTERS[idx + 1];
+                            currentParagraphIndex = 0;
+                            scrollVelocity *= 0.3; // kill most momentum at chapter change
+                            scrollAccumulator = 0;
+                            showChapterFlash(CHAPTER_NAMES[currentChapter] || currentChapter);
+                            changed = true;
+                        } else {
+                            scrollAccumulator = 0;
+                            scrollVelocity = 0;
+                        }
+                        break;
+                    }
+                } else {
+                    scrollAccumulator += SCROLL_THRESHOLD;
+                    if (currentParagraphIndex > 0) {
+                        currentParagraphIndex--;
+                        changed = true;
+                    } else {
+                        // Chapter boundary — retreat to previous chapter
+                        const idx = CHAPTERS.indexOf(currentChapter);
+                        if (idx > 0) {
+                            currentChapter = CHAPTERS[idx - 1];
+                            const prevMax = getMaxParagraphCount();
+                            currentParagraphIndex = Math.max(0, prevMax - 1);
+                            scrollVelocity *= 0.3;
+                            scrollAccumulator = 0;
+                            showChapterFlash(CHAPTER_NAMES[currentChapter] || currentChapter);
+                            changed = true;
+                        } else {
+                            scrollAccumulator = 0;
+                            scrollVelocity = 0;
+                        }
+                        break;
+                    }
+                }
+            }
+
+            if (changed) updateAllFaceText();
+        }
+
+        // ── Chapter transition flash ──
+        function showChapterFlash(name) {
+            chapterFlash.textContent = name;
+            chapterFlash.classList.add('visible');
+            if (chapterFlashTimeout) clearTimeout(chapterFlashTimeout);
+            chapterFlashTimeout = setTimeout(() => {
+                chapterFlash.classList.remove('visible');
+            }, 1200);
+        }
+
+        // ── Keyboard ──
+        document.addEventListener('keydown', (e) => {
+            keysDown[e.code] = true;
+
+            if (!isPointerLocked) return;
+
+            // Q/E chapter navigation
+            if (e.code === 'KeyQ') {
+                const idx = CHAPTERS.indexOf(currentChapter);
+                if (idx > 0) {
+                    currentChapter = CHAPTERS[idx - 1];
+                    currentParagraphIndex = 0;
+                    scrollVelocity = 0;
+                    scrollAccumulator = 0;
+                    showChapterFlash(CHAPTER_NAMES[currentChapter] || currentChapter);
+                    updateAllFaceText();
+                }
+            }
+            if (e.code === 'KeyE') {
+                const idx = CHAPTERS.indexOf(currentChapter);
+                if (idx < CHAPTERS.length - 1) {
+                    currentChapter = CHAPTERS[idx + 1];
+                    currentParagraphIndex = 0;
+                    scrollVelocity = 0;
+                    scrollAccumulator = 0;
+                    showChapterFlash(CHAPTER_NAMES[currentChapter] || currentChapter);
+                    updateAllFaceText();
+                }
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            keysDown[e.code] = false;
+        });
+
+        // ── Movement ──
+        function updateMovement() {
+            if (!isPointerLocked) return;
+
+            // Forward direction follows camera look (full 3D movement)
+            const forward = new THREE.Vector3(0, 0, -1);
+            forward.applyQuaternion(camera.quaternion);
+            const right = new THREE.Vector3(1, 0, 0);
+            right.applyQuaternion(camera.quaternion);
+
+            const velocity = new THREE.Vector3();
+            if (keysDown['KeyW']) velocity.add(forward);
+            if (keysDown['KeyS']) velocity.sub(forward);
+            if (keysDown['KeyD']) velocity.add(right);
+            if (keysDown['KeyA']) velocity.sub(right);
+
+            if (velocity.lengthSq() > 0) {
+                velocity.normalize().multiplyScalar(MOVE_SPEED);
+                camera.position.add(velocity);
+
+                // Boundary clamping
+                camera.position.x = Math.max(-BOUNDARY, Math.min(BOUNDARY, camera.position.x));
+                camera.position.y = Math.max(-BOUNDARY, Math.min(BOUNDARY, camera.position.y));
+                camera.position.z = Math.max(-BOUNDARY, Math.min(BOUNDARY, camera.position.z));
+            }
+        }
+
+        // ── Apply camera rotation from yaw/pitch ──
+        function updateCameraRotation() {
+            const euler = new THREE.Euler(pitch, yaw, 0, 'YXZ');
+            camera.quaternion.setFromEuler(euler);
+        }
+
+        // ── Animation loop ──
+        function animate() {
+            requestAnimationFrame(animate);
+            updateMovement();
+            updateScrollPhysics();
+            updateCameraRotation();
+            renderer.render(scene, camera);
+        }
+
+        // ── Resize handling ──
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / (window.innerHeight - 40);
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight - 40);
+        });
+
+        // Initial aspect ratio
+        camera.aspect = window.innerWidth / (window.innerHeight - 40);
+        camera.updateProjectionMatrix();
+
+        // ── About modal ──
+        const aboutModal = document.getElementById('about-modal');
+        const aboutBtn = document.getElementById('about-btn');
+        const aboutClose = document.getElementById('about-close');
+
+        aboutBtn.addEventListener('click', () => {
+            aboutModal.classList.toggle('hidden');
+        });
+        aboutClose.addEventListener('click', () => {
+            aboutModal.classList.add('hidden');
+        });
+        aboutModal.addEventListener('click', (e) => {
+            if (e.target === aboutModal) aboutModal.classList.add('hidden');
+        });
+
+        // ── Theme toggle ──
+        const themeBtn = document.getElementById('theme-toggle');
+        const themeLabel = document.getElementById('theme-label');
+        const sunIcon = document.getElementById('theme-icon-sun');
+        const moonIcon = document.getElementById('theme-icon-moon');
+        let darkMode = true;
+        themeBtn.addEventListener('click', () => {
+            darkMode = !darkMode;
+            themeLabel.textContent = darkMode ? 'Light' : 'Dark';
+            sunIcon.style.display = darkMode ? '' : 'none';
+            moonIcon.style.display = darkMode ? 'none' : '';
+            document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
+        });
+
+        // ── Load data and start ──
+        async function init() {
+            try {
+                const resp = await fetch('extracted_text/all_versions.json');
+                allVersions = await resp.json();
+
+                loadingScreen.style.display = 'none';
+                buildCube();
+                updateAllFaceText();
+                animate();
+            } catch (err) {
+                loadingScreen.querySelector('.loading-text').textContent =
+                    'Failed to load text data. Ensure all_versions.json is available.';
+                console.error('CAVE init error:', err);
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>

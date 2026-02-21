@@ -3517,6 +3517,9 @@ function setupViewModeButtons() {
                 const mode = item.dataset.mode;
                 if (mode === 'gonzo') {
                     openGonzoModal();
+                } else if (mode === 'gonzo-cave') {
+                    saveViewState();
+                    window.location.href = 'gonzo_cave.html';
                 } else {
                     setViewMode(mode);
                 }
