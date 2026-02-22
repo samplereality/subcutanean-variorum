@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gonzo CAVE — Subcutanean Variorum</title>
+    <title>CAVE — Subcutanean Variorum</title>
     <link rel="icon" type="svg+xml" href="favicon.svg" sizes="any">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -503,11 +503,11 @@
     <nav class="cave-nav">
         <a href="index.html">Variorum</a>
         <span class="separator">/</span>
-        <span class="current">Gonzo CAVE</span>
+        <span class="current">CAVE</span>
         <span class="separator">/</span>
         <span id="chapter-nav-label" class="current" aria-live="polite"></span>
         <div class="nav-right">
-            <button id="about-btn" title="About Gonzo CAVE">
+            <button id="about-btn" title="About the CAVE">
                 <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 3px;"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
                 About
             </button>
@@ -530,15 +530,15 @@
         Click to enter the CAVE
         <span class="subtitle">Immersive reading of 25 seeds</span>
     </button>
-    <p class="sr-only">Gonzo CAVE: an immersive 3D reading room displaying all 25 versions of Subcutanean simultaneously on the walls and ceiling of a virtual cube. Requires mouse and keyboard interaction.</p>
+    <p class="sr-only">The CAVE: an immersive 3D reading room displaying all 25 versions of Subcutanean simultaneously on the walls and ceiling of a virtual cube. Requires mouse and keyboard interaction.</p>
 
     <!-- About modal -->
     <div id="about-modal" class="cave-modal hidden" role="dialog" aria-modal="true" aria-labelledby="cave-about-title">
         <div class="cave-modal-content">
             <button class="cave-modal-close" id="about-close" aria-label="Close">&times;</button>
-            <h2 id="cave-about-title">Gonzo CAVE</h2>
+            <h2 id="cave-about-title">The CAVE</h2>
             <p><strong>CAVE</strong> stands for <em>Cave Automatic Virtual Environment</em>, a term coined in 1992 for room-sized immersive visualization systems where projectors display images on the walls, floor, and ceiling around the viewer.</p>
-            <p>The Gonzo CAVE reimagines this concept for literary exploration. You are standing inside a cube whose surfaces are covered with the text of Aaron Reed's novel <em>Subcutanean</em> &mdash; all 25 unique seeds at once.</p>
+            <p>The <em>Subcutanean</em> CAVE reimagines this concept for literary exploration. You are standing inside a cube whose surfaces are covered with the text of <em>Subcutanean</em>&mdash;25 unique seeds at once.</p>
             <h3>Layout</h3>
             <p>Each of the four walls and the ceiling displays 5 seeds in newspaper-style columns, for a total of 25 simultaneous versions. The floor displays project information.</p>
             <ul>
@@ -558,8 +558,8 @@
                 <li><strong>ESC</strong> to release your cursor</li>
             </ul>
             <h3>About <em>Subcutanean</em></h3>
-            <p>Every copy of <em>Subcutanean</em> is unique, generated from Aaron Reed's Quant markup language. Words, sentences, and entire scenes vary between printings. The Gonzo CAVE lets you experience the full breadth of this variation simultaneously, surrounding yourself with parallel versions of the same story.</p>
-            <p style="margin-top: 16px; opacity: 0.5; font-size: 13px;">Novel &copy; Aaron Reed (CC-BY 4.0) &middot; Variorum by Mark Sample</p>
+            <p>Every copy of <em>Subcutanean</em> is unique, generated from Aaron Reed's Quant markup language. Words, sentences, and entire scenes vary between printings. The CAVE lets you experience the full breadth of this variation simultaneously, surrounding yourself with parallel versions of the same story.</p>
+            <p style="margin-top: 16px; opacity: 0.5; font-size: 13px;">Novel by Aaron Reed (CC-BY 4.0) &middot; Variorum by Mark Sample</p>
         </div>
     </div>
 
@@ -699,12 +699,12 @@
             content.className = 'cave-face-content';
 
             content.innerHTML = `
-                <div class="floor-title">Subcutanean Variorum</div>
+                <div class="floor-title">The Subcutanean CAVE</div>
                 <div class="floor-subtitle">
                     <p>An immersive reading room for Aaron Reed's novel <em>Subcutanean</em>.</p>
-                    <p>25 unique copies of the novel surround you. Each wall and the ceiling display 5 seeds in newspaper-style columns.</p>
-                    <p>Use WASD to move, mouse to look, scroll wheel to advance text, Q/E to change chapters.</p>
-                    <p style="margin-top: 16px; font-size: 13px; opacity: 0.5;">Novel &copy; Aaron Reed (CC-BY 4.0) &middot; Variorum by Mark Sample</p>
+                    <p>25 unique copies of the novel surround you.</p>
+                    <p>Use WASD to move, mouse to look, scroll wheel to advance text, Q/E keys to change chapters.</p>
+                    <p style="margin-top: 16px; font-size: 13px; opacity: 0.5;"><em>Subcutanean</em> by Aaron Reed (CC-BY 4.0) &middot; Variorum by Mark Sample</p>
                 </div>
             `;
 

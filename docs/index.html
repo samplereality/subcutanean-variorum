@@ -219,7 +219,7 @@
                         <i data-lucide="grid-3x3" aria-hidden="true"></i> Gonzo
                     </button>
                     <button class="dropdown-item" data-mode="gonzo-cave" data-desc="Walk inside a cube of text, FPS-style immersive reading" title="Walk inside a cube of text, FPS-style immersive reading" role="menuitem">
-                        <i data-lucide="box" aria-hidden="true"></i> Gonzo CAVE
+                        <i data-lucide="box" aria-hidden="true"></i> CAVE
                     </button>
                     <button class="dropdown-item hidden" id="syntax-toggle-btn" data-desc="Toggle Quant syntax highlighting" title="Toggle Quant syntax highlighting" role="menuitem">
                         <i data-lucide="highlighter" aria-hidden="true"></i> Syntax Highlighting
@@ -509,6 +509,8 @@
                 <p>In 2025 Reed <a href="https://subcutanean.textories.com/source-release.html" target="_blank">released the source text and code</a> of <em>Subcutanean</em> under a CC-BY 4.0 license, meaning anyone can copy, share, modify, or remix the novel as long as credit for the original is given to Reed.</p> 
                     
                 <p>The Subcutanean Variorum is designed by <a href="https://www.samplereality.com" target="_blank"> Mark Sample</a>. The project code is available on <a href="https://github.com/samplereality/subcutanean-variorum" target="_blank">GitHub</a>.</p>
+
+                <p style="margin-top: 1.5rem; font-size: 0.8rem; opacity: 0.5;">Version 0.9 · Last updated February 22, 2026</p>
             </div>
         </div>
     </div>
@@ -695,11 +697,11 @@
                 <h3>Overview</h3>
                 <p><strong>Gonzo Mode</strong> displays the same paragraph(s) from all 25 built-in versions of <em>Subcutanean</em> simultaneously in a 5×5 grid.</p>
 
-                <p>Each cell shows 3 paragraphs from a different seed, letting you see at a glance how the text varies across all versions.</p>
+                <p>Each cell shows 10 paragraphs from a different seed, letting you see at a glance how the text varies across all versions.</p>
 
                 <h4>Navigation</h4>
                 <ul>
-                    <li><strong>Prev / Next</strong> — Move through paragraphs (3 at a time)</li>
+                    <li><strong>Prev / Next</strong> — Move through paragraphs (10 at a time)</li>
                     <li><strong>Chapter dropdown</strong> — Jump to a different chapter</li>
                     <li><strong>Scroll any cell</strong> — All cells scroll together</li>
                 </ul>
@@ -711,6 +713,9 @@
                     <li><strong>Home / End</strong> — Go to chapter start/end</li>
                     <li><strong>ESC</strong> — Close Gonzo Mode</li>
                 </ul>
+
+                <h4>Cross-Highlight</h4>
+                <p>Select text in any cell to see it highlighted across all 25 versions. Gold marks the source; cyan marks matches in other cells. Match counts appear in cell headers.</p>
 
                 <h4>Empty Cells</h4>
                 <p>If a version has fewer paragraphs than others, its cell will appear grayed out with "No content" displayed.</p>

@@ -73,7 +73,7 @@ const FEATURE_TIPS = {
 // Gonzo Mode state
 let gonzoCurrentChapter = 'prologue';
 let gonzoCurrentParagraphIndex = 0;
-const GONZO_PARAGRAPHS_PER_VIEW = 3;
+const GONZO_PARAGRAPHS_PER_VIEW = 10;
 let gonzoScrollSyncEnabled = true;
 let gonzoHasBeenOpened = false;  // Track if Gonzo has been opened before
 let savedScrollPosition = 0;     // Save main view scroll position when entering Gonzo
@@ -83,6 +83,10 @@ const GONZO_CHAPTERS = [
     'chapter10', 'chapter11', 'chapter12', 'chapter13', 'chapter14',
     'chapter15', 'chapter16', 'chapter17', 'chapter18'
 ];
+
+// Gonzo cross-highlight state
+let gonzoCrossHighlightActive = false;
+let gonzoCrossHighlightText = '';
 
 // ============================================
 // Accessibility Utilities
@@ -3614,7 +3618,7 @@ function setupViewModeButtons() {
                     openGonzoModal();
                 } else if (mode === 'gonzo-cave') {
                     saveViewState();
-                    window.location.href = 'gonzo_cave.html';
+                    window.location.href = 'cave.html';
                 } else {
                     setViewMode(mode);
                 }
@@ -11145,6 +11149,13 @@ document.addEventListener('DOMContentLoaded', () => {
         // Add keyboard listener
         document.addEventListener('keydown', handleGonzoKeydown);
 
+        // Set up cross-highlight listener
+        const grid = document.getElementById('gonzo-grid');
+        if (grid && !grid._gonzoCrossHighlightHandler) {
+            grid._gonzoCrossHighlightHandler = handleGonzoCrossHighlightSelection;
+            grid.addEventListener('mouseup', grid._gonzoCrossHighlightHandler);
+        }
+
         // Initialize Lucide icons in the modal
         if (typeof lucide !== 'undefined') {
             lucide.createIcons();
@@ -11161,6 +11172,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function closeGonzoModal() {
+        // Clean up cross-highlight
+        clearGonzoCrossHighlights();
+        const grid = document.getElementById('gonzo-grid');
+        if (grid && grid._gonzoCrossHighlightHandler) {
+            grid.removeEventListener('mouseup', grid._gonzoCrossHighlightHandler);
+            delete grid._gonzoCrossHighlightHandler;
+        }
+
         const modal = document.getElementById('gonzo-modal');
         if (modal) {
             modal.classList.add('hidden');
@@ -11312,6 +11331,14 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderGonzoGrid() {
         const grid = document.getElementById('gonzo-grid');
         if (!grid || !allVersions) return;
+
+        // Reset cross-highlight state (grid.innerHTML wipes the marks)
+        if (gonzoCrossHighlightActive) {
+            gonzoCrossHighlightActive = false;
+            gonzoCrossHighlightText = '';
+            const infoBar = document.getElementById('gonzo-highlight-info');
+            if (infoBar) infoBar.remove();
+        }
 
         grid.innerHTML = '';
 
@@ -11545,6 +11572,235 @@ document.addEventListener('DOMContentLoaded', () => {
             requestAnimationFrame(() => {
                 gonzoScrollSyncEnabled = true;
             });
+        });
+    }
+
+    // ── Gonzo Cross-Highlight (text selection mirroring across cells) ──
+
+    function collectTextNodes(element) {
+        const nodes = [];
+        const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false);
+        let node;
+        while (node = walker.nextNode()) {
+            nodes.push(node);
+        }
+        return nodes;
+    }
+
+    function buildTextMap(textNodes) {
+        let fullText = '';
+        const map = [];
+        let lastParagraph = null;
+
+        textNodes.forEach(node => {
+            // Insert a space at paragraph boundaries to prevent word fusion
+            const currentParagraph = node.parentElement ? node.parentElement.closest('p') : null;
+            if (lastParagraph && currentParagraph && lastParagraph !== currentParagraph) {
+                fullText += ' ';
+            }
+            lastParagraph = currentParagraph;
+
+            map.push({
+                node: node,
+                startInFull: fullText.length,
+                length: node.textContent.length
+            });
+            fullText += node.textContent;
+        });
+        return { fullText, map };
+    }
+
+    function findCrossHighlightOccurrences(haystack, needle) {
+        const results = [];
+        const haystackLower = haystack.toLowerCase();
+        const needleLower = needle.toLowerCase();
+        let pos = 0;
+        while (pos <= haystackLower.length - needleLower.length) {
+            const idx = haystackLower.indexOf(needleLower, pos);
+            if (idx === -1) break;
+            results.push({ start: idx, end: idx + needleLower.length });
+            pos = idx + 1;
+        }
+        return results;
+    }
+
+    function applyGonzoCrossHighlights(matches, textMap, cssClass) {
+        // Process matches in reverse order so DOM modifications
+        // don't invalidate positions of earlier matches
+        for (let m = matches.length - 1; m >= 0; m--) {
+            const { start: matchStart, end: matchEnd } = matches[m];
+
+            // Process overlapping text nodes in reverse order
+            for (let i = textMap.map.length - 1; i >= 0; i--) {
+                const entry = textMap.map[i];
+                const nodeStart = entry.startInFull;
+                const nodeEnd = nodeStart + entry.length;
+
+                // Skip nodes entirely outside the match range
+                if (nodeEnd <= matchStart || nodeStart >= matchEnd) continue;
+
+                const localStart = Math.max(0, matchStart - nodeStart);
+                const localEnd = Math.min(entry.length, matchEnd - nodeStart);
+                const textNode = entry.node;
+
+                // Split off "after" portion first
+                if (localEnd < textNode.textContent.length) {
+                    textNode.splitText(localEnd);
+                }
+
+                // Split off "before" portion
+                let matchNode = textNode;
+                if (localStart > 0) {
+                    matchNode = textNode.splitText(localStart);
+                }
+
+                // Wrap in <mark>
+                const mark = document.createElement('mark');
+                mark.className = cssClass;
+                matchNode.parentNode.insertBefore(mark, matchNode);
+                mark.appendChild(matchNode);
+            }
+        }
+    }
+
+    function clearGonzoCrossHighlights() {
+        const marks = document.querySelectorAll(
+            '#gonzo-grid .gonzo-cross-highlight, #gonzo-grid .gonzo-cross-highlight-source'
+        );
+        marks.forEach(mark => {
+            const parent = mark.parentNode;
+            while (mark.firstChild) {
+                parent.insertBefore(mark.firstChild, mark);
+            }
+            parent.removeChild(mark);
+            parent.normalize();
+        });
+
+        // Remove match count badges and info bar
+        document.querySelectorAll('.gonzo-match-count').forEach(b => b.remove());
+        const infoBar = document.getElementById('gonzo-highlight-info');
+        if (infoBar) infoBar.remove();
+
+        gonzoCrossHighlightActive = false;
+        gonzoCrossHighlightText = '';
+    }
+
+    function performGonzoCrossHighlight(selectedText, sourceCell) {
+        clearGonzoCrossHighlights();
+
+        if (!selectedText || selectedText.length < 3) return;
+
+        gonzoCrossHighlightActive = true;
+        gonzoCrossHighlightText = selectedText;
+
+        const allCells = document.querySelectorAll('.gonzo-cell:not(.empty)');
+        let cellsWithMatches = 0;
+
+        allCells.forEach(cell => {
+            const content = cell.querySelector('.gonzo-cell-content');
+            if (!content) return;
+
+            const isSource = (cell === sourceCell);
+            const cssClass = isSource
+                ? 'gonzo-cross-highlight-source'
+                : 'gonzo-cross-highlight';
+
+            const textNodes = collectTextNodes(content);
+            const textMap = buildTextMap(textNodes);
+            const matches = findCrossHighlightOccurrences(textMap.fullText, selectedText);
+
+            if (matches.length > 0) {
+                applyGonzoCrossHighlights(matches, textMap, cssClass);
+                cellsWithMatches++;
+
+                // Add match count badge to cell header
+                const header = cell.querySelector('.gonzo-cell-header');
+                if (header && !isSource) {
+                    const badge = document.createElement('span');
+                    badge.className = 'gonzo-match-count';
+                    badge.textContent = matches.length;
+                    badge.title = `${matches.length} match${matches.length !== 1 ? 'es' : ''}`;
+                    header.appendChild(badge);
+                }
+            } else {
+                const header = cell.querySelector('.gonzo-cell-header');
+                if (header) {
+                    const badge = document.createElement('span');
+                    badge.className = 'gonzo-match-count no-match';
+                    badge.textContent = '0';
+                    badge.title = 'No matches';
+                    header.appendChild(badge);
+                }
+            }
+        });
+
+        const totalCells = allCells.length;
+        showGonzoHighlightInfo(selectedText, cellsWithMatches, totalCells);
+        announce(`Highlighted "${selectedText.substring(0, 30)}" \u2014 found in ${cellsWithMatches} of ${totalCells} seeds`);
+    }
+
+    function showGonzoHighlightInfo(text, cellCount, totalCells) {
+        const existing = document.getElementById('gonzo-highlight-info');
+        if (existing) existing.remove();
+
+        const header = document.querySelector('.gonzo-header');
+        const headerRight = document.querySelector('.gonzo-header-right');
+        if (!header || !headerRight) return;
+
+        const info = document.createElement('div');
+        info.id = 'gonzo-highlight-info';
+        info.className = 'gonzo-highlight-info';
+
+        const preview = document.createElement('span');
+        preview.className = 'highlight-text-preview';
+        const displayText = text.length > 40 ? text.substring(0, 40) + '\u2026' : text;      
+        preview.textContent = `${displayText}`;
+        preview.title = text;
+
+        const summary = document.createElement('span');
+        summary.className = 'highlight-match-summary';
+        summary.textContent = `${cellCount}/${totalCells} seeds`;
+
+        const clearBtn = document.createElement('button');
+        clearBtn.className = 'gonzo-highlight-clear-btn';
+        clearBtn.textContent = 'Clear';
+        clearBtn.title = 'Clear cross-highlights';
+        clearBtn.addEventListener('click', clearGonzoCrossHighlights);
+
+        info.appendChild(preview);
+        info.appendChild(summary);
+        info.appendChild(clearBtn);
+        header.insertBefore(info, headerRight);
+    }
+
+    function handleGonzoCrossHighlightSelection() {
+        requestAnimationFrame(() => {
+            const selection = window.getSelection();
+            const selectedText = selection
+                ? selection.toString().trim().replace(/\n+/g, ' ').replace(/\s+/g, ' ')
+                : '';
+
+            if (selectedText.length < 3) {
+                if (gonzoCrossHighlightActive) {
+                    clearGonzoCrossHighlights();
+                }
+                return;
+            }
+
+            // Find source cell
+            const anchorNode = selection.anchorNode;
+            if (!anchorNode) return;
+
+            const sourceCell = anchorNode.nodeType === Node.TEXT_NODE
+                ? anchorNode.parentElement.closest('.gonzo-cell')
+                : anchorNode.closest('.gonzo-cell');
+
+            if (!sourceCell) return;
+
+            performGonzoCrossHighlight(selectedText, sourceCell);
+
+            // Collapse native selection — our <mark> highlights replace it
+            selection.removeAllRanges();
         });
     }
 

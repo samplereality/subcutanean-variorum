@@ -69,7 +69,7 @@ A web-based variorum browser for exploring textual variations across 25 versions
    - About modal with CAVE history, layout diagram, and control reference
    - Light/dark theme toggle (walls switch between dark bg + glowing text and light bg + dark text)
    - Breadcrumb nav bar with chapter/paragraph indicator
-   - Standalone `gonzo_cave.html` page, accessed via View dropdown or direct URL
+   - Standalone `cave.html` page, accessed via View dropdown or direct URL
 
 8. **Source Code Mode** (enhanced)
    - Click code icon on any paragraph to view underlying Quant source
@@ -120,7 +120,7 @@ docs/
 ├── scan_pathways.py        # Preprocessing for pathways data
 ├── final_fight.html        # Final fight arena analysis visualization
 ├── build_final_fight.py    # Preprocessing for final fight data
-└── gonzo_cave.html         # FPS immersive CAVE reading room (Three.js CSS3DRenderer)
+└── cave.html         # FPS immersive CAVE reading room (Three.js CSS3DRenderer)
 ```
 
 ### Key JavaScript Functions (compare.js)
@@ -862,7 +862,7 @@ A fullscreen 5x5 grid showing all 25 versions simultaneously for comparative rea
 
 ### Gonzo CAVE (FPS Immersive Reading Room)
 
-A standalone page (`docs/gonzo_cave.html`) providing an FPS-style immersive reading experience inside a 3D cube, inspired by CAVE (Cave Automatic Virtual Environment) installations.
+A standalone page (`docs/cave.html`) providing an FPS-style immersive reading experience inside a 3D cube, inspired by CAVE (Cave Automatic Virtual Environment) installations.
 
 **Technology: Three.js CSS3DRenderer**
 - CSS3DRenderer positions real DOM elements in 3D space — text is always pixel-perfect
@@ -933,7 +933,7 @@ A standalone page (`docs/gonzo_cave.html`) providing an FPS-style immersive read
 - Icons: inline SVGs for info (About) and sun/moon (theme toggle)
 
 **Integration (compare.js):**
-- `setupViewModeButtons()` handles `gonzo-cave` mode: calls `saveViewState()` then navigates to `gonzo_cave.html`
+- `setupViewModeButtons()` handles `gonzo-cave` mode: calls `saveViewState()` then navigates to `cave.html`
 - View dropdown button in `index.html` with `data-mode="gonzo-cave"`, Lucide `box` icon
 
 **Key Constants:**
