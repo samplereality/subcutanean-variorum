@@ -56,6 +56,42 @@ button [data-lucide],
 }
 
 /* ============================================
+   Accessibility Utilities
+   ============================================ */
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.sr-only-focusable:focus,
+.sr-only-focusable:focus-within {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: auto;
+    height: auto;
+    padding: 0.75rem 1.5rem;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+    background: var(--accent-color);
+    color: #fff;
+    z-index: 10000;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+/* ============================================
    UI Font — sans-serif for all interface elements
    Novel text inherits serif from body via --content-font
    ============================================ */
@@ -421,6 +457,7 @@ header {
 .chapter-select:focus {
     outline: none;
     border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(255, 136, 0, 0.2);
 }
 
 .chapter-arrow-btn {
@@ -715,6 +752,7 @@ header {
 .version-select:focus {
     outline: none;
     border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(255, 136, 0, 0.2);
 }
 
 /* Variables toggle button */
@@ -1375,6 +1413,7 @@ header {
     outline: none;
     border-color: var(--accent-color);
     background-color: white;
+    box-shadow: 0 0 0 2px rgba(255, 136, 0, 0.2);
 }
 
 .tool-btn {
@@ -1450,6 +1489,7 @@ header {
 .bookmark-select:focus {
     outline: none;
     border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(255, 136, 0, 0.2);
 }
 
 .bookmark-label {
@@ -1502,6 +1542,7 @@ header {
     outline: none;
     border-color: var(--accent-color);
     background-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 0 2px rgba(255, 136, 0, 0.2);
 }
 
 .bookmark-divider {
@@ -4047,6 +4088,7 @@ main {
 .annotation-textarea:focus {
     outline: none;
     background-color: rgba(255, 255, 255, 0.03);
+    box-shadow: 0 0 0 2px rgba(255, 136, 0, 0.2);
 }
 
 .annotation-modal-actions {
@@ -4149,6 +4191,7 @@ main {
 .note-panel-textarea:focus {
     outline: none;
     background-color: rgba(255, 255, 255, 0.03);
+    box-shadow: 0 0 0 2px rgba(255, 136, 0, 0.2);
 }
 
 .note-panel-textarea::placeholder {
@@ -5451,6 +5494,7 @@ main {
 .gonzo-chapter-selector select:focus {
     outline: none;
     border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(255, 136, 0, 0.2);
 }
 
 .gonzo-position-info {
@@ -6219,4 +6263,19 @@ main {
     background: #ffffff;
     border-color: var(--accent-color);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15), 0 0 8px rgba(217, 104, 0, 0.1);
+}
+
+/* ============================================
+   Reduced Motion Preference
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }

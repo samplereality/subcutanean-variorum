@@ -84,6 +84,87 @@ const GONZO_CHAPTERS = [
     'chapter15', 'chapter16', 'chapter17', 'chapter18'
 ];
 
+// ============================================
+// Accessibility Utilities
+// ============================================
+
+// Announce messages to screen readers via live region
+function announce(message) {
+    const el = document.getElementById('a11y-announcer');
+    if (el) {
+        el.textContent = '';
+        requestAnimationFrame(() => { el.textContent = message; });
+    }
+}
+
+// Focus trap for modal dialogs
+let focusTrapCleanup = null;
+let lastFocusedElement = null;
+
+function trapFocus(modalElement) {
+    const focusableSelectors = 'a[href], button:not([disabled]):not([style*="display: none"]):not(.hidden), textarea, input:not([type="hidden"]):not([style*="display: none"]), select, [tabindex]:not([tabindex="-1"])';
+    const focusableElements = Array.from(modalElement.querySelectorAll(focusableSelectors))
+        .filter(el => el.offsetParent !== null); // exclude hidden elements
+    if (focusableElements.length === 0) return;
+
+    const firstFocusable = focusableElements[0];
+    const lastFocusable = focusableElements[focusableElements.length - 1];
+
+    function handleKeydown(e) {
+        if (e.key !== 'Tab') return;
+        if (e.shiftKey) {
+            if (document.activeElement === firstFocusable) {
+                e.preventDefault();
+                lastFocusable.focus();
+            }
+        } else {
+            if (document.activeElement === lastFocusable) {
+                e.preventDefault();
+                firstFocusable.focus();
+            }
+        }
+    }
+
+    modalElement.addEventListener('keydown', handleKeydown);
+    focusTrapCleanup = () => {
+        modalElement.removeEventListener('keydown', handleKeydown);
+    };
+}
+
+function releaseFocus() {
+    if (focusTrapCleanup) {
+        focusTrapCleanup();
+        focusTrapCleanup = null;
+    }
+}
+
+function openModalA11y(modal, focusTarget) {
+    lastFocusedElement = document.activeElement;
+    modal.classList.remove('hidden');
+    if (focusTarget) {
+        // Small delay to let the modal become visible before focusing
+        requestAnimationFrame(() => {
+            focusTarget.focus();
+            trapFocus(modal);
+        });
+    } else {
+        const closeBtn = modal.querySelector('.close-btn');
+        requestAnimationFrame(() => {
+            if (closeBtn) closeBtn.focus();
+            trapFocus(modal);
+        });
+    }
+}
+
+function closeModalA11y(modal) {
+    releaseFocus();
+    modal.classList.add('hidden');
+    if (lastFocusedElement) {
+        lastFocusedElement.focus();
+        lastFocusedElement = null;
+    }
+}
+
 // Theme functions
 function initializeTheme() {
     // Check localStorage for saved preference
@@ -354,14 +435,20 @@ function toggleNavDropdown(dropdownId, navItemId) {
     } else {
         closeAllNavDropdowns();
         if (dropdown) dropdown.classList.add('open');
-        if (navItem) navItem.classList.add('active');
+        if (navItem) {
+            navItem.classList.add('active');
+            navItem.setAttribute('aria-expanded', 'true');
+        }
         activeNavDropdown = dropdownId;
     }
 }
 
 function closeAllNavDropdowns() {
     document.querySelectorAll('.nav-dropdown').forEach(d => d.classList.remove('open'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => {
+        n.classList.remove('active');
+        if (n.hasAttribute('aria-expanded')) n.setAttribute('aria-expanded', 'false');
+    });
     activeNavDropdown = null;
 }
 
@@ -1934,7 +2021,8 @@ function renderVariablesPanel() {
                 }
             }
 
-            return `<span class="var-tag ${clickable} ${notRendered}" data-var="${v}" ${targetVersionAttr} data-tooltip="${escapeHtml(description)}${chapterHint}">${v}</span>`;
+            const a11yAttrs = clickable ? 'tabindex="0" role="button"' : '';
+            return `<span class="var-tag ${clickable} ${notRendered}" ${a11yAttrs} data-var="${v}" ${targetVersionAttr} data-tooltip="${escapeHtml(description)}${chapterHint}">${v}</span>`;
         }).join('');
     };
 
@@ -1952,7 +2040,9 @@ function renderVariablesPanel() {
             const crossRefStr = crossRef ? ` [from ${crossRef}]` : '';
             const targetAttr = targetVersion ? `data-target-version="${targetVersion}"` : '';
 
+            const a11yAttrs = clickable ? 'tabindex="0" role="button"' : '';
             return `<span class="var-tag chapter-var-tag ${clickable} ${notRendered}"
+                ${a11yAttrs}
                 data-var="${varName}"
                 data-chapter-local="true"
                 ${targetAttr}
@@ -2021,13 +2111,17 @@ function renderVariablesPanel() {
         });
     }
 
-    // Click handlers for all variable tags (global and chapter-local)
+    // Click and keyboard handlers for all variable tags (global and chapter-local)
     container.querySelectorAll('.var-tag-clickable').forEach(tag => {
-        tag.addEventListener('click', () => {
+        const handler = () => {
             const varName = tag.dataset.var;
             const targetVersion = tag.dataset.targetVersion || null;
             const isChapterLocal = tag.dataset.chapterLocal === 'true';
             handleVariableClick(varName, targetVersion, isChapterLocal);
+        };
+        tag.addEventListener('click', handler);
+        tag.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handler(); }
         });
     });
 
@@ -3382,8 +3476,8 @@ function initializeControlPanel() {
     function closeAllDropdowns() {
         if (viewMenu) viewMenu.classList.add('hidden');
         if (analyzeMenu) analyzeMenu.classList.add('hidden');
-        if (viewBtn) viewBtn.classList.remove('active');
-        if (analyzeBtn) analyzeBtn.classList.remove('active');
+        if (viewBtn) { viewBtn.classList.remove('active'); viewBtn.setAttribute('aria-expanded', 'false'); }
+        if (analyzeBtn) { analyzeBtn.classList.remove('active'); analyzeBtn.setAttribute('aria-expanded', 'false'); }
         openDropdown = null;
     }
 
@@ -3402,6 +3496,7 @@ function initializeControlPanel() {
             // Open this dropdown
             menu.classList.remove('hidden');
             btn.classList.add('active');
+            btn.setAttribute('aria-expanded', 'true');
             openDropdown = name;
         }
     }
@@ -3527,7 +3622,7 @@ function setupViewModeButtons() {
                 setTimeout(() => {
                     viewMenu.classList.add('hidden');
                     const viewBtn = document.getElementById('view-toggle-btn');
-                    if (viewBtn) viewBtn.classList.remove('active');
+                    if (viewBtn) { viewBtn.classList.remove('active'); viewBtn.setAttribute('aria-expanded', 'false'); }
                 }, 150);
             });
         });
@@ -3543,6 +3638,11 @@ function setViewMode(mode) {
             btn.classList.toggle('active', btn.dataset.mode === mode);
         });
     }
+    const modeNames = {
+        unified: 'Unified view', sidebyside: 'Side-by-side view', diff: 'Track Changes view',
+        comparison: 'Collation view', gonzo: 'Gonzo Mode', 'gonzo-cave': 'Gonzo CAVE'
+    };
+    announce(modeNames[mode] || mode);
     displayComparison();
 }
 
@@ -3572,6 +3672,7 @@ function displayComparison() {
         clearChapterLocalVarCache();
         closeAllNotePanels();
         mobileSideBySideTab = 'A';
+        announce(`Now viewing ${formatChapterLabel(currentChapter)}`);
         lastDisplayedChapter = currentChapter;
     }
 
@@ -5497,7 +5598,7 @@ function calculateWordDifferential() {
     displayWordLists();
 
     // Show modal
-    modal.classList.remove('hidden');
+    openModalA11y(modal, modal.querySelector('.close-btn'));
 }
 
 function displayWordLists() {
@@ -5534,48 +5635,38 @@ function displayWordLists() {
     if (uniqueCCount) uniqueCCount.textContent = sortedC.length;
 
     // Display unique words with frequencies if in frequency mode
-    uniqueWordsA.innerHTML = '';
-    sortedA.forEach((word, i) => {
-        const freq = currentWordData.freqA.get(word) || 0;
+    function createWordItem(container, word, i, freq, seedId) {
         const freqText = currentSortMode === 'freq' ? ` (${freq})` : '';
         const span = document.createElement('span');
         span.className = 'word-item';
+        span.setAttribute('tabindex', '0');
+        span.setAttribute('role', 'button');
         span.style.setProperty('--i', i);
         span.textContent = word + freqText;
         span.dataset.word = word;
-        span.dataset.seed = versionA;
-        span.addEventListener('click', (e) => showWordPopup(e, word, versionA));
-        uniqueWordsA.appendChild(span);
+        span.dataset.seed = seedId;
+        span.addEventListener('click', (e) => showWordPopup(e, word, seedId));
+        span.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showWordPopup(e, word, seedId); }
+        });
+        container.appendChild(span);
+    }
+
+    uniqueWordsA.innerHTML = '';
+    sortedA.forEach((word, i) => {
+        createWordItem(uniqueWordsA, word, i, currentWordData.freqA.get(word) || 0, versionA);
     });
 
     uniqueWordsB.innerHTML = '';
     sortedB.forEach((word, i) => {
-        const freq = currentWordData.freqB.get(word) || 0;
-        const freqText = currentSortMode === 'freq' ? ` (${freq})` : '';
-        const span = document.createElement('span');
-        span.className = 'word-item';
-        span.style.setProperty('--i', i);
-        span.textContent = word + freqText;
-        span.dataset.word = word;
-        span.dataset.seed = versionB;
-        span.addEventListener('click', (e) => showWordPopup(e, word, versionB));
-        uniqueWordsB.appendChild(span);
+        createWordItem(uniqueWordsB, word, i, currentWordData.freqB.get(word) || 0, versionB);
     });
 
     // Display version C words if available
     if (uniqueWordsC && versionC) {
         uniqueWordsC.innerHTML = '';
         sortedC.forEach((word, i) => {
-            const freq = currentWordData.freqC.get(word) || 0;
-            const freqText = currentSortMode === 'freq' ? ` (${freq})` : '';
-            const span = document.createElement('span');
-            span.className = 'word-item';
-            span.style.setProperty('--i', i);
-            span.textContent = word + freqText;
-            span.dataset.word = word;
-            span.dataset.seed = versionC;
-            span.addEventListener('click', (e) => showWordPopup(e, word, versionC));
-            uniqueWordsC.appendChild(span);
+            createWordItem(uniqueWordsC, word, i, currentWordData.freqC.get(word) || 0, versionC);
         });
     }
 
@@ -5763,7 +5854,7 @@ function closeWordPopup() {
 
 function closeModal() {
     const modal = document.getElementById('word-diff-modal');
-    modal.classList.add('hidden');
+    closeModalA11y(modal);
 }
 
 function navigateToChapter(chapterId) {
@@ -6122,12 +6213,12 @@ function openManageUploadsModal() {
         });
     }
 
-    modal.classList.remove('hidden');
+    openModalA11y(modal, modal.querySelector('.close-btn'));
 }
 
 function closeManageUploadsModal() {
     const modal = document.getElementById('manage-uploads-modal');
-    modal.classList.add('hidden');
+    closeModalA11y(modal);
 }
 
 function deleteCustomVersion(versionId) {
@@ -6182,12 +6273,12 @@ function markManageInfoNoticeSeen() {
 function openManageInfoModal() {
     closeAllModals();
     const modal = document.getElementById('manage-info-modal');
-    modal.classList.remove('hidden');
+    openModalA11y(modal, modal.querySelector('.close-btn'));
 }
 
 function closeManageInfoModal() {
     const modal = document.getElementById('manage-info-modal');
-    modal.classList.add('hidden');
+    closeModalA11y(modal);
 }
 
 function acceptManageInfoAndProceed() {
@@ -6213,6 +6304,7 @@ function closeAllModals() {
         'tapestry-modal'
         // Note: gonzo-modal is excluded so it persists when other modals open
     ];
+    releaseFocus();
     modalIds.forEach(id => {
         const modal = document.getElementById(id);
         if (modal) {
@@ -6240,7 +6332,7 @@ function shouldShowWelcome() {
 function openWelcomeModal() {
     const modal = document.getElementById('welcome-modal');
     if (!modal) return;
-    modal.classList.remove('hidden');
+    openModalA11y(modal, document.getElementById('welcome-close-btn'));
     // Initialize Lucide icons inside the modal
     if (typeof lucide !== 'undefined') {
         lucide.createIcons({ nodes: [modal] });
@@ -6250,7 +6342,7 @@ function openWelcomeModal() {
 function closeWelcomeModal() {
     const modal = document.getElementById('welcome-modal');
     if (!modal) return;
-    modal.classList.add('hidden');
+    closeModalA11y(modal);
     try {
         localStorage.setItem('subcutanean_welcome_last_shown', Date.now().toString());
     } catch (e) { /* ignore */ }
@@ -6269,11 +6361,32 @@ function initializeWelcomeModal() {
         });
     }
 
+    // Global Escape key handler for all modals (except Gonzo/Tapestry which have their own)
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            const welcomeModal = document.getElementById('welcome-modal');
-            if (welcomeModal && !welcomeModal.classList.contains('hidden')) {
-                closeWelcomeModal();
+        if (e.key !== 'Escape') return;
+
+        // Check modals in z-index/priority order (most specific first)
+        const modalCloseMap = [
+            ['bookmark-name-modal', closeBookmarkNameModal],
+            ['export-modal', closeExportModal],
+            ['annotation-modal', closeAnnotationModal],
+            ['word-diff-modal', closeModal],
+            ['heatmap-modal', () => { const m = document.getElementById('heatmap-modal'); if (m) closeModalA11y(m); }],
+            ['manage-uploads-modal', closeManageUploadsModal],
+            ['manage-info-modal', closeManageInfoModal],
+            ['privacy-notice-modal', closePrivacyNoticeModal],
+            ['globals-modal', closeGlobalsModal],
+            ['generate-modal', closeGenerateModal],
+            ['about-modal', closeAboutModal],
+            ['welcome-modal', closeWelcomeModal]
+        ];
+
+        for (const [id, closeFn] of modalCloseMap) {
+            const modal = document.getElementById(id);
+            if (modal && !modal.classList.contains('hidden')) {
+                closeFn();
+                e.stopPropagation();
+                return;
             }
         }
     });
@@ -6288,12 +6401,12 @@ function initializeWelcomeModal() {
 function openAboutModal() {
     closeAllModals();
     const modal = document.getElementById('about-modal');
-    modal.classList.remove('hidden');
+    openModalA11y(modal, modal.querySelector('.close-btn'));
 }
 
 function closeAboutModal() {
     const modal = document.getElementById('about-modal');
-    modal.classList.add('hidden');
+    closeModalA11y(modal);
 }
 
 // Generate Copy Modal functionality
@@ -6301,12 +6414,12 @@ function closeAboutModal() {
 function openGenerateModal() {
     closeAllModals();
     const modal = document.getElementById('generate-modal');
-    modal.classList.remove('hidden');
+    openModalA11y(modal, document.getElementById('generate-email'));
 }
 
 function closeGenerateModal() {
     const modal = document.getElementById('generate-modal');
-    modal.classList.add('hidden');
+    closeModalA11y(modal);
 }
 
 // Globals Modal functionality
@@ -6332,12 +6445,12 @@ function openGlobalsModal() {
         });
     }
 
-    modal.classList.remove('hidden');
+    openModalA11y(modal, modal.querySelector('.close-btn'));
 }
 
 function closeGlobalsModal() {
     const modal = document.getElementById('globals-modal');
-    modal.classList.add('hidden');
+    closeModalA11y(modal);
 }
 
 function initializeGlobalsModal() {
@@ -6541,12 +6654,14 @@ function saveCurrentBookmark() {
     if (!modal || !input) return;
 
     input.value = defaultName;
+    lastFocusedElement = document.activeElement;
     modal.classList.remove('hidden');
 
     // Focus and select the input text
     setTimeout(() => {
         input.focus();
         input.select();
+        trapFocus(modal);
     }, 50);
 
     // Store state for the confirm handler
@@ -6605,8 +6720,13 @@ function confirmBookmarkSave() {
 function closeBookmarkNameModal() {
     const modal = document.getElementById('bookmark-name-modal');
     if (modal) {
+        releaseFocus();
         modal.classList.add('hidden');
         modal._pendingBookmark = null;
+        if (lastFocusedElement) {
+            lastFocusedElement.focus();
+            lastFocusedElement = null;
+        }
     }
 }
 
@@ -7932,12 +8052,12 @@ function getParagraphsInCurrentView() {
 function openExportModal() {
     closeAllModals();
     const modal = document.getElementById('export-modal');
-    if (modal) modal.classList.remove('hidden');
+    if (modal) openModalA11y(modal, modal.querySelector('.close-btn'));
 }
 
 function closeExportModal() {
     const modal = document.getElementById('export-modal');
-    if (modal) modal.classList.add('hidden');
+    if (modal) closeModalA11y(modal);
 }
 
 function exportToJSON() {
@@ -8490,12 +8610,12 @@ function markPrivacyNoticeSeen() {
 function openPrivacyNoticeModal() {
     closeAllModals();
     const modal = document.getElementById('privacy-notice-modal');
-    modal.classList.remove('hidden');
+    openModalA11y(modal, modal.querySelector('.close-btn'));
 }
 
 function closePrivacyNoticeModal() {
     const modal = document.getElementById('privacy-notice-modal');
-    modal.classList.add('hidden');
+    closeModalA11y(modal);
 }
 
 function acceptPrivacyNoticeAndProceed() {
@@ -10139,13 +10259,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function openHeatmapModal() {
         closeAllModals();
         const modal = document.getElementById('heatmap-modal');
-        modal.classList.remove('hidden');
+        openModalA11y(modal, modal.querySelector('.close-btn'));
         displayChapterHeatmap();
     }
 
     function closeHeatmapModal() {
         const modal = document.getElementById('heatmap-modal');
-        modal.classList.add('hidden');
+        closeModalA11y(modal);
     }
 
     function calculateChapterVariation(chapterId) {
@@ -10397,6 +10517,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const modal = document.getElementById('tapestry-modal');
         if (!modal) return;
 
+        lastFocusedElement = document.activeElement;
         modal.classList.remove('hidden');
         renderTapestryDiagram(tapestryData);
         updateTapestryThreadAppearance();
@@ -10413,6 +10534,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         document.addEventListener('keydown', handleTapestryKeydown);
+        requestAnimationFrame(() => {
+            const closeBtn = document.getElementById('tapestry-close-btn');
+            if (closeBtn) closeBtn.focus();
+            trapFocus(modal);
+        });
     }
 
     function showTapestryWelcome() {
@@ -10437,6 +10563,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function closeTapestryModal() {
+        releaseFocus();
         const modal = document.getElementById('tapestry-modal');
         if (modal) {
             modal.classList.add('hidden');
@@ -10446,6 +10573,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (welcome) welcome.classList.add('hidden');
         document.removeEventListener('keydown', handleTapestryKeydown);
         resetTapestryState();
+        if (lastFocusedElement) {
+            lastFocusedElement.focus();
+            lastFocusedElement = null;
+        }
     }
 
     function updateTapestryThemeIcon() {
@@ -10992,6 +11123,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Save main view scroll position to restore when closing
         savedScrollPosition = window.scrollY;
+        lastFocusedElement = document.activeElement;
 
         // Only initialize chapter/paragraph on first open
         // On subsequent opens, preserve where user left off
@@ -11020,6 +11152,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Update theme icon to reflect current theme
         updateGonzoThemeIcon();
+
+        // Focus close button for keyboard access
+        requestAnimationFrame(() => {
+            const closeBtn = document.getElementById('gonzo-close-btn');
+            if (closeBtn) closeBtn.focus();
+        });
     }
 
     function closeGonzoModal() {
@@ -11031,6 +11169,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Restore main view scroll position
         window.scrollTo(0, savedScrollPosition);
+        if (lastFocusedElement) {
+            lastFocusedElement.focus();
+            lastFocusedElement = null;
+        }
     }
 
     function updateGonzoThemeIcon() {
@@ -11051,7 +11193,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function openGonzoAboutModal() {
         const modal = document.getElementById('gonzo-about-modal');
         if (modal) {
-            modal.classList.remove('hidden');
+            openModalA11y(modal, modal.querySelector('.close-btn'));
             if (typeof lucide !== 'undefined') {
                 lucide.createIcons();
             }
@@ -11061,7 +11203,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function closeGonzoAboutModal() {
         const modal = document.getElementById('gonzo-about-modal');
         if (modal) {
-            modal.classList.add('hidden');
+            closeModalA11y(modal);
         }
     }
 
@@ -11281,6 +11423,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (totalParas) {
             totalParas.textContent = maxParagraphs;
         }
+
+        // Announce for screen readers
+        const chapterName = chapterNames[gonzoCurrentChapter] || gonzoCurrentChapter;
+        announce(`${chapterName}, paragraphs ${startIdx + 1} to ${endIdx} of ${maxParagraphs}`);
     }
 
     function updateGonzoNavButtons(maxParagraphs) {

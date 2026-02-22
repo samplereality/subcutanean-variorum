@@ -34,6 +34,9 @@
     <script src="https://cdn.jsdelivr.net/npm/leader-line-new@1.1.9/leader-line.min.js"></script>
 </head>
 <body>
+    <a href="#comparison-display" class="sr-only sr-only-focusable">Skip to main content</a>
+    <h1 class="sr-only">Subcutanean Variorum</h1>
+
     <!-- Main Navigation Bar -->
     <nav class="main-nav" id="main-nav">
         <div class="nav-brand">
@@ -43,19 +46,19 @@
 
         <div class="nav-links" id="nav-links">
             <button class="nav-item" id="nav-about" title="About this project">
-                <i data-lucide="info" class="nav-icon"></i>
+                <i data-lucide="info" class="nav-icon" aria-hidden="true"></i>
                 <span class="nav-label">About</span>
             </button>
-            <button class="nav-item" id="nav-bookmarks" title="Saved views">
-                <i data-lucide="bookmark" class="nav-icon"></i>
+            <button class="nav-item" id="nav-bookmarks" title="Saved views" aria-haspopup="true" aria-expanded="false">
+                <i data-lucide="bookmark" class="nav-icon" aria-hidden="true"></i>
                 <span class="nav-label">Bookmarks</span>
             </button>
-            <button class="nav-item" id="nav-annotations" title="Research notes">
-                <i data-lucide="sticky-note" class="nav-icon"></i>
+            <button class="nav-item" id="nav-annotations" title="Research notes" aria-haspopup="true" aria-expanded="false">
+                <i data-lucide="sticky-note" class="nav-icon" aria-hidden="true"></i>
                 <span class="nav-label">Notes</span>
             </button>
-            <button class="nav-item" id="nav-files" title="Upload files">
-                <i data-lucide="folder-open" class="nav-icon"></i>
+            <button class="nav-item" id="nav-files" title="Upload files" aria-haspopup="true" aria-expanded="false">
+                <i data-lucide="folder-open" class="nav-icon" aria-hidden="true"></i>
                 <span class="nav-label">Files</span>
             </button>
             <!-- <button class="nav-item" id="nav-source" title="Quant source">
@@ -63,19 +66,19 @@
                 <span class="nav-label">Source</span>
             </button> -->
             <button class="nav-item" id="nav-generate" title="Generate your own copy">
-                <i data-lucide="sparkles" class="nav-icon"></i>
+                <i data-lucide="sparkles" class="nav-icon" aria-hidden="true"></i>
                 <span class="nav-label">Generate</span>
             </button>
             <button class="nav-item theme-toggle" id="theme-toggle" title="Toggle light/dark mode">
-                <i data-lucide="sun" class="theme-icon" id="theme-icon"></i>
+                <i data-lucide="sun" class="theme-icon" id="theme-icon" aria-hidden="true"></i>
                 <span class="nav-label" id="theme-label">Light</span>
             </button>
         </div>
 
         <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Menu">
-            <span class="nav-toggle-line"></span>
-            <span class="nav-toggle-line"></span>
-            <span class="nav-toggle-line"></span>
+            <span class="nav-toggle-line" aria-hidden="true"></span>
+            <span class="nav-toggle-line" aria-hidden="true"></span>
+            <span class="nav-toggle-line" aria-hidden="true"></span>
         </button>
     </nav>
 
@@ -107,8 +110,8 @@
     <div class="nav-dropdown" id="annotations-dropdown">
         <div class="dropdown-header">
             <span>Research Notes</span>
-            <span id="annotations-count" class="annotations-badge hidden">0</span>
-            <button id="toggle-note-lines-btn" class="note-lines-toggle active" title="Show/hide connector lines"><i data-lucide="link"></i></button>
+            <span id="annotations-count" class="annotations-badge hidden" aria-live="polite">0</span>
+            <button id="toggle-note-lines-btn" class="note-lines-toggle active" title="Show/hide connector lines" aria-label="Toggle connector lines"><i data-lucide="link" aria-hidden="true"></i></button>
         </div>
         <div class="dropdown-body">
             <p class="annotations-instruction">Double-click any paragraph to add a note.</p>
@@ -136,7 +139,7 @@
                 <input type="file" id="epub-upload" accept=".epub,.txt" style="display: none;">
             </label>
             <button id="manage-uploads-btn" class="tool-btn full-width" title="Manage uploaded versions">Manage Uploads</button>
-            <span id="upload-status" class="upload-status"></span>
+            <span id="upload-status" class="upload-status" aria-live="polite"></span>
         </div>
     </div>
 
@@ -172,91 +175,91 @@
                     <select id="version-c-select" class="version-select">
                         <!-- Options populated by JavaScript -->
                     </select>
-                    <button id="remove-version-c-btn" class="remove-version-btn" title="Remove third version">
-                        <i data-lucide="x"></i>
+                    <button id="remove-version-c-btn" class="remove-version-btn" title="Remove third version" aria-label="Remove third version">
+                        <i data-lucide="x" aria-hidden="true"></i>
                     </button>
                 </div>
 
-                <button id="add-version-c-btn" class="tool-btn add-version-btn" title="Add a third version to compare">
-                    <i data-lucide="plus"></i>
+                <button id="add-version-c-btn" class="tool-btn add-version-btn" title="Add a third version to compare" aria-label="Add third version">
+                    <i data-lucide="plus" aria-hidden="true"></i>
                 </button>
             </div>
 
             <div class="chapter-nav-compact">
-                <button id="chapter-prev-btn" class="chapter-arrow-btn" title="Previous chapter">
-                    <i data-lucide="chevron-left"></i>
+                <button id="chapter-prev-btn" class="chapter-arrow-btn" title="Previous chapter" aria-label="Previous chapter">
+                    <i data-lucide="chevron-left" aria-hidden="true"></i>
                 </button>
                 <select id="chapter-select" class="chapter-select">
                     <!-- Options populated by JavaScript -->
                 </select>
-                <button id="chapter-next-btn" class="chapter-arrow-btn" title="Next chapter">
-                    <i data-lucide="chevron-right"></i>
+                <button id="chapter-next-btn" class="chapter-arrow-btn" title="Next chapter" aria-label="Next chapter">
+                    <i data-lucide="chevron-right" aria-hidden="true"></i>
                 </button>
             </div>
 
             <!-- View dropdown -->
             <div class="control-dropdown" id="view-dropdown">
-                <button id="view-toggle-btn" class="panel-toggle-btn" title="View mode options">
-                    <i data-lucide="layout-grid"></i> <span class="btn-label">View</span>
+                <button id="view-toggle-btn" class="panel-toggle-btn" title="View mode options" aria-haspopup="true" aria-expanded="false">
+                    <i data-lucide="layout-grid" aria-hidden="true"></i> <span class="btn-label">View</span>
                 </button>
-                <div class="dropdown-menu hidden" id="view-menu">
-                    <button class="dropdown-item" data-mode="unified" data-desc="Read a single version without comparison" title="Read a single version without comparison">
-                        <i data-lucide="file-text"></i> Unified
+                <div class="dropdown-menu hidden" id="view-menu" role="menu">
+                    <button class="dropdown-item" data-mode="unified" data-desc="Read a single version without comparison" title="Read a single version without comparison" role="menuitem">
+                        <i data-lucide="file-text" aria-hidden="true"></i> Unified
                     </button>
-                    <button class="dropdown-item active" data-mode="sidebyside" data-desc="Two versions in parallel columns" title="Two versions in parallel columns">
-                        <i data-lucide="columns-2"></i> Side-by-side
+                    <button class="dropdown-item active" data-mode="sidebyside" data-desc="Two versions in parallel columns" title="Two versions in parallel columns" role="menuitem">
+                        <i data-lucide="columns-2" aria-hidden="true"></i> Side-by-side
                     </button>
-                    <button class="dropdown-item" data-mode="diff" data-desc="Word-level additions and deletions between versions" title="Word-level additions and deletions between versions">
-                        <i data-lucide="git-compare"></i> Track Changes
+                    <button class="dropdown-item" data-mode="diff" data-desc="Word-level additions and deletions between versions" title="Word-level additions and deletions between versions" role="menuitem">
+                        <i data-lucide="git-compare" aria-hidden="true"></i> Track Changes
                     </button>
-                    <button class="dropdown-item" data-mode="comparison" data-desc="Table of aligned paragraphs across witnesses" title="Table of aligned paragraphs across witnesses">
-                        <i data-lucide="table"></i> Collation
+                    <button class="dropdown-item" data-mode="comparison" data-desc="Table of aligned paragraphs across witnesses" title="Table of aligned paragraphs across witnesses" role="menuitem">
+                        <i data-lucide="table" aria-hidden="true"></i> Collation
                     </button>
-                    <button class="dropdown-item" data-mode="gonzo" data-desc="Same paragraphs across all 25 versions in a 5x5 grid" title="Same paragraphs across all 25 versions in a 5x5 grid">
-                        <i data-lucide="grid-3x3"></i> Gonzo
+                    <button class="dropdown-item" data-mode="gonzo" data-desc="Same paragraphs across all 25 versions in a 5x5 grid" title="Same paragraphs across all 25 versions in a 5x5 grid" role="menuitem">
+                        <i data-lucide="grid-3x3" aria-hidden="true"></i> Gonzo
                     </button>
-                    <button class="dropdown-item" data-mode="gonzo-cave" data-desc="Walk inside a cube of text, FPS-style immersive reading" title="Walk inside a cube of text, FPS-style immersive reading">
-                        <i data-lucide="box"></i> Gonzo CAVE
+                    <button class="dropdown-item" data-mode="gonzo-cave" data-desc="Walk inside a cube of text, FPS-style immersive reading" title="Walk inside a cube of text, FPS-style immersive reading" role="menuitem">
+                        <i data-lucide="box" aria-hidden="true"></i> Gonzo CAVE
                     </button>
-                    <button class="dropdown-item hidden" id="syntax-toggle-btn" data-desc="Toggle Quant syntax highlighting" title="Toggle Quant syntax highlighting">
-                        <i data-lucide="highlighter"></i> Syntax Highlighting
+                    <button class="dropdown-item hidden" id="syntax-toggle-btn" data-desc="Toggle Quant syntax highlighting" title="Toggle Quant syntax highlighting" role="menuitem">
+                        <i data-lucide="highlighter" aria-hidden="true"></i> Syntax Highlighting
                     </button>
                 </div>
             </div>
 
             <!-- Analyze dropdown -->
             <div class="control-dropdown" id="analyze-dropdown">
-                <button id="analyze-toggle-btn" class="panel-toggle-btn" title="Analysis tools">
-                    <i data-lucide="bar-chart-2"></i> <span class="btn-label">Analyze</span>
+                <button id="analyze-toggle-btn" class="panel-toggle-btn" title="Analysis tools" aria-haspopup="true" aria-expanded="false">
+                    <i data-lucide="bar-chart-2" aria-hidden="true"></i> <span class="btn-label">Analyze</span>
                 </button>
-                <div class="dropdown-menu hidden" id="analyze-menu">
-                    <button class="dropdown-item" id="source-code-mode-btn" data-desc="Click any paragraph to view its underlying Quant source" title="Click any paragraph to view its underlying Quant source">
-                        <i data-lucide="code"></i> Source Code
+                <div class="dropdown-menu hidden" id="analyze-menu" role="menu">
+                    <button class="dropdown-item" id="source-code-mode-btn" data-desc="Click any paragraph to view its underlying Quant source" title="Click any paragraph to view its underlying Quant source" role="menuitem">
+                        <i data-lucide="code" aria-hidden="true"></i> Source Code
                     </button>
-                    <button class="dropdown-item" id="show-vars-btn" data-desc="Show which Quant variables differ between versions" title="Show which Quant variables differ between versions">
-                        <i data-lucide="variable"></i> Variables
+                    <button class="dropdown-item" id="show-vars-btn" data-desc="Show which Quant variables differ between versions" title="Show which Quant variables differ between versions" role="menuitem">
+                        <i data-lucide="variable" aria-hidden="true"></i> Variables
                     </button>
-                    <button class="dropdown-item" id="word-diff-btn" data-desc="Unique vocabulary in each version, click to find in context" title="Unique vocabulary in each version, click to find in context">
-                        <i data-lucide="split"></i> Word Diff
+                    <button class="dropdown-item" id="word-diff-btn" data-desc="Unique vocabulary in each version, click to find in context" title="Unique vocabulary in each version, click to find in context" role="menuitem">
+                        <i data-lucide="split" aria-hidden="true"></i> Word Diff
                     </button>
-                    <button class="dropdown-item" id="heatmap-btn" data-desc="Chapter-by-chapter variation density between versions" title="Chapter-by-chapter variation density between versions">
-                        <i data-lucide="flame"></i> Heatmap
+                    <button class="dropdown-item" id="heatmap-btn" data-desc="Chapter-by-chapter variation density between versions" title="Chapter-by-chapter variation density between versions" role="menuitem">
+                        <i data-lucide="flame" aria-hidden="true"></i> Heatmap
                     </button>
-                    <button class="dropdown-item" id="tapestry-btn" data-desc="10,000 variant threads converging and diverging" title="10,000 variant threads converging and diverging">
-                        <i data-lucide="layers"></i> Tapestry
+                    <button class="dropdown-item" id="tapestry-btn" data-desc="10,000 variant threads converging and diverging" title="10,000 variant threads converging and diverging" role="menuitem">
+                        <i data-lucide="layers" aria-hidden="true"></i> Tapestry
                     </button>
-                    <button class="dropdown-item" id="pathways-btn" data-desc="Key story-state variables plotted across multiple seeds" title="Key story-state variables plotted across multiple seeds">
-                        <i data-lucide="git-branch"></i> Pathways
+                    <button class="dropdown-item" id="pathways-btn" data-desc="Key story-state variables plotted across multiple seeds" title="Key story-state variables plotted across multiple seeds" role="menuitem">
+                        <i data-lucide="git-branch" aria-hidden="true"></i> Pathways
                     </button>
-                    <button class="dropdown-item" id="final-fight-btn" data-desc="The 12 possible arenas of the final confrontation" title="The 12 possible arenas of the final confrontation">
-                        <i data-lucide="swords"></i> Final Fight
+                    <button class="dropdown-item" id="final-fight-btn" data-desc="The 12 possible arenas of the final confrontation" title="The 12 possible arenas of the final confrontation" role="menuitem">
+                        <i data-lucide="swords" aria-hidden="true"></i> Final Fight
                     </button>
                 </div>
             </div>
 
             <!-- Search toggle -->
             <button id="search-toggle-btn" class="panel-toggle-btn" title="Search across chapters">
-                <i data-lucide="search"></i> <span class="btn-label">Search</span>
+                <i data-lucide="search" aria-hidden="true"></i> <span class="btn-label">Search</span>
             </button>
         </div>
 
@@ -271,18 +274,19 @@
     <!-- Search panel (sticky, outside header so it stays visible on scroll) -->
     <div id="search-panel" class="hidden">
         <div class="search-box">
+            <label class="sr-only" for="search-input">Search text</label>
             <input type="text" id="search-input" placeholder="Search text..." />
-            <button id="search-chapter-btn" class="tool-btn" title="Search this chapter"><i data-lucide="search"></i> Chapter</button>
-            <button id="search-all-btn" class="tool-btn" title="Search all chapters"><i data-lucide="search"></i> All</button>
+            <button id="search-chapter-btn" class="tool-btn" title="Search this chapter"><i data-lucide="search" aria-hidden="true"></i> Chapter</button>
+            <button id="search-all-btn" class="tool-btn" title="Search all chapters"><i data-lucide="search" aria-hidden="true"></i> All</button>
             <div class="search-navigation hidden" id="search-navigation">
-                <button id="search-prev-btn" class="search-nav-btn" title="Previous occurrence">&#8592;</button>
+                <button id="search-prev-btn" class="search-nav-btn" title="Previous occurrence" aria-label="Previous match">&#8592;</button>
                 <div class="search-info">
-                    <span id="search-results-count" class="search-count">0 of 0</span>
+                    <span id="search-results-count" class="search-count" aria-live="polite" aria-atomic="true">0 of 0</span>
                     <span id="search-chapter-label" class="search-chapter"></span>
                 </div>
-                <button id="search-next-btn" class="search-nav-btn" title="Next occurrence">&#8594;</button>
+                <button id="search-next-btn" class="search-nav-btn" title="Next occurrence" aria-label="Next match">&#8594;</button>
             </div>
-            <button id="clear-search-btn" class="tool-btn" title="Clear search results"><i data-lucide="x"></i> Clear</button>
+            <button id="clear-search-btn" class="tool-btn" title="Clear search results"><i data-lucide="x" aria-hidden="true"></i> Clear</button>
         </div>
     </div>
 
@@ -291,6 +295,7 @@
             <!-- Comparison will be rendered here -->
         </div>
     </main>
+    <div id="a11y-announcer" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 
     <footer>
         <p>
@@ -300,10 +305,10 @@
     </footer>
 
     <!-- Word Differential Modal -->
-    <div id="word-diff-modal" class="modal hidden">
+    <div id="word-diff-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="word-diff-modal-title">
         <div class="modal-content">
             <div class="modal-header word-diff-modal-header">
-                <h2>Word Diff</h2>
+                <h2 id="word-diff-modal-title">Word Diff</h2>
                 <div class="word-diff-header-controls">
                     <div class="sort-buttons">
                         <button id="sort-alpha-btn" class="sort-btn active" title="Sort words alphabetically">A-Z</button>
@@ -311,7 +316,7 @@
                     </div>
                     <span class="word-diff-instruction">Click a word to see it in context</span>
                 </div>
-                <button id="close-modal-btn" class="close-btn"><i data-lucide="x"></i></button>
+                <button id="close-modal-btn" class="close-btn" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button>
             </div>
             <p id="word-diff-description" style="display: none;"></p>
             <div class="modal-body">
@@ -338,7 +343,7 @@
 
     <!-- Word Chapter Popup -->
     <div id="word-popup" class="word-popup">
-        <button id="word-popup-close" class="word-popup-close"><i data-lucide="x"></i></button>
+        <button id="word-popup-close" class="word-popup-close" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button>
         <div class="word-popup-header">
             Chapters containing "<span id="popup-word"></span>":
         </div>
@@ -348,11 +353,11 @@
     </div>
 
     <!-- Manage Uploads Modal -->
-    <div id="manage-uploads-modal" class="modal hidden">
+    <div id="manage-uploads-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="manage-uploads-modal-title">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Manage Uploaded Versions</h2>
-                <button id="close-manage-modal-btn" class="close-btn"><i data-lucide="x"></i></button>
+                <h2 id="manage-uploads-modal-title">Manage Uploaded Versions</h2>
+                <button id="close-manage-modal-btn" class="close-btn" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button>
             </div>
             <div class="modal-body">
                 <div id="uploads-list" class="uploads-list">
@@ -366,20 +371,20 @@
     </div>
 
     <!-- Privacy Notice Modal -->
-    <div id="privacy-notice-modal" class="modal hidden">
+    <div id="privacy-notice-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="privacy-notice-modal-title">
         <div class="modal-content privacy-notice-content">
             <div class="modal-header">
-                <h2>📁 About File Uploads</h2>
-                <button id="close-privacy-modal-btn" class="close-btn"><i data-lucide="x"></i></button>
+                <h2 id="privacy-notice-modal-title">About File Uploads</h2>
+                <button id="close-privacy-modal-btn" class="close-btn" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button>
             </div>
             <div class="modal-body">
                 <p><strong>Your files stay on your device.</strong></p>
                 <p>When you upload a file, it’s stored only in your browser’s local storage—not on any server. This means:</p>
                 <ul class="check-list">
-                    <li><i data-lucide="check" class="check-icon"></i> Your files are completely private</li>
-                    <li><i data-lucide="check" class="check-icon"></i> No data is transmitted over the internet</li>
-                    <li><i data-lucide="check" class="check-icon"></i> Only you have access to your uploaded versions</li>
-                    <li><i data-lucide="check" class="check-icon"></i> Files persist across browser sessions on this device</li>
+                    <li><i data-lucide="check" class="check-icon" aria-hidden="true"></i> Your files are completely private</li>
+                    <li><i data-lucide="check" class="check-icon" aria-hidden="true"></i> No data is transmitted over the internet</li>
+                    <li><i data-lucide="check" class="check-icon" aria-hidden="true"></i> Only you have access to your uploaded versions</li>
+                    <li><i data-lucide="check" class="check-icon" aria-hidden="true"></i> Files persist across browser sessions on this device</li>
                 </ul>
                 <p class="privacy-note">You can delete uploaded versions anytime using the “Manage Uploads” button.</p>
                 <button id="privacy-understand-btn" class="tool-btn">Got it, proceed with upload</button>
@@ -388,20 +393,20 @@
     </div>
 
     <!-- Manage Uploads Info Modal -->
-    <div id="manage-info-modal" class="modal hidden">
+    <div id="manage-info-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="manage-info-modal-title">
         <div class="modal-content privacy-notice-content">
             <div class="modal-header">
-                <h2><i data-lucide="folder-open" class="modal-header-icon"></i> About Your Uploads</h2>
-                <button id="close-manage-info-modal-btn" class="close-btn"><i data-lucide="x"></i></button>
+                <h2 id="manage-info-modal-title"><i data-lucide="folder-open" class="modal-header-icon" aria-hidden="true"></i> About Your Uploads</h2>
+                <button id="close-manage-info-modal-btn" class="close-btn" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button>
             </div>
             <div class="modal-body">
                 <p><strong>Your uploaded files are stored locally.</strong></p>
                 <p>All versions you’ve uploaded are stored in your browser’s local storage, not on any server:</p>
                 <ul class="check-list">
-                    <li><i data-lucide="check" class="check-icon"></i> Files remain private to this device and browser</li>
-                    <li><i data-lucide="check" class="check-icon"></i> No data is transmitted over the internet</li>
-                    <li><i data-lucide="check" class="check-icon"></i> You can delete any version at any time</li>
-                    <li><i data-lucide="check" class="check-icon"></i> Storage is limited by your browser (typically 5-10 MB)</li>
+                    <li><i data-lucide="check" class="check-icon" aria-hidden="true"></i> Files remain private to this device and browser</li>
+                    <li><i data-lucide="check" class="check-icon" aria-hidden="true"></i> No data is transmitted over the internet</li>
+                    <li><i data-lucide="check" class="check-icon" aria-hidden="true"></i> You can delete any version at any time</li>
+                    <li><i data-lucide="check" class="check-icon" aria-hidden="true"></i> Storage is limited by your browser (typically 5-10 MB)</li>
                 </ul>
                 <p class="privacy-note">Use this manager to view and delete uploaded versions from your browser's storage.</p>
                 <button id="manage-info-understand-btn" class="tool-btn">Got it, show my uploads</button>
@@ -410,11 +415,11 @@
     </div>
 
     <!-- Bookmark Name Modal -->
-    <div id="bookmark-name-modal" class="modal hidden">
+    <div id="bookmark-name-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="bookmark-name-modal-title">
         <div class="modal-content bookmark-name-content">
             <div class="modal-header">
-                <h2><i data-lucide="bookmark" class="modal-header-icon"></i> Save Bookmark</h2>
-                <button id="close-bookmark-name-modal-btn" class="close-btn"><i data-lucide="x"></i></button>
+                <h2 id="bookmark-name-modal-title"><i data-lucide="bookmark" class="modal-header-icon" aria-hidden="true"></i> Save Bookmark</h2>
+                <button id="close-bookmark-name-modal-btn" class="close-btn" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button>
             </div>
             <div class="modal-body">
                 <label class="bookmark-name-label" for="bookmark-name-input">Name</label>
@@ -428,12 +433,12 @@
     </div>
 
     <!-- Annotation Modal -->
-    <div id="annotation-modal" class="modal hidden">
+    <div id="annotation-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="annotation-modal-title">
         <div class="modal-content annotation-modal-content">
             <div class="annotation-modal-header">
                 <span id="annotation-modal-title" class="annotation-title">Add Note</span>
                 <span id="annotation-location" class="annotation-location"></span>
-                <button id="close-annotation-modal-btn" class="close-btn"><i data-lucide="x"></i></button>
+                <button id="close-annotation-modal-btn" class="close-btn" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button>
             </div>
             <div class="annotation-passage-preview">
                 "<span id="annotation-paragraph-preview"></span>"
@@ -448,11 +453,11 @@
     </div>
 
     <!-- Export Modal -->
-    <div id="export-modal" class="modal hidden">
+    <div id="export-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="export-modal-title">
         <div class="modal-content export-modal-content">
             <div class="modal-header">
-                <h2>Export Research Notes</h2>
-                <button id="close-export-modal-btn" class="close-btn"><i data-lucide="x"></i></button>
+                <h2 id="export-modal-title">Export Research Notes</h2>
+                <button id="close-export-modal-btn" class="close-btn" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button>
             </div>
             <div class="modal-body export-modal-body">
                 <p>Export all your bookmarks and annotations for backup or sharing.</p>
@@ -471,11 +476,11 @@
     </div>
 
     <!-- About Modal -->
-    <div id="about-modal" class="modal hidden">
+    <div id="about-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="about-modal-title">
         <div class="modal-content about-modal-content">
             <div class="modal-header">
-                <h2>Subcutanean Variorum</h2>
-                <button id="close-about-modal-btn" class="close-btn"><i data-lucide="x"></i></button>
+                <h2 id="about-modal-title">Subcutanean Variorum</h2>
+                <button id="close-about-modal-btn" class="close-btn" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button>
             </div>
             <div class="modal-body about-modal-body">
                 <h3>Overview</h3>
@@ -509,11 +514,11 @@
     </div>
 
     <!-- Generate Copy Modal -->
-    <div id="generate-modal" class="modal hidden">
+    <div id="generate-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="generate-modal-title">
         <div class="modal-content generate-modal-content">
             <div class="modal-header">
-                <h2>Generate Your Own <em>Subcutanean</em></h2>
-                <button id="close-generate-modal-btn" class="close-btn"><i data-lucide="x"></i></button>
+                <h2 id="generate-modal-title">Generate Your Own <em>Subcutanean</em></h2>
+                <button id="close-generate-modal-btn" class="close-btn" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button>
             </div>
             <div class="modal-body generate-modal-body">
                 <p>In 2025, Aaron Reed released the source text and code of <em>Subcutanean</em> under a CC-BY 4.0 license. This Creative Commons license means anyone can copy, share, modify, or remix the novel as long as credit is given to Reed.</p>
@@ -561,11 +566,11 @@
     </div>
 
     <!-- Chapter Heatmap Modal -->
-    <div id="heatmap-modal" class="modal hidden">
+    <div id="heatmap-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="heatmap-modal-title">
         <div class="modal-content">
             <div class="modal-header heatmap-modal-header">
-                <h2>Chapter Variation: <span id="heatmap-version-a"></span> vs <span id="heatmap-version-b"></span><span id="heatmap-version-c-separator" style="display: none;"> vs </span><span id="heatmap-version-c" style="display: none;"></span></h2>
-                <button id="close-heatmap-modal-btn" class="close-btn"><i data-lucide="x"></i></button>
+                <h2 id="heatmap-modal-title">Chapter Variation: <span id="heatmap-version-a"></span> vs <span id="heatmap-version-b"></span><span id="heatmap-version-c-separator" style="display: none;"> vs </span><span id="heatmap-version-c" style="display: none;"></span></h2>
+                <button id="close-heatmap-modal-btn" class="close-btn" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button>
             </div>
             <div class="modal-body">
                 <div id="heatmap-container" class="heatmap-container">
@@ -582,10 +587,10 @@
     </div>
 
     <!-- Tapestry Visualization Modal -->
-    <div id="tapestry-modal" class="modal hidden tapestry-fullscreen">
+    <div id="tapestry-modal" class="modal hidden tapestry-fullscreen" role="dialog" aria-modal="true" aria-labelledby="tapestry-modal-title">
         <div class="tapestry-container">
             <div class="tapestry-header">
-                <h2>Tapestry</h2>
+                <h2 id="tapestry-modal-title">Tapestry</h2>
                 <p class="tapestry-subtitle">10,000 threads converging and diverging across chapters</p>
                 <div class="tapestry-cluster-filters">
                     <button class="tapestry-cluster-btn" id="tapestry-cluster-0" style="--cluster-color: #ff8800" title="Toggle Club intro">Club Intro</button>
@@ -593,14 +598,14 @@
                     <button class="tapestry-cluster-btn" id="tapestry-cluster-2" style="--cluster-color: #81c784" title="Toggle Noodles intro">Noodles Intro</button>
                 </div>
                 <div class="tapestry-header-actions">
-                    <button class="tapestry-header-btn" id="tapestry-info-btn" title="How to read this chart">
-                        <i data-lucide="info"></i>
+                    <button class="tapestry-header-btn" id="tapestry-info-btn" title="How to read this chart" aria-label="About Tapestry">
+                        <i data-lucide="info" aria-hidden="true"></i>
                     </button>
-                    <button class="tapestry-header-btn" id="tapestry-theme-btn" title="Toggle light/dark mode">
-                        <i data-lucide="sun"></i>
+                    <button class="tapestry-header-btn" id="tapestry-theme-btn" title="Toggle light/dark mode" aria-label="Toggle theme">
+                        <i data-lucide="sun" aria-hidden="true"></i>
                     </button>
-                    <button class="tapestry-header-btn" id="tapestry-close-btn" title="Close">
-                        <i data-lucide="x"></i>
+                    <button class="tapestry-header-btn" id="tapestry-close-btn" title="Close" aria-label="Close Tapestry">
+                        <i data-lucide="x" aria-hidden="true"></i>
                     </button>
                 </div>
             </div>
@@ -623,12 +628,12 @@
     </div>
 
     <!-- Gonzo Mode Modal - 5x5 Grid View of All 25 Versions -->
-    <div id="gonzo-modal" class="modal hidden gonzo-fullscreen">
+    <div id="gonzo-modal" class="modal hidden gonzo-fullscreen" role="dialog" aria-modal="true" aria-labelledby="gonzo-modal-title">
         <div class="gonzo-container">
             <!-- Header with nav controls -->
             <div class="gonzo-header">
                 <div class="gonzo-header-left">
-                    <h2>Gonzo Mode</h2>
+                    <h2 id="gonzo-modal-title">Gonzo Mode</h2>
                     <div class="gonzo-location">
                         <span id="gonzo-chapter-label">Prologue</span>
                         <span class="gonzo-separator">|</span>
@@ -636,14 +641,14 @@
                     </div>
                 </div>
                 <div class="gonzo-header-right">
-                    <button id="gonzo-about-btn" class="gonzo-header-btn" title="About Gonzo Mode">
-                        <i data-lucide="info"></i>
+                    <button id="gonzo-about-btn" class="gonzo-header-btn" title="About Gonzo Mode" aria-label="About Gonzo Mode">
+                        <i data-lucide="info" aria-hidden="true"></i>
                     </button>
-                    <button id="gonzo-theme-btn" class="gonzo-header-btn" title="Toggle light/dark mode">
-                        <i data-lucide="sun"></i>
+                    <button id="gonzo-theme-btn" class="gonzo-header-btn" title="Toggle light/dark mode" aria-label="Toggle theme">
+                        <i data-lucide="sun" aria-hidden="true"></i>
                     </button>
-                    <button id="gonzo-close-btn" class="gonzo-header-btn gonzo-close" title="Close (ESC)">
-                        <i data-lucide="x"></i>
+                    <button id="gonzo-close-btn" class="gonzo-header-btn gonzo-close" title="Close (ESC)" aria-label="Close Gonzo Mode">
+                        <i data-lucide="x" aria-hidden="true"></i>
                     </button>
                 </div>
             </div>
@@ -656,7 +661,7 @@
             <!-- Navigation Controls -->
             <div class="gonzo-controls">
                 <button id="gonzo-prev-btn" class="gonzo-nav-btn" title="Previous paragraphs (Left Arrow)">
-                    <i data-lucide="chevron-left"></i> Prev
+                    <i data-lucide="chevron-left" aria-hidden="true"></i> Prev
                 </button>
 
                 <div class="gonzo-chapter-selector">
@@ -671,19 +676,19 @@
                 </div>
 
                 <button id="gonzo-next-btn" class="gonzo-nav-btn" title="Next paragraphs (Right Arrow)">
-                    Next <i data-lucide="chevron-right"></i>
+                    Next <i data-lucide="chevron-right" aria-hidden="true"></i>
                 </button>
             </div>
         </div>
     </div>
 
     <!-- Gonzo Mode About Modal -->
-    <div id="gonzo-about-modal" class="modal hidden gonzo-about-overlay">
+    <div id="gonzo-about-modal" class="modal hidden gonzo-about-overlay" role="dialog" aria-modal="true" aria-labelledby="gonzo-about-modal-title">
         <div class="modal-content about-modal-content">
             <div class="modal-header">
-                <h2>About Gonzo Mode</h2>
-                <button id="gonzo-about-close-btn" class="close-btn">
-                    <i data-lucide="x"></i>
+                <h2 id="gonzo-about-modal-title">About Gonzo Mode</h2>
+                <button id="gonzo-about-close-btn" class="close-btn" aria-label="Close">
+                    <i data-lucide="x" aria-hidden="true"></i>
                 </button>
             </div>
             <div class="modal-body about-modal-body">
@@ -713,12 +718,12 @@
         </div>
     </div>
 
-    <div id="globals-modal" class="modal hidden">
+    <div id="globals-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="globals-modal-title">
         <div class="modal-content globals-modal-content">
             <div class="modal-header">
-                <h2>globals.txt</h2>
+                <h2 id="globals-modal-title">globals.txt</h2>
                 <p class="modal-description">Global variable and macro definitions for <em>Subcutanean</em></p>
-                <button id="globals-close-btn" class="close-btn"><i data-lucide="x"></i></button>
+                <button id="globals-close-btn" class="close-btn" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button>
             </div>
             <div class="modal-body globals-modal-body" id="globals-modal-body">
                 <pre id="globals-content" class="globals-source-code"></pre>
@@ -727,10 +732,10 @@
     </div>
 
     <!-- Welcome Modal -->
-    <div id="welcome-modal" class="modal hidden">
+    <div id="welcome-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="welcome-modal-title">
         <div class="modal-content welcome-modal-content">
             <div class="welcome-title-area">
-                <h1 class="welcome-title">Subcutanean Variorum</h1>
+                <h1 id="welcome-modal-title" class="welcome-title">Subcutanean Variorum</h1>
                 <p class="welcome-subtitle">Study multiple versions of Aaron Reed’s variable novel</p>
             </div>
             <div class="modal-body welcome-modal-body">
