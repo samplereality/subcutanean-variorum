@@ -6418,6 +6418,21 @@ function closeAboutModal() {
 function openGenerateModal() {
     closeAllModals();
     const modal = document.getElementById('generate-modal');
+
+    // Reset form state in case the modal was previously submitted in this session
+    const form = document.getElementById('subcutanean-form');
+    const responseMsg = document.getElementById('generate-response-msg');
+    const submitBtn = document.getElementById('generate-submit-btn');
+    if (form) {
+        form.style.display = '';
+        form.reset();
+    }
+    if (responseMsg) responseMsg.classList.add('hidden');
+    if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Generate My Variant';
+    }
+
     openModalA11y(modal, document.getElementById('generate-email'));
 }
 
