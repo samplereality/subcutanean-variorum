@@ -91,6 +91,7 @@
             <div class="bookmark-save-section">
                 <textarea id="bookmark-notes-input" class="bookmark-notes-input" placeholder="Add notes about this view (optional)..." rows="2"></textarea>
                 <button id="save-bookmark-btn" class="tool-btn full-width" title="Save the current versions, chapter, and view">Save Current View</button>
+                <button id="copy-link-btn" class="tool-btn full-width" title="Copy a shareable URL to the current view">Copy Link to Current View</button>
             </div>
             <hr class="bookmark-divider">
             <label class="bookmark-label" for="bookmark-select">Saved views:</label>
@@ -233,11 +234,13 @@
                     <i data-lucide="bar-chart-2" aria-hidden="true"></i> <span class="btn-label">Analyze</span>
                 </button>
                 <div class="dropdown-menu hidden" id="analyze-menu" role="menu">
-                    <button class="dropdown-item" id="source-code-mode-btn" data-desc="Click any paragraph to view its underlying Quant source" title="Click any paragraph to view its underlying Quant source" role="menuitem">
+                    <button class="dropdown-item" id="source-code-mode-btn" data-desc="Click any paragraph to view its underlying Quant source" title="Click any paragraph to view its underlying Quant source" role="menuitem" aria-pressed="false">
                         <i data-lucide="code" aria-hidden="true"></i> Source Code
+                        <i data-lucide="check" class="dropdown-toggle-indicator" aria-hidden="true"></i>
                     </button>
-                    <button class="dropdown-item" id="show-vars-btn" data-desc="Show which Quant variables differ between versions" title="Show which Quant variables differ between versions" role="menuitem">
+                    <button class="dropdown-item" id="show-vars-btn" data-desc="Show which Quant variables differ between versions" title="Show which Quant variables differ between versions" role="menuitem" aria-pressed="false">
                         <i data-lucide="variable" aria-hidden="true"></i> Variables
+                        <i data-lucide="check" class="dropdown-toggle-indicator" aria-hidden="true"></i>
                     </button>
                     <button class="dropdown-item" id="word-diff-btn" data-desc="Unique vocabulary in each version, click to find in context" title="Unique vocabulary in each version, click to find in context" role="menuitem">
                         <i data-lucide="split" aria-hidden="true"></i> Word Diff

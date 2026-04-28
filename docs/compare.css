@@ -571,6 +571,7 @@ header {
     color: var(--text-color, #e8e8e8);
     font-size: 0.9rem;
     text-align: left;
+    white-space: nowrap;
     cursor: pointer;
     transition: background-color 0.15s ease;
     position: relative;
@@ -614,6 +615,16 @@ header {
     width: 16px;
     height: 16px;
     flex-shrink: 0;
+}
+
+.dropdown-toggle-indicator {
+    display: none;
+    margin-left: auto;
+    color: var(--accent-color);
+}
+
+.dropdown-item.active .dropdown-toggle-indicator {
+    display: inline-flex;
 }
 
 .dropdown-item.hidden {

@@ -1400,7 +1400,7 @@ async function loadAllVersions() {
 
         // Check URL parameters for deep linking (e.g., ?versionA=60005&chapter=chapter14&mode=unified)
         const urlParams = new URLSearchParams(window.location.search);
-        const hasUrlParams = urlParams.has('versionA') || urlParams.has('versionB') || urlParams.has('chapter') || urlParams.has('mode') || urlParams.has('tool');
+        const hasUrlParams = urlParams.has('versionA') || urlParams.has('versionB') || urlParams.has('versionC') || urlParams.has('chapter') || urlParams.has('mode') || urlParams.has('tool');
 
         if (hasUrlParams) {
             // URL params take priority (deep links from sub-pages like pathways)
@@ -1414,6 +1414,12 @@ async function loadAllVersions() {
                 const paramB = urlParams.get('versionB');
                 if (allVersions[paramB] || customVersions[paramB]) {
                     versionB = paramB;
+                }
+            }
+            if (urlParams.has('versionC')) {
+                const paramC = urlParams.get('versionC');
+                if (allVersions[paramC] || customVersions[paramC]) {
+                    versionC = paramC;
                 }
             }
             if (urlParams.has('chapter')) {
@@ -2784,6 +2790,7 @@ function toggleVariablePanel() {
 
     if (btn) {
         btn.classList.toggle('active', isHidden);
+        btn.setAttribute('aria-pressed', isHidden ? 'true' : 'false');
     }
 
     if (isHidden) {
@@ -2837,6 +2844,7 @@ function toggleSourceCodeMode() {
     const btn = document.getElementById('source-code-mode-btn');
     if (btn) {
         btn.classList.toggle('active', sourceCodeModeEnabled);
+        btn.setAttribute('aria-pressed', sourceCodeModeEnabled ? 'true' : 'false');
     }
 
     if (sourceCodeModeEnabled) {
@@ -2845,7 +2853,10 @@ function toggleSourceCodeMode() {
         if (varsPanel && !varsPanel.classList.contains('hidden')) {
             varsPanel.classList.add('hidden');
             const varsBtn = document.getElementById('show-vars-btn');
-            if (varsBtn) varsBtn.classList.remove('active');
+            if (varsBtn) {
+                varsBtn.classList.remove('active');
+                varsBtn.setAttribute('aria-pressed', 'false');
+            }
             clearVariableHighlights();
         }
     } else {
@@ -6690,6 +6701,48 @@ function updateBookmarkNotesDisplay() {
     }
 }
 
+function copyLinkToCurrentView() {
+    if (!versionA || !versionB) return;
+
+    const params = new URLSearchParams();
+    params.set('versionA', versionA);
+    params.set('versionB', versionB);
+    if (versionC) params.set('versionC', versionC);
+    if (currentChapter) params.set('chapter', currentChapter);
+    if (currentMode) params.set('mode', currentMode);
+
+    const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+    const btn = document.getElementById('copy-link-btn');
+    const originalText = btn ? btn.textContent : null;
+
+    const flash = (msg) => {
+        if (!btn) return;
+        btn.textContent = msg;
+        setTimeout(() => { btn.textContent = originalText; }, 1500);
+    };
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url)
+            .then(() => flash('Copied!'))
+            .catch(() => flash('Copy failed'));
+    } else {
+        // Fallback for older browsers / insecure contexts
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+            document.execCommand('copy');
+            flash('Copied!');
+        } catch (e) {
+            flash('Copy failed');
+        }
+        document.body.removeChild(ta);
+    }
+}
+
 function saveCurrentBookmark() {
     if (!versionA || !versionB) return;
 
@@ -9931,6 +9984,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (saveBookmarkBtn) {
         saveBookmarkBtn.addEventListener('click', saveCurrentBookmark);
+    }
+    const copyLinkBtn = document.getElementById('copy-link-btn');
+    if (copyLinkBtn) {
+        copyLinkBtn.addEventListener('click', copyLinkToCurrentView);
     }
     if (loadBookmarkBtn) {
         loadBookmarkBtn.addEventListener('click', () => {
