@@ -3675,6 +3675,26 @@ main {
     font-style: italic;
 }
 
+.about-modal-body code {
+    font-family: 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 0.85em;
+    background: rgba(255, 136, 0, 0.08);
+    border: 1px solid rgba(255, 136, 0, 0.2);
+    padding: 0.1em 0.4em;
+    border-radius: 3px;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+[data-theme="light"] .about-modal-body code {
+    background: rgba(217, 104, 0, 0.08);
+    border-color: rgba(217, 104, 0, 0.25);
+}
+
+.about-modal-body .deeplink-list li {
+    margin-bottom: 0.85rem;
+}
+
 /* Welcome Modal */
 
 .welcome-modal-content {

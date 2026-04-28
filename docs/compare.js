@@ -1400,7 +1400,7 @@ async function loadAllVersions() {
 
         // Check URL parameters for deep linking (e.g., ?versionA=60005&chapter=chapter14&mode=unified)
         const urlParams = new URLSearchParams(window.location.search);
-        const hasUrlParams = urlParams.has('versionA') || urlParams.has('versionB') || urlParams.has('chapter') || urlParams.has('mode');
+        const hasUrlParams = urlParams.has('versionA') || urlParams.has('versionB') || urlParams.has('chapter') || urlParams.has('mode') || urlParams.has('tool');
 
         if (hasUrlParams) {
             // URL params take priority (deep links from sub-pages like pathways)
@@ -1478,6 +1478,39 @@ async function loadAllVersions() {
             window.history.replaceState({}, '', window.location.pathname);
         }
         refreshBookmarkUI();
+
+        // Deep-link dispatch for Gonzo modes and Analyze tools.
+        // Done after displayComparison() so the underlying view renders first
+        // (Gonzo grid and analyze modals overlay the current comparison).
+        if (hasUrlParams) {
+            const paramMode = urlParams.get('mode');
+            const paramTool = urlParams.get('tool');
+
+            if (paramMode === 'gonzo-cave') {
+                saveViewState();
+                window.location.href = 'cave.html';
+                return;
+            }
+            if (paramMode === 'gonzo' && typeof window.openGonzoModal === 'function') {
+                window.openGonzoModal();
+            }
+
+            if (paramTool) {
+                const toolButtons = {
+                    'source-code': 'source-code-mode-btn',
+                    'variables': 'show-vars-btn',
+                    'word-diff': 'word-diff-btn',
+                    'heatmap': 'heatmap-btn',
+                    'tapestry': 'tapestry-btn',
+                    'pathways': 'pathways-btn',
+                    'final-fight': 'final-fight-btn',
+                    'generate': 'nav-generate',
+                };
+                const btnId = toolButtons[paramTool];
+                const btn = btnId && document.getElementById(btnId);
+                if (btn) btn.click();
+            }
+        }
 
     } catch (error) {
         console.error('Error loading versions:', error);
