@@ -6711,6 +6711,18 @@ function copyLinkToCurrentView() {
     if (currentChapter) params.set('chapter', currentChapter);
     if (currentMode) params.set('mode', currentMode);
 
+    // Include any active persistent tool so the link reopens the same view.
+    // Source Code mode and the Variables panel are mutually exclusive, so a
+    // single tool param suffices. Modal-based tools (word-diff, heatmap, etc.)
+    // are transient and intentionally not encoded.
+    const variablesPanel = document.getElementById('variables-panel');
+    const variablesPanelOpen = variablesPanel && !variablesPanel.classList.contains('hidden');
+    if (sourceCodeModeEnabled) {
+        params.set('tool', 'source-code');
+    } else if (variablesPanelOpen) {
+        params.set('tool', 'variables');
+    }
+
     const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
     const btn = document.getElementById('copy-link-btn');
     const originalText = btn ? btn.textContent : null;
