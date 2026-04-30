@@ -9972,6 +9972,38 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Arrow keys for chapter navigation (left/right)
+    document.addEventListener('keydown', (e) => {
+        if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+        if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
+
+        // Skip when typing in form fields or editable content
+        const ae = document.activeElement;
+        if (ae) {
+            const tag = ae.tagName;
+            if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || ae.isContentEditable) return;
+        }
+
+        // Skip when any modal or fullscreen overlay is visible
+        // (Gonzo and Tapestry register their own arrow handlers; standard modals shouldn't be hijacked)
+        if (document.querySelector('.modal:not(.hidden)')) return;
+        const gonzo = document.getElementById('gonzo-fullscreen');
+        if (gonzo && !gonzo.classList.contains('hidden')) return;
+        const tapestry = document.getElementById('tapestry-modal');
+        if (tapestry && !tapestry.classList.contains('hidden')) return;
+
+        // Skip if no chapters loaded yet
+        if (!availableChapters || availableChapters.length === 0) return;
+
+        const direction = e.key === 'ArrowLeft' ? -1 : 1;
+        const currentIndex = availableChapters.indexOf(currentChapter);
+        const newIndex = currentIndex + direction;
+        if (newIndex < 0 || newIndex >= availableChapters.length) return;
+
+        e.preventDefault();
+        navigateChapter(direction);
+    });
+
     // EPUB upload event listener
     const epubUpload = document.getElementById('epub-upload');
     epubUpload.addEventListener('change', handleEPUBUpload);
