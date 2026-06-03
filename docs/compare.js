@@ -1,5 +1,14 @@
 // Subcutanean Version Comparison Tool
 
+// ============================================
+//  App version (single source of truth)
+//  Bump these together when releasing. Semantic versioning:
+//  MAJOR.MINOR.PATCH. Written into the About modal at load
+//  by renderAppVersion().
+// ============================================
+const APP_VERSION = '1.0.1';
+const APP_UPDATED = 'June 3, 2026';
+
 let allVersions = null;
 let versionIds = [];
 let currentChapter = 'prologue';
@@ -9807,12 +9816,21 @@ function handleEPUBUpload(event) {
 }
 
 // Initialize
+// Write the app version + last-updated date into the About modal.
+function renderAppVersion() {
+    const el = document.getElementById('app-version-line');
+    if (el) {
+        el.textContent = `Version ${APP_VERSION} · Last updated ${APP_UPDATED}`;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize Lucide icons
     if (typeof lucide !== 'undefined') {
         lucide.createIcons();
     }
 
+    renderAppVersion();
     initializeTheme();
     loadShownFeatureTips();
     setupViewModeButtons();
