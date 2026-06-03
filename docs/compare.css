@@ -339,7 +339,7 @@ svg.nav-icon {
     max-height: calc(100vh - 70px);
     overflow-y: auto;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-    z-index: 4900;
+    z-index: 5001; /* Above nav bar (5000) and search panel; fixed, so never scrolls behind nav */
     display: none;
 }
 
@@ -711,11 +711,14 @@ header {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Search panel — sticky below the fixed nav bar */
+/* Search panel — sticky below the fixed nav bar.
+   z-index sits below the View/Analyze dropdown menus (4990) so an open
+   dropdown overlays the search bar, but still above page content and
+   below the nav bar (5000). */
 #search-panel {
     position: sticky;
     top: 50px;
-    z-index: 4999;
+    z-index: 4980;
     background-color: var(--bg-color, #0f1a2a);
     border-bottom: 1px solid rgba(255, 136, 0, 0.2);
     padding: 0.5rem 1rem;

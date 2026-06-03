@@ -6,7 +6,7 @@
 //  MAJOR.MINOR.PATCH. Written into the About modal at load
 //  by renderAppVersion().
 // ============================================
-const APP_VERSION = '1.0.1';
+const APP_VERSION = '1.0.2';
 const APP_UPDATED = 'June 3, 2026';
 
 let allVersions = null;
