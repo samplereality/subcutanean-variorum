@@ -773,6 +773,18 @@
         function updateAllFaceText() {
             if (!allVersions) return;
 
+            // Progressive loading: if this chapter's text hasn't arrived yet,
+            // fetch it and re-render when it lands. Kill scroll momentum so
+            // the reader can't coast through a chapter with no paragraphs.
+            if (progressiveMode && !loadedChapters.has(currentChapter)) {
+                scrollVelocity = 0;
+                scrollAccumulator = 0;
+                ensureChapterLoaded(currentChapter)
+                    .then(() => updateAllFaceText())
+                    .catch(err => console.error('CAVE chapter load failed:', err));
+                return;
+            }
+
             columnTextElements.forEach(el => {
                 const seedId = el.dataset.seedId;
                 const version = allVersions[seedId];
@@ -1092,10 +1104,56 @@
         });
 
         // ── Load data and start ──
+        // Progressive loading: fetch only the current chapter's file up front
+        // (~30-640KB instead of the ~9MB all_versions.json), then load the
+        // remaining chapters in the background. Falls back to the single file
+        // if the split files are missing.
+        let progressiveMode = false;
+        const loadedChapters = new Set();
+        const chapterLoadPromises = {};
+
+        async function fetchChapterFile(chapterId) {
+            const resp = await fetch(`extracted_text/chapters/${encodeURIComponent(chapterId)}.json`);
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            const data = await resp.json();
+            Object.keys(data).forEach(vid => {
+                if (allVersions[vid]) allVersions[vid][chapterId] = data[vid];
+            });
+            loadedChapters.add(chapterId);
+        }
+
+        function ensureChapterLoaded(chapterId) {
+            if (!progressiveMode || loadedChapters.has(chapterId)) return Promise.resolve();
+            if (!chapterLoadPromises[chapterId]) {
+                chapterLoadPromises[chapterId] = fetchChapterFile(chapterId).catch(err => {
+                    delete chapterLoadPromises[chapterId];
+                    throw err;
+                });
+            }
+            return chapterLoadPromises[chapterId];
+        }
+
         async function init() {
             try {
-                const resp = await fetch('extracted_text/all_versions.json');
-                allVersions = await resp.json();
+                try {
+                    const resp = await fetch(`extracted_text/chapters/${encodeURIComponent(currentChapter)}.json`);
+                    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                    const data = await resp.json();
+                    allVersions = {};
+                    SEED_IDS.forEach(id => { allVersions[id] = {}; });
+                    Object.keys(data).forEach(vid => {
+                        if (allVersions[vid]) allVersions[vid][currentChapter] = data[vid];
+                    });
+                    loadedChapters.add(currentChapter);
+                    progressiveMode = true;
+                    // Load the remaining chapters in the background
+                    CHAPTERS.forEach(ch => ensureChapterLoaded(ch).catch(err =>
+                        console.error('CAVE background chapter load failed:', ch, err)));
+                } catch (progressiveError) {
+                    console.warn('Progressive load unavailable, falling back to all_versions.json:', progressiveError);
+                    const resp = await fetch('extracted_text/all_versions.json');
+                    allVersions = await resp.json();
+                }
 
                 loadingScreen.style.display = 'none';
                 buildCube();

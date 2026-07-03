@@ -1074,11 +1074,43 @@ function unpreviewSeed() {
 //  UPLOADED VERSION SCANNING
 // ══════════════════════════════════════
 
-function scanUploadedVersions() {
+// Uploaded versions live in IndexedDB (managed by compare.js); older copies
+// may still sit in localStorage if the main page hasn't migrated them yet.
+// Read-only merge of both sources (IndexedDB wins).
+function readUploadedVersions() {
+  const fromLocalStorage = () => {
+    try {
+      const stored = localStorage.getItem('subcutanean_custom_versions');
+      return stored ? JSON.parse(stored) : {};
+    } catch (e) {
+      return {};
+    }
+  };
+  return new Promise((resolve) => {
+    if (!window.indexedDB) { resolve(fromLocalStorage()); return; }
+    const request = indexedDB.open('subcutanean', 1);
+    request.onupgradeneeded = () => {
+      if (!request.result.objectStoreNames.contains('customVersions')) {
+        request.result.createObjectStore('customVersions');
+      }
+    };
+    request.onsuccess = () => {
+      try {
+        const req = request.result.transaction('customVersions', 'readonly')
+          .objectStore('customVersions').get('all');
+        req.onsuccess = () => resolve({ ...fromLocalStorage(), ...(req.result || {}) });
+        req.onerror = () => resolve(fromLocalStorage());
+      } catch (e) {
+        resolve(fromLocalStorage());
+      }
+    };
+    request.onerror = () => resolve(fromLocalStorage());
+  });
+}
+
+async function scanUploadedVersions() {
   try {
-    const stored = localStorage.getItem('subcutanean_custom_versions');
-    if (!stored) return [];
-    const custom = JSON.parse(stored);
+    const custom = await readUploadedVersions();
     const results = [];
 
     for (const [vid, entry] of Object.entries(custom)) {
@@ -1542,12 +1574,12 @@ let allSeeds = [];
 
 fetch('extracted_text/pathway_viz.json')
   .then(r => r.json())
-  .then(data => {
+  .then(async data => {
     vizData = data;
 
     // Build seed list: built-in + uploaded
     allSeeds = [...data.builtin_seeds];
-    const uploaded = scanUploadedVersions();
+    const uploaded = await scanUploadedVersions();
     allSeeds.push(...uploaded);
 
     render();

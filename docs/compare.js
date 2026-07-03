@@ -6,8 +6,8 @@
 //  MAJOR.MINOR.PATCH. Written into the About modal at load
 //  by renderAppVersion().
 // ============================================
-const APP_VERSION = '1.0.2';
-const APP_UPDATED = 'June 3, 2026';
+const APP_VERSION = '1.1.0';
+const APP_UPDATED = 'July 3, 2026';
 
 let allVersions = null;
 let versionIds = [];
@@ -1390,15 +1390,125 @@ function isVersionSelectable(versionId) {
     return !!allVersions[versionId];
 }
 
+// ============================================
+//  Progressive version loading
+//  Startup fetches versions_index.json (~24KB) plus the initial chapter's
+//  file (~30-640KB) instead of the ~9MB all_versions.json, then loads the
+//  remaining chapters in the background. Chapter keys in the skeleton are
+//  null placeholders (keeps buildChapterNavigation complete) until their
+//  file arrives. Whole-book features must await ensureFullVersionsLoaded().
+//  If the split files are missing, falls back to the single-file load.
+// ============================================
+let progressiveMode = false;
+let loadedChapters = new Set();
+let chapterLoadPromises = {};
+let fullVersionsPromise = null;
+
+// Best guess at the first chapter to display, made before the existing
+// URL-param/saved-state logic runs. A wrong guess is self-healing: the
+// displayComparison gate lazy-fetches whatever chapter ends up current.
+function peekInitialChapter() {
+    try {
+        const param = new URLSearchParams(window.location.search).get('chapter');
+        if (param) return param;
+        const raw = sessionStorage.getItem('subcutanean_view_state');
+        if (raw) {
+            const saved = JSON.parse(raw);
+            if (saved && saved.chapter) return saved.chapter;
+        }
+    } catch (e) {
+        // fall through to default
+    }
+    return currentChapter;
+}
+
+async function fetchChapterFile(chapterId) {
+    const resp = await fetch(`extracted_text/chapters/${encodeURIComponent(chapterId)}.json`);
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const data = await resp.json();
+    Object.keys(data).forEach(vid => {
+        if (allVersions[vid]) {
+            allVersions[vid][chapterId] = data[vid];
+        }
+    });
+    loadedChapters.add(chapterId);
+}
+
+function ensureChapterLoaded(chapterId) {
+    if (!progressiveMode || loadedChapters.has(chapterId)) return Promise.resolve();
+    if (!chapterLoadPromises[chapterId]) {
+        chapterLoadPromises[chapterId] = fetchChapterFile(chapterId).catch(err => {
+            delete chapterLoadPromises[chapterId];
+            throw err;
+        });
+    }
+    return chapterLoadPromises[chapterId];
+}
+
+// Resolves when every chapter of every built-in version is in memory.
+// Await this before whole-book operations (global search, word diff,
+// Jaccard, heatmap, EPUB export).
+function ensureFullVersionsLoaded() {
+    return fullVersionsPromise || Promise.resolve();
+}
+
+async function loadVersionsProgressive() {
+    const initialChapter = peekInitialChapter();
+    const [indexResp, chapterResp] = await Promise.all([
+        fetch('extracted_text/versions_index.json'),
+        fetch(`extracted_text/chapters/${encodeURIComponent(initialChapter)}.json`).catch(() => null),
+    ]);
+    if (!indexResp.ok) throw new Error(`versions_index.json HTTP ${indexResp.status}`);
+    const index = await indexResp.json();
+
+    allVersions = {};
+    const allChapterIds = new Set();
+    Object.keys(index).forEach(vid => {
+        const meta = index[vid];
+        const version = { version_id: meta.version_id, variables: meta.variables || [] };
+        (meta.chapters || []).forEach(ch => {
+            version[ch] = null;
+            allChapterIds.add(ch);
+        });
+        allVersions[vid] = version;
+    });
+    versionIds = Object.keys(allVersions).sort();
+    progressiveMode = true;
+
+    if (chapterResp && chapterResp.ok) {
+        const data = await chapterResp.json();
+        Object.keys(data).forEach(vid => {
+            if (allVersions[vid]) allVersions[vid][initialChapter] = data[vid];
+        });
+        loadedChapters.add(initialChapter);
+    }
+
+    // Load every remaining chapter in the background
+    fullVersionsPromise = Promise.all(
+        [...allChapterIds].map(ch =>
+            ensureChapterLoaded(ch).catch(err =>
+                console.error(`Background load failed for ${ch}:`, err))
+        )
+    ).then(() => {});
+}
+
 // Load all versions data
 async function loadAllVersions() {
     try {
-        const response = await fetch('extracted_text/all_versions.json');
-        allVersions = await response.json();
-        versionIds = Object.keys(allVersions).sort();
+        try {
+            await loadVersionsProgressive();
+        } catch (progressiveError) {
+            // Split files missing or failed — fall back to the single file
+            console.warn('Progressive load unavailable, falling back to all_versions.json:', progressiveError);
+            const response = await fetch('extracted_text/all_versions.json');
+            allVersions = await response.json();
+            versionIds = Object.keys(allVersions).sort();
+            progressiveMode = false;
+            fullVersionsPromise = Promise.resolve();
+        }
 
-        // Load custom versions from localStorage
-        loadCustomVersions();
+        // Load uploaded versions (IndexedDB, with legacy localStorage migration)
+        await loadCustomVersions();
 
         // Populate version selectors
         populateVersionSelectors();
@@ -1409,7 +1519,7 @@ async function loadAllVersions() {
 
         // Check URL parameters for deep linking (e.g., ?versionA=60005&chapter=chapter14&mode=unified)
         const urlParams = new URLSearchParams(window.location.search);
-        const hasUrlParams = urlParams.has('versionA') || urlParams.has('versionB') || urlParams.has('versionC') || urlParams.has('chapter') || urlParams.has('mode') || urlParams.has('tool');
+        const hasUrlParams = urlParams.has('versionA') || urlParams.has('versionB') || urlParams.has('versionC') || urlParams.has('chapter') || urlParams.has('mode') || urlParams.has('tool') || urlParams.has('note');
 
         if (hasUrlParams) {
             // URL params take priority (deep links from sub-pages like pathways)
@@ -1524,6 +1634,20 @@ async function loadAllVersions() {
                 const btnId = toolButtons[paramTool];
                 const btn = btnId && document.getElementById(btnId);
                 if (btn) btn.click();
+            }
+
+            // Shared note link — the annotation travels in the URL
+            if (urlParams.has('note')) {
+                try {
+                    const shared = decodeSharedNote(urlParams.get('note'));
+                    if (shared && typeof shared.n === 'string' && shared.n &&
+                        typeof shared.v === 'string' && typeof shared.ch === 'string' &&
+                        Number.isInteger(shared.p) && shared.p >= 0) {
+                        openSharedNotePanel(shared);
+                    }
+                } catch (e) {
+                    console.warn('Ignoring malformed shared note link:', e);
+                }
             }
         }
 
@@ -3708,6 +3832,18 @@ function displayComparison() {
     if (!allVersions || !versionA || !versionB) {
         return;
     }
+    // Progressive loading: if a selected built-in version needs a chapter
+    // that isn't in memory yet, fetch its file and re-render when it lands.
+    if (progressiveMode && !loadedChapters.has(currentChapter) &&
+        [versionA, versionB, versionC].some(v => v && allVersions[v])) {
+        display.innerHTML = '<p class="loading">Loading chapter...</p>';
+        ensureChapterLoaded(currentChapter)
+            .then(() => displayComparison())
+            .catch(() => {
+                display.innerHTML = '<p class="loading">Error loading chapter data.</p>';
+            });
+        return;
+    }
     if (isSourceCodeVisible() && (currentMode === 'diff' || currentMode === 'comparison')) {
         currentMode = 'sidebyside';
         // Update dropdown active state
@@ -5285,7 +5421,7 @@ function findChaptersWithMatches(searchTerm, wholeWord = false) {
     return chapters;
 }
 
-function performSearch() {
+async function performSearch() {
     const searchInput = document.getElementById('search-input');
     const searchTerm = searchInput.value.trim();
 
@@ -5296,6 +5432,8 @@ function performSearch() {
     const ww = searchWholeWord;
 
     if (searchScope === 'global') {
+        // Cross-chapter search needs every chapter in memory
+        await ensureFullVersionsLoaded();
         // Global: find all chapters with matches, jump to first if needed
         searchMatchChapters = findChaptersWithMatches(searchTerm, ww);
 
@@ -5586,7 +5724,9 @@ function findSimilarVersions(uploadedVersionId) {
     };
 }
 
-function calculateWordDifferential() {
+async function calculateWordDifferential() {
+    // Compares full-book vocabulary — needs every chapter in memory
+    await ensureFullVersionsLoaded();
     const modal = document.getElementById('word-diff-modal');
     const seedALabel = document.getElementById('seed-a-label');
     const seedBLabel = document.getElementById('seed-b-label');
@@ -6176,6 +6316,8 @@ ${navItems}
 }
 
 async function downloadEPUB(versionId) {
+    // EPUB serializes every chapter
+    await ensureFullVersionsLoaded();
     const versionData = allVersions[versionId];
     if (!versionData) {
         showNotification('Version data not found', 'error');
@@ -6290,7 +6432,7 @@ function deleteCustomVersion(versionId) {
             delete allVersions[versionId];
             invalidateVersionCaches(versionId);
 
-            // Save to localStorage
+            // Persist uploaded versions
             saveCustomVersions();
 
             // If either selected version was deleted, reset to default versions
@@ -7171,37 +7313,10 @@ function getAnnotationByKey(key) {
     );
 }
 
-function openAnnotationModal(paragraphIndex, paragraphText, version, clickEvent) {
-    // Create a floating note panel instead of a modal
-    const key = createAnnotationKey(version, currentChapter, paragraphIndex);
-
-    // Toggle: if panel for this annotation is already open, close it
-    const existingEntry = Object.entries(openNotePanels).find(([, p]) => p.annotationKey === key);
-    if (existingEntry) {
-        closeNotePanel(existingEntry[0]);
-        return;
-    }
-
-    const existing = getAnnotationByKey(key);
-    // Strip HTML tags and the annotation indicator emoji
-    const cleanText = paragraphText.replace(/<[^>]*>/g, '').replace(/📝\s*/g, '').trim();
-    // Limit to ~80 chars to fit in 2 lines
-    const previewText = cleanText.length > 80 ? cleanText.substring(0, 80) + '…' : cleanText;
-    const locationText = `${formatVersionLabel(version)} — ${formatChapterLabel(currentChapter)}, ¶${paragraphIndex + 1}`;
-
-    // Create the floating panel
-    const panelId = `note-panel-${Date.now()}`;
-    const panel = document.createElement('div');
-    panel.className = 'note-panel';
-    panel.id = panelId;
-    panel.dataset.annotationKey = key;
-    panel.dataset.paragraphIndex = paragraphIndex;
-    panel.dataset.paragraphPreview = cleanText.substring(0, 50);
-    panel.dataset.version = version;
-    panel.dataset.chapter = currentChapter;
-    panel.dataset.annotationId = existing ? existing.id : '';
-
-    // Position panel to the side of the paragraph (absolute positioning, page coordinates)
+// Position a note panel beside its paragraph (right side preferred, left
+// fallback, above/below when cramped). clickEvent may be a real event or a
+// synthetic { target, clientX, clientY }; without one, panels cascade.
+function positionNotePanel(panel, clickEvent) {
     const panelWidth = 320;
     const panelHeight = 250; // approximate
     const scrollX = window.scrollX;
@@ -7256,6 +7371,39 @@ function openAnnotationModal(paragraphIndex, paragraphText, version, clickEvent)
 
     panel.style.top = `${top}px`;
     panel.style.left = `${left}px`;
+}
+
+function openAnnotationModal(paragraphIndex, paragraphText, version, clickEvent) {
+    // Create a floating note panel instead of a modal
+    const key = createAnnotationKey(version, currentChapter, paragraphIndex);
+
+    // Toggle: if panel for this annotation is already open, close it
+    const existingEntry = Object.entries(openNotePanels).find(([, p]) => p.annotationKey === key);
+    if (existingEntry) {
+        closeNotePanel(existingEntry[0]);
+        return;
+    }
+
+    const existing = getAnnotationByKey(key);
+    // Strip HTML tags and the annotation indicator emoji
+    const cleanText = paragraphText.replace(/<[^>]*>/g, '').replace(/📝\s*/g, '').trim();
+    // Limit to ~80 chars to fit in 2 lines
+    const previewText = cleanText.length > 80 ? cleanText.substring(0, 80) + '…' : cleanText;
+    const locationText = `${formatVersionLabel(version)} — ${formatChapterLabel(currentChapter)}, ¶${paragraphIndex + 1}`;
+
+    // Create the floating panel
+    const panelId = `note-panel-${Date.now()}`;
+    const panel = document.createElement('div');
+    panel.className = 'note-panel';
+    panel.id = panelId;
+    panel.dataset.annotationKey = key;
+    panel.dataset.paragraphIndex = paragraphIndex;
+    panel.dataset.paragraphPreview = cleanText.substring(0, 50);
+    panel.dataset.version = version;
+    panel.dataset.chapter = currentChapter;
+    panel.dataset.annotationId = existing ? existing.id : '';
+
+    positionNotePanel(panel, clickEvent);
     panel.style.zIndex = ++notePanelZIndex;
 
     panel.innerHTML = `
@@ -7267,6 +7415,7 @@ function openAnnotationModal(paragraphIndex, paragraphText, version, clickEvent)
         <textarea class="note-panel-textarea" placeholder="Add your note..." ${existing ? 'readonly' : ''}>${existing ? existing.note : ''}</textarea>
         <div class="note-panel-actions">
             <button class="note-panel-delete ${existing ? '' : 'hidden'}" title="Delete annotation"><i data-lucide="trash-2"></i> Delete</button>
+            <button class="note-panel-share ${existing ? '' : 'hidden'}" title="Copy a shareable link to this note"><i data-lucide="share-2"></i> Share</button>
             <button class="note-panel-edit ${existing ? '' : 'hidden'}" title="Edit annotation"><i data-lucide="pencil"></i> Edit</button>
             <button class="note-panel-save ${existing ? 'hidden' : ''}"><i data-lucide="save"></i> Save</button>
         </div>
@@ -7390,6 +7539,14 @@ function setupNotePanelEvents(panel) {
             showDeleteConfirmModal(panel.id, annotationId);
         }
     });
+
+    // Share button - copies a link that carries the note in the URL
+    const shareBtn = panel.querySelector('.note-panel-share');
+    if (shareBtn) {
+        shareBtn.addEventListener('click', () => {
+            copyShareableNoteLink(panel, shareBtn);
+        });
+    }
 
     // Auto-save on Ctrl+Enter
     textarea.addEventListener('keydown', (e) => {
@@ -7645,8 +7802,10 @@ function saveNotePanel(panel) {
             note: note
         };
         panel.dataset.annotationId = id;
-        // Show delete button now that annotation exists
+        // Show delete/share buttons now that annotation exists
         panel.querySelector('.note-panel-delete').classList.remove('hidden');
+        const shareBtn = panel.querySelector('.note-panel-share');
+        if (shareBtn) shareBtn.classList.remove('hidden');
     }
 
     const isNew = !existingId;
@@ -7678,6 +7837,199 @@ function saveNotePanel(panel) {
             editBtn.classList.remove('hidden');
         }, 800);
     }
+}
+
+// ============================================
+//  Shareable note links
+//  The annotation travels IN the URL (base64url-encoded JSON in a ?note=
+//  param) — nothing is stored server-side, so links work for recipients
+//  who have never seen the note. Payload: { v: version, ch: chapter,
+//  p: paragraphIndex, pp: paragraphPreview, n: note text }.
+// ============================================
+
+function encodeSharedNote(payload) {
+    const bytes = new TextEncoder().encode(JSON.stringify(payload));
+    let binary = '';
+    bytes.forEach(b => { binary += String.fromCharCode(b); });
+    return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+function decodeSharedNote(encoded) {
+    const b64 = encoded.replace(/-/g, '+').replace(/_/g, '/');
+    const binary = atob(b64);
+    const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
+    return JSON.parse(new TextDecoder().decode(bytes));
+}
+
+function buildShareableNoteLink(panel) {
+    const textarea = panel.querySelector('.note-panel-textarea');
+    const payload = {
+        v: panel.dataset.version,
+        ch: panel.dataset.chapter,
+        p: parseInt(panel.dataset.paragraphIndex),
+        pp: panel.dataset.paragraphPreview || '',
+        n: textarea.value.trim()
+    };
+
+    const params = new URLSearchParams();
+    // Make sure the annotated version is part of the recipient's view
+    let linkVersionA = versionA;
+    if (payload.v !== versionA && payload.v !== versionB && payload.v !== versionC) {
+        linkVersionA = payload.v;
+    }
+    params.set('versionA', linkVersionA);
+    params.set('versionB', versionB);
+    if (versionC) params.set('versionC', versionC);
+    params.set('chapter', payload.ch);
+    if (['unified', 'sidebyside', 'comparison', 'diff', 'collation'].includes(currentMode)) {
+        params.set('mode', currentMode);
+    }
+    params.set('note', encodeSharedNote(payload));
+
+    return `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+}
+
+async function copyShareableNoteLink(panel, shareBtn) {
+    const url = buildShareableNoteLink(panel);
+
+    if (customVersions[panel.dataset.version]) {
+        showNotification('This note is on an uploaded version — the link only works for someone who has uploaded the same file.', 'warning');
+    }
+    if (url.length > 2000) {
+        showNotification('This note is long, so the link may not work in every browser or email client.', 'warning');
+    }
+
+    let copied = false;
+    try {
+        await navigator.clipboard.writeText(url);
+        copied = true;
+    } catch (e) {
+        // Clipboard API unavailable (e.g. insecure context) — fallback
+        const temp = document.createElement('textarea');
+        temp.value = url;
+        temp.style.position = 'fixed';
+        temp.style.opacity = '0';
+        document.body.appendChild(temp);
+        temp.select();
+        try { copied = document.execCommand('copy'); } catch (e2) { copied = false; }
+        temp.remove();
+    }
+
+    if (copied) {
+        const original = shareBtn.innerHTML;
+        shareBtn.innerHTML = 'Copied!';
+        shareBtn.disabled = true;
+        setTimeout(() => {
+            shareBtn.innerHTML = original;
+            shareBtn.disabled = false;
+            if (typeof lucide !== 'undefined') lucide.createIcons({ nodes: [shareBtn] });
+        }, 1200);
+    } else {
+        showNotification('Could not copy the link to the clipboard.', 'error');
+    }
+}
+
+// Open a floating panel for a note that arrived via a shared link.
+// The note is NOT saved locally unless the reader clicks "Save to My Notes".
+function openSharedNotePanel(shared) {
+    const versionAvailable = (allVersions && allVersions[shared.v]) || customVersions[shared.v];
+    if (!versionAvailable) {
+        showNotification(`This shared note is on Seed ${shared.v}, which isn't available in this browser.`, 'warning');
+        return;
+    }
+
+    // Wait for the deep-linked view to render before positioning
+    setTimeout(() => {
+        const annotationLike = {
+            version: shared.v,
+            chapter: shared.ch,
+            paragraphIndex: shared.p,
+            paragraphPreview: shared.pp || ''
+        };
+        scrollToAnnotatedParagraph(annotationLike);
+
+        const panelId = `note-panel-shared-${Date.now()}`;
+        const panel = document.createElement('div');
+        panel.className = 'note-panel shared-note-panel';
+        panel.id = panelId;
+        panel.dataset.annotationKey = createAnnotationKey(shared.v, shared.ch, shared.p);
+        panel.dataset.paragraphIndex = shared.p;
+        panel.dataset.paragraphPreview = (shared.pp || '').substring(0, 50);
+        panel.dataset.version = shared.v;
+        panel.dataset.chapter = shared.ch;
+        panel.dataset.annotationId = '';
+
+        const container = document.getElementById('comparison-display');
+        const targetPara = container ? container.querySelector(`[data-paragraph-index="${shared.p}"]`) : null;
+        positionNotePanel(panel, targetPara ? { target: targetPara, clientX: 0, clientY: 0 } : null);
+        panel.style.zIndex = ++notePanelZIndex;
+
+        // Note text and previews are URL-controlled — never interpolate them
+        // into innerHTML; assign via value/textContent below instead.
+        panel.innerHTML = `
+            <div class="note-panel-header">
+                <span class="note-panel-location"></span>
+                <span class="note-panel-shared-tag">Shared</span>
+                <button class="note-panel-close" title="Close"><i data-lucide="x"></i></button>
+            </div>
+            <div class="note-panel-preview"></div>
+            <textarea class="note-panel-textarea" readonly></textarea>
+            <div class="note-panel-actions">
+                <button class="note-panel-delete hidden"></button>
+                <button class="note-panel-edit hidden"></button>
+                <button class="note-panel-save hidden"></button>
+                <button class="note-panel-save-shared" title="Add this note to your own annotations"><i data-lucide="save"></i> Save to My Notes</button>
+            </div>
+        `;
+
+        panel.querySelector('.note-panel-location').textContent =
+            `${formatVersionLabel(shared.v)} — ${formatChapterLabel(shared.ch)}, ¶${shared.p + 1}`;
+        const preview = (shared.pp || '').trim();
+        panel.querySelector('.note-panel-preview').textContent =
+            preview.length > 80 ? preview.substring(0, 80) + '…' : preview;
+        panel.querySelector('.note-panel-textarea').value = shared.n;
+
+        document.body.appendChild(panel);
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons({ nodes: [panel] });
+        }
+
+        openNotePanels[panelId] = {
+            element: panel,
+            annotationKey: panel.dataset.annotationKey,
+            position: { top: panel.style.top, left: panel.style.left }
+        };
+
+        setupNotePanelEvents(panel);
+        createNoteLine(panelId);
+
+        const saveSharedBtn = panel.querySelector('.note-panel-save-shared');
+        saveSharedBtn.addEventListener('click', () => {
+            if (getAnnotationByKey(panel.dataset.annotationKey)) {
+                showNotification('You already have a note on this paragraph. Edit it from the Notes menu.', 'warning');
+                return;
+            }
+            const now = new Date().toISOString();
+            const id = `annotation-${Date.now()}`;
+            annotations[id] = {
+                id: id,
+                created: now,
+                modified: now,
+                version: shared.v,
+                chapter: shared.ch,
+                paragraphIndex: shared.p,
+                paragraphPreview: (shared.pp || '').substring(0, 50),
+                note: shared.n
+            };
+            saveAnnotationsToStorage();
+            refreshAnnotationsUI();
+            markAnnotatedParagraphs();
+
+            saveSharedBtn.innerHTML = 'Saved!';
+            saveSharedBtn.disabled = true;
+            setTimeout(() => closeNotePanel(panelId), 800);
+        });
+    }, 600);
 }
 
 function getOpenNotePanelsState() {
@@ -8764,21 +9116,89 @@ function acceptPrivacyNoticeAndProceed() {
 
 // EPUB Upload and Processing
 
-function loadCustomVersions() {
-    try {
-        const stored = localStorage.getItem('subcutanean_custom_versions');
-        if (stored) {
-            const parsed = JSON.parse(stored);
-            customVersions = parsed;
+// Uploaded versions are stored in IndexedDB rather than localStorage:
+// localStorage's ~5MB quota fills up after a few full-novel uploads.
+// Legacy localStorage data ('subcutanean_custom_versions') is migrated
+// into IndexedDB on first load, then removed. pathways.html and
+// final_fight.html read the same store (read-only).
+const UPLOADS_DB_NAME = 'subcutanean';
+const UPLOADS_STORE = 'customVersions';
+const UPLOADS_KEY = 'all';
+let uploadsDbPromise = null;
 
-            // Merge custom versions into allVersions
-            Object.keys(customVersions).forEach(vid => {
-                allVersions[vid] = customVersions[vid].data;
+function openUploadsDb() {
+    if (!uploadsDbPromise) {
+        uploadsDbPromise = new Promise((resolve, reject) => {
+            if (!window.indexedDB) {
+                reject(new Error('IndexedDB unavailable'));
+                return;
+            }
+            const request = indexedDB.open(UPLOADS_DB_NAME, 1);
+            request.onupgradeneeded = () => {
+                if (!request.result.objectStoreNames.contains(UPLOADS_STORE)) {
+                    request.result.createObjectStore(UPLOADS_STORE);
+                }
+            };
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+        uploadsDbPromise.catch(() => { uploadsDbPromise = null; });
+    }
+    return uploadsDbPromise;
+}
+
+async function idbGetCustomVersions() {
+    const db = await openUploadsDb();
+    return new Promise((resolve, reject) => {
+        const req = db.transaction(UPLOADS_STORE, 'readonly')
+            .objectStore(UPLOADS_STORE).get(UPLOADS_KEY);
+        req.onsuccess = () => resolve(req.result || null);
+        req.onerror = () => reject(req.error);
+    });
+}
+
+async function idbSetCustomVersions(versions) {
+    const db = await openUploadsDb();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(UPLOADS_STORE, 'readwrite');
+        tx.objectStore(UPLOADS_STORE).put(versions, UPLOADS_KEY);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+        tx.onabort = () => reject(tx.error);
+    });
+}
+
+async function loadCustomVersions() {
+    let fromIdb = null;
+    try {
+        fromIdb = await idbGetCustomVersions();
+    } catch (error) {
+        console.error('Error reading custom versions from IndexedDB:', error);
+    }
+    customVersions = fromIdb || {};
+
+    // One-time migration of legacy localStorage data. The localStorage key
+    // is only removed after the data is safely written to IndexedDB.
+    try {
+        const legacy = localStorage.getItem('subcutanean_custom_versions');
+        if (legacy) {
+            const parsed = JSON.parse(legacy);
+            Object.keys(parsed).forEach(vid => {
+                if (!customVersions[vid]) {
+                    customVersions[vid] = parsed[vid];
+                }
             });
+            await idbSetCustomVersions(customVersions);
+            localStorage.removeItem('subcutanean_custom_versions');
         }
     } catch (error) {
-        console.error('Error loading custom versions:', error);
+        console.error('Error migrating custom versions from localStorage:', error);
     }
+
+    // Merge custom versions into allVersions
+    Object.keys(customVersions).forEach(vid => {
+        allVersions[vid] = customVersions[vid].data;
+    });
 }
 
 async function loadOriginSources() {
@@ -9105,13 +9525,19 @@ function inferVariablesFromText(chapters) {
     return inferredVars;
 }
 
-function saveCustomVersions() {
+async function saveCustomVersions() {
     try {
-        localStorage.setItem('subcutanean_custom_versions', JSON.stringify(customVersions));
+        await idbSetCustomVersions(customVersions);
     } catch (error) {
-        console.error('Error saving custom versions:', error);
-        if (error.name === 'QuotaExceededError') {
-            showUploadStatus('Storage limit exceeded. Try removing other uploaded versions.', 'error');
+        console.error('Error saving custom versions to IndexedDB:', error);
+        // Fall back to localStorage (works for small uploads)
+        try {
+            localStorage.setItem('subcutanean_custom_versions', JSON.stringify(customVersions));
+        } catch (lsError) {
+            console.error('Error saving custom versions:', lsError);
+            if (lsError.name === 'QuotaExceededError') {
+                showUploadStatus('Storage limit exceeded. Try removing other uploaded versions.', 'error');
+            }
         }
     }
 }
@@ -9290,7 +9716,7 @@ async function processEPUBFile(file) {
         // Merge into allVersions
         allVersions[versionId] = versionData;
 
-        // Save to localStorage
+        // Persist uploaded versions
         saveCustomVersions();
 
         // Refresh version selectors
@@ -9757,7 +10183,7 @@ async function processTextFile(file) {
         // Merge into allVersions
         allVersions[versionId] = versionData;
 
-        // Save to localStorage
+        // Persist uploaded versions
         saveCustomVersions();
 
         // Refresh version selectors
@@ -10260,11 +10686,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Jaccard Distance functionality
-    function openJaccardModal() {
+    async function openJaccardModal() {
         closeAllModals();
         const modal = document.getElementById('levenshtein-modal');
         modal.classList.remove('hidden');
 
+        // Vocabulary comparison spans the whole book
+        await ensureFullVersionsLoaded();
         displayJaccardAnalysis();
     }
 
@@ -10518,7 +10946,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function displayChapterHeatmap() {
+    async function displayChapterHeatmap() {
+        // Chapter-by-chapter variation needs every chapter in memory
+        await ensureFullVersionsLoaded();
         // Update version labels
         document.getElementById('heatmap-version-a').textContent = formatVersionLabel(versionA);
         document.getElementById('heatmap-version-b').textContent = formatVersionLabel(versionB);
@@ -11498,6 +11928,18 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderGonzoGrid() {
         const grid = document.getElementById('gonzo-grid');
         if (!grid || !allVersions) return;
+
+        // Progressive loading: the grid reads gonzoCurrentChapter for all
+        // 25 versions — fetch that chapter's file first if not yet loaded
+        if (progressiveMode && !loadedChapters.has(gonzoCurrentChapter)) {
+            grid.innerHTML = '<p class="loading">Loading chapter...</p>';
+            ensureChapterLoaded(gonzoCurrentChapter)
+                .then(() => renderGonzoGrid())
+                .catch(() => {
+                    grid.innerHTML = '<p class="loading">Error loading chapter data.</p>';
+                });
+            return;
+        }
 
         // Reset cross-highlight state (grid.innerHTML wipes the marks)
         if (gonzoCrossHighlightActive) {

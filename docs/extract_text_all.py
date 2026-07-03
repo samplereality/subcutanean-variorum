@@ -244,6 +244,8 @@ def extract_all_versions():
     with open(combined_file, 'w', encoding='utf-8') as f:
         json.dump(all_versions, f, indent=2, ensure_ascii=False)
 
+    write_split_files(all_versions, output_dir)
+
     print(f"\nExtracted {len(all_versions)} versions")
     print(f"Each version has {len(chapter_mapping)} sections")
     print(f"Output saved to {output_dir}")
@@ -251,5 +253,59 @@ def extract_all_versions():
     return all_versions
 
 
+def write_split_files(all_versions, output_dir):
+    """Write per-chapter files and a versions index for progressive loading.
+
+    The browser fetches versions_index.json plus the initial chapter's file
+    at startup (instead of the ~9MB all_versions.json), then loads the
+    remaining chapters in the background.
+
+    chapters/<chapterId>.json: { versionId: [paragraphs], ... }
+    versions_index.json: { versionId: { version_id, variables, chapters }, ... }
+
+    NOTE: run this AFTER add_variables.py if variables need to be current
+    (python extract_text_all.py --split-only re-splits from all_versions.json).
+    """
+    chapters_dir = output_dir / 'chapters'
+    chapters_dir.mkdir(exist_ok=True)
+
+    # Collect every chapter key present in any version (list-valued keys only)
+    chapter_ids = []
+    for version_data in all_versions.values():
+        for key, value in version_data.items():
+            if key != 'version_id' and isinstance(value, list) and key != 'variables':
+                if key not in chapter_ids:
+                    chapter_ids.append(key)
+
+    for chapter_id in chapter_ids:
+        chapter_data = {}
+        for version_id, version_data in all_versions.items():
+            paragraphs = version_data.get(chapter_id)
+            if isinstance(paragraphs, list):
+                chapter_data[version_id] = paragraphs
+        with open(chapters_dir / f'{chapter_id}.json', 'w', encoding='utf-8') as f:
+            json.dump(chapter_data, f, separators=(',', ':'), ensure_ascii=False)
+
+    index = {}
+    for version_id, version_data in all_versions.items():
+        index[version_id] = {
+            'version_id': version_data.get('version_id', version_id),
+            'variables': version_data.get('variables', []),
+            'chapters': [k for k in chapter_ids if isinstance(version_data.get(k), list)],
+        }
+    with open(output_dir / 'versions_index.json', 'w', encoding='utf-8') as f:
+        json.dump(index, f, separators=(',', ':'), ensure_ascii=False)
+
+    print(f"Wrote {len(chapter_ids)} chapter files to {chapters_dir}")
+    print(f"Wrote versions_index.json ({len(index)} versions)")
+
+
 if __name__ == '__main__':
-    extract_all_versions()
+    import sys
+    if '--split-only' in sys.argv:
+        # Re-split from the existing all_versions.json (e.g. after add_variables.py)
+        out = Path(__file__).parent / 'extracted_text'
+        with open(out / 'all_versions.json', encoding='utf-8') as f:
+            write_split_files(json.load(f), out)
+    else:
+        extract_all_versions()

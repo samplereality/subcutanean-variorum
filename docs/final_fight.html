@@ -610,29 +610,32 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   textFont('Inter');
 
-  // Build seed list: built-in + uploaded
-  allSeeds = [...ffData.builtin_seeds];
-  const uploaded = scanUploadedVersions();
-  allSeeds.push(...uploaded);
+  // Uploaded versions come from IndexedDB (async); p5's setup() can't await,
+  // so build the seed list and particles when the read resolves. Until then
+  // currentStep stays 'loading' and draw() just paints the background.
+  scanUploadedVersions().then(uploaded => {
+    // Build seed list: built-in + uploaded
+    allSeeds = [...ffData.builtin_seeds, ...uploaded];
 
-  // Generate generic seeds to reach 100 total, distributed by 10K proportions
-  const TARGET_TOTAL = 100;
-  const genericCount = Math.max(0, TARGET_TOTAL - allSeeds.length);
-  const genericSeeds = generateGenericSeeds(genericCount);
-  allSeeds.push(...genericSeeds);
+    // Generate generic seeds to reach 100 total, distributed by 10K proportions
+    const TARGET_TOTAL = 100;
+    const genericCount = Math.max(0, TARGET_TOTAL - allSeeds.length);
+    const genericSeeds = generateGenericSeeds(genericCount);
+    allSeeds.push(...genericSeeds);
 
-  // Create particles
-  particles = allSeeds.map((seed, i) => {
-    const p = new Particle(seed, i);
-    p.spawn(
-      random(width * 0.15, width * 0.85),
-      random(height * 0.12, height * 0.42)
-    );
-    return p;
+    // Create particles
+    particles = allSeeds.map((seed, i) => {
+      const p = new Particle(seed, i);
+      p.spawn(
+        random(width * 0.15, width * 0.85),
+        random(height * 0.12, height * 0.42)
+      );
+      return p;
+    });
+
+    currentStep = 'intro';
+    renderCard();
   });
-
-  currentStep = 'intro';
-  renderCard();
 }
 
 function generateGenericSeeds(count) {
@@ -1122,11 +1125,43 @@ function navigateToSeed(seed) {
 //  UPLOADED VERSION SCANNING
 // ══════════════════════════════════════
 
-function scanUploadedVersions() {
+// Uploaded versions live in IndexedDB (managed by compare.js); older copies
+// may still sit in localStorage if the main page hasn't migrated them yet.
+// Read-only merge of both sources (IndexedDB wins).
+function readUploadedVersions() {
+  const fromLocalStorage = () => {
+    try {
+      const stored = localStorage.getItem('subcutanean_custom_versions');
+      return stored ? JSON.parse(stored) : {};
+    } catch (e) {
+      return {};
+    }
+  };
+  return new Promise((resolve) => {
+    if (!window.indexedDB) { resolve(fromLocalStorage()); return; }
+    const request = indexedDB.open('subcutanean', 1);
+    request.onupgradeneeded = () => {
+      if (!request.result.objectStoreNames.contains('customVersions')) {
+        request.result.createObjectStore('customVersions');
+      }
+    };
+    request.onsuccess = () => {
+      try {
+        const req = request.result.transaction('customVersions', 'readonly')
+          .objectStore('customVersions').get('all');
+        req.onsuccess = () => resolve({ ...fromLocalStorage(), ...(req.result || {}) });
+        req.onerror = () => resolve(fromLocalStorage());
+      } catch (e) {
+        resolve(fromLocalStorage());
+      }
+    };
+    request.onerror = () => resolve(fromLocalStorage());
+  });
+}
+
+async function scanUploadedVersions() {
   try {
-    const stored = localStorage.getItem('subcutanean_custom_versions');
-    if (!stored) return [];
-    const custom = JSON.parse(stored);
+    const custom = await readUploadedVersions();
     const results = [];
 
     for (const [vid, entry] of Object.entries(custom)) {

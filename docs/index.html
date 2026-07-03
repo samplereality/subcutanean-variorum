@@ -38,10 +38,10 @@
         async src="//gc.zgo.at/count.js"></script>
 
 
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <!-- Lucide Icons (pinned version; @latest risks upstream breaking changes) -->
+    <script defer src="https://unpkg.com/lucide@1.23.0/dist/umd/lucide.min.js"></script>
     <!-- Leader Line (connector lines between note panels and paragraphs) -->
-    <script src="https://cdn.jsdelivr.net/npm/leader-line-new@1.1.9/leader-line.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/leader-line-new@1.1.9/leader-line.min.js"></script>
 </head>
 <body>
     <a href="#comparison-display" class="sr-only sr-only-focusable">Skip to main content</a>
@@ -780,9 +780,9 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/diff@5.1.0/dist/diff.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/diff@5.1.0/dist/diff.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script>
         // Optimized Levenshtein distance implementation
         function levenshtein(a, b) {
@@ -827,6 +827,7 @@
             return row[a.length];
         }
     </script>
-    <script src="compare.js"></script>
+    <!-- Deferred so it executes after the deferred CDN libraries above (defer preserves document order) -->
+    <script defer src="compare.js"></script>
 </body>
 </html>
