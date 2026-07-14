@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subcutanean — Generation Flight</title>
+<style>
+    :root {
+        --bg: #0d1626;
+        --nav-bg: #0a1220;
+        --text: #e8e8e8;
+        --text-dim: #8a9bb0;
+        --accent: #ff8800;
+        --accent-dim: #b35f00;
+        --panel-bg: rgba(14, 22, 38, 0.92);
+        --panel-border: #24344f;
+        --green: #4caf7d;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+        width: 100%; height: 100%;
+        overflow: hidden;
+        background: var(--bg);
+        color: var(--text);
+        font-family: Georgia, 'Times New Roman', serif;
+    }
+
+    /* ---------- Nav bar ---------- */
+    #flight-nav {
+        position: fixed; top: 0; left: 0; right: 0;
+        height: 50px;
+        background: var(--nav-bg);
+        border-bottom: 1px solid #1a2740;
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 0 16px;
+        z-index: 8000;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-size: 13px;
+    }
+    #flight-nav .breadcrumb { color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #flight-nav .breadcrumb strong { color: var(--accent); font-weight: 600; }
+    #flight-nav .breadcrumb .crumb-sep { margin: 0 6px; opacity: 0.4; }
+    #flight-nav .nav-actions { display: flex; gap: 8px; align-items: center; }
+    .nav-btn {
+        background: transparent;
+        border: 1px solid #2a3a58;
+        color: #cdd8e8;
+        border-radius: 5px;
+        padding: 5px 10px;
+        font-size: 12px;
+        font-family: inherit;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: border-color 0.15s, color 0.15s;
+    }
+    .nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .nav-btn.active { border-color: var(--accent); color: var(--accent); }
+    #speed-display { color: var(--text-dim); font-size: 12px; min-width: 34px; text-align: center; }
+
+    /* ---------- Progress bar ---------- */
+    #progress-bar {
+        position: fixed; top: 50px; left: 0;
+        height: 3px; width: 0%;
+        background: linear-gradient(90deg, var(--accent-dim), var(--accent));
+        z-index: 8000;
+        transition: width 0.4s ease;
+        box-shadow: 0 0 6px rgba(255, 136, 0, 0.5);
+    }
+
+    /* ---------- 3D container ---------- */
+    #container { position: fixed; inset: 0; }
+    #container canvas, #css-layer { position: absolute; inset: 0; }
+    #css-layer { pointer-events: none; }
+
+    /* ---------- Alternative panels (CSS3D) ---------- */
+    .alt-card {
+        width: 300px;
+        background: var(--panel-bg);
+        border: 1px solid var(--panel-border);
+        border-radius: 10px;
+        padding: 14px 16px 12px;
+        font-size: 15px;
+        line-height: 1.45;
+        color: #d5e2ef;
+        text-shadow: 0 0 8px rgba(120, 170, 220, 0.25);
+        box-shadow: 0 0 24px rgba(0, 0, 0, 0.55);
+        transition: opacity 0.5s ease, transform 0.5s ease, box-shadow 0.4s ease, border-color 0.4s ease, background-color 0.4s ease;
+        position: relative;
+    }
+    .alt-card .alt-num {
+        position: absolute; top: -11px; left: -11px;
+        width: 22px; height: 22px; border-radius: 50%;
+        background: #1a2740; border: 1px solid var(--panel-border);
+        color: var(--text-dim); font-size: 11px;
+        display: flex; align-items: center; justify-content: center;
+        font-family: -apple-system, sans-serif;
+    }
+    .alt-card .alt-badges {
+        display: flex; gap: 6px; margin-top: 8px;
+        font-family: -apple-system, sans-serif; font-size: 10px;
+        color: var(--text-dim);
+    }
+    .alt-card .alt-badges .badge {
+        border: 1px solid #2a3a58; border-radius: 4px; padding: 1px 6px;
+    }
+    .alt-card .alt-badges .badge.pref { color: var(--accent); border-color: var(--accent-dim); }
+    .alt-empty { font-style: italic; color: #5d6f86; }
+    .macro-ref { color: #6f87a8; font-size: 0.85em; font-family: monospace; }
+
+    .alt-card.actual-seed::after {
+        content: 'the seed chose this';
+        position: absolute; bottom: -22px; left: 50%; transform: translateX(-50%);
+        white-space: nowrap;
+        font-family: -apple-system, sans-serif; font-size: 10px;
+        color: var(--green);
+    }
+    .alt-card.pickable { cursor: pointer; }
+    .alt-card.pickable:hover {
+        border-color: var(--accent);
+        box-shadow: 0 0 30px rgba(255, 136, 0, 0.4);
+    }
+
+    /* ---------- DEFINE signposts (CSS3D) ---------- */
+    .define-sign {
+        width: 260px;
+        font-family: 'SF Mono', Menlo, monospace;
+        font-size: 12px;
+        color: #5f7896;
+        border-left: 2px solid #2a3a58;
+        padding: 6px 10px;
+        background: rgba(10, 18, 32, 0.6);
+        border-radius: 0 6px 6px 0;
+    }
+    .define-sign .def-kw { color: #7a5fa8; }
+    .define-sign .def-chosen { color: var(--accent); }
+
+    /* ---------- HUD ---------- */
+    #ticker-bar {
+        position: fixed; bottom: 0; left: 0; right: 0;
+        height: 58px;
+        background: linear-gradient(180deg, rgba(10, 18, 32, 0.6), rgba(10, 18, 32, 0.96));
+        border-top: 1px solid #1a2740;
+        z-index: 7500;
+        display: flex; align-items: center;
+        padding: 0 16px;
+        gap: 14px;
+    }
+    #ticker-label {
+        font-family: -apple-system, sans-serif;
+        font-size: 10px; letter-spacing: 1.5px;
+        color: var(--text-dim);
+        flex-shrink: 0;
+    }
+    #ticker-label .word-count { color: var(--accent); display: block; font-size: 11px; margin-top: 2px; letter-spacing: 0; }
+    #ticker-scroll {
+        flex: 1;
+        overflow: hidden;
+        white-space: nowrap;
+        font-size: 15px;
+        color: #c8d6e4;
+        direction: rtl;
+        text-align: left;
+    }
+    #ticker-scroll #ticker-text { direction: ltr; unicode-bidi: plaintext; display: inline; }
+    #ticker-text .fresh { color: var(--accent); transition: color 2s ease; }
+    #ticker-text .ch-marker { color: var(--text-dim); font-family: -apple-system, sans-serif; font-size: 11px; letter-spacing: 1px; }
+
+    #method-chip {
+        position: fixed; bottom: 74px; left: 50%;
+        transform: translateX(-50%);
+        font-family: -apple-system, sans-serif;
+        font-size: 11px; letter-spacing: 1px;
+        color: var(--text-dim);
+        background: rgba(10, 18, 32, 0.8);
+        border: 1px solid #1e2c46;
+        border-radius: 20px;
+        padding: 5px 14px;
+        z-index: 7500;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        text-transform: uppercase;
+    }
+    #method-chip.visible { opacity: 1; }
+    #method-chip strong { color: var(--accent); font-weight: 600; }
+
+    #choose-prompt {
+        position: fixed; top: 72px; left: 50%;
+        transform: translateX(-50%);
+        font-family: -apple-system, sans-serif;
+        font-size: 13px;
+        color: var(--accent);
+        background: rgba(10, 18, 32, 0.85);
+        border: 1px solid var(--accent-dim);
+        border-radius: 8px;
+        padding: 8px 18px;
+        z-index: 7500;
+        animation: prompt-pulse 1.8s ease-in-out infinite;
+    }
+    @keyframes prompt-pulse { 0%, 100% { opacity: 0.75; } 50% { opacity: 1; } }
+
+    #divergence-chip {
+        position: fixed; top: 72px; right: 16px;
+        font-family: -apple-system, sans-serif;
+        font-size: 11px;
+        color: var(--text-dim);
+        background: rgba(10, 18, 32, 0.8);
+        border: 1px solid #1e2c46;
+        border-radius: 8px;
+        padding: 6px 12px;
+        z-index: 7400;
+    }
+    #divergence-chip strong { color: var(--accent); }
+
+    #controls-hint {
+        position: fixed; bottom: 70px; right: 16px;
+        font-family: -apple-system, sans-serif;
+        font-size: 11px; line-height: 1.7;
+        color: rgba(138, 155, 176, 0.75);
+        text-align: right;
+        z-index: 7400;
+        pointer-events: none;
+    }
+    #controls-hint b { color: rgba(205, 216, 232, 0.9); font-weight: 600; }
+
+    #pause-badge {
+        position: fixed; top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        font-family: -apple-system, sans-serif;
+        font-size: 14px; letter-spacing: 3px;
+        color: var(--accent);
+        border: 1px solid var(--accent-dim);
+        border-radius: 8px;
+        padding: 10px 26px;
+        background: rgba(10, 18, 32, 0.85);
+        z-index: 7600;
+    }
+
+    /* ---------- Chapter flash ---------- */
+    #chapter-flash {
+        position: fixed; top: 40%; left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 34px;
+        color: var(--accent);
+        text-shadow: 0 0 30px rgba(255, 136, 0, 0.6);
+        opacity: 0;
+        transition: opacity 0.12s ease-in;
+        z-index: 7600;
+        pointer-events: none;
+        text-align: center;
+        letter-spacing: 2px;
+    }
+    #chapter-flash.show { opacity: 1; transition: opacity 0.1s ease-in; }
+    #chapter-flash.fade { opacity: 0; transition: opacity 0.6s ease-out; }
+
+    /* ---------- Overlays: intro / boot / end / about ---------- */
+    .overlay {
+        position: fixed; inset: 0;
+        background: radial-gradient(ellipse at 50% 40%, #101c31 0%, #090f1c 75%);
+        z-index: 9000;
+        display: flex; align-items: center; justify-content: center;
+        transition: opacity 0.6s ease;
+    }
+    .overlay.fade-out { opacity: 0; pointer-events: none; }
+    .overlay-inner {
+        max-width: 640px;
+        width: calc(100% - 48px);
+        text-align: center;
+    }
+    .overlay h1 {
+        font-size: 40px;
+        font-weight: normal;
+        letter-spacing: 3px;
+        color: var(--text);
+        margin-bottom: 6px;
+    }
+    .overlay h1 .accent { color: var(--accent); text-shadow: 0 0 24px rgba(255, 136, 0, 0.5); }
+    .overlay .seed-line {
+        font-family: 'SF Mono', Menlo, monospace;
+        font-size: 13px;
+        color: var(--text-dim);
+        letter-spacing: 2px;
+        margin-bottom: 28px;
+    }
+    .overlay .seed-line strong { color: var(--accent); }
+    .overlay p.desc {
+        font-size: 16px; line-height: 1.65;
+        color: #b8c6d6;
+        margin-bottom: 30px;
+        text-align: left;
+    }
+    .mode-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .mode-btn {
+        background: rgba(20, 30, 50, 0.8);
+        border: 1px solid #2a3a58;
+        border-radius: 10px;
+        color: var(--text);
+        font-family: inherit;
+        padding: 18px 22px;
+        width: 260px;
+        cursor: pointer;
+        text-align: left;
+        transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+    }
+    .mode-btn:hover {
+        border-color: var(--accent);
+        box-shadow: 0 0 26px rgba(255, 136, 0, 0.25);
+        transform: translateY(-2px);
+    }
+    .mode-btn .mode-title { font-size: 18px; color: var(--accent); margin-bottom: 6px; }
+    .mode-btn .mode-sub { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
+    .overlay .fine-print {
+        margin-top: 26px;
+        font-family: -apple-system, sans-serif;
+        font-size: 11px;
+        color: rgba(138, 155, 176, 0.6);
+    }
+    .overlay .fine-print a { color: var(--text-dim); }
+    #intro-error { color: #e06060; font-family: monospace; font-size: 13px; margin-top: 18px; display: none; }
+
+    /* ---------- Boot sequence ---------- */
+    #boot-overlay { align-items: flex-start; justify-content: flex-start; }
+    #boot-inner {
+        width: 100%; height: 100%;
+        padding: 70px 40px 40px;
+        font-family: 'SF Mono', Menlo, monospace;
+        font-size: 12px;
+        line-height: 1.75;
+        color: #6f87a8;
+        overflow: hidden;
+        display: flex; flex-direction: column;
+    }
+    #boot-header { color: var(--accent); letter-spacing: 2px; margin-bottom: 14px; flex-shrink: 0; }
+    #boot-log { flex: 1; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; }
+    #boot-log .def-kw { color: #7a5fa8; }
+    #boot-log .def-chosen { color: var(--accent); }
+    #boot-log .def-off { opacity: 0.45; }
+    #boot-skip {
+        position: absolute; bottom: 24px; right: 28px;
+        font-family: -apple-system, sans-serif; font-size: 11px;
+        color: rgba(138, 155, 176, 0.6);
+    }
+
+    /* ---------- End screen ---------- */
+    #end-overlay .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 14px;
+        margin: 28px 0;
+    }
+    .stat-cell {
+        background: rgba(20, 30, 50, 0.7);
+        border: 1px solid #2a3a58;
+        border-radius: 10px;
+        padding: 16px 10px;
+    }
+    .stat-cell .stat-num { font-size: 28px; color: var(--accent); }
+    .stat-cell .stat-label { font-family: -apple-system, sans-serif; font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+
+    /* ---------- About modal ---------- */
+    #about-modal {
+        position: fixed; inset: 0;
+        background: rgba(5, 9, 17, 0.8);
+        z-index: 9500;
+        display: flex; align-items: center; justify-content: center;
+    }
+    #about-modal.hidden { display: none; }
+    .about-content {
+        background: #101c31;
+        border: 1px solid #2a3a58;
+        border-radius: 12px;
+        max-width: 560px;
+        width: calc(100% - 48px);
+        max-height: 80vh;
+        overflow-y: auto;
+        padding: 28px 32px;
+        position: relative;
+    }
+    .about-content h2 { color: var(--accent); font-weight: normal; margin-bottom: 14px; }
+    .about-content p { font-size: 14px; line-height: 1.65; color: #b8c6d6; margin-bottom: 12px; }
+    .about-content .about-close {
+        position: absolute; top: 12px; right: 14px;
+        background: none; border: none;
+        color: var(--text-dim); font-size: 22px; cursor: pointer;
+        line-height: 1;
+    }
+    .about-content .about-close:hover { color: var(--accent); }
+    .about-content kbd {
+        font-family: 'SF Mono', Menlo, monospace;
+        font-size: 11px;
+        background: #1a2740; border: 1px solid #2a3a58; border-radius: 4px;
+        padding: 1px 6px;
+    }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 700px) {
+        #controls-hint { display: none; }
+        .overlay h1 { font-size: 28px; }
+        #flight-nav .breadcrumb { font-size: 11px; }
+    }
+</style>
+<script type="importmap">
+{
+    "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+    }
+}
+</script>
+</head>
+<body>
+
+<nav id="flight-nav">
+    <div class="breadcrumb">
+        <strong>Subcutanean</strong><span class="crumb-sep">/</span>Generation Flight<span class="crumb-sep">/</span><span id="crumb-chapter">—</span><span class="crumb-sep">·</span><span id="crumb-decision">decision 0 / 0</span>
+    </div>
+    <div class="nav-actions">
+        <span id="speed-display">1.0×</span>
+        <button class="nav-btn" id="mode-btn" title="Toggle autopilot / manual (M)">Autopilot</button>
+        <button class="nav-btn" id="about-btn">About</button>
+        <button class="nav-btn" onclick="window.location.href='index.html'">Exit</button>
+    </div>
+</nav>
+<div id="progress-bar"></div>
+
+<div id="container"></div>
+
+<div id="method-chip"></div>
+<div id="choose-prompt" class="hidden">You are the RNG — click a path, or press 1–9</div>
+<div id="divergence-chip" class="hidden">diverged from seed: <strong id="divergence-count">0</strong> / <span id="divergence-total">0</span></div>
+<div id="pause-badge" class="hidden">PAUSED</div>
+<div id="chapter-flash"></div>
+
+<div id="controls-hint">
+    <b>space</b> pause &nbsp; <b>↑/↓</b> speed &nbsp; <b>enter</b> skip<br>
+    <b>Q/E</b> chapter &nbsp; <b>M</b> mode
+</div>
+
+<div id="ticker-bar">
+    <div id="ticker-label">ASSEMBLED&nbsp;TEXT<span class="word-count" id="word-count">0 words</span></div>
+    <div id="ticker-scroll"><span id="ticker-text"></span></div>
+</div>
+
+<!-- Intro -->
+<div class="overlay" id="intro-overlay">
+    <div class="overlay-inner">
+        <h1>Generation <span class="accent">Flight</span></h1>
+        <div class="seed-line">SEED <strong id="intro-seed">1541928</strong> · <span id="intro-count">…</span> DECISIONS</div>
+        <p class="desc">
+            Every copy of <em>Subcutanean</em> is generated by a script that walks the
+            novel's source text and, at each point of variation, chooses one
+            alternative and discards the rest. This is a flight through one such
+            run — every decision the generator made, in the order it made them,
+            as the book assembled itself around the seed.
+        </p>
+        <div class="mode-buttons">
+            <button class="mode-btn" id="start-auto">
+                <div class="mode-title">Autopilot</div>
+                <div class="mode-sub">Ride along as the RNG chooses. The path of seed 1541928, exactly as it happened.</div>
+            </button>
+            <button class="mode-btn" id="start-manual">
+                <div class="mode-title">Manual</div>
+                <div class="mode-sub">You are the random number generator. Choose at every fork and watch your text diverge from the seed's.</div>
+            </button>
+        </div>
+        <div class="fine-print">
+            Part of the <a href="index.html">Subcutanean Variorum Browser</a> ·
+            novel &amp; Quant language by Aaron Reed
+        </div>
+        <div id="intro-error"></div>
+    </div>
+</div>
+
+<!-- Boot sequence -->
+<div class="overlay hidden" id="boot-overlay">
+    <div id="boot-inner">
+        <div id="boot-header">SEED 1541928 — INITIALIZING VARIABLES</div>
+        <div id="boot-log"></div>
+    </div>
+    <div id="boot-skip">click or press space to skip</div>
+</div>
+
+<!-- End screen -->
+<div class="overlay hidden" id="end-overlay">
+    <div class="overlay-inner">
+        <h1>Render <span class="accent">Complete</span></h1>
+        <div class="seed-line" id="end-seed-line">SEED 1541928 · TEXT ASSEMBLED</div>
+        <div class="stat-grid" id="end-stats"></div>
+        <div class="mode-buttons">
+            <button class="mode-btn" onclick="window.location.reload()">
+                <div class="mode-title">Fly Again</div>
+                <div class="mode-sub">Restart the flight from the first decision.</div>
+            </button>
+            <button class="mode-btn" onclick="window.location.href='index.html'">
+                <div class="mode-title">Back to the Variorum</div>
+                <div class="mode-sub">Return to the comparison browser.</div>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- About modal -->
+<div id="about-modal" class="hidden">
+    <div class="about-content">
+        <button class="about-close" id="about-close">×</button>
+        <h2>About Generation Flight</h2>
+        <p>
+            <em>Subcutanean</em> is a novel by Aaron Reed in which no two copies are
+            alike. Each copy is rendered from source text written in Reed's Quant
+            markup language: a script walks the text and, wherever the author wrote
+            alternatives, picks one — sometimes weighted by probability, sometimes
+            guided by discourse heuristics, sometimes purely at random.
+        </p>
+        <p>
+            This page replays a recorded trace of that process for one seed. Each
+            floating panel is an alternative the author actually wrote; the ring is
+            a decision the generator actually faced. In <strong>Autopilot</strong> you
+            watch the recorded run. In <strong>Manual</strong> you make the choices
+            yourself, and the flight tracks how far your text diverges from the copy
+            the seed produced.
+        </p>
+        <p>
+            The ★ badge marks the author's preferred draft of a passage; percentage
+            badges show explicit weights. Panels labeled <em>(nothing)</em> are
+            choices where one alternative is silence — text that simply doesn't
+            appear in some copies.
+        </p>
+        <p>
+            Controls: <kbd>space</kbd> pause · <kbd>↑</kbd>/<kbd>↓</kbd> speed (up
+            to 10×) · <kbd>enter</kbd> skip ahead · <kbd>Q</kbd>/<kbd>E</kbd>
+            previous/next chapter · <kbd>M</kbd> toggle mode ·
+            <kbd>1</kbd>–<kbd>9</kbd> choose (manual). At 5× and above the
+            autopilot stops pausing at decisions and flies straight through
+            them — hyperspace.
+        </p>
+    </div>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { CSS3DRenderer, CSS3DObject } from 'three/addons/renderers/CSS3DRenderer.js';
+
+// ---------------------------------------------------------------
+// Constants
+// ---------------------------------------------------------------
+const TRACE_URL = 'tracing/1541928.trace.json';
+const SEED = '1541928';
+
+const GATE_SPACING = 1050;      // z distance between choice gates
+const SIGN_SPACING = 320;       // z distance consumed by a DEFINE signpost
+const START_Z = -1500;          // z of first flight item
+const BASE_SPEED = 300;         // units/sec at 1x
+const APPROACH_DIST = 900;      // begin slowing
+const DECIDE_DIST = 560;        // stop/decide distance from gate
+const CREATE_AHEAD = 7000;      // build items within this range ahead
+const REMOVE_BEHIND = 500;      // tear down items this far behind
+const RING_COUNT = 16;
+const RING_SPACING = 800;
+
+const PORTAL_DIM = new THREE.Color(0x2a3a58);
+const PORTAL_HOT = new THREE.Color(0xff8800);
+
+const CHAPTER_NAMES = { 'globals.txt': 'Globals', 'ch_epilogue.txt': 'Epilogue', 'end-stats.txt': 'Statistics', 'end-abouttheauthor.txt': 'About the Author' };
+for (let i = 1; i <= 17; i++) CHAPTER_NAMES[`ch${String(i).padStart(2, '0')}.txt`] = `Chapter ${i}`;
+
+// ---------------------------------------------------------------
+// State
+// ---------------------------------------------------------------
+let scene, cssScene, camera, glRenderer, cssRenderer;
+let dustPoints, sparkPoints, rings = [];
+
+let trace = null;
+let bootDefines = [];    // leading DEFINE run, shown in boot overlay
+let flightItems = [];    // remaining decisions in order, each gets ._z
+let totalChoices = 0;
+let chapterFirstGate = new Map();   // source_file -> flightItems index of first CHOICE
+
+let started = false;
+let paused = false;
+let mode = 'auto';               // 'auto' | 'manual'
+let speedMult = 1;
+let curSpeed = 0;
+let camZ = 0;
+let mouseX = 0, mouseY = 0;
+
+// Corridor centerline: each resolved choice bends the path toward the
+// chosen panel via a smooth S-curve. bends hold active deflections;
+// fully-passed ones fold into bendBase.
+let bends = [];                  // { zStart, len, dx, dy }
+let bendBase = { x: 0, y: 0 };
+
+let flightState = 'cruise';      // cruise | deciding | awaiting | resolving | done
+let nextIdx = 0;                 // index into flightItems of next unresolved item
+let currentChapter = null;
+let choicesDone = 0;
+let wordsAssembled = 0;
+let divergences = 0;
+let manualPicks = 0;
+
+let decideTimer = 0;             // contemplative pause before the choice lights up
+let decideGate = -1;
+let resolveTimer = 0;
+let built = new Map();           // flightItems index -> { css: [CSS3DObject], gl: [Mesh], cards: [el] }
+
+const $ = id => document.getElementById(id);
+
+// ---------------------------------------------------------------
+// Data loading & prep
+// ---------------------------------------------------------------
+async function loadTrace() {
+    const resp = await fetch(TRACE_URL);
+    if (!resp.ok) throw new Error(`HTTP ${resp.status} fetching trace`);
+    trace = await resp.json();
+
+    const decisions = trace.decisions;
+    let firstChoice = decisions.findIndex(d => d.type === 'CHOICE');
+    if (firstChoice < 0) firstChoice = decisions.length;
+
+    bootDefines = decisions.slice(0, firstChoice);
+    flightItems = decisions.slice(firstChoice);
+
+    // Lay items out along the corridor
+    let z = START_Z;
+    flightItems.forEach((item, i) => {
+        item._z = z;
+        z -= (item.type === 'CHOICE') ? GATE_SPACING : SIGN_SPACING;
+        if (item.type === 'CHOICE') {
+            totalChoices++;
+            if (!chapterFirstGate.has(item.source_file)) chapterFirstGate.set(item.source_file, i);
+        }
+    });
+
+    $('intro-count').textContent = trace.total_decisions;
+    $('crumb-decision').textContent = `decision 0 / ${totalChoices}`;
+    $('divergence-total').textContent = totalChoices;
+}
+
+function chapterName(sourceFile) {
+    return CHAPTER_NAMES[sourceFile] || sourceFile.replace('.txt', '');
+}
+
+function escapeHtml(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function styleMacros(escaped) {
+    return escaped.replace(/\{([^{}]*)\}/g, '<span class="macro-ref">{$1}</span>');
+}
+
+// ---------------------------------------------------------------
+// Three.js scene
+// ---------------------------------------------------------------
+function initScene() {
+    const container = $('container');
+
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0d1626);
+    scene.fog = new THREE.FogExp2(0x0d1626, 0.00042);
+
+    cssScene = new THREE.Scene();
+
+    camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 14000);
+    camera.position.set(0, 0, 0);
+    camera.rotation.order = 'YXZ';
+
+    glRenderer = new THREE.WebGLRenderer({ antialias: true });
+    glRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    glRenderer.setSize(window.innerWidth, window.innerHeight);
+    container.appendChild(glRenderer.domElement);
+
+    cssRenderer = new CSS3DRenderer();
+    cssRenderer.setSize(window.innerWidth, window.innerHeight);
+    cssRenderer.domElement.id = 'css-layer';
+    container.appendChild(cssRenderer.domElement);
+
+    // Dust field (cool blue motes)
+    dustPoints = makePointField(1400, 0x4a6a8a, 2.4, 0.55);
+    scene.add(dustPoints);
+    // Sparks (rare orange motes)
+    sparkPoints = makePointField(140, 0xff8800, 3.2, 0.75);
+    scene.add(sparkPoints);
+
+    // Corridor rings
+    const ringGeo = new THREE.TorusGeometry(640, 1.4, 6, 72);
+    const ringMat = new THREE.MeshBasicMaterial({ color: 0x1c3050, transparent: true, opacity: 0.55 });
+    for (let i = 0; i < RING_COUNT; i++) {
+        const ring = new THREE.Mesh(ringGeo, ringMat);
+        ring.position.z = -i * RING_SPACING;
+        rings.push(ring);
+        scene.add(ring);
+    }
+
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        glRenderer.setSize(window.innerWidth, window.innerHeight);
+        cssRenderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    document.addEventListener('mousemove', e => {
+        mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+        mouseY = (e.clientY / window.innerHeight) * 2 - 1;
+    });
+}
+
+function makePointField(count, color, size, opacity) {
+    const positions = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+        const a = Math.random() * Math.PI * 2;
+        const r = 300 + Math.random() * 800;
+        positions[i * 3] = Math.cos(a) * r;
+        positions[i * 3 + 1] = Math.sin(a) * r * 0.8;
+        positions[i * 3 + 2] = -Math.random() * CREATE_AHEAD;
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    const mat = new THREE.PointsMaterial({ color, size, transparent: true, opacity, sizeAttenuation: true });
+    return new THREE.Points(geo, mat);
+}
+
+// A freshly added bend would instantly shift the whole distant tunnel.
+// Instead its strength ramps 0 → 1 with the camera's progress toward the
+// gate, so the tunnel ahead swings smoothly into its new curve and the
+// bend is at full strength exactly as we pass through the door.
+function bendEff(b) {
+    if (!b.intro) return 1;
+    const t = (b.intro.from - camZ) / (b.intro.from - b.intro.to);
+    if (t >= 1) { b.intro = null; return 1; }
+    if (t <= 0) return 0;
+    return t * t * (3 - 2 * t);
+}
+
+// Lateral offset (and slope per forward unit) of the corridor at depth z
+function centerline(z) {
+    let x = bendBase.x, y = bendBase.y, dx = 0, dy = 0;
+    for (const b of bends) {
+        const t = (b.zStart - z) / b.len;         // 0 at bend start → 1 at end
+        if (t <= 0) continue;
+        const eff = bendEff(b);
+        if (eff === 0) continue;
+        if (t >= 1) { x += b.dx * eff; y += b.dy * eff; continue; }
+        const s = t * t * (3 - 2 * t);            // smoothstep
+        x += b.dx * s * eff;
+        y += b.dy * s * eff;
+        const dsdz = 6 * t * (1 - t) / b.len;     // slope of smoothstep per forward unit
+        dx += b.dx * dsdz * eff;
+        dy += b.dy * dsdz * eff;
+    }
+    return { x, y, dx, dy };
+}
+
+function foldBends() {
+    // A bend is over once everything in the active window (z <= camZ+500)
+    // sits past its ramp; fold it into the base offset.
+    while (bends.length && camZ + 600 <= bends[0].zStart - bends[0].len) {
+        bendBase.x += bends[0].dx;
+        bendBase.y += bends[0].dy;
+        bends.shift();
+    }
+}
+
+function recyclePoints(points) {
+    const pos = points.geometry.attributes.position;
+    let changed = false;
+    for (let i = 0; i < pos.count; i++) {
+        if (pos.getZ(i) > camZ + 200) {
+            const newZ = camZ - CREATE_AHEAD + Math.random() * 600;
+            const c = centerline(newZ);
+            const a = Math.random() * Math.PI * 2;
+            const r = 300 + Math.random() * 800;
+            pos.setXYZ(i, c.x + Math.cos(a) * r, c.y + Math.sin(a) * r * 0.8, newZ);
+            changed = true;
+        }
+    }
+    if (changed) pos.needsUpdate = true;
+}
+
+// ---------------------------------------------------------------
+// Gate & signpost construction
+// ---------------------------------------------------------------
+function slotPositions(n) {
+    // Returns [{x, y}] positions around the corridor, avoiding dead center & bottom HUD
+    const slots = [];
+    if (n === 2) {
+        slots.push({ x: -430, y: 20 }, { x: 430, y: 20 });
+    } else if (n === 3) {
+        slots.push({ x: -460, y: -20 }, { x: 0, y: 265 }, { x: 460, y: -20 });
+    } else if (n === 4) {
+        slots.push({ x: -490, y: -80 }, { x: -250, y: 255 }, { x: 250, y: 255 }, { x: 490, y: -80 });
+    } else {
+        // Arc over the top from lower-left to lower-right, second ring if needed
+        const perRing = 8;
+        const ringsNeeded = Math.ceil(n / perRing);
+        let placed = 0;
+        for (let r = 0; r < ringsNeeded; r++) {
+            const inRing = Math.min(perRing, n - placed);
+            const radius = 440 + r * 300;
+            for (let k = 0; k < inRing; k++) {
+                const t = inRing === 1 ? 0.5 : k / (inRing - 1);
+                const deg = 205 - t * 230;             // 205° → -25° (over the top)
+                const rad = deg * Math.PI / 180;
+                slots.push({ x: Math.cos(rad) * radius, y: Math.sin(rad) * radius * 0.6 });
+                placed++;
+            }
+        }
+    }
+    return slots;
+}
+
+function buildGate(idx, gate) {
+    const objs = { css: [], gl: [], cards: [] };
+    const n = gate.alternatives.length;
+    const slots = slotPositions(n);
+    const cardScale = n <= 4 ? 0.85 : (n <= 8 ? 0.68 : 0.52);
+
+    // Extents of the panel arrangement (units), for fit-on-screen distance
+    const halfW = 150 * cardScale + 50, halfH = 120 * cardScale + 40;
+    let extX = 0, extUp = 0, extDown = 0;
+    slots.forEach(s => {
+        extX = Math.max(extX, Math.abs(s.x) + halfW);
+        extUp = Math.max(extUp, s.y + halfH);
+        extDown = Math.max(extDown, -s.y + halfH);
+    });
+    objs.extent = { x: extX, up: extUp, down: extDown };
+
+    gate.alternatives.forEach((alt, i) => {
+        // Outer wrapper gets the renderer's 3D transform; the inner card
+        // keeps its own class-driven transforms/opacity (chosen highlight).
+        const wrap = document.createElement('div');
+        const el = document.createElement('div');
+        el.className = 'alt-card';
+        const raw = (alt.full_text !== undefined && alt.full_text !== null) ? alt.full_text : (alt.text || '');
+        const body = raw.trim() === ''
+            ? '<span class="alt-empty">(nothing — the text falls silent here)</span>'
+            : styleMacros(escapeHtml(raw));
+        let badges = '';
+        if (alt.probability !== null && alt.probability !== undefined) badges += `<span class="badge">${alt.probability}%</span>`;
+        if (alt.author_preferred) badges += `<span class="badge pref">★ author's draft</span>`;
+        el.innerHTML = `<span class="alt-num">${i + 1}</span>${body}${badges ? `<div class="alt-badges">${badges}</div>` : ''}`;
+        wrap.appendChild(el);
+
+        const obj = new CSS3DObject(wrap);
+        const slot = slots[i] || { x: 0, y: 0 };
+        obj.userData = { sx: slot.x, sy: slot.y, z: gate._z, face: true };
+        const c = centerline(gate._z);
+        obj.position.set(slot.x + c.x, slot.y + c.y, gate._z);
+        obj.scale.setScalar(cardScale);
+        cssScene.add(obj);
+        objs.css.push(obj);
+        objs.cards.push(el);
+
+        el.addEventListener('click', () => onCardClick(idx, i));
+    });
+
+    // Portal ring in WebGL — starts cool and dim; its orange intensity is
+    // driven by camera proximity every frame (see animate)
+    const portalGeo = new THREE.TorusGeometry(560, 2.2, 8, 80);
+    const portalMat = new THREE.MeshBasicMaterial({ color: 0x2a3a58, transparent: true, opacity: 0.3 });
+    const portal = new THREE.Mesh(portalGeo, portalMat);
+    portal.userData = { sx: 0, sy: 0, z: gate._z, portal: true };
+    const pc = centerline(gate._z);
+    portal.position.set(pc.x, pc.y, gate._z);
+    scene.add(portal);
+    objs.gl.push(portal);
+
+    return objs;
+}
+
+function buildSignpost(idx, item) {
+    const objs = { css: [], gl: [], cards: [] };
+    const el = document.createElement('div');
+    el.className = 'define-sign';
+    const alts = item.alternatives.map(a => {
+        const label = escapeHtml(a.text || '(off)');
+        return a.chosen ? `<span class="def-chosen">${label}</span>` : `<span class="def-off">${label}</span>`;
+    }).join(' | ');
+    el.innerHTML = `<span class="def-kw">DEFINE</span> ${alts || escapeHtml(String(item.chosen || ''))}`;
+
+    const obj = new CSS3DObject(el);
+    const side = (idx % 2 === 0) ? 1 : -1;
+    obj.userData = { sx: side * 520, sy: 140 + (idx % 3) * 60, z: item._z };
+    const c = centerline(item._z);
+    obj.position.set(obj.userData.sx + c.x, obj.userData.sy + c.y, item._z);
+    obj.rotation.y = -side * 0.35;
+    obj.scale.setScalar(0.9);
+    cssScene.add(obj);
+    objs.css.push(obj);
+    return objs;
+}
+
+function ensureBuilt() {
+    for (let i = nextIdx; i < flightItems.length; i++) {
+        const item = flightItems[i];
+        if (item._z < camZ - CREATE_AHEAD) break;
+        if (!built.has(i)) {
+            built.set(i, item.type === 'CHOICE' ? buildGate(i, item) : buildSignpost(i, item));
+        }
+    }
+    for (const [i, objs] of built) {
+        if (flightItems[i]._z > camZ + REMOVE_BEHIND) {
+            destroyItem(i, objs);
+        }
+    }
+}
+
+function destroyItem(i, objs) {
+    objs.css.forEach(o => { cssScene.remove(o); o.element.remove(); });
+    objs.gl.forEach(o => { scene.remove(o); o.geometry.dispose(); o.material.dispose(); });
+    built.delete(i);
+}
+
+// ---------------------------------------------------------------
+// Flight state machine
+// ---------------------------------------------------------------
+// Distance at which every panel of a gate is fully on screen,
+// accounting for the nav bar (top) and ticker (bottom) chrome.
+function decideDistanceFor(gi) {
+    const objs = built.get(gi);
+    if (!objs || !objs.extent) return DECIDE_DIST;
+    const tanHalf = Math.tan(70 * Math.PI / 360);   // rest-state fov, not the hyperspace-stretched one
+    const dX = objs.extent.x / (tanHalf * camera.aspect * 0.94);
+    const dUp = objs.extent.up / (tanHalf * 0.74);
+    const dDown = objs.extent.down / (tanHalf * 0.76);
+    return Math.max(DECIDE_DIST, dX, dUp, dDown);
+}
+
+function nextGateIndex() {
+    for (let i = nextIdx; i < flightItems.length; i++) {
+        if (flightItems[i].type === 'CHOICE') return i;
+        // DEFINE items are passive; they resolve by being passed
+    }
+    return -1;
+}
+
+function advancePastSignposts() {
+    // Move nextIdx forward past any passive items the camera has passed
+    while (nextIdx < flightItems.length &&
+           flightItems[nextIdx].type === 'DEFINE' &&
+           flightItems[nextIdx]._z > camZ - 60) {
+        nextIdx++;
+    }
+}
+
+function updateFlight(dt) {
+    advancePastSignposts();
+    const gi = nextGateIndex();
+
+    if (gi === -1 && flightState !== 'done') {
+        // Fly a beat past the last item, then finish
+        const lastZ = flightItems.length ? flightItems[flightItems.length - 1]._z : camZ;
+        if (camZ < lastZ - 400) { finishFlight(); return; }
+        curSpeed += (BASE_SPEED * speedMult - curSpeed) * Math.min(1, dt * 3);
+    } else if (flightState === 'cruise' && gi >= 0) {
+        const gate = flightItems[gi];
+        const dist = camZ - gate._z;
+        // Hyperspace: at 5x+ in autopilot, never pause — resolve gates on the fly
+        const flythrough = mode === 'auto' && speedMult >= 5;
+        const dd = flythrough ? 0 : decideDistanceFor(gi);
+        const approach = Math.max(APPROACH_DIST, dd + 340);
+        let target = BASE_SPEED * speedMult;
+        if (!flythrough && dist < approach) {
+            const floor = 50 * Math.max(1, speedMult);
+            const t = Math.max(0, (dist - dd) / (approach - dd));
+            target = floor + t * (BASE_SPEED * speedMult - floor);
+        }
+        curSpeed += (target - curSpeed) * Math.min(1, dt * 4);
+        if (flythrough) {
+            if (dist <= 340) {
+                maybeChapterFlash(gate.source_file);
+                const chosen = gate.chosen_index ?? gate.alternatives.findIndex(a => a.chosen);
+                resolveGate(gi, chosen, false);
+                flightState = 'cruise';   // no resolving pause — keep flying
+            }
+        } else if (dist <= dd) {
+            curSpeed = 0;
+            beginDecision(gi);
+        }
+    } else if (flightState === 'deciding') {
+        curSpeed += (0 - curSpeed) * Math.min(1, dt * 6);
+        decideTimer -= dt;
+        if (decideTimer <= 0 && decideGate >= 0) {
+            const gate = flightItems[decideGate];
+            const chosen = gate.chosen_index ?? gate.alternatives.findIndex(a => a.chosen);
+            const gi = decideGate;
+            decideGate = -1;
+            resolveGate(gi, chosen, false);
+        }
+    } else if (flightState === 'awaiting') {
+        curSpeed = 0;
+    } else if (flightState === 'resolving') {
+        resolveTimer -= dt;
+        // ease smoothly back into motion while the choice lights up
+        curSpeed += (200 * speedMult - curSpeed) * Math.min(1, dt * 3);
+        if (resolveTimer <= 0) {
+            flightState = 'cruise';
+            $('method-chip').classList.remove('visible');
+        }
+    }
+
+    camZ -= curSpeed * dt;
+}
+
+function beginDecision(gi) {
+    const gate = flightItems[gi];
+    maybeChapterFlash(gate.source_file);
+
+    const chip = $('method-chip');
+    chip.innerHTML = `decision <strong>${choicesDone + 1}</strong> of ${totalChoices} &nbsp;·&nbsp; method: <strong>${gate.method || gate.strategy || '?'}</strong> &nbsp;·&nbsp; ${gate.alternatives.length} paths`;
+    chip.classList.add('visible');
+
+    if (mode === 'manual') {
+        flightState = 'awaiting';
+        $('choose-prompt').classList.remove('hidden');
+        const objs = built.get(gi);
+        if (objs) objs.cards.forEach(c => { c.classList.add('pickable'); c.style.pointerEvents = 'auto'; });
+    } else {
+        // A short beat with all alternatives on screen, then the chosen
+        // one lights up — no scanning between options.
+        decideGate = gi;
+        decideTimer = 0.7 / Math.max(1, speedMult);
+        flightState = 'deciding';
+    }
+}
+
+function onCardClick(gi, altIdx) {
+    if (flightState !== 'awaiting' || gi !== nextGateIndex()) return;
+    resolveGate(gi, altIdx, true);
+}
+
+function resolveGate(gi, pickIdx, userPicked) {
+    const gate = flightItems[gi];
+    const objs = built.get(gi);
+    const seedIdx = gate.chosen_index ?? gate.alternatives.findIndex(a => a.chosen);
+
+    $('choose-prompt').classList.add('hidden');
+
+    if (objs) {
+        // Only the chosen panel reacts — and not with a step change: its
+        // glow is driven by camera proximity per frame (see animate), so it
+        // blooms gradually as we steer toward and through it.
+        objs.cards.forEach((c, i) => {
+            c.classList.remove('pickable');
+            c.style.pointerEvents = 'none';
+            if (userPicked && i === seedIdx && seedIdx !== pickIdx) c.classList.add('actual-seed');
+        });
+        const chosenWrap = objs.css[pickIdx];
+        if (chosenWrap) {
+            chosenWrap.userData.warm = { startDist: Math.max(1, camZ - gate._z) };
+            chosenWrap.userData.warmEl = objs.cards[pickIdx];
+            objs.cards[pickIdx].style.transition = 'none';
+        }
+        // The camera steers over to the chosen panel and flies through it
+        // at its spot on the ring (dock bend); beyond the gate the tunnel
+        // keeps turning in that direction (turn bend).
+        const slot = objs.css[pickIdx];
+        if (slot) {
+            const clampMag = v => Math.max(-650, Math.min(650, v));
+            const intro = { from: camZ, to: gate._z };
+            bends.push({
+                zStart: camZ,
+                len: Math.max(camZ - gate._z, 650),
+                dx: slot.userData.sx,
+                dy: slot.userData.sy,
+                intro: { ...intro },
+            });
+            bends.push({
+                zStart: gate._z - 120,
+                len: 1500,
+                dx: clampMag(slot.userData.sx * 1.6),
+                dy: clampMag(slot.userData.sy * 1.6),
+                intro: { ...intro },
+            });
+        }
+    }
+
+    if (userPicked) {
+        manualPicks++;
+        if (pickIdx !== seedIdx) divergences++;
+        $('divergence-count').textContent = divergences;
+    }
+
+    const alt = gate.alternatives[pickIdx];
+    appendTicker(alt ? ((alt.full_text ?? alt.text) || '') : '');
+
+    choicesDone++;
+    $('crumb-decision').textContent = `decision ${choicesDone} / ${totalChoices}`;
+    $('progress-bar').style.width = `${(choicesDone / totalChoices) * 100}%`;
+
+    nextIdx = gi + 1;
+    resolveTimer = 0.55 / Math.max(1, speedMult);
+    flightState = 'resolving';
+}
+
+function finishFlight() {
+    flightState = 'done';
+    curSpeed = 0;
+    $('method-chip').classList.remove('visible');
+    showEndScreen();
+}
+
+// ---------------------------------------------------------------
+// Ticker (assembled text)
+// ---------------------------------------------------------------
+function appendTicker(text) {
+    const tickerEl = $('ticker-text');
+    const clean = text.trim();
+    if (clean === '') return;
+
+    wordsAssembled += clean.split(/\s+/).length;
+    $('word-count').textContent = `${wordsAssembled.toLocaleString()} words`;
+
+    const span = document.createElement('span');
+    span.className = 'fresh';
+    const needsSpace = tickerEl.childNodes.length > 0 && !/^[,.;:!?'"”’)]/.test(clean);
+    span.innerHTML = (needsSpace ? ' ' : '') + styleMacros(escapeHtml(clean));
+    tickerEl.appendChild(span);
+    requestAnimationFrame(() => span.classList.remove('fresh'));
+
+    // trim old nodes
+    while (tickerEl.childNodes.length > 60) tickerEl.removeChild(tickerEl.firstChild);
+}
+
+function appendTickerMarker(label) {
+    const tickerEl = $('ticker-text');
+    const span = document.createElement('span');
+    span.className = 'ch-marker';
+    span.textContent = `  — ${label} —  `;
+    tickerEl.appendChild(span);
+}
+
+// ---------------------------------------------------------------
+// Chapter handling
+// ---------------------------------------------------------------
+function maybeChapterFlash(sourceFile) {
+    if (sourceFile === currentChapter) return;
+    currentChapter = sourceFile;
+    const name = chapterName(sourceFile);
+    $('crumb-chapter').textContent = name;
+    appendTickerMarker(name);
+
+    const flash = $('chapter-flash');
+    flash.textContent = name;
+    flash.classList.remove('fade');
+    flash.classList.add('show');
+    setTimeout(() => { flash.classList.remove('show'); flash.classList.add('fade'); }, 1300);
+}
+
+function jumpChapter(dir) {
+    if (!started || flightState === 'done') return;
+    const chapters = [...chapterFirstGate.keys()];
+    const curPos = chapters.indexOf(currentChapter);
+    const target = curPos + dir;
+    if (target < 0 || target >= chapters.length) return;
+
+    const gi = chapterFirstGate.get(chapters[target]);
+
+    // tear down everything and rebuild at the new position
+    for (const [i, objs] of [...built]) destroyItem(i, objs);
+    decideGate = -1;
+    $('choose-prompt').classList.add('hidden');
+    $('method-chip').classList.remove('visible');
+
+    nextIdx = gi;
+    // recompute progress up to this gate
+    choicesDone = flightItems.slice(0, gi).filter(d => d.type === 'CHOICE').length;
+    $('crumb-decision').textContent = `decision ${choicesDone} / ${totalChoices}`;
+    $('progress-bar').style.width = `${(choicesDone / totalChoices) * 100}%`;
+
+    camZ = flightItems[gi]._z + APPROACH_DIST + 300;
+    curSpeed = BASE_SPEED * speedMult;
+    flightState = 'cruise';
+    camYaw = 0; camPitch = 0;
+}
+
+// ---------------------------------------------------------------
+// Boot sequence
+// ---------------------------------------------------------------
+function runBootSequence(onDone) {
+    const overlay = $('boot-overlay');
+    const log = $('boot-log');
+    overlay.classList.remove('hidden');
+
+    let i = 0;
+    let finished = false;
+    const lines = bootDefines.map(d => {
+        const parts = d.alternatives.map(a => {
+            const p = (a.probability !== null && a.probability !== undefined) ? `${a.probability}>` : '';
+            const label = escapeHtml(p + (a.text || '∅'));
+            return a.chosen ? `<span class="def-chosen">${label}</span>` : `<span class="def-off">${label}</span>`;
+        }).join('  |  ');
+        return `<span class="def-kw">[DEFINE]</span>  ${parts || escapeHtml(String(d.chosen ?? ''))}`;
+    });
+
+    function addLine() {
+        if (finished) return;
+        if (i < lines.length) {
+            const div = document.createElement('div');
+            div.innerHTML = lines[i];
+            log.appendChild(div);
+            while (log.childNodes.length > 40) log.removeChild(log.firstChild);
+            i++;
+            setTimeout(addLine, 32);
+        } else {
+            finish();
+        }
+    }
+
+    function finish() {
+        if (finished) return;
+        finished = true;
+        const div = document.createElement('div');
+        div.innerHTML = `<br><span class="def-chosen">${bootDefines.length} variables set · ${totalChoices} choices queued · beginning render…</span>`;
+        log.appendChild(div);
+        setTimeout(() => {
+            overlay.classList.add('fade-out');
+            setTimeout(() => overlay.classList.add('hidden'), 700);
+            onDone();
+        }, 1100);
+    }
+
+    const skip = () => finish();
+    overlay.addEventListener('click', skip, { once: true });
+    const keySkip = e => { if (e.code === 'Space') { e.preventDefault(); finish(); document.removeEventListener('keydown', keySkip); } };
+    document.addEventListener('keydown', keySkip);
+
+    addLine();
+}
+
+// ---------------------------------------------------------------
+// End screen
+// ---------------------------------------------------------------
+function showEndScreen() {
+    const stats = [
+        { num: totalChoices.toLocaleString(), label: 'choices made' },
+        { num: wordsAssembled.toLocaleString(), label: 'words assembled' },
+        { num: (trace.summary?.methods_used?.discourse ?? 0).toLocaleString(), label: 'discourse-guided' },
+        { num: (trace.summary?.methods_used?.random ?? 0).toLocaleString(), label: 'pure random' },
+    ];
+    if (manualPicks > 0) {
+        stats.push({ num: `${divergences} / ${manualPicks}`, label: 'your picks diverged from the seed' });
+        $('end-seed-line').textContent = divergences === 0
+            ? `SEED ${SEED} · YOU MATCHED THE SEED EXACTLY`
+            : `SEED ${SEED} · YOU GENERATED A DIFFERENT BOOK`;
+    }
+    $('end-stats').innerHTML = stats.map(s =>
+        `<div class="stat-cell"><div class="stat-num">${s.num}</div><div class="stat-label">${s.label}</div></div>`
+    ).join('');
+    $('end-overlay').classList.remove('hidden');
+}
+
+// ---------------------------------------------------------------
+// Mode & controls
+// ---------------------------------------------------------------
+function setMode(m) {
+    mode = m;
+    $('mode-btn').textContent = m === 'auto' ? 'Autopilot' : 'Manual';
+    $('mode-btn').classList.toggle('active', m === 'manual');
+    $('divergence-chip').classList.toggle('hidden', m !== 'manual');
+    // If we're mid-decision, adapt
+    if (started && flightState === 'deciding' && m === 'manual' && decideGate >= 0) {
+        const gi = decideGate;
+        decideGate = -1;
+        const objs = built.get(gi);
+        if (objs) objs.cards.forEach(c => { c.classList.add('pickable'); c.style.pointerEvents = 'auto'; });
+        flightState = 'awaiting';
+        $('choose-prompt').classList.remove('hidden');
+    } else if (started && flightState === 'awaiting' && m === 'auto') {
+        const gi = nextGateIndex();
+        $('choose-prompt').classList.add('hidden');
+        const objs = built.get(gi);
+        if (objs) objs.cards.forEach(c => { c.classList.remove('pickable'); c.style.pointerEvents = 'none'; });
+        decideGate = gi;
+        decideTimer = 0.4;
+        flightState = 'deciding';
+    }
+}
+
+function setupControls() {
+    $('mode-btn').addEventListener('click', () => setMode(mode === 'auto' ? 'manual' : 'auto'));
+    $('about-btn').addEventListener('click', () => $('about-modal').classList.remove('hidden'));
+    $('about-close').addEventListener('click', () => $('about-modal').classList.add('hidden'));
+    $('about-modal').addEventListener('click', e => { if (e.target === $('about-modal')) $('about-modal').classList.add('hidden'); });
+
+    document.addEventListener('keydown', e => {
+        if (!started) return;
+        if (e.code === 'Space') {
+            e.preventDefault();
+            paused = !paused;
+            $('pause-badge').classList.toggle('hidden', !paused);
+        } else if (e.code === 'ArrowUp') {
+            speedMult = Math.min(10, speedMult * 1.3);
+            $('speed-display').textContent = speedMult.toFixed(1) + '×';
+        } else if (e.code === 'ArrowDown') {
+            speedMult = Math.max(0.4, speedMult / 1.3);
+            $('speed-display').textContent = speedMult.toFixed(1) + '×';
+        } else if (e.code === 'KeyM') {
+            setMode(mode === 'auto' ? 'manual' : 'auto');
+        } else if (e.code === 'KeyQ') {
+            jumpChapter(-1);
+        } else if (e.code === 'KeyE') {
+            jumpChapter(1);
+        } else if (e.code === 'Enter') {
+            // Skip: instantly resolve the pending decision, or fast-forward cruise to next gate
+            if (flightState === 'deciding' && decideGate >= 0) {
+                const gate = flightItems[decideGate];
+                const chosen = gate.chosen_index ?? gate.alternatives.findIndex(a => a.chosen);
+                const gi = decideGate;
+                decideGate = -1;
+                resolveGate(gi, chosen, false);
+            } else if (flightState === 'cruise') {
+                const gi = nextGateIndex();
+                if (gi >= 0) { camZ = flightItems[gi]._z + DECIDE_DIST + 30; }
+            }
+        } else if (e.code === 'Escape') {
+            $('about-modal').classList.add('hidden');
+        } else if (/^Digit[1-9]$/.test(e.code) && flightState === 'awaiting') {
+            const pick = parseInt(e.code.slice(5), 10) - 1;
+            const gi = nextGateIndex();
+            if (gi >= 0 && pick < flightItems[gi].alternatives.length) resolveGate(gi, pick, true);
+        }
+    });
+}
+
+// ---------------------------------------------------------------
+// Main loop
+// ---------------------------------------------------------------
+let lastTime = performance.now();
+let camYaw = 0, camPitch = 0;
+function animate() {
+    requestAnimationFrame(animate);
+    const now = performance.now();
+    let dt = (now - lastTime) / 1000;
+    lastTime = now;
+    dt = Math.min(dt, 0.05);
+
+    if (started && !paused && flightState !== 'done') {
+        updateFlight(dt);
+        foldBends();
+        ensureBuilt();
+        recyclePoints(dustPoints);
+        recyclePoints(sparkPoints);
+        rings.forEach(r => { if (r.position.z > camZ + 200) r.position.z -= RING_COUNT * RING_SPACING; });
+    }
+
+    // Camera rides the corridor centerline; yaw/pitch follow its tangent
+    // so the tunnel visibly turns toward each chosen path. Roll banks
+    // into horizontal turns; mouse adds a little parallax.
+    const c = centerline(camZ);
+    const px = mouseX * 26, py = -mouseY * 18;
+    camera.position.x += ((c.x + px) - camera.position.x) * Math.min(1, dt * 6);
+    camera.position.y += ((c.y + py) - camera.position.y) * Math.min(1, dt * 6);
+    camera.position.z = camZ;
+    const yawT = -Math.atan(c.dx);
+    const pitchT = Math.atan(c.dy);
+    camYaw += (yawT - camYaw) * Math.min(1, dt * 2.5);
+    camPitch += (pitchT - camPitch) * Math.min(1, dt * 2.5);
+    camera.rotation.y = camYaw;
+    camera.rotation.x = camPitch;
+    camera.rotation.z += ((camYaw * 0.55) - camera.rotation.z) * Math.min(1, dt * 2);
+
+    // Hyperspace FOV stretch at high autopilot speeds
+    const targetFov = 70 + (mode === 'auto' ? Math.min(22, Math.max(0, (speedMult - 4) * 3.2)) : 0);
+    if (Math.abs(camera.fov - targetFov) > 0.05) {
+        camera.fov += (targetFov - camera.fov) * Math.min(1, dt * 1.5);
+        camera.updateProjectionMatrix();
+    }
+
+    // Structures follow the corridor curve; rings and panels stay
+    // perpendicular to the local path tangent so the corridor reads as a
+    // twisting tube. CSS3D cards fade by distance.
+    for (const objs of built.values()) {
+        for (const o of objs.css) {
+            const cc = centerline(o.userData.z);
+            o.position.x = o.userData.sx + cc.x;
+            o.position.y = o.userData.sy + cc.y;
+            if (o.userData.face) {
+                o.rotation.y = -Math.atan(cc.dx);
+                o.rotation.x = Math.atan(cc.dy);
+            }
+            const d = o.position.z - camZ;   // negative when ahead
+            const dist = Math.abs(d);
+            let op;
+            if (d > 40) op = Math.max(0, 1 - (d - 40) / 260);          // behind camera: fade fast
+            else op = Math.max(0, Math.min(1, (3200 - dist) / 2400));  // ahead: fade in with distance
+            o.element.style.opacity = op.toFixed(2);
+            // Chosen panel: glow blooms with proximity, no step change
+            if (o.userData.warm) {
+                let k = 1 - Math.min(1, Math.max(0, (o.userData.z ? camZ - o.userData.z : 0) / o.userData.warm.startDist));
+                k = k * k * (3 - 2 * k);
+                const el = o.userData.warmEl;
+                el.style.borderColor = `rgba(255, 136, 0, ${(0.15 + 0.85 * k).toFixed(3)})`;
+                el.style.boxShadow = `0 0 ${(18 + 46 * k).toFixed(0)}px rgba(255, 136, 0, ${(0.08 + 0.62 * k).toFixed(3)})`;
+                el.style.backgroundColor = `rgba(${Math.round(14 + 16 * k)}, ${Math.round(22 + 4 * k)}, ${Math.round(38 - 24 * k)}, 0.94)`;
+            }
+        }
+        for (const m of objs.gl) {
+            const cc = centerline(m.userData.z);
+            m.position.x = cc.x;
+            m.position.y = cc.y;
+            m.rotation.y = -Math.atan(cc.dx);
+            m.rotation.x = Math.atan(cc.dy);
+            // Ring heats from cool slate to orange as the camera nears
+            if (m.userData.portal) {
+                let k = 1 - Math.min(1, Math.max(0, ((camZ - m.userData.z) - 150) / 2600));
+                k = k * k * (3 - 2 * k);
+                m.material.color.lerpColors(PORTAL_DIM, PORTAL_HOT, k);
+                m.material.opacity = 0.3 + 0.55 * k;
+            }
+        }
+    }
+    for (const r of rings) {
+        const cc = centerline(r.position.z);
+        r.position.x = cc.x;
+        r.position.y = cc.y;
+        r.rotation.y = -Math.atan(cc.dx);
+        r.rotation.x = Math.atan(cc.dy);
+    }
+
+    glRenderer.render(scene, camera);
+    cssRenderer.render(cssScene, camera);
+}
+
+// ---------------------------------------------------------------
+// Bootstrap
+// ---------------------------------------------------------------
+async function main() {
+    try {
+        await loadTrace();
+    } catch (err) {
+        const el = $('intro-error');
+        el.style.display = 'block';
+        el.textContent = `Failed to load trace data (${err.message}). If you're viewing this locally, serve the docs/ folder over HTTP.`;
+        return;
+    }
+
+    initScene();
+    setupControls();
+    animate();
+
+    function begin(chosenMode) {
+        setMode(chosenMode);
+        $('intro-overlay').classList.add('fade-out');
+        setTimeout(() => $('intro-overlay').classList.add('hidden'), 700);
+        runBootSequence(() => { started = true; lastTime = performance.now(); });
+    }
+    $('start-auto').addEventListener('click', () => begin('auto'));
+    $('start-manual').addEventListener('click', () => begin('manual'));
+
+    // Deep-link auto-start: flight.html?mode=auto|manual&boot=skip
+    const params = new URLSearchParams(window.location.search);
+    const pMode = params.get('mode');
+    if (pMode === 'auto' || pMode === 'manual') {
+        if (params.get('boot') === 'skip') bootDefines = [];
+        begin(pMode);
+    }
+}
+
+main();
+</script>
+</body>
+</html>
